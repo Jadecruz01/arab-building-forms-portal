@@ -307,10 +307,10 @@
   .calnav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
   .calnav button { width: auto; margin: 0; padding: 8px 14px; }
   .calmonth { font-family: var(--serif); font-weight: 600; font-size: 15.5px; color: var(--ink); margin: 0; text-align: center; flex: 1; }
-  .calgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .calgrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
   .calwd { text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); padding-bottom: 6px; }
-  .calday { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 12.5px; color: var(--ink); background: var(--bg); gap: 2px; }
-  .calday.empty { background: transparent; }
+  .calday { height: 46px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 12.5px; color: var(--ink); background: var(--bg); gap: 2px; }
+  .calday.empty { background: transparent; padding: 0; }
   .calday.has { background: var(--surface-alt); font-weight: 700; }
   .calday.today { outline: 2px solid var(--primary); outline-offset: -2px; }
   .caldots { display: flex; gap: 2px; }
@@ -408,6 +408,7 @@
   .formcard .chev{margin-top:0;font-size:22px;}
   .paynotice{padding:14px;} .paynotice .tx p{font-size:14px;} .paynotice .tx .lbl{font-size:12.5px;}
   .demoNotice{margin-top:14px;}
+  .calcard{padding:12px;} .calgrid{gap:4px;} .calday{height:44px;font-size:14px;border-radius:9px;} .calwd{font-size:11px;} .calnav button{padding:10px 14px;min-width:46px;} .calmonth{font-size:17px;} .calleg{font-size:12.5px;}
 }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
