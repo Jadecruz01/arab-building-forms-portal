@@ -10,7 +10,7 @@
  * they rarely change. CACHE_NAME is bumped to v2 so every existing
  * install immediately drops its old (stale) cache on first update.
  */
-var CACHE_NAME = 'arab-permits-shell-v2';
+var CACHE_NAME = 'arab-permits-shell-v3';
 var APP_SHELL = [
   './manifest.json',
   './icon-192.png',
@@ -43,7 +43,7 @@ self.addEventListener('fetch', function (event) {
   if (isNavigation) {
     // Network-first: always try to get the latest deployed page first.
     event.respondWith(
-      fetch(event.request).then(function (res) {
+      fetch(event.request, { cache: 'no-store' }).then(function (res) {
         if (res && res.ok) {
           var copy = res.clone();
           caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, copy); });
