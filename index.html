@@ -388,6 +388,7 @@
   .lede{display:none;} .lede-short{display:block;}
   .officialbar{font-size:12.5px;padding:9px 10px;}
   header.top h1{font-size:23px;}
+  header.top{position:static;}
   .qmenu-toggle{display:none !important;}
   .qmenu-panel,.qmenu-panel[hidden]{display:grid !important;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 8px;padding:0;border:0;background:transparent;box-shadow:none;}
   .qmenu-panel .calpromo.qmenu-item{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px !important;padding:16px 10px 14px !important;min-height:98px;margin:0;border-radius:14px;}
@@ -605,7 +606,7 @@
   var FORM_META = {
     owner:        { title:'Building Permit — Homeowner',   eyebrow:'Building Permit', sub:'For homeowners acting as their own contractor.' },
     contractor:   { title:'Building Permit — Contractor',  eyebrow:'Building Permit', sub:'For licensed contractors and general contractors.' },
-    subcontractor:{ title:'Sub-Contractor Permit',         eyebrow:'Building Permit', sub:'Electrical, HVAC, plumbing, gas and other sub-trades.' },
+    subcontractor:{ title:'Building Permit — Sub-Trade Contractor', eyebrow:'Building Permit', sub:'Electrical, HVAC, plumbing, gas and other sub-trades.' },
     sign:         { title:'Sign Permit Application',       eyebrow:'Sign Permit', sub:'A separate application is required for each sign.' },
     pool:         { title:'Swimming Pool Permit',          eyebrow:'Building Permit', sub:'Flat fee $50.' },
     demolition:   { title:'Demolition Permit',             eyebrow:'Building Permit', sub:'Flat fee $100.' },
@@ -1108,7 +1109,7 @@
     var apply = [
       {grp:'Building & trades', view:'owner', ic:ICONS.home, ttl:'Building Permit — Homeowner', dsc:'New construction, additions, remodels and single-trade work you are doing yourself.', fee:'Fee based on construction value'},
       {view:'contractor', ic:ICONS.helmet, ttl:'Building Permit — Contractor', dsc:'New construction, additions, remodels and single-trade work performed by a licensed contractor.', fee:'Fee based on construction value'},
-      {view:'subcontractor', ic:ICONS.plug, ttl:'Sub-Contractor Permit', dsc:'Electrical, HVAC, plumbing, gas and other sub-trades. Every sub-trade must pull its own permit.', fee:'Fee based on construction value'},
+      {view:'subcontractor', ic:ICONS.plug, ttl:'Building Permit — Sub-Trade Contractor', dsc:'Electrical, HVAC, plumbing, gas and other sub-trades. Every sub-trade must pull its own permit.', fee:'Fee based on construction value'},
       {grp:'Signs, pools & structures', view:'sign', ic:ICONS.sign, ttl:'Sign Permit', dsc:'Freestanding ground signs and building signs. One application per sign.', fee:'$50 non-illuminated · $75 illuminated'},
       {view:'pool', ic:ICONS.pool, ttl:'Swimming Pool Permit', dsc:'In-ground and above-ground pool installations.', fee:'$50 flat fee'},
       {view:'demolition', ic:ICONS.demo, ttl:'Demolition Permit', dsc:'Demolition of any building or structure.', fee:'$100 flat fee'},
@@ -2184,7 +2185,7 @@
   }
 
   /* ---------- staff preview: sync toggle + overview + report export + submitted test applications ---------- */
-  var TYPE_LABEL = { owner:'Building — Homeowner', contractor:'Building — Contractor', subcontractor:'Sub-Contractor', sign:'Sign', pool:'Pool', demolition:'Demolition', moving:'Moving', subdivision:'Subdivision', annexation:'Annexation' };
+  var TYPE_LABEL = { owner:'Building — Homeowner', contractor:'Building — Contractor', subcontractor:'Building — Sub-Trade Contractor', sign:'Sign', pool:'Pool', demolition:'Demolition', moving:'Moving', subdivision:'Subdivision', annexation:'Annexation' };
   var TYPE_ORDER = ['owner','contractor','subcontractor','sign','pool','demolition','moving','subdivision','annexation'];
 
   function computeTotals(records){
