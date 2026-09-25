@@ -1638,7 +1638,7 @@ input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.35em;
     var files = [];
     inputs.forEach(function(inp){
       var lbl = form.querySelector('label[for="' + inp.id + '"]');
-      Array.prototype.forEach.call(inp.files || [], function(file){ files.push({ field: inp.id, fieldLabel: lbl ? lbl.textContent.trim() : inp.id, file: file }); });
+      Array.prototype.forEach.call(inp.files || [], function(file){ files.push({ field: inp.id, fieldLabel: lbl ? lbl.textContent.replace(/\s*\*\s*$/, '').trim() : inp.id, file: file }); });
     });
     var total = 0;
     for (var i = 0; i < files.length; i++){
