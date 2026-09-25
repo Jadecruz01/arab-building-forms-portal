@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arab Building Forms</title>
 <style>
   :root {
@@ -378,6 +380,34 @@
 .qmenu-item .dsc,.qmenu-item .btn{display:none;}
 .qmenu-item .ttl{font-size:13.5px;}
 .demoNotice{margin:10px 0 0;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);text-align:center;}
+/* --- Phone layout for the home page (<=640px): fewer words, bigger targets, grouped list --- */
+.lede-short{display:none;color:var(--ink-soft);font-size:16px;line-height:1.5;margin:0 0 14px;}
+.grp{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 8px;}
+.cardgrid .grp:first-child{margin-top:0;}
+@media (max-width: 640px){
+  .lede{display:none;} .lede-short{display:block;}
+  .officialbar{font-size:12.5px;padding:9px 10px;}
+  header.top h1{font-size:23px;}
+  .qmenu-toggle{display:none !important;}
+  .qmenu-panel,.qmenu-panel[hidden]{display:grid !important;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 8px;padding:0;border:0;background:transparent;box-shadow:none;}
+  .qmenu-panel .calpromo.qmenu-item{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px !important;padding:16px 10px 14px !important;min-height:98px;margin:0;border-radius:14px;}
+  .qmenu-item .ic{width:42px;height:42px;flex:0 0 42px;border-radius:12px;}
+  .qmenu-item .ic svg{width:22px;height:22px;}
+  .qmenu-item .body{flex:none;min-width:0;}
+  .qmenu-item .ttl{font-size:15px;font-weight:700;margin:0;line-height:1.2;}
+  h2.section{font-size:19px;margin:22px 0 4px;}
+  .cardgrid{gap:8px;}
+  .formcard{align-items:center;padding:13px 14px;border-radius:14px;min-height:66px;gap:12px;}
+  .formcard:active{background:var(--surface-alt);}
+  .formcard .ic{width:44px;height:44px;border-radius:12px;}
+  .formcard .ic svg{width:22px;height:22px;}
+  .formcard .ttl{font-size:16px;margin:0 0 3px;line-height:1.3;}
+  .formcard .dsc{display:none;}
+  .formcard .fee{font-size:13px;margin-top:0;}
+  .formcard .chev{margin-top:0;font-size:22px;}
+  .paynotice{padding:14px;} .paynotice .tx p{font-size:14px;} .paynotice .tx .lbl{font-size:12.5px;}
+  .demoNotice{margin-top:14px;}
+}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
@@ -1076,17 +1106,18 @@
   /* ---------- home / landing page ---------- */
   function renderHome(main){
     var apply = [
-      {view:'owner', ic:ICONS.home, ttl:'Building Permit — Homeowner', dsc:'New construction, additions, remodels and single-trade work you are doing yourself.', fee:'Fee by construction value — see slide scale'},
-      {view:'contractor', ic:ICONS.helmet, ttl:'Building Permit — Contractor', dsc:'New construction, additions, remodels and single-trade work performed by a licensed contractor.', fee:'Fee by construction value — see slide scale'},
-      {view:'subcontractor', ic:ICONS.plug, ttl:'Sub-Contractor Permit', dsc:'Electrical, HVAC, plumbing, gas and other sub-trades. Every sub-trade must pull its own permit.', fee:'Fee by construction value — see slide scale'},
-      {view:'sign', ic:ICONS.sign, ttl:'Sign Permit', dsc:'Freestanding ground signs and building signs. One application per sign.', fee:'$50 non-illuminated · $75 illuminated'},
+      {grp:'Building & trades', view:'owner', ic:ICONS.home, ttl:'Building Permit — Homeowner', dsc:'New construction, additions, remodels and single-trade work you are doing yourself.', fee:'Fee based on construction value'},
+      {view:'contractor', ic:ICONS.helmet, ttl:'Building Permit — Contractor', dsc:'New construction, additions, remodels and single-trade work performed by a licensed contractor.', fee:'Fee based on construction value'},
+      {view:'subcontractor', ic:ICONS.plug, ttl:'Sub-Contractor Permit', dsc:'Electrical, HVAC, plumbing, gas and other sub-trades. Every sub-trade must pull its own permit.', fee:'Fee based on construction value'},
+      {grp:'Signs, pools & structures', view:'sign', ic:ICONS.sign, ttl:'Sign Permit', dsc:'Freestanding ground signs and building signs. One application per sign.', fee:'$50 non-illuminated · $75 illuminated'},
       {view:'pool', ic:ICONS.pool, ttl:'Swimming Pool Permit', dsc:'In-ground and above-ground pool installations.', fee:'$50 flat fee'},
       {view:'demolition', ic:ICONS.demo, ttl:'Demolition Permit', dsc:'Demolition of any building or structure.', fee:'$100 flat fee'},
       {view:'moving', ic:ICONS.truck, ttl:'Moving Permit', dsc:'Moving a building or structure into, out of, or within the city.', fee:'$100 flat fee'},
-      {view:'subdivision', ic:ICONS.plat, ttl:'Subdivision / Development Approval', dsc:'Sketch, preliminary or final plat review by the Planning Commission.', fee:'Reviewed monthly — NO FEE'},
-      {view:'annexation', ic:ICONS.annex, ttl:'Application for Annexation', dsc:'Petition to bring property into the City of Arab and its services.', fee:'Reviewed by the Planning Commission — NO FEE'}
+      {grp:'Planning Commission', view:'subdivision', ic:ICONS.plat, ttl:'Subdivision / Development Approval', dsc:'Sketch, preliminary or final plat review by the Planning Commission.', fee:'Reviewed monthly — no fee'},
+      {view:'annexation', ic:ICONS.annex, ttl:'Application for Annexation', dsc:'Petition to bring property into the City of Arab and its services.', fee:'Planning Commission review — no fee'}
     ];
     var html = '<p class="lede">Building permits are required to erect, enlarge, alter, demolish, or repair a structure in the City of Arab — everything from garages to commercial construction, signs and additions. Pick the form that matches your project below.</p>';
+    html += '<p class="lede-short">Choose the permit you need below and tap it to apply.</p>';
 
     html += '<a class="calpromo" href="#calendar"><div class="ic">'+ICONS.calendar+'</div><div class="body"><p class="ttl">City Calendar</p><p class="dsc">Planning Commission meetings, submission deadlines and office closures.</p></div><div class="btn">View live calendar<span aria-hidden="true">&rsaquo;</span></div></a>';
 
@@ -1105,6 +1136,7 @@
     html += '<h2 class="section">Apply online</h2>';
     html += '<div class="cardgrid">';
     apply.forEach(function(f){
+      if (f.grp) html += '<p class="grp">'+f.grp+'</p>';
       html += '<a class="formcard" href="#'+f.view+'"><div class="ic">'+f.ic+'</div><div class="body"><p class="ttl">'+f.ttl+'</p><p class="dsc">'+f.dsc+'</p><p class="fee">'+f.fee+'</p></div><div class="chev">&rsaquo;</div></a>';
     });
     html += '</div>';
