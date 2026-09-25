@@ -915,8 +915,97 @@
     } catch(e){}
   }
 
+  /* ---------- Supabase backend: real accounts, sessions and shared storage ----------
+   * The site talks only to a small set of bf_* database functions (see bf_schema.sql).
+   * Every call carries the signed-in session token; the database enforces who may
+   * read or change what. The key below is the project's publishable key — it is
+   * safe to ship in a web page and grants no table access on its own. */
+  var SB_URL = 'https://yighcuismepfmappcfui.supabase.co';
+  var SB_KEY = 'sb_publishable_nGh6iXqOO0iKTPo6uOvXSA_x4ZjIEUi';
+  var SB_TOKEN = null;
+  function sbRpc(fn, args){
+    return fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY },
+      body: JSON.stringify(args || {})
+    }).then(function(res){
+      return res.text().then(function(txt){
+        var body = null;
+        try { body = txt ? JSON.parse(txt) : null; } catch(e){ body = null; }
+        if (!res.ok){
+          var msg = (body && (body.message || body.hint || body.details)) || ('Request failed (' + res.status + ').');
+          var err = new Error(msg); err.status = res.status; throw err;
+        }
+        return body;
+      });
+    });
+  }
+  /* Minimal document-store client over the bf_* functions. Live lists refresh every
+   * 15 seconds and immediately after any change made from this browser. */
+  function makeSupabaseDb(){
+    var subs = [], gen = 0;
+    function mkDoc(id, data){ var has = data !== null && data !== undefined; return { id: id, exists: has, data: function(){ return has ? data : null; } }; }
+    function runQuery(q){
+      return sbRpc('bf_query', { p_token: SB_TOKEN, p_collection: q.coll, p_where_field: q.wf || null, p_where_value: (q.wv === undefined || q.wv === null) ? null : String(q.wv), p_order_field: q.of || null, p_order_dir: q.od || 'asc', p_limit: q.lim || 100 })
+        .then(function(rows){ return { docs: (rows || []).map(function(r){ return mkDoc(r.id, r.data); }) }; });
+    }
+    function refresh(coll){ subs.slice().forEach(function(s){ if (s.coll === coll) s.tick(); }); }
+    function subscribe(coll, fetchFn, cb, errCb){
+      var s = { coll: coll, gen: gen };
+      s.tick = function(){
+        if (s.gen !== gen) return;
+        fetchFn().then(function(res){ if (s.gen === gen) cb(res); }).catch(function(e){ if (s.gen === gen && errCb) errCb(e); });
+      };
+      s.timer = setInterval(s.tick, 15000);
+      subs.push(s);
+      s.tick();
+      return function(){ s.gen = -1; clearInterval(s.timer); };
+    }
+    function collection(coll){
+      var q = { coll: coll };
+      var api = {
+        where: function(f, op, val){ q.wf = f; q.wv = val; return api; },
+        orderBy: function(f, dir){ q.of = f; q.od = dir || 'asc'; return api; },
+        limit: function(n){ q.lim = n; return api; },
+        get: function(){ return runQuery(q); },
+        onSnapshot: function(cb, errCb){ return subscribe(coll, function(){ return runQuery(q); }, cb, errCb); },
+        add: function(data){ return sbRpc('bf_add', { p_token: SB_TOKEN, p_collection: coll, p_data: data }).then(function(id){ refresh(coll); return { id: id }; }); }
+      };
+      return api;
+    }
+    function doc(path){
+      var parts = String(path).split('/'), coll = parts[0], id = parts.slice(1).join('/');
+      function getData(){ return sbRpc('bf_get', { p_token: SB_TOKEN, p_collection: coll, p_id: id }).then(function(d){ return mkDoc(id, d); }); }
+      return {
+        get: getData,
+        set: function(data){ return sbRpc('bf_set', { p_token: SB_TOKEN, p_collection: coll, p_id: id, p_data: data }).then(function(){ refresh(coll); }); },
+        update: function(patch){ return sbRpc('bf_update', { p_token: SB_TOKEN, p_collection: coll, p_id: id, p_patch: patch }).then(function(){ refresh(coll); }); },
+        delete: function(){ return sbRpc('bf_delete', { p_token: SB_TOKEN, p_collection: coll, p_id: id }).then(function(){ refresh(coll); }); },
+        onSnapshot: function(cb, errCb){ return subscribe(coll, getData, cb, errCb); }
+      };
+    }
+    return { collection: collection, doc: doc, _reset: function(){ gen++; subs.forEach(function(s){ clearInterval(s.timer); }); subs = []; } };
+  }
+  /* Plain browser download (replaces the preview sandbox's download capability). */
+  function makeDownloads(){
+    return { save: function(opts){
+      return new Promise(function(resolve, reject){
+        try {
+          var blob = (opts.data instanceof Blob) ? opts.data : new Blob([opts.data]);
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url; a.download = opts.filename || 'download'; a.style.display = 'none';
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+          resolve({ ok: true });
+        } catch(e){ reject(e); }
+      });
+    } };
+  }
+
   function render(){
     applyKioskClass();
+    if (window.__db && window.__db._reset) window.__db._reset();
     var view = (location.hash||'').replace('#','') || 'home';
     if (isKiosk() && (view === 'staff' || view === 'inspect')){ navigate('home'); return; }
     if ((view === 'staff' || view === 'inspect') && !hasStaffAccess()){ navigate('account'); return; }
@@ -1497,9 +1586,9 @@
   }
   function renderConfirmation(kind, fee, status, permitNumber){
     var main = document.getElementById('main');
-    var note = status === 'saving' ? 'Saving your test submission…'
-      : status === 'saved' ? 'Saved to the staff preview list below the fold — this is a design test, not a real permit application.'
-      : status === 'error' ? 'Could not save this test submission (the design database was unavailable). The fee math above is still accurate.'
+    var note = status === 'saving' ? 'Submitting your application…'
+      : status === 'saved' ? 'Your application has been submitted to the Building Department. Keep your permit number — you’ll need it to check your status.'
+      : status === 'error' ? 'Your application could not be submitted right now (the server didn’t respond). Please check your connection and try again — nothing was saved.'
       : 'This preview isn’t connected to a database in this view, so nothing was saved — the fee math above is still accurate.';
     var html = '<div class="confirm"><div class="badge">&#10003;</div><h2>Application received</h2>';
     html += '<p>'+note+'</p>';
@@ -1531,12 +1620,27 @@
       var raw = localStorage.getItem('arabCitizenSession') || sessionStorage.getItem('arabCitizenSession');
       CURRENT_CITIZEN = raw ? JSON.parse(raw) : null;
     } catch(e){ CURRENT_CITIZEN = null; }
+    SB_TOKEN = (CURRENT_CITIZEN && CURRENT_CITIZEN.token) || null;
+  }
+  /* Re-check a remembered sign-in against the server (the session may have expired or the
+     account's access level may have changed since the last visit). */
+  function verifyCitizenSession(){
+    if (!CURRENT_CITIZEN || !SB_TOKEN) return Promise.resolve(false);
+    var remembered = false;
+    try { remembered = !!localStorage.getItem('arabCitizenSession'); } catch(e){}
+    return sbRpc('bf_me', { p_token: SB_TOKEN }).then(function(acc){
+      if (!acc){ clearCitizenSession(); return false; }
+      var changed = acc.role !== CURRENT_CITIZEN.role || acc.name !== CURRENT_CITIZEN.name;
+      saveCitizenSession({ id: acc.id, email: acc.email, name: acc.name, role: acc.role || 'citizen', token: SB_TOKEN }, remembered);
+      return changed;
+    }).catch(function(){ return false; });
   }
   /* remember=true (default) keeps the session across browser restarts (localStorage);
      remember=false keeps it only for this tab/window (sessionStorage) — the honest,
      no-real-backend equivalent of an unchecked "remember me" box. */
   function saveCitizenSession(c, remember){
     CURRENT_CITIZEN = c;
+    SB_TOKEN = (c && c.token) || null;
     if (remember === undefined) remember = true;
     try {
       if (remember){ localStorage.setItem('arabCitizenSession', JSON.stringify(c)); sessionStorage.removeItem('arabCitizenSession'); }
@@ -1544,7 +1648,9 @@
     } catch(e){}
   }
   function clearCitizenSession(){
+    if (SB_TOKEN){ try { sbRpc('bf_sign_out', { p_token: SB_TOKEN }).catch(function(){}); } catch(e){} }
     CURRENT_CITIZEN = null;
+    SB_TOKEN = null;
     try { localStorage.removeItem('arabCitizenSession'); sessionStorage.removeItem('arabCitizenSession'); } catch(e){}
   }
   /*
@@ -1595,7 +1701,7 @@
     html += '<p class="reportstatus" id="suStatus"></p>';
     html += '</div>';
     html += '<p class="acctnote">Building Department staff use this same sign-in — once your access has been granted by an administrator, signing in here also unlocks the staff dashboard.</p>';
-    html += '<p class="acctpasskeynote"><b>About “sign in faster”:</b> this design preview can’t register a real passkey — that needs a live, secure domain to work. Checking “Remember me” keeps you signed in on this device instead, so you skip retyping your password next time. <b>Design-prototype note:</b> this login exists to test the feature and isn’t a production authentication system yet.</p>';
+    html += '<p class="acctpasskeynote"><b>Remember me</b> keeps you signed in on this device for 30 days so you skip retyping your password next time. Leave it unchecked on a shared or public computer — you’ll then be signed out when you close the browser.</p>';
     html += '</div></div>';
     main.innerHTML = html;
 
@@ -1610,25 +1716,21 @@
       var email = v('siEmail').trim(), pass = v('siPass');
       var stEl = document.getElementById('siStatus');
       if (!email || !pass){ setStatus(stEl,'Enter your email and password.',false); return; }
-      if (!window.__db){ setStatus(stEl,'Sign-in isn’t connected to the design database in this view.',false); return; }
       setStatus(stEl,'Signing in…');
-      var key = citizenKey(email);
-      window.__db.doc('citizens/'+key).get().then(function(doc){
-        if (!doc || !doc.exists){ setStatus(stEl,'No account found with that email.',false); return; }
-        var data = doc.data();
-        return hashPassword(pass).then(function(hash){
-          if (hash !== data.passHash){ setStatus(stEl,'Incorrect password.',false); return; }
-          var remember = document.getElementById('siRemember');
-          remember = !remember || remember.checked;
-          try {
-            if (remember) localStorage.setItem('arabRememberedEmail', data.email);
-            else localStorage.removeItem('arabRememberedEmail');
-          } catch(e){}
-          saveCitizenSession({ id:key, email:data.email, name:data.name, role:data.role||'citizen' }, remember);
-          if (hasStaffAccess()) navigate('staff');
-          else renderAccountPage(document.getElementById('main'));
-        });
-      }).catch(function(){ setStatus(stEl,'Something went wrong signing in — please try again.',false); });
+      var remember = document.getElementById('siRemember');
+      remember = !remember || remember.checked;
+      hashPassword(pass).then(function(hash){
+        return sbRpc('bf_sign_in', { p_email: email, p_pass: hash, p_remember: remember });
+      }).then(function(res){
+        var acc = res.account;
+        try {
+          if (remember) localStorage.setItem('arabRememberedEmail', acc.email);
+          else localStorage.removeItem('arabRememberedEmail');
+        } catch(e){}
+        saveCitizenSession({ id:acc.id, email:acc.email, name:acc.name, role:acc.role||'citizen', token:res.token }, remember);
+        if (hasStaffAccess()) navigate('staff');
+        else renderAccountPage(document.getElementById('main'));
+      }).catch(function(err){ setStatus(stEl, (err && err.message) || 'Something went wrong signing in — please try again.', false); });
     });
 
     document.getElementById('suBtn').addEventListener('click', function(){
@@ -1638,24 +1740,20 @@
       if (!/^\S+@\S+\.\S+$/.test(email)){ setStatus(stEl,'Enter a valid email address.',false); return; }
       if (pass.length < 6){ setStatus(stEl,'Password must be at least 6 characters.',false); return; }
       if (pass !== confirmPass){ setStatus(stEl,'Passwords don’t match.',false); return; }
-      if (!window.__db){ setStatus(stEl,'Sign-up isn’t connected to the design database in this view.',false); return; }
       setStatus(stEl,'Creating your account…');
-      var key = citizenKey(email);
-      window.__db.doc('citizens/'+key).get().then(function(doc){
-        if (doc && doc.exists){ setStatus(stEl,'An account with that email already exists — sign in instead.',false); return; }
-        return hashPassword(pass).then(function(hash){
-          return window.__db.doc('citizens/'+key).set({ email:email, name:name, passHash:hash, role:'citizen', createdAt:new Date().toISOString() }).then(function(){
-            var remember = document.getElementById('suRemember');
-            remember = !remember || remember.checked;
-            try {
-              if (remember) localStorage.setItem('arabRememberedEmail', email);
-              else localStorage.removeItem('arabRememberedEmail');
-            } catch(e){}
-            saveCitizenSession({ id:key, email:email, name:name, role:'citizen' }, remember);
-            renderAccountPage(document.getElementById('main'));
-          });
-        });
-      }).catch(function(){ setStatus(stEl,'Something went wrong creating your account — please try again.',false); });
+      var remember = document.getElementById('suRemember');
+      remember = !remember || remember.checked;
+      hashPassword(pass).then(function(hash){
+        return sbRpc('bf_sign_up', { p_email: email, p_name: name, p_pass: hash, p_remember: remember });
+      }).then(function(res){
+        var acc = res.account;
+        try {
+          if (remember) localStorage.setItem('arabRememberedEmail', acc.email);
+          else localStorage.removeItem('arabRememberedEmail');
+        } catch(e){}
+        saveCitizenSession({ id:acc.id, email:acc.email, name:acc.name, role:acc.role||'citizen', token:res.token }, remember);
+        renderAccountPage(document.getElementById('main'));
+      }).catch(function(err){ setStatus(stEl, (err && err.message) || 'Something went wrong creating your account — please try again.', false); });
     });
   }
   function renderAccountDashboard(main){
@@ -2842,13 +2940,15 @@
 
   /* ---------- boot ---------- */
   function boot(){
+    window.__db = makeSupabaseDb();
+    window.__downloads = makeDownloads();
     loadCitizenSession();
     render();
     setupPWA();
-    if (window.claude && window.claude.use){
-      window.claude.use('db').then(function(db){ window.__db = db; var v = (location.hash||'').replace('#',''); if (v==='staff' || v==='calendar' || (v==='account' && CURRENT_CITIZEN)) render(); });
-      window.claude.use('downloads').then(function(dl){ window.__downloads = dl; });
-    }
+    verifyCitizenSession().then(function(changed){
+      var v = (location.hash||'').replace('#','');
+      if (changed || (!CURRENT_CITIZEN && (v==='staff' || v==='inspect' || v==='account'))) render();
+    });
   }
   if (window.claude && window.claude.hot){
     window.claude.hot.ready ? window.claude.hot.ready(boot) : boot();
