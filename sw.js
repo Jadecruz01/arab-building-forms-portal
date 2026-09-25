@@ -1,18 +1,17 @@
 /*
  * City of Arab Building Department — Online Forms
- * Minimal app-shell service worker. This is here so the prototype is ready
- * to be genuinely installable once it's ported to the live site (Claude's
- * artifact sandbox does not allow service workers to register, so this
- * file simply sits unused while the prototype lives on claude.ai).
+ * App-shell service worker for the installed PWA.
  *
- * Strategy: cache the app shell on install, serve it cache-first, and fall
- * back to the network for anything not cached (so CDN scripts, fonts, and
- * any future backend calls still work normally).
+ * Strategy (v2 — fixes a stale-content bug): HTML page loads are network-
+ * first, so a browser with this service worker already installed always
+ * gets the latest deployed index.html instead of an indefinitely cached
+ * copy; the last successful page load is still cached as an offline
+ * fallback. Static shell assets (manifest, icons) stay cache-first, since
+ * they rarely change. CACHE_NAME is bumped to v2 so every existing
+ * install immediately drops its old (stale) cache on first update.
  */
-var CACHE_NAME = 'arab-permits-shell-v1';
+var CACHE_NAME = 'arab-permits-shell-v2';
 var APP_SHELL = [
-  './',
-  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -38,11 +37,32 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   if (event.request.method !== 'GET') return;
+
+  var isNavigation = event.request.mode === 'navigate' || event.request.destination === 'document';
+
+  if (isNavigation) {
+    // Network-first: always try to get the latest deployed page first.
+    event.respondWith(
+      fetch(event.request).then(function (res) {
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, copy); });
+        }
+        return res;
+      }).catch(function () {
+        return caches.match(event.request).then(function (cached) {
+          return cached || caches.match('./index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  // Everything else (CSS/JS/images/fonts): cache-first, fall back to network.
   event.respondWith(
     caches.match(event.request).then(function (cached) {
       if (cached) return cached;
       return fetch(event.request).then(function (res) {
-        // Only cache same-origin, successful responses (leave CDN/opaque responses alone).
         if (res && res.ok && new URL(event.request.url).origin === self.location.origin) {
           var copy = res.clone();
           caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, copy); });
