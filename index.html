@@ -410,6 +410,58 @@
   .demoNotice{margin-top:14px;}
   .calcard{padding:12px;} .calgrid{gap:4px;} .calday{height:44px;font-size:14px;border-radius:9px;} .calwd{font-size:11px;} .calnav button{padding:10px 14px;min-width:46px;} .calmonth{font-size:17px;} .calleg{font-size:12.5px;}
 }
+/* --- Header account button, staff tabs, app settings, notices, splash, phone tables --- */
+.hdracct{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--primary);font-weight:700;font-size:12.5px;text-decoration:none;white-space:nowrap;}
+.hdracct svg{width:16px;height:16px;}
+.hdracct:hover{border-color:var(--primary);}
+.inspmodebtn:not([hidden]) ~ .hdracct{margin-left:8px;}
+.staff-link{display:none;}
+.stabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 10px;margin:0 0 4px;border-bottom:1px solid var(--border);scrollbar-width:none;}
+.stabs::-webkit-scrollbar{display:none;}
+.stabs button{flex:0 0 auto;padding:9px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;margin:0;width:auto;}
+.stabs button[aria-selected="true"]{background:var(--primary);color:#fff;border-color:var(--primary);}
+.stab[hidden]{display:none;}
+.stab > h2.section:first-child{margin-top:14px;}
+#app.staffwide .acctwelcome{padding:10px 14px;margin-bottom:10px;}
+#app.staffwide .acctwelcome .who p.name{font-size:15px;}
+.appset{display:grid;gap:14px;}
+.iconprev{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.iconprev img{width:72px;height:72px;border-radius:16px;border:1px solid var(--border);background:#fff;object-fit:cover;}
+.iconprev .lbl{font-size:12px;color:var(--ink-soft);}
+.btnrow2{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.btnrow2 button{width:auto;margin:0;}
+.noticelist .nrow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);}
+.noticelist .nrow p{margin:0;}
+.noticelist .nrow .t{font-weight:700;font-size:13.5px;}
+.noticelist .nrow .m{font-size:12.5px;color:var(--ink-soft);}
+.noticelist .nrow button{width:auto;margin:0;padding:6px 10px;font-size:12px;}
+.noticebar{background:var(--gold-bg);border-bottom:1px solid var(--gold);padding:10px 16px;display:flex;justify-content:center;}
+.noticebar .inner{max-width:560px;width:100%;display:flex;gap:10px;align-items:flex-start;}
+.noticebar .ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--gold);color:var(--gold-ink);display:flex;align-items:center;justify-content:center;}
+.noticebar .ic svg{width:15px;height:15px;}
+.noticebar .tx{flex:1;min-width:0;font-size:13px;line-height:1.45;color:var(--ink);}
+.noticebar .tx b{display:block;font-size:13.5px;}
+.noticebar .tx a{color:var(--primary);font-weight:700;}
+.noticebar .x{flex:0 0 auto;border:0;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:var(--ink-soft);padding:0 4px;width:auto;margin:0;}
+.splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;transition:opacity .4s;}
+.splash img{width:96px;height:96px;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.25);}
+.splash .t{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;}
+.splash .s{font-size:14px;opacity:.85;margin:0;}
+.splash.out{opacity:0;pointer-events:none;}
+@media (max-width:640px){
+  .qmenu-panel .qmenu-item:nth-child(3):last-child{grid-column:1/-1;}
+  table.sublist thead{display:none;}
+  table.sublist,table.sublist tbody,table.sublist tr,table.sublist td{display:block;width:100%;}
+  table.sublist tr{border:1px solid var(--border);border-radius:12px;padding:8px 12px;margin-bottom:10px;background:var(--surface);}
+  table.sublist td{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--border);font-size:13.5px;text-align:right;}
+  table.sublist td:last-child{border-bottom:0;}
+  table.sublist td::before{content:attr(data-label);color:var(--ink-soft);font-weight:700;font-size:12px;flex:0 0 38%;text-align:left;}
+  table.sublist td[data-label=""]::before{display:none;}
+  table.sublist td.empty{display:block;text-align:center;}
+  table.sublist td button{width:100% !important;padding:10px 12px !important;font-size:14px !important;}
+  .exportrow{grid-template-columns:1fr;}
+  .stabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;}
+}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
@@ -424,6 +476,7 @@
         <h1 id="pageTitle">Building Department Online Forms</h1>
       </div>
       <button type="button" class="inspmodebtn" id="inspModeBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4.5" width="14" height="17" rx="1.5"/><path d="M8.5 11.3l2 2 4-4.3M8.5 16.5h7"/></svg><span>Inspection Mode</span></button>
+      <a class="hdracct" id="hdrAcct" href="#account" hidden></a>
     </div>
     <p class="sub" id="pageSub"></p>
   </header>
@@ -617,7 +670,7 @@
     calendar:     { title:'City Calendar',                 eyebrow:'Building Department', sub:'Meetings, submission deadlines and office closures.' },
     search:       { title:'Search My Permit',              eyebrow:'Building Department', sub:'Look up the status of a permit you already applied for.' },
     account:      { title:'My Account',                    eyebrow:'Building Department', sub:'Sign in to see the status of every permit you’ve applied for.' },
-    staff:        { title:'Staff Preview',                 eyebrow:'Internal', sub:'Test submissions and sync settings — not part of the public site.' },
+    staff:        { title:'Staff Dashboard',               eyebrow:'Internal', sub:'Applications, reports, calendar and app settings.' },
     inspect:      { title:'Inspection Mode',                eyebrow:'Building Inspector', sub:'Large-touch view for recording inspections on site, built for iPad and iPhone.' }
   };
 
@@ -1035,6 +1088,270 @@
     } };
   }
 
+  /* ---------- Header account button + fee-page pay notice ---------- */
+  var FEE_VIEWS = ['home','owner','contractor','subcontractor','sign','pool','demolition','moving'];
+  function updateHeaderAccount(view){
+    var a = document.getElementById('hdrAcct');
+    if (!a) return;
+    var hide = (view === 'inspect' || view === 'account' || view === 'staff' || isKiosk());
+    a.hidden = hide;
+    if (hide) return;
+    if (CURRENT_CITIZEN){
+      var first = String(CURRENT_CITIZEN.name || '').trim().split(' ')[0] || 'My Account';
+      a.innerHTML = ICONS.account + '<span>' + esc(hasStaffAccess() ? 'Dashboard' : first) + '</span>';
+      a.href = hasStaffAccess() ? '#staff' : '#account';
+    } else {
+      a.innerHTML = ICONS.account + '<span>Sign in</span>';
+      a.href = '#account';
+    }
+  }
+  function updatePayNotice(view){
+    var el = document.querySelector('.paynotice');
+    if (el) el.hidden = FEE_VIEWS.indexOf(view) === -1;
+  }
+
+  /* ---------- App settings (icon, splash screen) + notifications ---------- */
+  var APP_SETTINGS = null;
+  var NOTICES = [];
+  var DEFAULT_SPLASH = { enabled:false, title:'City of Arab', subtitle:'Building Department Online Forms', bg:'#0F3273', fg:'#FBF9F4', seconds:2, web:false };
+  var BELL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+  function loadAppSettings(){
+    return sbRpc('bf_get', { p_token: null, p_collection: 'settings', p_id: 'app' })
+      .then(function(d){ APP_SETTINGS = d || {}; return APP_SETTINGS; })
+      .catch(function(){ APP_SETTINGS = APP_SETTINGS || {}; return APP_SETTINGS; });
+  }
+  function appIconSrc(size){
+    var s = APP_SETTINGS || {};
+    return s['icon' + size] || s.icon512 || (size === 180 ? 'apple-touch-icon.png' : 'icon-' + size + '.png');
+  }
+  function applyAppSettings(){
+    var s = APP_SETTINGS || {};
+    try {
+      if (s.icon512){
+        var man = {
+          name: 'City of Arab Building Department', short_name: 'Arab Permits',
+          start_url: location.origin + '/', scope: location.origin + '/', display: 'standalone',
+          background_color: (s.splash && s.splash.bg) || '#F6F4EC', theme_color: '#0F3273',
+          icons: [ { src: s.icon192 || s.icon512, sizes: '192x192', type: 'image/png' }, { src: s.icon512, sizes: '512x512', type: 'image/png' } ]
+        };
+        var link = document.querySelector('link[rel="manifest"]');
+        if (!link){ link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+        link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(man));
+        var at = document.querySelector('link[rel="apple-touch-icon"]');
+        if (at) at.href = s.icon180 || s.icon512;
+      }
+    } catch(e){}
+    showSplash(s.splash);
+  }
+  function showSplash(sp){
+    sp = sp || {};
+    if (!sp.enabled) return;
+    if (!isStandaloneMode() && !sp.web) return;
+    try {
+      if (sessionStorage.getItem('arabSplashShown')) return;
+      sessionStorage.setItem('arabSplashShown', '1');
+    } catch(e){}
+    renderSplash(sp);
+  }
+  function renderSplash(sp){
+    var old = document.getElementById('splashScreen'); if (old) old.remove();
+    var el = document.createElement('div');
+    el.className = 'splash'; el.id = 'splashScreen';
+    el.style.background = sp.bg || '#0F3273';
+    el.style.color = sp.fg || '#FBF9F4';
+    el.innerHTML = '<img src="' + esc(appIconSrc(192)) + '" alt=""><p class="t">' + esc(sp.title || 'City of Arab') + '</p>' + (sp.subtitle ? '<p class="s">' + esc(sp.subtitle) + '</p>' : '');
+    document.body.appendChild(el);
+    var ms = Math.max(500, Math.min(8000, (Number(sp.seconds) || 2) * 1000));
+    setTimeout(function(){ el.classList.add('out'); setTimeout(function(){ el.remove(); }, 450); }, ms);
+  }
+  function loadNotices(){
+    return sbRpc('bf_query', { p_token: null, p_collection: 'notices', p_where_field: null, p_where_value: null, p_order_field: 'createdAt', p_order_dir: 'desc', p_limit: 20 })
+      .then(function(rows){ NOTICES = (rows || []).map(function(r){ var d = r.data || {}; d.id = r.id; return d; }); paintNoticeBar(); })
+      .catch(function(){});
+  }
+  function readList(key){ try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; } }
+  function pushList(key, id){ try { var l = readList(key); l.push(id); localStorage.setItem(key, JSON.stringify(l.slice(-50))); } catch(e){} }
+  function activeNotices(){
+    var now = Date.now(), dismissed = readList('arabDismissedNotices');
+    return NOTICES.filter(function(n){ return (!n.expiresAt || new Date(n.expiresAt).getTime() > now) && dismissed.indexOf(n.id) === -1; });
+  }
+  function paintNoticeBar(){
+    var old = document.getElementById('noticeBar'); if (old) old.remove();
+    var list = activeNotices();
+    if (!list.length || isKiosk()) return;
+    var n = list[0];
+    var bar = document.createElement('div');
+    bar.className = 'noticebar'; bar.id = 'noticeBar';
+    bar.innerHTML = '<div class="inner"><span class="ic">' + BELL_ICON + '</span><div class="tx"><b>' + esc(n.title || 'Notice') + '</b>' + esc(n.message || '') +
+      (n.link ? ' <a href="' + esc(n.link) + '" target="_blank" rel="noopener">Learn more &rsaquo;</a>' : '') +
+      (list.length > 1 ? ' <span style="color:var(--ink-soft)">(+' + (list.length - 1) + ' more)</span>' : '') +
+      '</div><button type="button" class="x" aria-label="Dismiss">&times;</button></div>';
+    bar.querySelector('.x').addEventListener('click', function(){ pushList('arabDismissedNotices', n.id); paintNoticeBar(); });
+    var ob = document.querySelector('.officialbar');
+    if (ob && ob.parentNode) ob.parentNode.insertBefore(bar, ob.nextSibling); else document.body.insertBefore(bar, document.body.firstChild);
+    maybeSystemNotify(n);
+  }
+  function maybeSystemNotify(n){
+    try {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      if (readList('arabNotifiedNotices').indexOf(n.id) !== -1) return;
+      pushList('arabNotifiedNotices', n.id);
+      if (navigator.serviceWorker && navigator.serviceWorker.ready){
+        navigator.serviceWorker.ready.then(function(reg){ return reg.showNotification(n.title || 'City of Arab', { body: n.message || '', icon: appIconSrc(192) }); }).catch(function(){});
+      }
+    } catch(e){}
+  }
+  /* Resize an uploaded image to the three PNG sizes the app needs. */
+  function makeIconSet(file){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function(){
+        try {
+          var out = {};
+          [512, 192, 180].forEach(function(size){
+            var c = document.createElement('canvas'); c.width = size; c.height = size;
+            var ctx = c.getContext('2d');
+            var side = Math.min(img.naturalWidth, img.naturalHeight);
+            var sx = (img.naturalWidth - side) / 2, sy = (img.naturalHeight - side) / 2;
+            ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+            out['icon' + size] = c.toDataURL('image/png');
+          });
+          URL.revokeObjectURL(url);
+          resolve(out);
+        } catch(e){ reject(e); }
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('That file could not be read as an image.')); };
+      img.src = url;
+    });
+  }
+  function renderAppSettings(sec){
+    if (!sec) return;
+    var s = APP_SETTINGS || {};
+    var sp = {}; Object.keys(DEFAULT_SPLASH).forEach(function(k){ sp[k] = DEFAULT_SPLASH[k]; }); Object.keys(s.splash || {}).forEach(function(k){ sp[k] = s.splash[k]; });
+    var html = '<h2 class="section">App</h2><p class="section-note">Customize the installed app: its home-screen icon, an opening splash screen, and notifications shown to everyone who opens the site or the app.</p>';
+    html += '<div class="appset">';
+    html += '<div class="card"><p class="ttl" style="font-weight:700;margin:0 0 8px">App icon</p><div class="iconprev"><img id="appIconPrev" src="' + esc(appIconSrc(192)) + '" alt="App icon"><div><p class="lbl" style="margin:0 0 6px">Square image, at least 512 &times; 512 (PNG or JPG). It is resized automatically.</p><input type="file" id="appIconFile" accept="image/png,image/jpeg,image/webp"></div></div>';
+    html += '<div class="btnrow2"><button type="button" class="primary" id="appIconSave" disabled>Save icon</button><button type="button" class="ghost" id="appIconReset">Use default icon</button></div><p class="reportstatus" id="appIconStatus"></p>';
+    html += '<p class="hint" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 0">Android and desktop installs use the new icon from their next install. iPhone home-screen icons come from a file on the site itself &mdash; send the icon image to Claude to bake it in for iPhone too.</p></div>';
+    html += '<div class="card"><div class="togglebar" style="margin:0 0 12px;padding:0;border:0;background:transparent;box-shadow:none"><div><p class="ttl">Splash screen</p><p class="dsc">A short branded screen when the app opens.</p></div><label class="switch"><input type="checkbox" id="spEnabled" ' + (sp.enabled ? 'checked' : '') + '><span class="track"></span><span class="thumb"></span></label></div>';
+    html += fText('spTitle', 'Title', { value: sp.title }) + fText('spSubtitle', 'Subtitle', { value: sp.subtitle });
+    html += '<div class="daterow"><div class="field" style="margin:0"><label for="spBg">Background color</label><input type="color" id="spBg" value="' + esc(sp.bg) + '" style="height:42px;padding:2px"></div><div class="field" style="margin:0"><label for="spFg">Text color</label><input type="color" id="spFg" value="' + esc(sp.fg) + '" style="height:42px;padding:2px"></div></div>';
+    html += '<div class="field" style="margin-top:12px"><label for="spSeconds">Show for</label><select id="spSeconds">' + [1,2,3,4,5].map(function(n){ return '<option value="' + n + '"' + (Number(sp.seconds) === n ? ' selected' : '') + '>' + n + ' second' + (n > 1 ? 's' : '') + '</option>'; }).join('') + '</select></div>';
+    html += '<div class="rememberrow" style="margin:0 0 12px"><input type="checkbox" id="spWeb" ' + (sp.web ? 'checked' : '') + '><label for="spWeb">Also show when the site is opened in a web browser (not just the installed app)</label></div>';
+    html += '<div class="btnrow2"><button type="button" class="primary" id="spSave">Save splash screen</button><button type="button" class="ghost" id="spPreview">Preview</button></div><p class="reportstatus" id="spStatus"></p></div>';
+    html += '<div class="card"><p class="ttl" style="font-weight:700;margin:0 0 4px">Send a notification</p><p class="dsc" style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px">Shown as a banner at the top of the site and the app for everyone until they dismiss it. On phones with the app installed and alerts allowed, it also appears as a phone notification when the app is opened.</p>';
+    html += fText('ntTitle', 'Title', { placeholder: 'e.g. Office closed Monday' }) + fTextarea('ntMessage', 'Message', { placeholder: 'What people need to know.' }) + fText('ntLink', 'Link (optional)', { type: 'url', placeholder: 'https://' });
+    html += '<div class="field"><label for="ntExpires">Stop showing after</label><select id="ntExpires"><option value="1">1 day</option><option value="7" selected>7 days</option><option value="30">30 days</option><option value="0">Never (until deleted)</option></select></div>';
+    html += '<div class="btnrow2"><button type="button" class="primary" id="ntSend">Send notification</button></div><p class="reportstatus" id="ntStatus"></p>';
+    html += '<p class="filterlbl" style="margin-top:16px">Sent notifications</p><div class="noticelist" id="noticeList"><p class="reportstatus">Loading&hellip;</p></div></div>';
+    html += '</div>';
+    sec.innerHTML = html;
+
+    function st(id, msg, ok){ var el = document.getElementById(id); if (!el) return; el.textContent = msg; el.className = 'reportstatus' + (ok === true ? ' ok' : ok === false ? ' err' : ''); }
+    function saveSettings(next, statusId, okMsg){
+      st(statusId, 'Saving…');
+      return window.__db.doc('settings/app').set(next).then(function(){
+        APP_SETTINGS = next; applyAppSettings(); st(statusId, okMsg, true);
+      }).catch(function(err){ st(statusId, (err && err.message) || 'Could not save.', false); });
+    }
+    var pendingIcons = null;
+    document.getElementById('appIconFile').addEventListener('change', function(){
+      var f = this.files && this.files[0]; if (!f) return;
+      st('appIconStatus', 'Preparing icon…');
+      makeIconSet(f).then(function(set){
+        pendingIcons = set;
+        document.getElementById('appIconPrev').src = set.icon192;
+        document.getElementById('appIconSave').disabled = false;
+        st('appIconStatus', 'Looks good — click Save icon to use it.');
+      }).catch(function(err){ st('appIconStatus', err.message || 'Could not read that image.', false); });
+    });
+    document.getElementById('appIconSave').addEventListener('click', function(){
+      if (!pendingIcons) return;
+      var next = {}; Object.keys(APP_SETTINGS || {}).forEach(function(k){ next[k] = APP_SETTINGS[k]; });
+      next.icon512 = pendingIcons.icon512; next.icon192 = pendingIcons.icon192; next.icon180 = pendingIcons.icon180; next.iconUpdatedAt = new Date().toISOString();
+      saveSettings(next, 'appIconStatus', 'Icon saved.').then(function(){ pendingIcons = null; document.getElementById('appIconSave').disabled = true; });
+    });
+    document.getElementById('appIconReset').addEventListener('click', function(){
+      var next = {}; Object.keys(APP_SETTINGS || {}).forEach(function(k){ if (k.indexOf('icon') !== 0) next[k] = APP_SETTINGS[k]; });
+      saveSettings(next, 'appIconStatus', 'Default icon restored.').then(function(){ document.getElementById('appIconPrev').src = 'icon-192.png'; });
+    });
+    function splashFromForm(){
+      return { enabled: document.getElementById('spEnabled').checked, title: v('spTitle').trim(), subtitle: v('spSubtitle').trim(), bg: v('spBg'), fg: v('spFg'), seconds: Number(v('spSeconds')) || 2, web: document.getElementById('spWeb').checked };
+    }
+    document.getElementById('spPreview').addEventListener('click', function(){ renderSplash(splashFromForm()); });
+    document.getElementById('spSave').addEventListener('click', function(){
+      var next = {}; Object.keys(APP_SETTINGS || {}).forEach(function(k){ next[k] = APP_SETTINGS[k]; });
+      next.splash = splashFromForm();
+      saveSettings(next, 'spStatus', next.splash.enabled ? 'Splash screen saved and turned on.' : 'Splash screen saved (currently off).');
+    });
+    document.getElementById('ntSend').addEventListener('click', function(){
+      var title = v('ntTitle').trim(), message = v('ntMessage').trim(), link = v('ntLink').trim(), days = Number(v('ntExpires'));
+      if (!title || !message){ st('ntStatus', 'A title and a message are both required.', false); return; }
+      if (link && !/^https?:\/\//i.test(link)){ st('ntStatus', 'The link must start with http:// or https://', false); return; }
+      st('ntStatus', 'Sending…');
+      var rec = { title: title, message: message, link: link || null, createdAt: new Date().toISOString(), expiresAt: days ? new Date(Date.now() + days * 86400000).toISOString() : null, sentBy: CURRENT_CITIZEN ? CURRENT_CITIZEN.email : null };
+      window.__db.collection('notices').add(rec).then(function(){
+        st('ntStatus', 'Notification sent — it is now showing at the top of the site.', true);
+        document.getElementById('ntTitle').value = ''; document.getElementById('ntMessage').value = ''; document.getElementById('ntLink').value = '';
+        loadNotices();
+      }).catch(function(err){ st('ntStatus', (err && err.message) || 'Could not send.', false); });
+    });
+    var listEl = document.getElementById('noticeList');
+    window.__db.collection('notices').orderBy('createdAt', 'desc').limit(50).onSnapshot(function(snap){
+      var docs = snap.docs || [];
+      if (!docs.length){ listEl.innerHTML = '<p class="reportstatus">No notifications sent yet.</p>'; return; }
+      var now = Date.now();
+      listEl.innerHTML = docs.map(function(d){
+        var n = d.data() || {};
+        var expired = n.expiresAt && new Date(n.expiresAt).getTime() < now;
+        var when = n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '';
+        return '<div class="nrow"><div><p class="t">' + esc(n.title || '') + (expired ? ' <span class="pill">Expired</span>' : '') + '</p><p class="m">' + esc(n.message || '') + '</p><p class="m">' + esc(when) + (n.expiresAt && !expired ? ' · until ' + esc(new Date(n.expiresAt).toLocaleDateString()) : '') + '</p></div><button type="button" class="ghost" data-del="' + esc(d.id) + '">Delete</button></div>';
+      }).join('');
+      listEl.querySelectorAll('[data-del]').forEach(function(b){
+        b.addEventListener('click', function(){
+          b.disabled = true;
+          window.__db.doc('notices/' + b.getAttribute('data-del')).delete().then(loadNotices).catch(function(){ b.disabled = false; });
+        });
+      });
+    }, function(){ listEl.innerHTML = '<p class="reportstatus err">Could not load notifications.</p>'; });
+  }
+
+  /* ---------- Staff dashboard tabs + phone-friendly tables ---------- */
+  function setupStaffTabs(main){
+    var nav = document.getElementById('staffTabs');
+    if (!nav) return;
+    var tabs = [['apps','Applications'],['reports','Reports'],['calendar','Calendar'],['app','App']];
+    if (isAdminUser()) tabs.push(['users','Users']);
+    tabs.push(['settings','Settings']);
+    var keys = tabs.map(function(t){ return t[0]; });
+    var current = 'apps';
+    try { var saved = sessionStorage.getItem('arabStaffTab'); if (saved && keys.indexOf(saved) !== -1) current = saved; } catch(e){}
+    nav.innerHTML = tabs.map(function(t){ return '<button type="button" role="tab" data-tab="' + t[0] + '">' + t[1] + '</button>'; }).join('');
+    function show(key){
+      current = key;
+      try { sessionStorage.setItem('arabStaffTab', key); } catch(e){}
+      nav.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-tab') === key ? 'true' : 'false'); });
+      main.querySelectorAll('.stab').forEach(function(s){ s.hidden = s.getAttribute('data-tab') !== key; });
+    }
+    nav.addEventListener('click', function(e){ var b = e.target.closest('[data-tab]'); if (b) show(b.getAttribute('data-tab')); });
+    show(current);
+  }
+  function labelTableCells(root){
+    (root || document).querySelectorAll('table.sublist').forEach(function(t){
+      var heads = Array.prototype.map.call(t.querySelectorAll('thead th'), function(th){ return th.textContent.trim(); });
+      t.querySelectorAll('tbody tr').forEach(function(tr){
+        Array.prototype.forEach.call(tr.children, function(td, i){ if (!td.hasAttribute('data-label')) td.setAttribute('data-label', heads[i] || ''); });
+      });
+    });
+  }
+  function watchStaffTables(main){
+    if (!window.MutationObserver) return;
+    var mo = new MutationObserver(function(){ labelTableCells(main); });
+    mo.observe(main, { childList: true, subtree: true });
+    labelTableCells(main);
+  }
+
   function render(){
     applyKioskClass();
     if (window.__db && window.__db._reset) window.__db._reset();
@@ -1050,6 +1367,8 @@
     window.__curUpdate = null;
     main.innerHTML = '';
     updateInspModeButton(view);
+    updateHeaderAccount(view);
+    updatePayNotice(view);
 
     if (view === 'home'){
       app.classList.add('wide');
@@ -1123,11 +1442,6 @@
 
     html += '<a class="calpromo" href="#calendar"><div class="ic">'+ICONS.calendar+'</div><div class="body"><p class="ttl">City Calendar</p><p class="dsc">Planning Commission meetings, submission deadlines and office closures.</p></div><div class="btn">View live calendar<span aria-hidden="true">&rsaquo;</span></div></a>';
 
-    if (CURRENT_CITIZEN){
-      html += '<a class="calpromo" href="#account"><div class="ic">'+ICONS.account+'</div><div class="body"><p class="ttl">My Account</p><p class="dsc">Signed in as '+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+' — view the status of every permit on your account.</p></div><div class="btn">View my permits<span aria-hidden="true">&rsaquo;</span></div></a>';
-    } else {
-      html += '<a class="calpromo" href="#account"><div class="ic">'+ICONS.account+'</div><div class="body"><p class="ttl">My Account</p><p class="dsc">Create a free account to keep every permit you apply for — and its status — in one place.</p></div><div class="btn">Sign in or create account<span aria-hidden="true">&rsaquo;</span></div></a>';
-    }
 
     html += '<a class="calpromo" href="#search"><div class="ic">'+ICONS.search+'</div><div class="body"><p class="ttl">Search My Permit</p><p class="dsc">Already applied? Look up your permit status with your permit number.</p></div><div class="btn">Search my permit<span aria-hidden="true">&rsaquo;</span></div></a>';
 
@@ -2222,14 +2536,19 @@
 
   function renderStaff(main){
     var html = '<div class="acctwelcome"><div class="who"><p class="name">'+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+'</p><p class="email">'+esc(CURRENT_CITIZEN.email)+' — '+esc(roleLabel(CURRENT_CITIZEN.role))+'</p></div><button type="button" class="ghost" id="staffSignOutBtn">Sign out</button></div>';
+    html += '<nav class="stabs" id="staffTabs" aria-label="Dashboard sections"></nav>';
 
     if (isAdminUser()){
-      html += '<h2 class="section" style="margin-top:0">Access &amp; users</h2>';
+      html += '<section class="stab" data-tab="users" hidden>';
+      html += '<h2 class="section">Access &amp; users</h2>';
       html += '<p class="section-note">Every account starts as a Citizen with no dashboard access. Grant Staff or Administrator access here once you’ve approved someone.</p>';
       html += '<div class="scrollx"><table class="sublist" id="usersTable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead><tbody><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>';
       html += '<p class="reportstatus" id="usersStatus"></p>';
+      html += '</section>';
     }
 
+    html += '<section class="stab" data-tab="settings" hidden>';
+    html += '<h2 class="section">Settings</h2>';
     html += '<div class="togglebar"><div><p class="ttl">Sync to Google Sheets / Excel</p><p class="dsc">Off by default. Turning it on will let staff export new online applications straight to a shared sheet.</p></div>' +
       '<label class="switch"><input type="checkbox" id="syncToggle"><span class="track"></span><span class="thumb"></span></label></div>';
     html += '<div id="syncPanel" hidden></div>';
@@ -2238,14 +2557,19 @@
       '<div><p class="ttl" style="font-weight:600;font-size:14px;margin:0 0 2px">Kiosk mode</p>' +
       '<p class="dsc" style="font-size:12px;color:var(--ink-soft);margin:0;max-width:340px">Turn this device into a self-service lobby kiosk showing only the forms — no staff tools visible. An "Exit kiosk mode" button stays at the bottom of every page.</p></div>' +
       '<button type="button" class="ghost" id="kioskEnterBtn" style="width:auto;margin-top:0;white-space:nowrap;padding:11px 16px">Enter kiosk mode</button></div>';
+    html += '</section>';
 
-    html += '<div id="calSection"></div>';
+    html += '<section class="stab" data-tab="calendar" hidden><div id="calSection"></div></section>';
+    html += '<section class="stab" data-tab="app" id="appSettingsSection" hidden></section>';
 
-    html += '<h2 class="section" style="margin-top:28px">Overview</h2>';
-    html += '<p class="section-note">Totals across the test submissions below.</p>';
+    html += '<section class="stab" data-tab="apps" hidden>';
+    html += '<h2 class="section">Overview</h2>';
+    html += '<p class="section-note">Totals across all applications received.</p>';
     html += '<div class="statgrid" id="ovTiles"></div>';
     html += '<div class="scrollx"><table class="breakdown" id="ovBreakdown"></table></div>';
+    html += '</section>';
 
+    html += '<section class="stab" data-tab="reports" hidden>';
     html += '<h2 class="section">CICT fee report</h2>';
     html += '<p class="section-note">Commercial Impact / CICT fees by month, for FY'+fyEndYear(fiscalYearMonths())+' (Oct 1 – Sep 30). Defaults to the current month.</p>';
     html += '<div class="reportpanel">';
@@ -2272,15 +2596,24 @@
     html += '<p class="reportstatus" id="reportStatus"></p>';
     html += '<p class="reporthint">Each export includes the overview totals for the filtered range plus one row per matching application. The Excel file opens directly in Google Sheets too — upload it, or drag it in from Drive.</p>';
     html += '</div>';
+    html += '</section>';
 
-    html += '<h2 class="section">Test submissions</h2>';
-    html += '<p class="section-note">Anything submitted through the forms above lands here so you can check the fields and fee math before this goes live.</p>';
+    html += '<section class="stab" data-tab="apps" hidden>';
+    html += '<h2 class="section">Applications</h2>';
+    html += '<p class="section-note">Every application submitted through the online forms. Open one to record inspections, sign-off and payment.</p>';
     html += '<div class="scrollx"><table class="sublist" id="subsTable"><thead><tr><th>Permit #</th><th>Type</th><th>Applicant</th><th>Address</th><th>Total</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>';
 
+    html += '</section>';
+
+    html += '<section class="stab" data-tab="settings" hidden>';
     html += '<h2 class="section">Suggestions from reviewers</h2>';
-    html += '<p class="section-note">Notes sent with the "Suggest a change" button on each form. This design preview can’t send real email, so notes are captured here for jadecruz@starsonn.com to review instead.</p>';
+    html += '<p class="section-note">Notes sent with the "Suggest a change" button on each form.</p>';
     html += '<div class="scrollx"><table class="sublist" id="suggestTable"><thead><tr><th>Page</th><th>Type</th><th>Note</th><th>Submitted</th></tr></thead><tbody><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>';
+    html += '</section>';
     main.innerHTML = html;
+    setupStaffTabs(main);
+    watchStaffTables(main);
+    renderAppSettings(document.getElementById('appSettingsSection'));
 
     document.getElementById('staffSignOutBtn').addEventListener('click', function(){
       clearCitizenSession();
@@ -2364,7 +2697,7 @@
         return '<tr><td>'+esc(TYPE_LABEL[k])+'</td><td class="num">'+bt.count+'</td><td class="num">'+money(bt.permit)+'</td><td class="num">'+money(bt.cict)+'</td><td class="num">'+money(bt.total)+'</td></tr>';
       });
       if (!rows.length){
-        ovBreak.innerHTML = '<tbody><tr><td class="empty" style="padding:16px 8px">No test submissions yet.</td></tr></tbody>';
+        ovBreak.innerHTML = '<tbody><tr><td class="empty" style="padding:16px 8px">No applications yet.</td></tr></tbody>';
         return;
       }
       ovBreak.innerHTML = '<thead><tr><th>Permit type</th><th class="num">Count</th><th class="num">Permit fees</th><th class="num">CICT fees</th><th class="num">Total</th></tr></thead><tbody>' +
@@ -2477,7 +2810,7 @@
       return review.approved ? 'Approved' : 'Pending';
     }
     function paintSubs(docs){
-      if (!docs.length){ tbody.innerHTML = '<tr><td colspan="8" class="empty">No test submissions yet — try one of the forms.</td></tr>'; return; }
+      if (!docs.length){ tbody.innerHTML = '<tr><td colspan="8" class="empty">No applications yet.</td></tr>'; return; }
       SUBMISSION_DOCS = {};
       tbody.innerHTML = docs.map(function(d){
         var r = d.data();
@@ -2546,7 +2879,7 @@
     function refreshCount(){
       var rows = reportRows();
       var n = rows.length;
-      countEl.textContent = ALL_RECORDS.length ? (n + ' of ' + ALL_RECORDS.length + ' test submissions match these filters.') : 'No test submissions yet — try one of the forms, then come back to build a report.';
+      countEl.textContent = ALL_RECORDS.length ? (n + ' of ' + ALL_RECORDS.length + ' applications match these filters.') : 'No applications yet.';
       paintPreview(rows);
     }
     chips.forEach(function(c){
@@ -2979,6 +3312,8 @@
     loadCitizenSession();
     render();
     setupPWA();
+    loadAppSettings().then(applyAppSettings);
+    loadNotices();
     verifyCitizenSession().then(function(changed){
       var v = (location.hash||'').replace('#','');
       if (changed || (!CURRENT_CITIZEN && (v==='staff' || v==='inspect' || v==='account'))) render();
