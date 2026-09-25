@@ -365,6 +365,18 @@
   body.kiosk button.primary { font-size: 17px; padding: 16px; }
   body.kiosk .radiogroup label.opt { padding: 13px 14px; font-size: 14.5px; }
   body.kiosk fieldset legend { font-size: 16px; }
+
+/* --- Compact home menu + Get the App popup (UX pass) --- */
+.qmenu-toggle{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;font-size:13px;letter-spacing:.01em;cursor:pointer;margin:2px 0 16px;}
+.qmenu-toggle svg{width:17px;height:17px;flex:0 0 auto;}
+.qmenu-toggle[aria-expanded="true"]{background:var(--primary);color:#fff;border-color:var(--primary);}
+.qmenu-panel{display:flex;flex-direction:column;gap:6px;margin:-10px 0 16px;padding:8px;border:1px solid var(--border);border-radius:12px;background:var(--surface);box-shadow:0 10px 28px rgba(15,50,115,.14);}
+.qmenu-panel[hidden]{display:none;}
+.qmenu-panel .calpromo.qmenu-item{padding:9px 10px !important;border-radius:8px;gap:10px;}
+.qmenu-item .ic{width:26px;height:26px;flex:0 0 26px;}
+.qmenu-item .dsc,.qmenu-item .btn{display:none;}
+.qmenu-item .ttl{font-size:13.5px;}
+.demoNotice{margin:10px 0 0;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);text-align:center;}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
@@ -392,6 +404,8 @@
       </div>
     </div>
     <a class="staff-link" href="#account">Staff sign in</a>
+  
+    <p class="demoNotice">Demo version &middot; for preview and testing</p>
   </footer>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1009,6 +1023,59 @@
     var installBtn = document.getElementById('installPromoBtn');
     if (installBtn) installBtn.addEventListener('click', openInstallModal);
   }
+
+  function enhanceHomeMenu(){
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#app .calpromo'));
+    if (!cards.length) return;
+    var appCard = document.getElementById('installPromoBtn');
+    var menuCards = cards.filter(function(c){ return c !== appCard; });
+    var anchor = cards[0];
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'qmenu-toggle';
+    toggle.id = 'qmenuToggle';
+    toggle.setAttribute('aria-expanded','false');
+    toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg><span>Menu</span>';
+    var panel = document.createElement('div');
+    panel.className = 'qmenu-panel';
+    panel.id = 'qmenuPanel';
+    panel.hidden = true;
+    anchor.parentNode.insertBefore(toggle, anchor);
+    anchor.parentNode.insertBefore(panel, anchor);
+    menuCards.forEach(function(c){ c.classList.add('qmenu-item'); panel.appendChild(c); });
+    if (appCard){
+      appCard.hidden = true;
+      var installItem = document.createElement('button');
+      installItem.type = 'button';
+      installItem.className = 'calpromo qmenu-item';
+      installItem.innerHTML = '<div class="ic">'+ICONS.install+'</div><div class="body"><p class="ttl">Get the App</p></div>';
+      installItem.addEventListener('click', function(){ panel.hidden = true; toggle.setAttribute('aria-expanded','false'); openInstallModal(); });
+      panel.appendChild(installItem);
+    }
+    toggle.addEventListener('click', function(){
+      var open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function(e){
+      if (!panel.hidden && !panel.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)){
+        panel.hidden = true;
+        toggle.setAttribute('aria-expanded','false');
+      }
+    });
+    try {
+      if (!sessionStorage.getItem('arabAppPromptShown')){
+        var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+        if (!standalone){
+          setTimeout(function(){
+            try { sessionStorage.setItem('arabAppPromptShown','1'); } catch(e){}
+            if (typeof openInstallModal === 'function') openInstallModal();
+          }, 1200);
+        }
+      }
+    } catch(e){}
+  }
+  enhanceHomeMenu();
 
   /* ---------- building permit (owner + contractor share this schema) ---------- */
   function renderBuildingForm(main, kind){
