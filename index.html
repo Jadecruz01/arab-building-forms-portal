@@ -386,7 +386,7 @@
 .cardgrid .grp:first-child{margin-top:0;}
 @media (max-width: 640px){
   .lede{display:none;} .lede-short{display:block;}
-  .officialbar{font-size:12.5px;padding:9px 10px;}
+  .officialbar{font-size:12.5px;padding:calc(9px + env(safe-area-inset-top,0px)) 10px 9px;}
   header.top h1{font-size:23px;}
   header.top{position:static;}
   .qmenu-toggle{display:none !important;}
@@ -472,6 +472,40 @@
 .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
 .swatches button{width:32px;height:32px;margin:0;padding:0;border-radius:50%;border:2px solid var(--border);cursor:pointer;}
 .swatches button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink);}
+/* --- Sept 25 update: safe-area top (app), Safari date inputs, pass/fail, editor, who-menu --- */
+.officialbar{padding-top:calc(7px + env(safe-area-inset-top,0px));}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;}
+input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.35em;}
+.inspgrid > .mf,.inspgrid3 > .field,.two-col > .field,.editgrid > .field{min-width:0;}
+.inspgrid input,.inspgrid3 input,.two-col input,.editgrid input,.modalbox .field input{width:100%;max-width:100%;min-width:0;}
+.resultseg{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);}
+.resultseg .opts{display:inline-flex;border:1px solid var(--border);border-radius:99px;overflow:hidden;position:relative;}
+.resultseg .opts label{padding:7px 16px;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink-soft);background:var(--surface);margin:0;}
+.resultseg .opts input{position:absolute;opacity:0;width:0;height:0;margin:0;}
+.resultseg .opts label.pass:has(input:checked){background:var(--success-bg);color:var(--success);}
+.resultseg .opts label.fail:has(input:checked){background:#FBE9E7;color:#A23B3B;}
+.resultseg .opts label.pass.on{background:var(--success-bg);color:var(--success);}
+.resultseg .opts label.fail.on{background:#FBE9E7;color:#A23B3B;}
+.inspitem .resultseg{margin:2px 0 12px;}
+.statuslist li.fail{color:#A23B3B;font-weight:600;}
+.inspcard .progress.fail{background:#FBE9E7;color:#A23B3B;}
+.auditline{font-size:12.5px;color:var(--ink-soft);margin:6px 0 0;font-style:italic;}
+.statuscard .cardbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.statuscard .cardbtns button{width:auto;margin:0;padding:8px 14px;font-size:13px;}
+.editgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
+.editgrid .edwide{grid-column:1 / -1;}
+.edro{font-size:13.5px;color:var(--ink-soft);background:var(--surface-alt);border-radius:8px;padding:8px 10px;line-height:1.45;}
+@media (max-width:640px){ .editgrid{grid-template-columns:1fr;} }
+.modalbox .btnrow2.pdfrow{display:flex;gap:8px;flex-wrap:wrap;margin:0;}
+.modalbox .btnrow2.pdfrow button{width:auto;margin:0;padding:9px 14px;font-size:13px;}
+.whomenu{position:relative;min-width:0;}
+.acctwelcome .whobtn{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;margin:0;width:auto;font-family:var(--serif);font-size:17px;color:var(--ink);cursor:pointer;line-height:1.25;text-align:left;}
+.acctwelcome .whobtn .caret{font-size:11px;color:var(--ink-soft);}
+.acctwelcome .whopanel{position:absolute;top:calc(100% + 6px);left:0;z-index:30;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;display:flex;flex-direction:column;gap:2px;}
+.acctwelcome .whopanel[hidden]{display:none;}
+.acctwelcome .whopanel button{width:100%;margin:0;padding:9px 12px;text-align:left;background:none;border:0;border-radius:7px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;}
+.acctwelcome .whopanel button:hover{background:var(--surface-alt);}
+#app.staffwide .acctwelcome .whobtn{font-size:15px;}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
@@ -565,9 +599,10 @@
   }
   function fFile(id,label,opts){
     opts = opts||{};
-    return '<div class="field"><label for="'+id+'">'+label+'</label>' +
-      '<input type="file" id="'+id+'" multiple>' +
-      (opts.hint?'<div class="hint">'+opts.hint+'</div>':'') + '</div>';
+    var hint = opts.hint ? opts.hint + ' ' : '';
+    return '<div class="field"><label for="'+id+'">'+label+' <span class="req">*</span></label>' +
+      '<input type="file" id="'+id+'" multiple required accept="image/*,.pdf,.doc,.docx,.heic">' +
+      '<div class="hint">'+hint+'Required. PDF, photo or Word file — up to 8 MB each. Your documents are stored with this application.</div></div>';
   }
   function fRadio(name,label,options,opts){
     opts = opts||{};
@@ -752,6 +787,7 @@
 
     var body = '<h3>'+esc(TYPE_LABEL[rec.type]||rec.type)+' &mdash; '+esc(rec.permitNumber||'')+'</h3>';
     body += '<p class="modaldsc">'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'. These fields are staff-only — applicants never see this panel.</p>';
+    if (lastEdit(rec)) body += '<p class="auditline">'+esc(auditStampText(rec, false))+'</p>';
     body += '<div id="reviewFormWrap">';
 
     if (isBP){
@@ -760,6 +796,7 @@
       INSPECTION_ORDER.forEach(function(k){
         var it = insp[k] || {};
         body += '<div class="insprow"><label class="insphead" for="rv_'+k+'_done"><input type="checkbox" id="rv_'+k+'_done" '+(it.done?'checked':'')+'> '+esc(INSPECTION_LABEL[k])+'</label>' +
+          '<div class="resultseg"><span>Result</span><div class="opts"><label class="pass"><input type="radio" name="rv_'+k+'_result" value="pass" '+(it.result==='pass'?'checked':'')+'> Pass</label><label class="fail"><input type="radio" name="rv_'+k+'_result" value="fail" '+(it.result==='fail'?'checked':'')+'> Fail</label></div></div>' +
           '<div class="inspgrid">' +
           '<div class="mf"><label for="rv_'+k+'_date">Date of inspection</label><input type="date" id="rv_'+k+'_date" value="'+esc(it.date||'')+'"></div>' +
           '<div class="mf"><label for="rv_'+k+'_by">Completed by</label><input type="text" id="rv_'+k+'_by" placeholder="Initials" value="'+esc(it.completedBy||'')+'"></div>' +
@@ -792,6 +829,12 @@
         '</div></div>';
     }
 
+    body += '<div class="reviewsection"><p class="lbl">Application</p><div class="btnrow2 pdfrow">' +
+      '<button type="button" class="ghost" id="rvPermitPdf">Download permit PDF</button>' +
+      '<button type="button" class="ghost" id="rvBundle">PDF + documents (ZIP)</button>' +
+      '<button type="button" class="ghost" id="rvEdit">Edit application</button></div>' +
+      (rec.attachments && rec.attachments.length ? '<p class="hint" style="margin-top:8px">'+rec.attachments.length+' document'+(rec.attachments.length===1?'':'s')+' uploaded: '+esc(rec.attachments.map(function(a){ return a.name; }).join(', '))+'</p>' : '<p class="hint" style="margin-top:8px">No documents were uploaded with this application.</p>') +
+      '</div>';
     body += '<div class="modalbtns"><button type="button" class="ghost" id="rvCancel">Close</button><button type="button" class="primary" id="rvSave" style="margin-top:0">Save review</button></div>';
     body += '<p class="reportstatus" id="rvStatus"></p></div>';
 
@@ -800,6 +843,10 @@
 
     document.getElementById('rvCancel').addEventListener('click', closeReviewModal);
     veil.addEventListener('click', function(e){ if (e.target === veil) closeReviewModal(); });
+    var recWithId = Object.assign({ id: id }, rec);
+    document.getElementById('rvPermitPdf').addEventListener('click', function(){ downloadPermitPdf(recWithId, document.getElementById('rvStatus')); });
+    document.getElementById('rvBundle').addEventListener('click', function(){ downloadPermitBundle(recWithId, document.getElementById('rvStatus')); });
+    document.getElementById('rvEdit').addEventListener('click', function(){ closeReviewModal(); openEditModal(id, rec); });
 
     if (isBP){
       var updateFeeGate = function(){
@@ -822,7 +869,7 @@
         var statusEl = document.getElementById('rvStatus');
         var liveReview = { inspections:{}, certOfOccupancy:{}, feePaid: checked('rvFeePaid') };
         INSPECTION_ORDER.forEach(function(k){
-          liveReview.inspections[k] = { done: checked('rv_'+k+'_done'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
+          liveReview.inspections[k] = { done: checked('rv_'+k+'_done'), result: radioVal('rv_'+k+'_result'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
         });
         liveReview.certOfOccupancy = { given: radioVal('rvCoo'), comments: v('rvCooComments'), initials: v('rvCooInitials'), date: v('rvCooDate') };
         downloadInspectionPdf({ type: rec.type, permitNumber: rec.permitNumber, fields: f, review: liveReview }, statusEl);
@@ -835,7 +882,7 @@
       if (isBP){
         newReview = { inspections:{}, certOfOccupancy:{}, feePaid: checked('rvFeePaid') };
         INSPECTION_ORDER.forEach(function(k){
-          newReview.inspections[k] = { done: checked('rv_'+k+'_done'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
+          newReview.inspections[k] = { done: checked('rv_'+k+'_done'), result: radioVal('rv_'+k+'_result'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
         });
         newReview.certOfOccupancy = { given: radioVal('rvCoo'), comments: v('rvCooComments'), initials: v('rvCooInitials'), date: v('rvCooDate') };
       } else {
@@ -1127,7 +1174,7 @@
   var BELL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
   function loadAppSettings(){
     return sbRpc('bf_get', { p_token: null, p_collection: 'settings', p_id: 'app' })
-      .then(function(d){ APP_SETTINGS = d || {}; return APP_SETTINGS; })
+      .then(function(d){ APP_SETTINGS = d || {}; cacheAppSettings(APP_SETTINGS); return APP_SETTINGS; })
       .catch(function(){ APP_SETTINGS = APP_SETTINGS || {}; return APP_SETTINGS; });
   }
   function appIconSrc(size){
@@ -1430,6 +1477,316 @@
     var mo = new MutationObserver(function(){ labelTableCells(main); });
     mo.observe(main, { childList: true, subtree: true });
     labelTableCells(main);
+  }
+
+
+  /* ---------- Field labels for PDFs and the staff editor ---------- */
+  var FIELD_LABELS = {
+    applicantName:'Applicant name', applicantEmail:'Applicant email', applicantPhone:'Applicant phone', date:'Application date',
+    address:'Property address', lot:'Lot #', zoning:'Zoning', propertyOwner:'Property owner', propertyOwnerName:'Property owner',
+    propertyOwnerPhone:'Property owner phone', propertyOwnerEmail:'Property owner email',
+    gcLicense:'General contractor license #', contractorName:'Contractor name', businessName:'Business name', contractorPhone:'Contractor phone', contractorEmail:'Contractor email',
+    buildType:'Type of build', projectType:'Project type', heatedSqft:'Heated sq ft', unheatedSqft:'Unheated sq ft', estimatedCost:'Estimated cost / value',
+    workDescription:'Description of work', authorizedEmployee:'Authorized employee', declaration:'Licensing declaration', startedWithoutPermit:'Work started without a permit',
+    termsAgreed:'Terms agreed', buildingAgreement:'Building Application Agreement', inspectionRequirements:'Inspection Requirements & Permit Conditions', occupancyResponsibilities:'Occupancy & Final Inspection Responsibilities', swornStatement:'Sworn Statement (licensure exemption)', signAgreement:'Sign Permit Agreement',
+    trade:'Trade', tradeLicense:'Trade license #', subContractorName:'Sub-contractor name', subContractorPhone:'Sub-contractor phone', subContractorEmail:'Sub-contractor email',
+    signAddress:'Sign address', signType:'Sign type', businessLicense:'Business license', businessOwnerContact:'Business owner contact', tenantName:'Tenant name', tenantPhone:'Tenant phone', tenantEmail:'Tenant email',
+    feature:'Feature', reason:'Reason', additionalInfo:'Additional information', submittingAs:'Submitting as',
+    subdivisionName:'Subdivision name', approvalType:'Approval type', phase:'Phase', lotCount:'Number of lots', acreage:'Acreage', avgLotSize:'Average lot size', zone:'Zone',
+    engineerName:'Engineer', engineerFirm:'Engineering firm', engineerAddress:'Engineer address', engineerPhone:'Engineer phone', engineerEmail:'Engineer email',
+    surveyorName:'Surveyor', surveyorFirm:'Surveying firm', surveyorLicense:'Surveyor license #', surveyorAddress:'Surveyor address', surveyorPhone:'Surveyor phone', surveyorEmail:'Surveyor email',
+    sketchPlatDate:'Sketch plat date', surveyAvailable:'Survey available', drainage:'Drainage', groundType:'Ground type', availableSewer:'City sewer available', availableWater:'City water available', availableElectric:'Electric power available',
+    certified:'Certification', ownerAddress:'Owner mailing address', ownerCity:'Owner city', ownerState:'Owner state', ownerZip:'Owner ZIP', ownerPhone:'Owner phone', ownerCell:'Owner cell', ownerEmail:'Owner email',
+    additionalOwners:'Additional owners', ownsAdjoiningLand:'Owns adjoining land', adjoiningPlan:'Plans for adjoining land', desiredZoning:'Desired zoning', accessoryStructures:'Accessory structures',
+    housingUnits:'Housing units', housingAddresses:'Housing addresses', trailers:'Trailers', trailerAddresses:'Trailer addresses', businesses:'Businesses', homeOccupation:'Home occupation', signsBillboards:'Signs / billboards',
+    hasAnimals:'Animals kept', animalDetail:'Animal details', animalEnclosure:'Animal enclosure', otherFeatures:'Other features', householdMembers:'Household members', childrenAges:'Ages of children', busPickup:'School bus pickup',
+    registeredVoters:'Registered voters', votingAge:'Residents of voting age', agreedToServices:'Statement on city services agreed', signedName:'Signed (typed name)', buildingType:'Building type'
+  };
+  function fieldLabel(key){
+    if (FIELD_LABELS[key]) return FIELD_LABELS[key];
+    var s = String(key).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ');
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  }
+  function fieldValueText(val){
+    if (val === null || val === undefined || val === '') return '—';
+    if (val === true) return 'Yes';
+    if (val === false) return 'No';
+    if (Array.isArray(val)) return val.map(fieldValueText).join(', ');
+    if (typeof val === 'object'){
+      return Object.keys(val).filter(function(k){ return val[k] !== undefined; }).map(function(k){ return fieldLabel(k) + ': ' + fieldValueText(val[k]); }).join('; ');
+    }
+    return String(val);
+  }
+  function ownerOf(f){ return f.propertyOwner || f.propertyOwnerName || f.ownerName || applicantOf(f) || ''; }
+  function fmtStamp(iso){ try { return new Date(iso).toLocaleString(); } catch(e){ return String(iso || ''); } }
+  function lastEdit(rec){ var e = rec && rec.edits; return (e && e.length) ? e[e.length - 1] : null; }
+  function auditStampText(rec, forCitizen){
+    var e = lastEdit(rec);
+    if (!e) return '';
+    return 'Edited by ' + (forCitizen ? 'City staff' : (e.name || e.by || 'staff')) + ' on ' + fmtStamp(e.at) + (rec.edits.length > 1 ? ' (' + rec.edits.length + ' edits)' : '');
+  }
+
+  /* ---------- Full permit / application PDF (all questions + answers) ---------- */
+  function buildPermitPdf(rec){
+    var jsPDFctor = window.jspdf && window.jspdf.jsPDF;
+    if (!jsPDFctor) throw new Error('The PDF library did not load — check your connection and try again.');
+    var f = rec.fields || {};
+    var review = rec.review || {};
+    var fee = rec.fee || {};
+    var typeLabel = TYPE_LABEL[rec.type] || rec.type || 'Application';
+    var doc = new jsPDFctor({ unit: 'mm', format: 'letter' });
+    var pageW = 215.9, pageH = 279.4, mx = 14;
+    var hdrLine2 = 'Owner: ' + (ownerOf(f) || '—') + '   |   Property: ' + (addressOf(f) || '—') + '   |   Permit #: ' + (rec.permitNumber || '—');
+    var stamp = auditStampText(rec, !hasStaffAccess()) || 'No staff edits recorded';
+
+    function drawHeader(){
+      doc.setFillColor(15, 50, 115); doc.rect(0, 0, pageW, 22, 'F');
+      doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+      doc.text('City of Arab Building Department — ' + typeLabel, mx, 9);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.text(doc.splitTextToSize(hdrLine2, pageW - mx * 2), mx, 15.5);
+      doc.setTextColor(22, 35, 63);
+    }
+    function drawFooter(pageNo, total){
+      doc.setFontSize(8); doc.setTextColor(90, 100, 120);
+      doc.text(stamp + '   ·   Generated ' + new Date().toLocaleString(), mx, pageH - 8, { maxWidth: pageW - mx * 2 - 30 });
+      doc.text('Page ' + pageNo + ' of ' + total, pageW - mx, pageH - 8, { align: 'right' });
+      doc.setTextColor(22, 35, 63);
+    }
+    var tableOpts = { startY: 28, margin: { top: 28, left: mx, right: mx, bottom: 16 }, styles: { fontSize: 9, cellPadding: 2.2, overflow: 'linebreak', textColor: [22, 35, 63] }, headStyles: { fillColor: [236, 232, 218], textColor: [22, 35, 63], fontStyle: 'bold' }, columnStyles: { 0: { cellWidth: 62, fontStyle: 'bold' } }, didDrawPage: function(){ drawHeader(); } };
+
+    // 1. Submission details
+    var details = [
+      ['Permit / application #', rec.permitNumber || '—'],
+      ['Type', typeLabel],
+      ['Submitted', rec.submittedAt ? fmtStamp(rec.submittedAt) : '—'],
+      ['Applicant', applicantOf(f) || '—'],
+      ['Property owner', ownerOf(f) || '—'],
+      ['Property address', addressOf(f) || '—']
+    ];
+    if (rec.citizenEmail) details.push(['Submitted from account', rec.citizenEmail]);
+    if (fee && (fee.total !== undefined)){
+      if (fee.constructionValue) details.push(['Construction value', money(fee.constructionValue)]);
+      details.push(['Permit fee', money(fee.permitFee || 0)]);
+      if (fee.cictFee) details.push(['CICT fee', money(fee.cictFee)]);
+      details.push(['Total due', money(fee.total || 0)]);
+    }
+    doc.autoTable(Object.assign({}, tableOpts, { head: [['Submission details', '']], body: details }));
+
+    // 2. Every question and answer
+    var qa = [];
+    Object.keys(f).forEach(function(k){
+      var val = f[k];
+      if (val && typeof val === 'object' && !Array.isArray(val)){
+        Object.keys(val).forEach(function(sub){ if (val[sub] !== undefined) qa.push([fieldLabel(k) + ' — ' + fieldLabel(sub), fieldValueText(val[sub])]); });
+      } else {
+        qa.push([fieldLabel(k), fieldValueText(val)]);
+      }
+    });
+    doc.autoTable(Object.assign({}, tableOpts, { startY: doc.lastAutoTable.finalY + 6, head: [['Question', 'Answer']], body: qa }));
+
+    // 3. Review / inspection status
+    var status = [];
+    if (isBuildingPermitType(rec.type)){
+      var insp = review.inspections || {};
+      INSPECTION_ORDER.forEach(function(k){
+        var it = insp[k] || {};
+        var txt = it.result === 'fail' ? 'FAILED' : (it.done ? 'Passed' : 'Not yet inspected');
+        if (it.date) txt += ' · ' + it.date;
+        if (it.completedBy) txt += ' · by ' + it.completedBy;
+        if (it.comment) txt += ' · ' + it.comment;
+        status.push([INSPECTION_LABEL[k] + ' inspection', txt]);
+      });
+      var coo = review.certOfOccupancy || {};
+      status.push(['Certificate of occupancy', (coo.given === 'given' ? 'Given' : coo.given === 'not_given' ? 'Not given' : 'Pending') + (coo.date ? ' · ' + coo.date : '') + (coo.initials ? ' · ' + coo.initials : '') + (coo.comments ? ' · ' + coo.comments : '')]);
+      status.push(['Fee', review.feePaid ? 'Paid' : 'Not yet paid']);
+    } else {
+      status.push(['Approval', review.approved ? 'Approved' : 'Pending review']);
+      if (review.signedBy) status.push(['Signed off by', review.signedBy]);
+      if (review.dateSignedOff) status.push(['Date signed off', review.dateSignedOff]);
+    }
+    if (rec.attachments && rec.attachments.length) status.push(['Uploaded documents', rec.attachments.map(function(a){ return a.name; }).join(', ')]);
+    if (rec.edits && rec.edits.length) status.push(['Staff edits', rec.edits.map(function(e){ return (e.name || e.by) + ' — ' + fmtStamp(e.at); }).join('\n')]);
+    doc.autoTable(Object.assign({}, tableOpts, { startY: doc.lastAutoTable.finalY + 6, head: [['Status', '']], body: status }));
+
+    var total = doc.internal.getNumberOfPages();
+    for (var p = 1; p <= total; p++){ doc.setPage(p); drawFooter(p, total); }
+    return doc;
+  }
+  function permitPdfName(rec){ return 'arab-' + String(rec.permitNumber || rec.type || 'permit').toLowerCase() + '.pdf'; }
+  function downloadPermitPdf(rec, statusEl){
+    try {
+      var doc = buildPermitPdf(rec);
+      saveGeneratedFile(permitPdfName(rec), doc.output('blob'), statusEl);
+    } catch(err){
+      if (statusEl){ statusEl.textContent = err.message || 'Could not build the PDF.'; statusEl.className = 'reportstatus err'; }
+    }
+  }
+
+  /* ---------- Uploaded documents (stored with the submission) + ZIP download ---------- */
+  var UPLOAD_MAX_FILE = 8 * 1024 * 1024, UPLOAD_MAX_TOTAL = 25 * 1024 * 1024;
+  function readFileAsDataUrl(file){
+    return new Promise(function(resolve, reject){
+      var r = new FileReader();
+      r.onload = function(){ resolve(String(r.result)); };
+      r.onerror = function(){ reject(new Error('Could not read ' + file.name)); };
+      r.readAsDataURL(file);
+    });
+  }
+  function collectUploads(form){
+    var inputs = Array.prototype.slice.call(form.querySelectorAll('input[type="file"]'));
+    var files = [];
+    inputs.forEach(function(inp){
+      var lbl = form.querySelector('label[for="' + inp.id + '"]');
+      Array.prototype.forEach.call(inp.files || [], function(file){ files.push({ field: inp.id, fieldLabel: lbl ? lbl.textContent.trim() : inp.id, file: file }); });
+    });
+    var total = 0;
+    for (var i = 0; i < files.length; i++){
+      if (files[i].file.size > UPLOAD_MAX_FILE) return Promise.reject(new Error('"' + files[i].file.name + '" is larger than 8 MB. Please upload a smaller file.'));
+      total += files[i].file.size;
+    }
+    if (total > UPLOAD_MAX_TOTAL) return Promise.reject(new Error('Uploaded documents total more than 25 MB. Please reduce the file sizes.'));
+    return Promise.all(files.map(function(x){
+      return readFileAsDataUrl(x.file).then(function(data){ return { field: x.field, fieldLabel: x.fieldLabel, name: x.file.name, type: x.file.type || 'application/octet-stream', size: x.file.size, data: data }; });
+    }));
+  }
+  function loadAttachments(submissionId){
+    return window.__db.collection('attachments').where('submissionId', '==', submissionId).limit(50).get().then(function(snap){
+      return (snap.docs || []).map(function(d){ var a = d.data() || {}; a.id = d.id; return a; });
+    });
+  }
+  function loadScriptOnce(src){
+    return new Promise(function(resolve, reject){
+      if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+      var s = document.createElement('script'); s.src = src; s.onload = function(){ resolve(); }; s.onerror = function(){ reject(new Error('Could not load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+  function downloadPermitBundle(rec, statusEl){
+    function st(msg, ok){ if (!statusEl) return; statusEl.textContent = msg; statusEl.className = 'reportstatus' + (ok === true ? ' ok' : ok === false ? ' err' : ''); }
+    st('Preparing PDF and documents…');
+    var pdfDoc;
+    try { pdfDoc = buildPermitPdf(rec); } catch(err){ st(err.message || 'Could not build the PDF.', false); return; }
+    var need = (typeof window.JSZip !== 'undefined') ? Promise.resolve() : loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    need.then(function(){ return loadAttachments(rec.id); }).then(function(files){
+      var zip = new window.JSZip();
+      var base = String(rec.permitNumber || 'permit').replace(/[^A-Za-z0-9_-]+/g, '-');
+      zip.file(base + '.pdf', pdfDoc.output('blob'));
+      var used = {};
+      files.forEach(function(a){
+        var name = (a.name || 'document').replace(/[\/\\]/g, '_');
+        if (used[name]){ name = used[name] + '-' + name; }
+        used[name] = (used[name] || 0) + 1;
+        var b64 = String(a.data || '').split(',')[1] || '';
+        zip.folder('attachments').file(name, b64, { base64: true });
+      });
+      if (!files.length) zip.folder('attachments').file('README.txt', 'No documents were uploaded with this application.');
+      return zip.generateAsync({ type: 'blob' });
+    }).then(function(blob){
+      saveGeneratedFile('arab-' + String(rec.permitNumber || 'permit').toLowerCase() + '-with-documents.zip', blob, statusEl);
+    }).catch(function(err){ st((err && err.message) || 'Could not build the ZIP.', false); });
+  }
+
+  /* ---------- Staff: edit any submission (with audit stamp) ---------- */
+  function closeEditModal(){ var el = document.getElementById('editModal'); if (el) el.remove(); }
+  function openEditModal(id, rec){
+    closeEditModal();
+    var f = rec.fields || {};
+    var veil = document.createElement('div');
+    veil.className = 'modalveil'; veil.id = 'editModal';
+    var body = '<h3>Edit ' + esc(TYPE_LABEL[rec.type] || rec.type) + ' &mdash; ' + esc(rec.permitNumber || '') + '</h3>';
+    body += '<p class="modaldsc">Changes are saved to the application itself and stamped with your name and the time. ' + esc(auditStampText(rec, false)) + '</p>';
+    body += '<div class="editgrid">';
+    var keys = Object.keys(f);
+    keys.forEach(function(k){
+      var val = f[k];
+      var eid = 'ed_' + k.replace(/[^A-Za-z0-9_]/g, '_');
+      var label = esc(fieldLabel(k));
+      if (typeof val === 'boolean'){
+        body += '<div class="field edfield"><label class="checkline" for="' + eid + '"><input type="checkbox" id="' + eid + '" data-key="' + esc(k) + '" data-kind="bool" ' + (val ? 'checked' : '') + '> ' + label + '</label></div>';
+      } else if (val && typeof val === 'object'){
+        body += '<div class="field edfield edwide"><label>' + label + '</label><div class="edro">' + esc(fieldValueText(val)) + '</div></div>';
+      } else {
+        var s = (val === null || val === undefined) ? '' : String(val);
+        var long = s.length > 60 || /description|reason|additional|detail|comment|addresses|features|plan/i.test(k);
+        if (long) body += '<div class="field edfield edwide"><label for="' + eid + '">' + label + '</label><textarea id="' + eid + '" data-key="' + esc(k) + '" data-kind="text">' + esc(s) + '</textarea></div>';
+        else body += '<div class="field edfield"><label for="' + eid + '">' + label + '</label><input type="text" id="' + eid + '" data-key="' + esc(k) + '" data-kind="text" value="' + esc(s) + '"></div>';
+      }
+    });
+    body += '</div>';
+    body += '<div class="modalbtns"><button type="button" class="ghost" id="edCancel">Cancel</button><button type="button" class="primary" id="edSave" style="margin-top:0">Save changes</button></div>';
+    body += '<p class="reportstatus" id="edStatus"></p>';
+    veil.innerHTML = '<div class="modalbox wide">' + body + '</div>';
+    document.getElementById('main').appendChild(veil);
+    document.getElementById('edCancel').addEventListener('click', closeEditModal);
+    veil.addEventListener('click', function(e){ if (e.target === veil) closeEditModal(); });
+    document.getElementById('edSave').addEventListener('click', function(){
+      var statusEl = document.getElementById('edStatus');
+      var next = {}; Object.keys(f).forEach(function(k){ next[k] = f[k]; });
+      var changed = [];
+      veil.querySelectorAll('[data-key]').forEach(function(el){
+        var k = el.getAttribute('data-key');
+        var nv2 = el.getAttribute('data-kind') === 'bool' ? el.checked : el.value;
+        var old = f[k];
+        if (el.getAttribute('data-kind') !== 'bool' && typeof old === 'number' && nv2 !== '' && !isNaN(Number(nv2))) nv2 = Number(nv2);
+        if (nv2 !== old && !(old === undefined && nv2 === '')){ next[k] = nv2; changed.push(k); }
+      });
+      if (!changed.length){ statusEl.textContent = 'No changes to save.'; statusEl.className = 'reportstatus'; return; }
+      var edits = (rec.edits || []).slice();
+      edits.push({ by: CURRENT_CITIZEN ? CURRENT_CITIZEN.email : '', name: CURRENT_CITIZEN ? (CURRENT_CITIZEN.name || CURRENT_CITIZEN.email) : 'staff', at: new Date().toISOString(), fields: changed });
+      statusEl.textContent = 'Saving…'; statusEl.className = 'reportstatus';
+      window.__db.doc('submissions/' + id).update({ fields: next, edits: edits }).then(function(){
+        rec.fields = next; rec.edits = edits;
+        statusEl.textContent = 'Saved and stamped.'; statusEl.className = 'reportstatus ok';
+        setTimeout(closeEditModal, 600);
+      }).catch(function(err){ statusEl.textContent = (err && err.message) || 'Could not save — please try again.'; statusEl.className = 'reportstatus err'; });
+    });
+  }
+
+  /* ---------- Staff: "My permits" (the ones they applied for as a citizen) ---------- */
+  function closeMyPermitsModal(){ var el = document.getElementById('myPermitsModal'); if (el) el.remove(); }
+  function openMyPermitsModal(){
+    closeMyPermitsModal();
+    var veil = document.createElement('div');
+    veil.className = 'modalveil'; veil.id = 'myPermitsModal';
+    veil.innerHTML = '<div class="modalbox wide"><h3>My permits</h3><p class="modaldsc">Applications you submitted from this account, exactly as a citizen sees them.</p><div id="myPermitsModalList"><p class="reportstatus">Loading…</p></div><div class="modalbtns"><button type="button" class="ghost" id="mpClose">Close</button></div></div>';
+    document.getElementById('main').appendChild(veil);
+    document.getElementById('mpClose').addEventListener('click', closeMyPermitsModal);
+    veil.addEventListener('click', function(e){ if (e.target === veil) closeMyPermitsModal(); });
+    var listEl = document.getElementById('myPermitsModalList');
+    window.__db.collection('submissions').where('citizenId', '==', CURRENT_CITIZEN.id).limit(50).get().then(function(snap){
+      var docs = (snap.docs || []).slice().sort(function(a, b){ return ((b.data() || {}).submittedAt || '').localeCompare((a.data() || {}).submittedAt || ''); });
+      if (!docs.length){ listEl.innerHTML = '<div class="acctempty">You haven’t applied for any permits under this account.</div>'; return; }
+      listEl.innerHTML = docs.map(function(d){ var r = d.data(); r.id = d.id; return renderPermitStatusCard(r); }).join('');
+    }).catch(function(){ listEl.innerHTML = '<p class="reportstatus err">Couldn’t load your permits — please try again.</p>'; });
+  }
+  function setupWhoMenu(){
+    var btn = document.getElementById('whoMenuBtn'), panel = document.getElementById('whoMenuPanel');
+    if (!btn || !panel) return;
+    btn.addEventListener('click', function(e){ e.stopPropagation(); panel.hidden = !panel.hidden; btn.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true'); });
+    document.addEventListener('click', function(e){ if (!panel.hidden && !panel.contains(e.target) && e.target !== btn){ panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
+    var mp = document.getElementById('whoMyPermits');
+    if (mp) mp.addEventListener('click', function(){ panel.hidden = true; openMyPermitsModal(); });
+    var so = document.getElementById('whoSignOut');
+    if (so) so.addEventListener('click', function(){ panel.hidden = true; clearCitizenSession(); navigate('account'); });
+  }
+
+  /* ---------- Splash first: use the cached settings before anything renders ---------- */
+  function cacheAppSettings(s){
+    try {
+      var lite = { splash: s.splash || null, icon192: s.icon192 || null };
+      localStorage.setItem('arabAppSettingsCache', JSON.stringify(lite));
+    } catch(e){}
+  }
+  function showSplashFromCache(){
+    try {
+      var raw = localStorage.getItem('arabAppSettingsCache');
+      if (!raw) return;
+      var c = JSON.parse(raw);
+      if (!c || !c.splash || !c.splash.enabled) return;
+      if (!APP_SETTINGS) APP_SETTINGS = { icon192: c.icon192 || undefined, splash: c.splash };
+      showSplash(c.splash);
+    } catch(e){}
   }
 
   function render(){
@@ -1937,7 +2294,7 @@
     html += '<fieldset><legend>Project</legend>';
     html += fTextarea('workDesc',meta.descLabel,{required:true,hint:meta.descHint});
     html += '<div class="field checkrow"><label style="display:flex;gap:9px;align-items:flex-start;margin:0;font-size:13.5px;font-weight:400;color:var(--ink)"><input type="checkbox" id="startedEarly"><span>Work has already started without a permit. <span class="hint" style="margin-top:2px">Per city code, fees for work started before a permit is obtained are doubled.</span></span></label></div>';
-    html += fFile('uploads','Upload supporting documents (optional)');
+    html += fFile('uploads','Upload supporting documents');
     html += '</fieldset>';
 
     html += '<fieldset><legend>Terms &amp; agreement</legend>';
@@ -2001,16 +2358,28 @@
     var permitNumber = genPermitNumber(kind);
     var record = { type: kind, fields: fields, fee: fee, permitNumber: permitNumber, review: freshReview(kind), submittedAt: new Date().toISOString() };
     if (CURRENT_CITIZEN){ record.citizenId = CURRENT_CITIZEN.id; record.citizenEmail = CURRENT_CITIZEN.email; }
-    renderConfirmation(kind, fee, 'saving', permitNumber);
-    if (window.__db){
-      window.__db.collection('submissions').add(record).then(function(){
+    var form = document.querySelector('#main form');
+    var formStatus = form ? form.querySelector('.submitstatus') : null;
+    if (form && !formStatus){ formStatus = document.createElement('p'); formStatus.className = 'reportstatus submitstatus'; form.appendChild(formStatus); }
+    if (formStatus){ formStatus.textContent = 'Reading your documents…'; formStatus.className = 'reportstatus submitstatus'; }
+    var uploadsP = form ? collectUploads(form) : Promise.resolve([]);
+    uploadsP.then(function(uploads){
+      record.attachments = uploads.map(function(u){ return { field: u.field, fieldLabel: u.fieldLabel, name: u.name, type: u.type, size: u.size }; });
+      renderConfirmation(kind, fee, 'saving', permitNumber);
+      if (!window.__db){ setTimeout(function(){ renderConfirmation(kind, fee, 'nodb', permitNumber); }, 250); return; }
+      return window.__db.collection('submissions').add(record).then(function(ref){
+        var sid = ref && ref.id;
+        return Promise.all(uploads.map(function(u){
+          return window.__db.collection('attachments').add({ submissionId: sid, permitNumber: permitNumber, field: u.field, fieldLabel: u.fieldLabel, name: u.name, type: u.type, size: u.size, data: u.data, uploadedAt: new Date().toISOString() });
+        }));
+      }).then(function(){
         renderConfirmation(kind, fee, 'saved', permitNumber);
-      }).catch(function(err){
+      }, function(){
         renderConfirmation(kind, fee, 'error', permitNumber);
       });
-    } else {
-      setTimeout(function(){ renderConfirmation(kind, fee, 'nodb', permitNumber); }, 250);
-    }
+    }).catch(function(err){
+      if (formStatus){ formStatus.textContent = (err && err.message) || 'Could not read your documents. Please try again.'; formStatus.className = 'reportstatus submitstatus err'; formStatus.scrollIntoView({ block: 'center' }); }
+    });
   }
   function renderConfirmation(kind, fee, status, permitNumber){
     var main = document.getElementById('main');
@@ -2335,9 +2704,17 @@
       setStatus('Could not build the inspection PDF — please try again.', false);
     }
   }
+  var PERMIT_CARDS = {}, PERMIT_CARD_SEQ = 0;
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-permitpdf]'); if (!b) return;
+    var r = PERMIT_CARDS[b.getAttribute('data-permitpdf')]; if (!r) return;
+    var card = b.closest('.statuscard'); var st = card ? card.querySelector('.cardstatus') : null;
+    downloadPermitPdf(r, st);
+  });
   function renderPermitStatusCard(r){
     var f = r.fields || {};
     var review = r.review || {};
+    var cardKey = 'c' + (++PERMIT_CARD_SEQ); PERMIT_CARDS[cardKey] = r;
     var html = '<div class="statuscard">';
     html += '<p class="lbl">Permit #'+esc(r.permitNumber||'—')+'</p>';
     html += '<h3>'+esc(TYPE_LABEL[r.type]||r.type)+'</h3>';
@@ -2348,7 +2725,8 @@
       html += '<div class="statusblock"><p class="statuslbl">Inspections</p><ul class="statuslist">';
       INSPECTION_ORDER.forEach(function(k){
         var it = insp[k] || {};
-        html += '<li class="'+(it.done?'done':'')+'">'+(it.done?'&#10003;':'&#9675;')+' '+esc(INSPECTION_LABEL[k])+(it.done && it.date ? ' — '+esc(it.date) : '')+'</li>';
+        var failed = it.result === 'fail';
+        html += '<li class="'+(failed?'fail':it.done?'done':'')+'">'+(failed?'&#10007;':it.done?'&#10003;':'&#9675;')+' '+esc(INSPECTION_LABEL[k])+(failed?' — FAILED':'')+((it.done||failed) && it.date ? ' — '+esc(it.date) : '')+(failed && it.comment ? '<br><span style="font-weight:400">'+esc(it.comment)+'</span>' : '')+'</li>';
       });
       html += '</ul></div>';
       var coo = review.certOfOccupancy || {};
@@ -2359,6 +2737,8 @@
       html += '<div class="statusblock"><p class="statuslbl">Status</p><p class="statusval">'+(review.approved?'Approved':'Pending review')+'</p></div>';
       if (review.approved && review.dateSignedOff) html += '<p class="dsc" style="margin-top:6px">Signed off '+esc(review.dateSignedOff)+'</p>';
     }
+    if (lastEdit(r)) html += '<p class="auditline">'+esc(auditStampText(r, !hasStaffAccess()))+'</p>';
+    html += '<div class="cardbtns"><button type="button" class="ghost" data-permitpdf="'+cardKey+'">Download permit PDF</button></div><p class="reportstatus cardstatus"></p>';
     html += '</div>';
     return html;
   }
@@ -2615,7 +2995,8 @@
   function monthLabel(y,m){ return new Date(y,m,1).toLocaleString('en-US',{month:'long', year:'numeric'}); }
 
   function renderStaff(main){
-    var html = '<div class="acctwelcome"><div class="who"><p class="name">'+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+'</p><p class="email">'+esc(CURRENT_CITIZEN.email)+' — '+esc(roleLabel(CURRENT_CITIZEN.role))+'</p></div><button type="button" class="ghost" id="staffSignOutBtn">Sign out</button></div>';
+    var html = '<div class="acctwelcome"><div class="who whomenu"><button type="button" class="whobtn" id="whoMenuBtn" aria-haspopup="true" aria-expanded="false"><span class="name">'+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+'</span><span class="caret" aria-hidden="true">&#9662;</span></button><p class="email">'+esc(CURRENT_CITIZEN.email)+' — '+esc(roleLabel(CURRENT_CITIZEN.role))+'</p>' +
+      '<div class="whopanel" id="whoMenuPanel" hidden><button type="button" id="whoMyPermits">My permits (as an applicant)</button><button type="button" id="whoSignOut">Sign out</button></div></div><button type="button" class="ghost" id="staffSignOutBtn">Sign out</button></div>';
     html += '<nav class="stabs" id="staffTabs" aria-label="Dashboard sections"></nav>';
 
     if (isAdminUser()){
@@ -2695,6 +3076,7 @@
     watchStaffTables(main);
     renderAppSettings(document.getElementById('appSettingsSection'));
 
+    setupWhoMenu();
     document.getElementById('staffSignOutBtn').addEventListener('click', function(){
       clearCitizenSession();
       navigate('account');
@@ -2883,7 +3265,9 @@
         var insp = review.inspections || {};
         var doneCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].done; }).length;
         var coo = (review.certOfOccupancy||{}).given;
+        var failCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].result === 'fail'; }).length;
         if (coo === 'given') return review.feePaid ? 'C of O given · fee paid' : 'C of O given';
+        if (failCount) return failCount+' failed · '+doneCount+'/'+INSPECTION_ORDER.length+' inspections';
         if (doneCount) return doneCount+'/'+INSPECTION_ORDER.length+' inspections';
         return 'Not started';
       }
@@ -2899,10 +3283,12 @@
         var addr = addressOf(f) || '—';
         var when = r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—';
         return '<tr><td>'+esc(r.permitNumber||'—')+'</td><td><span class="pill">'+esc(TYPE_LABEL[r.type]||r.type)+'</span></td><td>'+esc(applicantOf(f)||'—')+'</td><td>'+esc(addr)+'</td><td>'+money((r.fee&&r.fee.total)||0)+'</td><td>'+esc(when)+'</td><td>'+esc(reviewStatusLabel(r))+'</td>' +
-          '<td><button type="button" class="ghost" data-review="'+d.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px;white-space:nowrap">Review</button></td></tr>';
+          '<td><span style="display:inline-flex;gap:6px;flex-wrap:wrap"><button type="button" class="ghost" data-review="'+d.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px;white-space:nowrap">Review</button><button type="button" class="ghost" data-edit="'+d.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px;white-space:nowrap">Edit</button></span></td></tr>';
       }).join('');
     }
     tbody.addEventListener('click', function(e){
+      var ed = e.target.closest('[data-edit]');
+      if (ed){ var eid = ed.getAttribute('data-edit'); if (SUBMISSION_DOCS[eid]) openEditModal(eid, SUBMISSION_DOCS[eid]); return; }
       var btn = e.target.closest('[data-review]');
       if (!btn) return;
       var id = btn.getAttribute('data-review');
@@ -3091,9 +3477,11 @@
     function progressInfo(r){
       var review = r.review || {};
       var insp = review.inspections || {};
-      var doneCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].done; }).length;
+      var doneCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].done && insp[k].result !== 'fail'; }).length;
+      var failCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].result === 'fail'; }).length;
       var given = (review.certOfOccupancy||{}).given;
       if (given === 'given') return { text: 'C of O given', done: true };
+      if (failCount) return { text: failCount+' failed · '+doneCount+'/'+INSPECTION_ORDER.length+' done', done: false, fail: true };
       return { text: doneCount+'/'+INSPECTION_ORDER.length+' inspections done', done: doneCount === INSPECTION_ORDER.length };
     }
 
@@ -3108,7 +3496,7 @@
         return '<button type="button" class="inspcard" data-open="'+d.id+'">' +
           '<span class="body"><span class="pnum">'+esc(r.permitNumber||'—')+' &middot; '+esc(TYPE_LABEL[r.type]||r.type)+'</span>' +
           '<span class="meta">'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'</span>' +
-          '<span class="progress'+(prog.done?' done':'')+'">'+esc(prog.text)+'</span></span>' +
+          '<span class="progress'+(prog.done?' done':'')+(prog.fail?' fail':'')+'">'+esc(prog.text)+'</span></span>' +
           '<span class="chev" aria-hidden="true">&rsaquo;</span></button>';
       }).join('');
     }
@@ -3151,6 +3539,7 @@
         var it = insp[k] || {};
         body += '<div class="inspitem"><div class="hd"><span class="lbl">'+esc(INSPECTION_LABEL[k])+'</span>' +
           '<label class="switch big" for="ix_'+k+'_done"><input type="checkbox" id="ix_'+k+'_done" '+(it.done?'checked':'')+'><span class="track"></span><span class="thumb"></span></label></div>' +
+          '<div class="resultseg"><span>Result</span><div class="opts"><label class="pass"><input type="radio" name="ix_'+k+'_result" value="pass" '+(it.result==='pass'?'checked':'')+'> Pass</label><label class="fail"><input type="radio" name="ix_'+k+'_result" value="fail" '+(it.result==='fail'?'checked':'')+'> Fail</label></div></div>' +
           '<div class="inspgrid3">' +
           '<div class="field"><label for="ix_'+k+'_date">Date of inspection</label><input type="date" id="ix_'+k+'_date" value="'+esc(it.date||'')+'"></div>' +
           '<div class="field"><label for="ix_'+k+'_by">Completed by</label><input type="text" id="ix_'+k+'_by" placeholder="Initials" value="'+esc(it.completedBy||'')+'"></div>' +
@@ -3172,7 +3561,7 @@
         '<p class="feegate" id="ixFeeGateNote"></p></div>';
 
       body += '<p class="reportstatus" id="ixStatus"></p>';
-      body += '<div class="inspsavebar"><button type="button" class="ghost" id="ixDownloadPdf">Download editable inspection PDF</button><button type="button" class="primary" id="ixSave">Save inspection</button></div>';
+      body += '<div class="inspsavebar"><button type="button" class="ghost" id="ixDownloadPdf">Editable inspection PDF</button><button type="button" class="ghost" id="ixPermitPdf">Permit PDF</button><button type="button" class="primary" id="ixSave">Save inspection</button></div>';
 
       detailWrap.innerHTML = dh + body;
       detailWrap.hidden = false;
@@ -3193,7 +3582,7 @@
       function liveReviewFromForm(){
         var lr = { inspections:{}, certOfOccupancy:{}, feePaid: checked('ixFeePaid') };
         INSPECTION_ORDER.forEach(function(k){
-          lr.inspections[k] = { done: checked('ix_'+k+'_done'), date: v('ix_'+k+'_date'), completedBy: v('ix_'+k+'_by'), dateRecorded: v('ix_'+k+'_rec'), comment: v('ix_'+k+'_comment') };
+          lr.inspections[k] = { done: checked('ix_'+k+'_done'), result: radioVal('ix_'+k+'_result'), date: v('ix_'+k+'_date'), completedBy: v('ix_'+k+'_by'), dateRecorded: v('ix_'+k+'_rec'), comment: v('ix_'+k+'_comment') };
         });
         lr.certOfOccupancy = { given: radioVal('ixCoo'), comments: v('ixCooComments'), initials: v('ixCooInitials'), date: v('ixCooDate') };
         return lr;
@@ -3202,6 +3591,9 @@
       document.getElementById('ixDownloadPdf').addEventListener('click', function(){
         var statusEl = document.getElementById('ixStatus');
         downloadInspectionPdf({ type: rec.type, permitNumber: rec.permitNumber, fields: f, review: liveReviewFromForm() }, statusEl);
+      });
+      document.getElementById('ixPermitPdf').addEventListener('click', function(){
+        downloadPermitPdf(Object.assign({ id: id }, rec, { review: liveReviewFromForm() }), document.getElementById('ixStatus'));
       });
 
       document.getElementById('ixSave').addEventListener('click', function(){
@@ -3311,7 +3703,7 @@
     html += fText('acreage','Acreage',{type:'number',required:true});
     html += fText('streetAddress','Street address of properties to be annexed',{required:true});
     html += fText('subdivisionName','Name of subdivision, if applicable');
-    html += fFile('deeds','Current recorded deeds for the properties to be annexed',{hint:'Required — must be included with this application.'});
+    html += fFile('deeds','Current recorded deeds for the properties to be annexed',{hint:'Must be included with this application.'});
     html += fFile('taxMap','Current tax parcel map');
     html += fRadio('surveyAvailable','Survey of the properties available?',['Yes','No']);
     html += '</fieldset>';
@@ -3390,6 +3782,7 @@
     window.__db = makeSupabaseDb();
     window.__downloads = makeDownloads();
     loadCitizenSession();
+    showSplashFromCache();
     render();
     setupPWA();
     loadAppSettings().then(applyAppSettings);
