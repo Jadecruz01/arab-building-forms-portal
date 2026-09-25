@@ -1,0 +1,2788 @@
+<title>Arab Building Forms</title>
+<style>
+  :root {
+    --bg: #F6F4EC; --surface: #FFFFFF; --surface-alt: #ECE8DA;
+    --ink: #16233F; --ink-soft: #5A6478;
+    --primary: #0F3273; --primary-dark: #0A2151;
+    --gold: #F2C230; --gold-ink: #6B4E06; --gold-bg: #FBF0D2;
+    --success: #3D7A5C; --success-bg: #E4F0EA;
+    --danger: #A23B3B; --danger-bg: #F6E6E6;
+    --warn: #8A5A12; --warn-bg: #F8EFD9;
+    --border: #DEDACB;
+    --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1526; --surface: #142038; --surface-alt: #1A2942;
+      --ink: #E8ECF4; --ink-soft: #9FADC2;
+      --primary: #7DA0E0; --primary-dark: #5679B6;
+      --gold: #F2C230; --gold-ink: #F2C230; --gold-bg: #3A2F10;
+      --success: #85C1A1; --success-bg: #1D3128;
+      --danger: #E3928E; --danger-bg: #3A2323;
+      --warn: #E6C27A; --warn-bg: #3A3020;
+      --border: #26324B;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B1526; --surface: #142038; --surface-alt: #1A2942;
+    --ink: #E8ECF4; --ink-soft: #9FADC2;
+    --primary: #7DA0E0; --primary-dark: #5679B6;
+    --gold: #F2C230; --gold-ink: #F2C230; --gold-bg: #3A2F10;
+    --success: #85C1A1; --success-bg: #1D3128;
+    --danger: #E3928E; --danger-bg: #3A2323;
+    --warn: #E6C27A; --warn-bg: #3A3020;
+    --border: #26324B;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
+  html, body { overscroll-behavior-y: contain; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; padding-inline: 16px; overflow-x: hidden; max-width: 100vw; }
+  #app { max-width: 560px; margin: 0 auto; padding-bottom: 64px; }
+  #app.wide { max-width: 900px; }
+  #app.staffwide { max-width: 1180px; }
+  a { color: var(--primary); }
+  .draftbar { background: var(--gold-bg); color: var(--gold-ink); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; text-align: center; padding: 7px 10px; margin: 0 -16px 0; }
+  header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); padding: 16px 0 10px; margin-bottom: 4px; border-bottom: 2px solid var(--gold); }
+  header.top .row { display: flex; align-items: center; gap: 10px; }
+  .backbtn { border: 1px solid var(--border); background: var(--surface); color: var(--ink); border-radius: 8px; width: 34px; height: 34px; flex-shrink: 0; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .backbtn:hover { background: var(--surface-alt); }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 2px; }
+  header.top h1 { font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0; line-height: 1.2; color: var(--primary); }
+  header.top .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .inspmodebtn { margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 7px; background: var(--primary); color: #FBF9F4; border: none; border-radius: 9px; padding: 9px 14px; font-family: var(--sans); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .inspmodebtn svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .inspmodebtn:hover { background: var(--primary-dark); }
+  .inspmodebtn.active { background: var(--gold); color: var(--gold-ink); }
+  @media (max-width: 480px) { .inspmodebtn span { display: none; } .inspmodebtn { padding: 9px; } }
+  main { padding-top: 14px; }
+  .lede { color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; margin: 0 0 18px; }
+  h2.section { font-family: var(--serif); font-size: 15.5px; font-weight: 600; color: var(--ink); margin: 26px 0 10px; padding-top: 4px; }
+  h2.section:first-of-type { margin-top: 6px; }
+  .section-note { font-size: 12.5px; color: var(--ink-soft); margin: -6px 0 12px; line-height: 1.5; }
+  .cardgrid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .formcard { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; font-family: var(--sans); color: var(--ink); text-decoration: none; }
+  .formcard:hover { border-color: var(--primary); }
+  .formcard .ic { flex-shrink: 0; width: 40px; height: 40px; border-radius: 9px; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; }
+  .formcard .ic svg { width: 20px; height: 20px; }
+  .formcard .body { flex: 1; min-width: 0; }
+  .formcard .ttl { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; }
+  .formcard .dsc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; margin: 0; }
+  .formcard .fee { font-size: 11.5px; color: var(--primary); font-weight: 700; margin-top: 5px; }
+  .formcard .chev { color: var(--ink-soft); font-size: 15px; flex-shrink: 0; margin-top: 8px; }
+  .pdfrow { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+  .pdfrow .ic { flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px; background: var(--primary-dark); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; letter-spacing: .02em; }
+  .pdfrow .body { flex: 1; min-width: 0; }
+  .pdfrow .ttl { font-weight: 600; font-size: 13.5px; margin: 0 0 1px; }
+  .pdfrow .dsc { font-size: 12px; color: var(--ink-soft); margin: 0; }
+  .pdfrow a.dl { flex-shrink: 0; font-size: 12.5px; font-weight: 700; color: var(--primary); text-decoration: none; border: 1px solid var(--border); padding: 7px 11px; border-radius: 8px; }
+  .pdfrow a.dl:hover { border-color: var(--primary); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  fieldset { border: 0; padding: 0; margin: 0 0 18px; }
+  fieldset legend { font-family: var(--serif); font-size: 14.5px; font-weight: 600; color: var(--primary); padding: 0 0 8px; width: 100%; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 5px; }
+  .field .req { color: var(--danger); }
+  .field .hint { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; line-height: 1.4; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 420px) { .two-col { grid-template-columns: 1fr; } }
+  input, select, textarea { width: 100%; font-family: var(--sans); font-size: 16px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  textarea { min-height: 76px; resize: vertical; }
+  input[type=file] { padding: 8px; font-size: 16px; }
+  input[type=checkbox] { width: auto; accent-color: var(--primary); margin-right: 7px; }
+  .checkrow { display: flex; align-items: flex-start; gap: 0; font-size: 13.5px; color: var(--ink); background: var(--warn-bg); border: 1px solid var(--warn); border-radius: 9px; padding: 11px 12px; }
+  .checkrow input { margin-top: 2px; }
+  .radiogroup { display: flex; flex-wrap: wrap; gap: 8px; }
+  .radiogroup label.opt { flex: 1 1 auto; min-width: 120px; border: 1px solid var(--border); background: var(--bg); border-radius: 9px; padding: 10px 12px; font-size: 13.5px; font-weight: 600; text-align: center; cursor: pointer; color: var(--ink-soft); }
+  .radiogroup label.opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .radiogroup label.opt.checked { border-color: var(--primary); background: var(--primary); color: #FBF9F4; }
+  .radiogroup.stack { flex-direction: column; }
+  .radiogroup.stack label.opt { text-align: left; }
+  [hidden] { display: none !important; }
+  .feebox { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 4px 0 20px; }
+  .feebox .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13.5px; color: var(--ink-soft); padding: 4px 0; font-variant-numeric: tabular-nums; }
+  .feebox .row.total { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 10px; font-size: 16px; font-weight: 700; color: var(--ink); }
+  .feebox .row.total b { color: var(--primary); }
+  .feebox .note { font-size: 11.5px; color: var(--ink-soft); margin-top: 10px; line-height: 1.5; }
+  .termsbox { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 4px 0 18px; }
+  .termsbox .termstitle { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
+  .termsbox .termssrc { font-size: 11px; color: var(--ink-soft); margin: 0 0 10px; }
+  .termsbox .termstext { font-size: 12.5px; line-height: 1.6; color: var(--ink); max-height: 160px; overflow-y: auto; padding: 12px; margin-bottom: 12px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 8px; }
+  .termsbox .termstext p { margin: 0 0 9px; }
+  .termsbox .termstext p:last-child { margin-bottom: 0; }
+  .termsbox .termstext strong.warn { color: var(--danger); }
+  .termsbox .checkline { font-size: 13.5px; }
+  .termsbox .checkline input { margin-top: 0; }
+  .receiptcard { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--gold); border-radius: 12px; margin: 20px 0 0; text-align: left; overflow: hidden; }
+  .receiptcard .permitsec { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+  .receiptcard .permitsec .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin: 0 0 4px; font-weight: 700; }
+  .receiptcard .permitsec .num { font-family: var(--serif); font-size: 21px; font-weight: 700; color: var(--primary); margin: 0 0 8px; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
+  .receiptcard .permitsec .hint { font-size: 12px; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+  .receiptcard .feesec { padding: 16px 20px; }
+  .receiptcard .feesec .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 16px; font-weight: 700; color: var(--ink); }
+  .receiptcard .feesec .row b { color: var(--primary); font-variant-numeric: tabular-nums; }
+  .receiptcard .feesec .note { font-size: 11.5px; color: var(--ink-soft); margin-top: 10px; line-height: 1.5; }
+  .searchcard { max-width: 480px; }
+  .statuscard { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-top: 18px; }
+  .statuscard .lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); font-weight: 700; margin: 0 0 4px; }
+  .statuscard h3 { font-family: var(--serif); font-size: 18px; margin: 0 0 6px; color: var(--ink); }
+  .statuscard .dsc { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 4px; line-height: 1.5; }
+  .statusblock { border-top: 1px solid var(--border); margin-top: 14px; padding-top: 12px; }
+  .statuslbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); font-weight: 700; margin: 0 0 8px; }
+  .statusval { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0; }
+  .statuslist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .statuslist li { font-size: 13px; color: var(--ink-soft); }
+  .statuslist li.done { color: var(--success); font-weight: 600; }
+  .modalbox.wide { max-width: 760px; }
+  .reviewsection { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .reviewsection:first-of-type { margin-top: 14px; padding-top: 0; border-top: none; }
+  .reviewsection > .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin: 0 0 12px; }
+  .insprow { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--bg); }
+  .insprow .insphead { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; margin-bottom: 10px; cursor: pointer; color: var(--ink); }
+  .insprow .inspgrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  @media (max-width: 480px) { .insprow .inspgrid { grid-template-columns: minmax(0,1fr); } }
+  .insprow .mf { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .insprow .mf label { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); font-weight: 700; }
+  .insprow .mf input { border: 1px solid var(--border); border-radius: 7px; padding: 7px 8px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--ink); }
+  .insprow .cmt { margin-top: 8px; }
+  .insprow .cmt textarea { width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 7px 8px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--ink); resize: vertical; min-height: 46px; }
+  .feegate { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; line-height: 1.5; }
+  .checkline { display: flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink); }
+  button.primary { width: 100%; padding: 13px 16px; border: none; border-radius: 9px; background: var(--primary); color: #FBF9F4; font-family: var(--sans); font-size: 15px; font-weight: 600; cursor: pointer; }
+  button.primary:hover { background: var(--primary-dark); }
+  button.ghost { width: 100%; padding: 11px 16px; border-radius: 9px; cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--ink); font-family: var(--sans); font-size: 14px; font-weight: 600; margin-top: 8px; }
+  .confirm { text-align: center; padding: 30px 10px 10px; }
+  .confirm .badge { width: 56px; height: 56px; border-radius: 50%; background: var(--success-bg); color: var(--success); font-size: 26px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm h2 { font-family: var(--serif); font-size: 19px; margin: 0 0 8px; color: var(--ink); }
+  .confirm p { color: var(--ink-soft); font-size: 13.5px; line-height: 1.55; }
+  .staff-link { display: block; text-align: center; font-size: 11px; color: var(--ink-soft); margin-top: 30px; text-decoration: none; }
+  footer.foot { text-align: center; color: var(--ink-soft); font-size: 11.5px; padding: 24px 4px 10px; line-height: 1.6; }
+  .paynotice { display: flex; align-items: flex-start; gap: 12px; text-align: left; background: var(--gold-bg); border: 1px solid var(--gold); border-radius: 12px; padding: 14px 16px; margin: 6px 0 18px; box-shadow: 0 1px 0 rgba(0,0,0,.02); }
+  .paynotice .ic { flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px; background: var(--gold); color: var(--gold-ink); display: flex; align-items: center; justify-content: center; }
+  .paynotice .ic svg { width: 17px; height: 17px; }
+  .paynotice .tx { min-width: 0; }
+  .paynotice .tx .lbl { margin: 0 0 3px; font-size: 12px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--gold-ink); }
+  .paynotice .tx p { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+  body.kiosk .paynotice { padding: 18px 20px; }
+  body.kiosk .paynotice .tx p { font-size: 15px; }
+  .togglebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
+  .togglebar .ttl { font-weight: 600; font-size: 14px; margin: 0 0 2px; }
+  .togglebar .dsc { font-size: 12px; color: var(--ink-soft); margin: 0; }
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+  .switch .track { position: absolute; inset: 0; background: var(--border); border-radius: 99px; transition: background .15s; }
+  .switch .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s; }
+  .switch input:checked ~ .track { background: var(--success); }
+  .switch input:checked ~ .thumb { transform: translateX(20px); }
+  .switch.big { width: 60px; height: 34px; }
+  .switch.big .thumb { width: 28px; height: 28px; }
+  .switch.big input:checked ~ .thumb { transform: translateX(26px); }
+
+  /* ---------- inspection mode (iPad, touch-optimized) ---------- */
+  .inspintro { font-size: 14px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 18px; }
+  .insplist { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 12px; }
+  .inspcard { display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor: pointer; font-family: var(--sans); color: var(--ink); }
+  .inspcard:hover, .inspcard:active { border-color: var(--primary); }
+  .inspcard .body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+  .inspcard .pnum { display: block; font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--primary); margin: 0 0 3px; }
+  .inspcard .meta { display: block; font-size: 13px; color: var(--ink-soft); margin: 0 0 8px; line-height: 1.4; }
+  .inspcard .progress { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--surface-alt); color: var(--ink-soft); }
+  .inspcard .progress.done { background: var(--success-bg); color: var(--success); }
+  .inspcard .chev { font-size: 22px; color: var(--ink-soft); flex-shrink: 0; }
+  .inspdetailhd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .inspdetailhd h2 { font-family: var(--serif); font-size: 19px; margin: 0 0 3px; color: var(--ink); }
+  .inspdetailhd p { font-size: 13px; color: var(--ink-soft); margin: 0; }
+  .insplistbtn { width: auto; margin: 0; padding: 11px 16px; white-space: nowrap; }
+  .inspitem { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+  .inspitem .hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .inspitem .hd .lbl { font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--ink); }
+  .inspgrid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+  .inspgrid3 > .field { min-width: 0; }
+  .inspgrid3 > .field input { min-width: 0; }
+  @media (max-width: 640px) { .inspgrid3 { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+  @media (max-width: 480px) { .inspgrid3 { grid-template-columns: minmax(0,1fr); } }
+  .inspitem .field label { font-size: 12px; }
+  .inspitem input, .inspitem textarea { font-size: 16px; padding: 12px 13px; }
+  .inspbig { width: 100%; padding: 16px; font-size: 16.5px; border-radius: 11px; margin-top: 10px; }
+  .inspcoo .radiogroup label.opt { padding: 15px 14px; font-size: 15px; min-height: 48px; display: flex; align-items: center; justify-content: center; }
+  /* Locked to the viewport bottom (not `sticky`, which jitters on iOS as the Safari chrome shows/hides mid-scroll) so it never jumps while inspecting on-site. */
+  #inspDetailWrap:not([hidden]) { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .inspsavebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; background: var(--bg); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); margin: 0; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 -2px 10px rgba(0,0,0,.06); }
+  body.kiosk .inspsavebar, #app.staffwide .inspsavebar { max-width: 1180px; margin: 0 auto; }
+  .inspsavebar button { width: auto; flex: 1 1 200px; margin: 0; min-height: 50px; font-size: 15.5px; }
+  table.sublist { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.sublist th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  table.sublist td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.sublist tr:last-child td { border-bottom: 0; }
+  .pill { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-alt); color: var(--ink-soft); }
+  .empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 30px 10px; }
+  .scrollx { overflow-x: auto; }
+
+  /* ---- staff: overview stat tiles ---- */
+  .statgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  @media (min-width: 620px) { .statgrid { grid-template-columns: repeat(4, 1fr); } }
+  .stattile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; }
+  .stattile .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 6px; }
+  .stattile .num { font-family: var(--serif); font-size: 21px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; margin: 0; line-height: 1.15; }
+  .stattile.grand { background: var(--gold-bg); border-color: var(--gold); }
+  .stattile.grand .num { color: var(--gold-ink); }
+  table.breakdown { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 6px; }
+  table.breakdown th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  table.breakdown td { padding: 7px 8px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  table.breakdown td.num, table.breakdown th.num { text-align: right; }
+  table.breakdown tr:last-child td { border-bottom: 0; }
+  table.breakdown tr.tot td { font-weight: 700; border-top: 1px solid var(--border); }
+
+  /* ---- staff: report / export panel ---- */
+  .reportpanel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .filterlbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); margin: 0 0 8px; }
+  .chiprow { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+  label.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--bg); border-radius: 99px; padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--ink-soft); cursor: pointer; }
+  label.chip input { position: static; opacity: 1; width: auto; height: auto; margin: 0; accent-color: var(--primary); }
+  label.chip.on { border-color: var(--primary); color: var(--primary); background: var(--surface-alt); }
+  .daterow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  @media (max-width: 420px) { .daterow { grid-template-columns: 1fr; } }
+  .exportrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  @media (max-width: 420px) { .exportrow { grid-template-columns: 1fr; } }
+  .exportrow button { margin-top: 0; }
+  button.gold { width: 100%; padding: 11px 16px; border-radius: 9px; cursor: pointer; background: var(--gold); border: 1px solid var(--gold); color: var(--gold-ink); font-family: var(--sans); font-size: 14px; font-weight: 700; }
+  button.gold:hover { filter: brightness(.96); }
+  .reporthint { font-size: 11px; color: var(--ink-soft); margin: 12px 0 0; line-height: 1.5; }
+  .reportstatus { font-size: 12px; font-weight: 600; margin: 10px 0 0; min-height: 1em; }
+  .reportstatus.ok { color: var(--success); }
+  .reportstatus.err { color: var(--danger); }
+
+  /* ---- calendar ---- */
+  .calpromo { display: flex; align-items: center; gap: 14px; background: var(--primary); color: #FBF9F4; border-radius: 12px; padding: 16px 18px; text-decoration: none; margin: 4px 0 22px; }
+  .calpromo:hover { background: var(--primary-dark); }
+  .calpromo .ic { flex-shrink: 0; width: 42px; height: 42px; border-radius: 10px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; }
+  .calpromo .ic svg { width: 22px; height: 22px; }
+  .calpromo .body { flex: 1; min-width: 0; }
+  .calpromo .ttl { font-weight: 700; font-size: 15px; margin: 0 0 2px; font-family: var(--serif); }
+  .calpromo .dsc { font-size: 12.5px; opacity: .85; margin: 0; line-height: 1.4; }
+  .calpromo .btn { flex-shrink: 0; display: flex; align-items: center; gap: 3px; background: var(--gold); color: var(--gold-ink); font-weight: 700; font-size: 12.5px; padding: 9px 14px; border-radius: 8px; white-space: nowrap; }
+  @media (max-width: 460px) { .calpromo { flex-wrap: wrap; } .calpromo .btn { width: 100%; justify-content: center; } }
+  button.calpromo { width: 100%; border: none; text-align: left; cursor: pointer; font-family: var(--sans); }
+  .calpromo.gold-promo { background: var(--gold-bg); border: 1px solid var(--gold); color: var(--ink); }
+  .calpromo.gold-promo .ic { background: var(--gold); color: var(--gold-ink); }
+  .calpromo.gold-promo .dsc { color: var(--ink-soft); opacity: 1; }
+  .calpromo.gold-promo .btn { background: var(--primary); color: #FBF9F4; }
+  .calpromo.gold-promo:hover { background: #F6E4AE; }
+  .installsteps { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .installsteps li { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--ink); line-height: 1.5; }
+  .installsteps .num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #FBF9F4; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .installnote { font-size: 12px; color: var(--ink-soft); margin: 14px 0 0; line-height: 1.5; }
+  .acctwrap { display: flex; justify-content: center; padding: 14px 0 32px; }
+  .acctcard { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 30px 26px 26px; box-shadow: 0 2px 4px rgba(15,50,115,.05), 0 14px 34px rgba(15,50,115,.09); }
+  @media (prefers-color-scheme: dark) { .acctcard { box-shadow: 0 2px 4px rgba(0,0,0,.25), 0 14px 34px rgba(0,0,0,.4); } }
+  :root[data-theme="dark"] .acctcard { box-shadow: 0 2px 4px rgba(0,0,0,.25), 0 14px 34px rgba(0,0,0,.4); }
+  .acctbrand { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 22px; }
+  .acctbrand .ic { width: 52px; height: 52px; border-radius: 50%; background: var(--gold-bg); color: var(--gold-ink); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .acctbrand .ic svg { width: 25px; height: 25px; }
+  .acctbrand h2 { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--ink); margin: 0 0 5px; }
+  .acctbrand p { font-size: 12.5px; color: var(--ink-soft); margin: 0; max-width: 300px; line-height: 1.4; }
+  .accttabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .accttab { flex: 1; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg); color: var(--ink-soft); font-family: var(--sans); font-size: 13.5px; font-weight: 700; cursor: pointer; }
+  .accttab.active { background: var(--primary); border-color: var(--primary); color: #FBF9F4; }
+  .rememberrow { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-soft); margin: -4px 0 16px; }
+  .rememberrow input { margin: 0; width: auto; flex-shrink: 0; }
+  .rememberrow label { cursor: pointer; }
+  .acctnote { font-size: 11.5px; color: var(--ink-soft); line-height: 1.55; margin-top: 18px; text-align: center; }
+  .acctpasskeynote { font-size: 11.5px; color: var(--ink-soft); line-height: 1.55; text-align: center; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-top: 14px; }
+  .acctwelcome { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; }
+  .acctwelcome .who p.name { font-family: var(--serif); font-size: 17px; margin: 0 0 2px; color: var(--ink); }
+  .acctwelcome .who p.email { font-size: 12.5px; color: var(--ink-soft); margin: 0; }
+  .acctwelcome button { width: auto; padding: 9px 16px; margin: 0; }
+  .acctempty { text-align: center; padding: 30px 16px; color: var(--ink-soft); font-size: 13.5px; line-height: 1.8; }
+  .calcard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 18px; }
+  .calnav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+  .calnav button { width: auto; margin: 0; padding: 8px 14px; }
+  .calmonth { font-family: var(--serif); font-weight: 600; font-size: 15.5px; color: var(--ink); margin: 0; text-align: center; flex: 1; }
+  .calgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .calwd { text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); padding-bottom: 6px; }
+  .calday { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 12.5px; color: var(--ink); background: var(--bg); gap: 2px; }
+  .calday.empty { background: transparent; }
+  .calday.has { background: var(--surface-alt); font-weight: 700; }
+  .calday.today { outline: 2px solid var(--primary); outline-offset: -2px; }
+  .caldots { display: flex; gap: 2px; }
+  .caldots i { width: 4px; height: 4px; border-radius: 50%; display: block; }
+  .callegend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .calleg { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-soft); }
+  .calleg i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .calagenda-row { display: flex; gap: 12px; border-left: 3px solid var(--border); background: var(--surface); border-radius: 0 10px 10px 0; padding: 12px 14px; margin-bottom: 8px; }
+  .calagenda-date { flex-shrink: 0; width: 78px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+  .calagenda-body { flex: 1; min-width: 0; }
+  .calagenda-body .ttl { font-weight: 600; font-size: 13.5px; margin: 0; }
+  .calagenda-body .dsc { font-size: 12.5px; color: var(--ink-soft); margin: 0; line-height: 1.4; }
+  body.kiosk .calpromo { padding: 20px 22px; }
+  body.kiosk .calpromo .ttl { font-size: 16.5px; }
+  body.kiosk .calpromo .dsc { font-size: 13.5px; }
+  body.kiosk .calday { font-size: 14px; }
+
+  /* ---- suggestion box (design-review only) ---- */
+  .suggestbox { margin: 0 0 18px; }
+  .suggestbtn { display: inline-flex; align-items: center; gap: 6px; background: var(--gold-bg); color: var(--gold-ink); border: 1px dashed var(--gold); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--sans); }
+  .suggestbtn:hover { background: var(--gold); }
+  .suggestbtn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .modalveil { position: fixed; inset: 0; background: rgba(10,15,25,.55); z-index: 70; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+  @media (min-width: 560px) { .modalveil { align-items: center; padding: 20px; } }
+  .modalbox { background: var(--surface); width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; padding: 22px 20px; max-height: 85vh; overflow-y: auto; }
+  @media (min-width: 560px) { .modalbox { border-radius: 16px; } }
+  .modalbox h3 { font-family: var(--serif); font-size: 17px; margin: 0 0 6px; color: var(--ink); }
+  .modaldsc { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 16px; line-height: 1.5; }
+  .modalbtns { display: flex; gap: 10px; margin-top: 4px; }
+  .modalbtns button { margin-top: 0; }
+  .modalsending { text-align: center; padding: 20px 10px; color: var(--ink-soft); font-size: 13px; }
+  .modalsent { text-align: center; padding: 10px 4px; }
+  .modalsent .badge { width: 44px; height: 44px; border-radius: 50%; background: var(--success-bg); color: var(--success); font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .modalsent p { font-size: 13px; color: var(--ink); line-height: 1.5; margin: 0 0 16px; }
+  .modalsent button { width: auto; margin: 0 auto; display: block; padding: 9px 20px; }
+  body.kiosk .suggestbox { display: none; }
+
+  /* ---- kiosk mode ---- */
+  body.kiosk .draftbar { display: none; }
+  body.kiosk footer.foot { padding-bottom: 34px; }
+  body.kiosk .staff-link { display: block; width: fit-content; margin: 26px auto 0; padding: 11px 22px; border: 1px solid var(--border); border-radius: 99px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); background: var(--surface); text-align: center; }
+  body.kiosk .staff-link:hover { border-color: var(--primary); color: var(--primary); }
+  body.kiosk #app { max-width: 720px; }
+  body.kiosk header.top h1 { font-size: 25px; }
+  body.kiosk .eyebrow { font-size: 13px; }
+  body.kiosk header.top .sub { font-size: 14.5px; }
+  body.kiosk .backbtn { width: 40px; height: 40px; font-size: 18px; }
+  body.kiosk .formcard { padding: 19px 20px; }
+  body.kiosk .formcard .ic { width: 50px; height: 50px; border-radius: 12px; }
+  body.kiosk .formcard .ic svg { width: 25px; height: 25px; }
+  body.kiosk .formcard .ttl { font-size: 16.5px; }
+  body.kiosk .formcard .dsc { font-size: 13.5px; }
+  body.kiosk .formcard .fee { font-size: 12.5px; }
+  body.kiosk input, body.kiosk select, body.kiosk textarea { font-size: 16px; padding: 13px 14px; }
+  body.kiosk button.primary { font-size: 17px; padding: 16px; }
+  body.kiosk .radiogroup label.opt { padding: 13px 14px; font-size: 14.5px; }
+  body.kiosk fieldset legend { font-size: 16px; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+
+<div class="draftbar">Draft preview &middot; not the live site</div>
+<div id="app">
+  <header class="top">
+    <div class="row">
+      <button class="backbtn" id="backBtn" hidden aria-label="Back">&larr;</button>
+      <div>
+        <p class="eyebrow" id="eyebrow">City of Arab, Alabama</p>
+        <h1 id="pageTitle">Building Department Online Forms</h1>
+      </div>
+      <button type="button" class="inspmodebtn" id="inspModeBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4.5" width="14" height="17" rx="1.5"/><path d="M8.5 11.3l2 2 4-4.3M8.5 16.5h7"/></svg><span>Inspection Mode</span></button>
+    </div>
+    <p class="sub" id="pageSub"></p>
+  </header>
+  <main id="main"></main>
+  <footer class="foot">
+    <div class="paynotice">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10.5h19"/><path d="M6.5 14.5h4"/></svg></span>
+      <div class="tx">
+        <p class="lbl">How to pay</p>
+        <p>Fees are payable <b>in person by cash or check</b> at the City of Arab Building Department, 740 N Main St, Arab, AL 35016. Checks payable to &ldquo;City of Arab.&rdquo;</p>
+      </div>
+    </div>
+    <a class="staff-link" href="#account">Staff sign in</a>
+  </footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- fee math (City of Arab published schedule) ---------- */
+  function permitFeeFromValue(v){
+    v = Math.max(0, Number(v)||0);
+    if (v <= 499) return 0;
+    if (v <= 2500) return 25;
+    if (v <= 50000) return 25 + Math.ceil((v-2500)/1000)*5;
+    if (v <= 100000) return 260 + Math.ceil((v-50000)/1000)*4;
+    if (v <= 500000) return 460 + Math.ceil((v-100000)/1000)*3;
+    return 1660 + Math.ceil((v-500000)/1000)*2;
+  }
+  function cictFeeFromValue(v){ return Math.ceil(Math.max(0,Number(v)||0)/1000) * 1; }
+  function money(n){ n = Math.round((Number(n)||0)*100)/100; return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function todayStr(){ var d=new Date(); var mm=String(d.getMonth()+1).padStart(2,'0'); var dd=String(d.getDate()).padStart(2,'0'); return mm+'-'+dd+'-'+d.getFullYear(); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  /* shared file-save helper (mirrors the report-export offerDownload pattern) for use outside renderStaff */
+  function saveGeneratedFile(filename, blob, statusEl){
+    function setStatus(msg, ok){
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':'');
+    }
+    if (!window.__downloads){
+      setStatus('Downloads aren’t available in this preview view — this works once the site is live.', false);
+      return;
+    }
+    setStatus('Preparing ' + filename + '…');
+    window.__downloads.save({filename: filename, data: blob}).then(function(){
+      setStatus('Saved ' + filename + '.', true);
+    }).catch(function(err){
+      var code = err && err.code;
+      if (code === 'declined') setStatus('Download cancelled.');
+      else setStatus('Could not save the file (' + (code||'unknown error') + ').', false);
+    });
+  }
+  function uid(){ return 'x'+Math.random().toString(36).slice(2,10); }
+
+  /* ---------- tiny field-rendering helpers ---------- */
+  function fText(id,label,opts){
+    opts = opts||{};
+    var req = opts.required ? ' <span class="req">*</span>' : '';
+    var type = opts.type||'text';
+    return '<div class="field"><label for="'+id+'">'+label+req+'</label>' +
+      '<input type="'+type+'" id="'+id+'" '+(opts.required?'required':'')+' placeholder="'+esc(opts.placeholder||'')+'" value="'+esc(opts.value||'')+'">' +
+      (opts.hint?'<div class="hint">'+opts.hint+'</div>':'') + '</div>';
+  }
+  function fTextarea(id,label,opts){
+    opts = opts||{};
+    var req = opts.required ? ' <span class="req">*</span>' : '';
+    return '<div class="field"><label for="'+id+'">'+label+req+'</label>' +
+      '<textarea id="'+id+'" '+(opts.required?'required':'')+' placeholder="'+esc(opts.placeholder||'')+'">'+esc(opts.value||'')+'</textarea>' +
+      (opts.hint?'<div class="hint">'+opts.hint+'</div>':'') + '</div>';
+  }
+  function fFile(id,label,opts){
+    opts = opts||{};
+    return '<div class="field"><label for="'+id+'">'+label+'</label>' +
+      '<input type="file" id="'+id+'" multiple>' +
+      (opts.hint?'<div class="hint">'+opts.hint+'</div>':'') + '</div>';
+  }
+  function fRadio(name,label,options,opts){
+    opts = opts||{};
+    var req = opts.required ? ' <span class="req">*</span>' : '';
+    var stack = opts.stack ? ' stack' : '';
+    var html = '<div class="field" data-radiofield="'+name+'"><label>'+label+req+'</label><div class="radiogroup'+stack+'">';
+    options.forEach(function(o,i){
+      var val = typeof o === 'string' ? o : o.value;
+      var lbl = typeof o === 'string' ? o : o.label;
+      var oid = name+'_'+i;
+      var checked = (opts.value===val) ? ' checked' : '';
+      html += '<label class="opt" for="'+oid+'"><input type="radio" id="'+oid+'" name="'+name+'" value="'+esc(val)+'" '+(opts.required?'required':'')+checked+'>'+esc(lbl)+'</label>';
+    });
+    html += '</div>' + (opts.hint?'<div class="hint">'+opts.hint+'</div>':'') + '</div>';
+    return html;
+  }
+  function radioVal(name){ var el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ''; }
+  function v(id){ var el = document.getElementById(id); return el ? el.value : ''; }
+  function nv(id){ return Number(v(id))||0; }
+  function checked(id){ var el = document.getElementById(id); return !!(el && el.checked); }
+
+  /* ---------- terms & agreement library ---------- */
+  /* Verbatim text from the City of Arab Building Department's paper terms documents. */
+  var TERMS = {
+    buildingAgreement: {
+      title: 'Terms & Agreement',
+      src: 'Building Application Agreement',
+      body: '<p>Application is hereby made for a certificate of compliance to erect/alter a structure as described herein or shown in accompanying plans and specifications, which structure is to be located as shown on the accompanying plot/plan. The information which follows, and the accompanying plans and specifications with the representation therein contained, is made as part of this application.</p>' +
+        '<p>It is agreed and understood by this applicant that any error, misstatement or misrepresentation of material fact or expression of material fact, either with or without intention on the part of this applicant, such as might, or would, operate to cause a refusal of this application, or any material alteration or change in the accompanying plans, specifications or structure made subsequent to the issuance of a certificate of compliance in accordance with this application, without approval of the City Building Inspector, shall constitute sufficient ground for the revocation of such certificate of compliance.</p>' +
+        '<p><b>Take Notice:</b> No change of plans or proposed use may be made in any building or on any premises which is inconsistent with this certificate.</p>'
+    },
+    inspectionRequirements: {
+      title: 'Contractor Inspection Requirements & Permit Conditions',
+      src: 'Inspection Requirements & Permit Conditions',
+      body: '<p>The purpose of this document is to emphasize the importance of calling the Building Inspector for required inspections during the construction of your building. Increasingly, lending institutions are requiring issuance of a Certificate of Occupancy by the City of Arab as part of a requirement for mortgage qualifying.</p>' +
+        '<p><b>It is the firm policy of the Building Inspector not to issue a Certificate of Occupancy if all required inspections have not been completed.</b> It is the responsibility of the contractor, or the homeowner serving as the contractor, to call the Building Inspector for required inspections. Such calls should be placed at least 24 hours before the day of the inspection.</p>' +
+        '<p>For single-family residential construction, unless deficiencies are found, at least three inspections are required: (1) Footing inspection, prior to concrete pouring; (2) Rough-in — framing, electrical and plumbing, prior to sheetrock and insulation; (3) Final inspection.</p>' +
+        '<p>If deficiencies are found during any of these inspections, the contractor or homeowner is responsible for calling the Building Inspector for a return inspection to inspect corrections. The City will not complete a final inspection once electrical and plumbing systems have been covered, and a Certificate of Occupancy will not be issued without a satisfactory final inspection. Call the Building Department at 256-586-5968 for all inspections.</p>'
+    },
+    occupancyResponsibilities: {
+      title: 'Occupancy & Final Inspection Responsibilities',
+      src: 'Occupancy & Final Inspection Responsibilities',
+      body: '<p>I understand that it is my responsibility to notify the Building Inspector when an inspection is needed. I also understand that under any circumstances no one shall occupy any building or portion of any building until a final inspection has been made and the Building Inspector has issued a Certificate of Occupancy.</p>' +
+        '<p>Upon issuance of a building permit, the Building Inspector may visit the building site, or call the owner or contractor, if a significant amount of time has passed and no inspections have been called for.</p>'
+    },
+    signAgreement: {
+      title: 'Sign Permit Agreement',
+      src: 'Sign Permit Agreement',
+      body: '<p>I certify and acknowledge that I have read this application and that all information provided is true and correct; that all work performed in association with the issued permit shall conform to the plans and specifications submitted and will comply with all City Codes and Ordinances.</p>' +
+        '<p>By signing this application as a contractor, I certify that I will meet all applicable laws of the State of Alabama, including any exemptions as the law provides. I certify and agree to protect all public improvements and public utilities adjacent to or serving the property on which the proposed structure(s) are located, whether or not the said improvements or utilities are the property of the City of Arab.</p>' +
+        '<p>I further agree to make, or cause to have made, all necessary repairs resulting from my actions, misuse or lack of care, or on the part of any of my employees, agents, subcontractors, or suppliers of materials. I further attest that I am authorized by the property owner to execute this document as his or her agent.</p>'
+    },
+    swornStatement: {
+      title: 'Sworn Statement — Home Builders Licensure Exemption',
+      src: 'Builder License Exemption Terms',
+      body: '<p>Sworn statement of a party claiming exemption from the requirements of the Home Builders Licensure law, Ala. Code &sect;34-14A-1, et seq. (1975).</p>' +
+        '<p>I understand that by claiming exempt status, I waive my rights for protection under the provisions of the Home Builders Licensure law and that in the event of litigation involving activities resulting from the grant of this permit, I may not make demand of any money from the Homeowner&rsquo;s Recovery Fund, established by the Home Builders Licensure law. I understand that my claim of exempt status does not exempt anyone who contracts with me to perform construction work on my residence from holding the required license when the total cost of the undertaking exceeds $10,000.00.</p>' +
+        '<p><strong class="warn">Violation of the Alabama Home Builders Licensure Law is a Class A misdemeanor (Ala. Code &sect;34-14A-14) punishable by up to 12 months in jail and fines up to $6,000.00.</strong></p>'
+    },
+    subdivisionCertification: {
+      title: 'Property Owner Certification',
+      src: 'Application for Subdivision/Development Approval',
+      body: '<p>As owner(s) of the above property, I submit this application for subdivision/development approval and hereby certify that I am ultimately responsible for the information provided in this application.</p>' +
+        '<p>I also agree not to hold the Arab Planning Commission, the City of Arab, Alabama, or its City Council liable for any information or construction inspections provided by City employees or inspectors, or by surveyors, engineers, contractors or sub-contractors employed by myself, during the design or construction of the subject subdivision.</p>' +
+        '<p>I further certify that a qualified, licensed contractor or a registered civil engineer in my employ will oversee the various elements of the subdivision construction, said contractor or engineer to be identified in writing prior to final approval of the Preliminary Plat.</p>' +
+        '<p>I further certify that I am aware of the current City of Arab Subdivision Regulations, have read said regulations, and will abide by them during the subdivision of the subject property.</p>'
+    },
+    annexationServiceStatement: {
+      title: 'Statement Regarding Provision of City Services to Newly Annexed Lands',
+      src: 'Application for Annexation',
+      body: '<p>City services will be provided to all newly annexed lands according to the same policies that already govern in Arab. Arab police and fire departments will respond to calls; garbage and trash will be collected by Republic Services; and school children may attend city rather than county schools. All applicable city ordinances will be enforced, including the implementation of zoning regulations. The national agency that establishes the rating schedule for fire insurance premiums (ISO) assigns a higher rate to property that is over 5 road miles from its responding fire station and/or over 1,000 feet from a fire hydrant.</p>' +
+        '<p>It has long been the Sewer Board policy to expand sanitary sewer service on a cost-benefit basis; this policy applies to all land within the city regardless of its annexation date. In order for an area to be considered for road maintenance, drainage improvements, recreational or community facilities, new fire stations, or sanitary sewer extension, the area must be in the city and then must be prioritized according to need. Newly annexed land will be accorded the same consideration as other city lands.</p>' +
+        '<p>Those autonomous boards, agencies and utilities that have authority over the delivery of specific public services set their own policies, procedures, and fees. Property, regardless of its annexation date, will be required to connect to these services once available in their area, at the property owner&rsquo;s expense.</p>' +
+        '<p>I have read the above statement governing the delivery of city services to lands annexed into the City of Arab, and I agree to these conditions as they may pertain to any of my lands that are annexed.</p>'
+    }
+  };
+  function fTerms(id, termKey){
+    var t = TERMS[termKey];
+    return '<div class="termsbox"><p class="termstitle">'+esc(t.title)+'</p>' +
+      '<p class="termssrc">City of Arab Building Department &mdash; '+esc(t.src)+'</p>' +
+      '<div class="termstext" tabindex="0">'+t.body+'</div>' +
+      '<label class="checkline" for="'+id+'"><input type="checkbox" id="'+id+'" required> I have read and agree to the above.</label></div>';
+  }
+
+  /* keep segmented-radio visuals in sync + let any change re-run the active form's update() */
+  document.getElementById('main').addEventListener('change', function(e){
+    var t = e.target;
+    if (t.matches('.radiogroup input[type=radio]')){
+      var group = t.closest('.radiogroup');
+      Array.prototype.forEach.call(group.querySelectorAll('label.opt'), function(l){ l.classList.remove('checked'); });
+      t.closest('label.opt').classList.add('checked');
+    }
+    if (typeof window.__curUpdate === 'function') window.__curUpdate();
+  });
+  document.getElementById('main').addEventListener('input', function(e){
+    if (typeof window.__curUpdate === 'function') window.__curUpdate();
+  });
+
+  /* ---------- router ---------- */
+  var FORM_META = {
+    owner:        { title:'Building Permit — Homeowner',   eyebrow:'Building Permit', sub:'For homeowners acting as their own contractor.' },
+    contractor:   { title:'Building Permit — Contractor',  eyebrow:'Building Permit', sub:'For licensed contractors and general contractors.' },
+    subcontractor:{ title:'Sub-Contractor Permit',         eyebrow:'Building Permit', sub:'Electrical, HVAC, plumbing, gas and other sub-trades.' },
+    sign:         { title:'Sign Permit Application',       eyebrow:'Sign Permit', sub:'A separate application is required for each sign.' },
+    pool:         { title:'Swimming Pool Permit',          eyebrow:'Building Permit', sub:'Flat fee $50.' },
+    demolition:   { title:'Demolition Permit',             eyebrow:'Building Permit', sub:'Flat fee $100.' },
+    moving:       { title:'Moving Permit',                 eyebrow:'Building Permit', sub:'Flat fee $100 — moving a structure into, out of, or within the city.' },
+    subdivision:  { title:'Subdivision / Development Approval', eyebrow:'Planning Commission', sub:'Sketch, preliminary or final plat review.' },
+    annexation:   { title:'Application for Annexation',    eyebrow:'Planning Commission', sub:'Petition to bring property into the City of Arab.' },
+    calendar:     { title:'City Calendar',                 eyebrow:'Building Department', sub:'Meetings, submission deadlines and office closures.' },
+    search:       { title:'Search My Permit',              eyebrow:'Building Department', sub:'Look up the status of a permit you already applied for.' },
+    account:      { title:'My Account',                    eyebrow:'Building Department', sub:'Sign in to see the status of every permit you’ve applied for.' },
+    staff:        { title:'Staff Preview',                 eyebrow:'Internal', sub:'Test submissions and sync settings — not part of the public site.' },
+    inspect:      { title:'Inspection Mode',                eyebrow:'Building Inspector', sub:'Large-touch view for recording inspections on site, built for iPad and iPhone.' }
+  };
+
+  function navigate(view){ location.hash = view === 'home' ? '' : view; }
+  window.addEventListener('hashchange', function(){ window.scrollTo(0, 0); render(); });
+
+  /* ---------- suggestion box (design-review only) ---------- */
+  var SUGGESTABLE_VIEWS = ['owner','contractor','subcontractor','sign','pool','demolition','moving','subdivision','annexation'];
+  function attachSuggestBox(main, pageKind, pageLabel){
+    var box = document.createElement('div');
+    box.className = 'suggestbox';
+    box.innerHTML = '<button type="button" class="suggestbtn">'+ICONS.bulb+'<span>Suggest a change to this form</span></button>';
+    main.insertBefore(box, main.firstChild);
+    box.querySelector('button').addEventListener('click', function(){ openSuggestModal(main, pageKind, pageLabel); });
+  }
+  function closeSuggestModal(){
+    var el = document.getElementById('suggestModal');
+    if (el) el.remove();
+  }
+  function openSuggestModal(main, pageKind, pageLabel){
+    closeSuggestModal();
+    var veil = document.createElement('div');
+    veil.className = 'modalveil';
+    veil.id = 'suggestModal';
+    veil.innerHTML = '<div class="modalbox">' +
+      '<h3>Suggest a change</h3>' +
+      '<p class="modaldsc">'+esc(pageLabel)+' — leave a note for the team: a correction, a suggestion, or a question to add. This is a design-review note, not a live change to the form.</p>' +
+      '<div id="suggestFormWrap">' +
+        fRadio('suggestType','What kind of note is this?',['Suggestion','Correction','Add a question'],{value:'Suggestion', stack:true}) +
+        fTextarea('suggestText','What should change?',{required:true, hint:'Plain language is fine — describe the correction, suggestion or new question. You are not building the actual form field here.'}) +
+        '<div class="modalbtns"><button type="button" class="ghost" id="suggestCancel">Cancel</button><button type="button" class="primary" id="suggestSend">Send suggestion</button></div>' +
+      '</div>' +
+    '</div>';
+    main.appendChild(veil);
+    document.getElementById('suggestCancel').addEventListener('click', closeSuggestModal);
+    veil.addEventListener('click', function(e){ if (e.target === veil) closeSuggestModal(); });
+    document.getElementById('suggestSend').addEventListener('click', function(){
+      var text = v('suggestText');
+      if (!text || !text.trim()){ document.getElementById('suggestText').focus(); return; }
+      var record = { page: pageKind, pageLabel: pageLabel, type: radioVal('suggestType') || 'Suggestion', text: text, submittedAt: new Date().toISOString() };
+      var wrap = document.getElementById('suggestFormWrap');
+      wrap.innerHTML = '<p class="modalsending">Sending…</p>';
+      function done(){
+        if (!document.getElementById('suggestModal')) return;
+        wrap.innerHTML = '<div class="modalsent"><div class="badge">&#10003;</div><p>Sent to <b>jadecruz@starsonn.com</b> for review. Thanks for the note!</p><button type="button" class="ghost" id="suggestDone">Close</button></div>';
+        document.getElementById('suggestDone').addEventListener('click', closeSuggestModal);
+      }
+      if (window.__db){
+        window.__db.collection('suggestions').add(record).then(done).catch(done);
+      } else {
+        setTimeout(done, 350);
+      }
+    });
+  }
+
+  /* ---------- staff review panel: inspections/CofO (building permits) or approval (everything else) ---------- */
+  function closeReviewModal(){
+    var el = document.getElementById('reviewModal');
+    if (el) el.remove();
+  }
+  function openReviewModal(id, rec){
+    closeReviewModal();
+    var isBP = isBuildingPermitType(rec.type);
+    var review = rec.review || freshReview(rec.type);
+    var f = rec.fields || {};
+    var veil = document.createElement('div');
+    veil.className = 'modalveil';
+    veil.id = 'reviewModal';
+
+    var body = '<h3>'+esc(TYPE_LABEL[rec.type]||rec.type)+' &mdash; '+esc(rec.permitNumber||'')+'</h3>';
+    body += '<p class="modaldsc">'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'. These fields are staff-only — applicants never see this panel.</p>';
+    body += '<div id="reviewFormWrap">';
+
+    if (isBP){
+      var insp = review.inspections || {};
+      body += '<div class="reviewsection"><p class="lbl">Inspections</p>';
+      INSPECTION_ORDER.forEach(function(k){
+        var it = insp[k] || {};
+        body += '<div class="insprow"><label class="insphead" for="rv_'+k+'_done"><input type="checkbox" id="rv_'+k+'_done" '+(it.done?'checked':'')+'> '+esc(INSPECTION_LABEL[k])+'</label>' +
+          '<div class="inspgrid">' +
+          '<div class="mf"><label for="rv_'+k+'_date">Date of inspection</label><input type="date" id="rv_'+k+'_date" value="'+esc(it.date||'')+'"></div>' +
+          '<div class="mf"><label for="rv_'+k+'_by">Completed by</label><input type="text" id="rv_'+k+'_by" placeholder="Initials" value="'+esc(it.completedBy||'')+'"></div>' +
+          '<div class="mf"><label for="rv_'+k+'_rec">Date recorded</label><input type="date" id="rv_'+k+'_rec" value="'+esc(it.dateRecorded||'')+'"></div>' +
+          '</div>' +
+          '<div class="cmt mf"><label for="rv_'+k+'_comment">Comments</label><textarea id="rv_'+k+'_comment" placeholder="Notes from the inspection…">'+esc(it.comment||'')+'</textarea></div>' +
+          '</div>';
+      });
+      body += '</div>';
+
+      var coo = review.certOfOccupancy || {};
+      body += '<div class="reviewsection"><p class="lbl">Certificate of occupancy</p>';
+      body += fRadio('rvCoo','Certificate of occupancy given?',[{value:'given',label:'Given'},{value:'not_given',label:'Not given'}],{value:coo.given||''});
+      body += fTextarea('rvCooComments','C of O comments',{value:coo.comments||''});
+      body += '<div class="two-col">' +
+        fText('rvCooInitials','Initials sign off',{value:coo.initials||'', hint:'Inspector initials'}) +
+        fText('rvCooDate','Date',{type:'date',value:coo.date||'', hint:'Date initialed'}) +
+        '</div></div>';
+
+      body += '<div class="reviewsection"><p class="lbl">Fee</p>' +
+        '<label class="checkline" for="rvFeePaid"><input type="checkbox" id="rvFeePaid" '+(review.feePaid?'checked':'')+'> Fee paid</label>' +
+        '<p class="feegate" id="rvFeeGateNote"></p></div>';
+      body += '<div class="reviewsection"><button type="button" class="ghost" id="rvDownloadPdf" style="margin-top:0">Download editable inspection PDF</button></div>';
+    } else {
+      body += '<div class="reviewsection"><p class="lbl">Approval</p>' +
+        '<label class="checkline" for="rvApproved"><input type="checkbox" id="rvApproved" '+(review.approved?'checked':'')+'> Approved by Building Department</label>' +
+        '<div class="two-col" style="margin-top:12px">' +
+        fText('rvSignedBy','Signed off by',{value:review.signedBy||''}) +
+        fText('rvDateSigned','Date signed off',{type:'date',value:review.dateSignedOff||''}) +
+        '</div></div>';
+    }
+
+    body += '<div class="modalbtns"><button type="button" class="ghost" id="rvCancel">Close</button><button type="button" class="primary" id="rvSave" style="margin-top:0">Save review</button></div>';
+    body += '<p class="reportstatus" id="rvStatus"></p></div>';
+
+    veil.innerHTML = '<div class="modalbox wide">'+body+'</div>';
+    document.getElementById('main').appendChild(veil);
+
+    document.getElementById('rvCancel').addEventListener('click', closeReviewModal);
+    veil.addEventListener('click', function(e){ if (e.target === veil) closeReviewModal(); });
+
+    if (isBP){
+      var updateFeeGate = function(){
+        var given = radioVal('rvCoo');
+        var feeCb = document.getElementById('rvFeePaid');
+        var note = document.getElementById('rvFeeGateNote');
+        if (given !== 'given'){
+          feeCb.checked = false;
+          feeCb.disabled = true;
+          note.textContent = 'Fee can be marked paid only after the Certificate of Occupancy is given.';
+        } else {
+          feeCb.disabled = false;
+          note.textContent = '';
+        }
+      };
+      updateFeeGate();
+      veil.addEventListener('change', function(e){ if (e.target && e.target.name === 'rvCoo') updateFeeGate(); });
+
+      document.getElementById('rvDownloadPdf').addEventListener('click', function(){
+        var statusEl = document.getElementById('rvStatus');
+        var liveReview = { inspections:{}, certOfOccupancy:{}, feePaid: checked('rvFeePaid') };
+        INSPECTION_ORDER.forEach(function(k){
+          liveReview.inspections[k] = { done: checked('rv_'+k+'_done'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
+        });
+        liveReview.certOfOccupancy = { given: radioVal('rvCoo'), comments: v('rvCooComments'), initials: v('rvCooInitials'), date: v('rvCooDate') };
+        downloadInspectionPdf({ type: rec.type, permitNumber: rec.permitNumber, fields: f, review: liveReview }, statusEl);
+      });
+    }
+
+    document.getElementById('rvSave').addEventListener('click', function(){
+      var statusEl = document.getElementById('rvStatus');
+      var newReview;
+      if (isBP){
+        newReview = { inspections:{}, certOfOccupancy:{}, feePaid: checked('rvFeePaid') };
+        INSPECTION_ORDER.forEach(function(k){
+          newReview.inspections[k] = { done: checked('rv_'+k+'_done'), date: v('rv_'+k+'_date'), completedBy: v('rv_'+k+'_by'), dateRecorded: v('rv_'+k+'_rec'), comment: v('rv_'+k+'_comment') };
+        });
+        newReview.certOfOccupancy = { given: radioVal('rvCoo'), comments: v('rvCooComments'), initials: v('rvCooInitials'), date: v('rvCooDate') };
+      } else {
+        newReview = { approved: checked('rvApproved'), signedBy: v('rvSignedBy'), dateSignedOff: v('rvDateSigned') };
+      }
+      if (!window.__db){ statusEl.textContent = 'Not connected to the design database in this view.'; statusEl.className = 'reportstatus err'; return; }
+      statusEl.textContent = 'Saving…'; statusEl.className = 'reportstatus';
+      window.__db.doc('submissions/'+id).update({ review: newReview }).then(function(){
+        statusEl.textContent = 'Saved.'; statusEl.className = 'reportstatus ok';
+        setTimeout(closeReviewModal, 500);
+      }).catch(function(){ statusEl.textContent = 'Could not save — please try again.'; statusEl.className = 'reportstatus err'; });
+    });
+  }
+
+  /* ---------- kiosk mode ---------- */
+  function isKiosk(){
+    if (typeof window.__kioskFlag === 'boolean') return window.__kioskFlag;
+    var on = false;
+    try { on = localStorage.getItem('arabKiosk') === '1'; } catch(e){ on = false; }
+    window.__kioskFlag = on;
+    return on;
+  }
+  function setKiosk(on){
+    window.__kioskFlag = !!on;
+    try { localStorage.setItem('arabKiosk', on ? '1' : '0'); } catch(e){}
+    applyKioskClass();
+  }
+  function applyKioskClass(){
+    document.body.classList.toggle('kiosk', isKiosk());
+    var link = document.querySelector('.staff-link');
+    if (!link) return;
+    if (isKiosk()){
+      link.textContent = 'Exit kiosk mode';
+      link.href = '#staff';
+      link.onclick = function(e){ e.preventDefault(); setKiosk(false); navigate('staff'); };
+    } else {
+      link.textContent = 'Staff sign in';
+      link.href = '#account';
+      link.onclick = null;
+    }
+  }
+
+  /* ---------- iPad / iPhone detection (for the staff "Inspection Mode" button) ---------- */
+  function isIPad(){
+    var ua = navigator.userAgent || navigator.vendor || '';
+    if (/iPad/i.test(ua)) return true;
+    /* iPadOS 13+ Safari reports itself as "Macintosh" — the reliable tell is touch support on what claims to be a Mac. */
+    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+    return false;
+  }
+  function isIPhone(){
+    var ua = navigator.userAgent || navigator.vendor || '';
+    return /iPhone|iPod/i.test(ua);
+  }
+  function updateInspModeButton(view){
+    var btn = document.getElementById('inspModeBtn');
+    if (!btn) return;
+    var relevant = (view === 'staff' || view === 'inspect');
+    var show = relevant && (isIPad() || isIPhone());
+    btn.hidden = !show;
+    if (!show) return;
+    var onInspect = view === 'inspect';
+    btn.classList.toggle('active', onInspect);
+    var lbl = btn.querySelector('span');
+    if (lbl) lbl.textContent = onInspect ? 'Exit Inspection Mode' : 'Inspection Mode';
+    btn.onclick = function(){ navigate(onInspect ? 'staff' : 'inspect'); };
+  }
+
+  /* ---------- installable app (PWA): "Get the App" ---------- */
+  function isIOSDevice(){
+    var ua = navigator.userAgent || navigator.vendor || '';
+    if (/iPhone|iPod/i.test(ua)) return true;
+    if (/iPad/i.test(ua)) return true;
+    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+    return false;
+  }
+  function isStandaloneMode(){
+    try {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.navigator.standalone) return true; /* iOS Safari's own flag */
+    } catch(e){}
+    return false;
+  }
+  var deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredInstallPrompt = null;
+  });
+  function closeInstallModal(){
+    var el = document.getElementById('installModal');
+    if (el) el.remove();
+  }
+  function openInstallModal(){
+    closeInstallModal();
+    var veil = document.createElement('div');
+    veil.className = 'modalveil';
+    veil.id = 'installModal';
+
+    var body = '<h3>Get the App</h3>';
+    body += '<p class="modaldsc">Add the Building Department Online Forms to your home screen. It opens full-screen with its own icon, just like an app — no browser address bar, and it stays one tap away.</p>';
+
+    if (deferredInstallPrompt){
+      body += '<button type="button" class="primary" id="installNowBtn" style="margin-top:0">Install now</button>';
+      body += '<p class="installnote">Your browser can install this directly — tap the button above.</p>';
+    } else if (isIOSDevice()){
+      body += '<ol class="installsteps">' +
+        '<li><span class="num">1</span><span>Tap the <b>Share</b> button in Safari’s toolbar (the square with an arrow pointing up).</span></li>' +
+        '<li><span class="num">2</span><span>Scroll down and tap <b>Add to Home Screen</b>.</span></li>' +
+        '<li><span class="num">3</span><span>Tap <b>Add</b> in the top right corner.</span></li>' +
+        '</ol>';
+      body += '<p class="installnote">This only works in Safari — iPadOS and iOS don’t support installing from Chrome or other browsers.</p>';
+    } else {
+      body += '<ol class="installsteps">' +
+        '<li><span class="num">1</span><span>Open your browser’s menu (usually three dots <b>⋮</b> or lines, top right).</span></li>' +
+        '<li><span class="num">2</span><span>Look for <b>Install app</b> or <b>Add to Home screen</b>.</span></li>' +
+        '<li><span class="num">3</span><span>Confirm, and an icon will appear on your home screen or desktop.</span></li>' +
+        '</ol>';
+      body += '<p class="installnote">Exact wording varies by browser. If you don’t see the option yet, this feature finishes rolling out once the site moves off this preview link.</p>';
+    }
+    body += '<div class="modalbtns" style="margin-top:16px"><button type="button" class="ghost" id="installCancel" style="margin-top:0">Close</button></div>';
+
+    veil.innerHTML = '<div class="modalbox">'+body+'</div>';
+    document.getElementById('main').appendChild(veil);
+    document.getElementById('installCancel').addEventListener('click', closeInstallModal);
+    veil.addEventListener('click', function(e){ if (e.target === veil) closeInstallModal(); });
+    var nowBtn = document.getElementById('installNowBtn');
+    if (nowBtn){
+      nowBtn.addEventListener('click', function(){
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function(){ deferredInstallPrompt = null; closeInstallModal(); });
+      });
+    }
+  }
+  /* Register the manifest/icons/service worker so the prototype is genuinely installable once it's
+     ported off this preview link. The artifact sandbox this runs in today doesn't allow a page to
+     register a service worker or load a <link rel="manifest">, so this quietly no-ops here and
+     activates once the same files (pwa/manifest.json, icon-192.png, icon-512.png, sw.js) ship
+     alongside index.html on the live site. */
+  function setupPWA(){
+    try {
+      if (!document.querySelector('link[rel="manifest"]')){
+        var manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = 'manifest.json';
+        document.head.appendChild(manifestLink);
+      }
+      var appleTouch = document.createElement('link');
+      appleTouch.rel = 'apple-touch-icon';
+      appleTouch.href = 'apple-touch-icon.png';
+      document.head.appendChild(appleTouch);
+      [
+        ['theme-color', '#0F3273'],
+        ['apple-mobile-web-app-capable', 'yes'],
+        ['apple-mobile-web-app-status-bar-style', 'black-translucent'],
+        ['apple-mobile-web-app-title', 'Arab Permits'],
+        ['mobile-web-app-capable', 'yes']
+      ].forEach(function(pair){
+        var m = document.createElement('meta');
+        m.name = pair[0];
+        m.content = pair[1];
+        document.head.appendChild(m);
+      });
+    } catch(e){}
+    try {
+      if ('serviceWorker' in navigator && window.isSecureContext){
+        navigator.serviceWorker.register('sw.js').catch(function(){});
+      }
+    } catch(e){}
+  }
+
+  function render(){
+    applyKioskClass();
+    var view = (location.hash||'').replace('#','') || 'home';
+    if (isKiosk() && (view === 'staff' || view === 'inspect')){ navigate('home'); return; }
+    if ((view === 'staff' || view === 'inspect') && !hasStaffAccess()){ navigate('account'); return; }
+    var app = document.getElementById('app');
+    var back = document.getElementById('backBtn');
+    var eyebrow = document.getElementById('eyebrow');
+    var title = document.getElementById('pageTitle');
+    var sub = document.getElementById('pageSub');
+    var main = document.getElementById('main');
+    window.__curUpdate = null;
+    main.innerHTML = '';
+    updateInspModeButton(view);
+
+    if (view === 'home'){
+      app.classList.add('wide');
+      app.classList.remove('staffwide');
+      back.hidden = true;
+      eyebrow.textContent = 'City of Arab, Alabama';
+      title.textContent = 'Building Department Online Forms';
+      sub.textContent = 'Apply online, or download a paper application for permits not yet available here.';
+      renderHome(main);
+      return;
+    }
+    app.classList.remove('wide');
+    if (view === 'staff' || view === 'inspect') app.classList.add('staffwide'); else app.classList.remove('staffwide');
+    back.hidden = false;
+    back.onclick = function(){ navigate(view === 'inspect' ? 'staff' : 'home'); };
+    var meta = FORM_META[view];
+    if (!meta){ navigate('home'); return; }
+    eyebrow.textContent = meta.eyebrow;
+    title.textContent = meta.title;
+    sub.textContent = meta.sub;
+
+    if (view==='owner' || view==='contractor') renderBuildingForm(main, view);
+    else if (view==='subcontractor') renderSubForm(main);
+    else if (view==='sign') renderSignForm(main);
+    else if (view==='pool' || view==='demolition' || view==='moving') renderSimpleForm(main, view);
+    else if (view==='subdivision') renderSubdivisionForm(main);
+    else if (view==='annexation') renderAnnexationForm(main);
+    else if (view==='calendar') renderCalendarPage(main, false);
+    else if (view==='search') renderSearchPage(main);
+    else if (view==='account') renderAccountPage(main);
+    else if (view==='staff') renderStaff(main);
+    else if (view==='inspect') renderInspectionMode(main);
+
+    if (SUGGESTABLE_VIEWS.indexOf(view) !== -1) attachSuggestBox(main, view, meta.title);
+  }
+
+  /* ---------- custom line icons (echoes arabcity.org's white line-icon tiles) ---------- */
+  var ICONS = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1v-9"/><rect x="7" y="12.6" width="2.1" height="2.1" rx=".3" stroke-width="1.4"/></svg>',
+    helmet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M2.5 15h19a.5.5 0 0 1 .5.5v1.3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1.3a.5.5 0 0 1 .5-.5z"/><path d="M12 7V4"/><path d="M8 8.7a6.3 6.3 0 0 1 8 0" stroke-width="1.3"/></svg>',
+    plug: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.76-3.76a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>',
+    sign: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v12"/><rect x="4" y="4" width="16" height="8" rx="1"/><path d="M9 21h6"/></svg>',
+    pool: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7.8" width="18" height="9.4" rx="4"/><path d="M4.8 12.4c1.3 1 2.6 1 3.9 0s2.6-1 3.9 0 2.6 1 3.9 0 2.6-1 3.9 0" stroke-width="1.3"/><path d="M17.3 4v6.5M19.7 4v6.5M17.3 6.1h2.4M17.3 8.4h2.4" stroke-width="1.5"/></svg>',
+    demo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9.5L12 4l8 5.5V21"/><path d="M4 21h16"/><path d="m9.5 9-2 5 3 1.5-2 5"/></svg>',
+    truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h10v10.3H3z"/><path d="M13 10.3h4.3L21 13.6v3.7h-3.7"/><path d="M13 17.3H9.6"/><circle cx="7" cy="18.6" r="1.6"/><circle cx="17.6" cy="18.6" r="1.6"/></svg>',
+    plat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="17" rx="1"/><path d="M3 10h18M9 3.5v6.5M9 10v10.5M15 10v10.5M3 16h6M15 15.3h6" stroke-width="1.5"/></svg>',
+    annex: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z"/><path d="M9.3 12.7 12 10.4l2.7 2.3v3.1a.5.5 0 0 1-.5.5H9.8a.5.5 0 0 1-.5-.5z" stroke-width="1.4"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><circle cx="8" cy="14" r=".6" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r=".6" fill="currentColor" stroke="none"/><circle cx="16" cy="14" r=".6" fill="currentColor" stroke="none"/><circle cx="8" cy="17.3" r=".6" fill="currentColor" stroke="none"/><circle cx="12" cy="17.3" r=".6" fill="currentColor" stroke="none"/></svg>',
+    bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.45 1 1.15 1 1.9V16h5v-.2c0-.75.4-1.45 1-1.9A6 6 0 0 0 12 3z"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg>',
+    clipboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="17" rx="1.5"/><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4.5"/></svg>',
+    install: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8v8M8.3 12.3 12 16l3.7-3.7" stroke-width="1.6"/></svg>',
+    account: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.4"/><path d="M4.8 20c.9-3.6 4-5.8 7.2-5.8s6.3 2.2 7.2 5.8"/></svg>'
+  };
+
+  /* ---------- home / landing page ---------- */
+  function renderHome(main){
+    var apply = [
+      {view:'owner', ic:ICONS.home, ttl:'Building Permit — Homeowner', dsc:'New construction, additions, remodels and single-trade work you are doing yourself.', fee:'Fee by construction value — see slide scale'},
+      {view:'contractor', ic:ICONS.helmet, ttl:'Building Permit — Contractor', dsc:'New construction, additions, remodels and single-trade work performed by a licensed contractor.', fee:'Fee by construction value — see slide scale'},
+      {view:'subcontractor', ic:ICONS.plug, ttl:'Sub-Contractor Permit', dsc:'Electrical, HVAC, plumbing, gas and other sub-trades. Every sub-trade must pull its own permit.', fee:'Fee by construction value — see slide scale'},
+      {view:'sign', ic:ICONS.sign, ttl:'Sign Permit', dsc:'Freestanding ground signs and building signs. One application per sign.', fee:'$50 non-illuminated · $75 illuminated'},
+      {view:'pool', ic:ICONS.pool, ttl:'Swimming Pool Permit', dsc:'In-ground and above-ground pool installations.', fee:'$50 flat fee'},
+      {view:'demolition', ic:ICONS.demo, ttl:'Demolition Permit', dsc:'Demolition of any building or structure.', fee:'$100 flat fee'},
+      {view:'moving', ic:ICONS.truck, ttl:'Moving Permit', dsc:'Moving a building or structure into, out of, or within the city.', fee:'$100 flat fee'},
+      {view:'subdivision', ic:ICONS.plat, ttl:'Subdivision / Development Approval', dsc:'Sketch, preliminary or final plat review by the Planning Commission.', fee:'Reviewed monthly — NO FEE'},
+      {view:'annexation', ic:ICONS.annex, ttl:'Application for Annexation', dsc:'Petition to bring property into the City of Arab and its services.', fee:'Reviewed by the Planning Commission — NO FEE'}
+    ];
+    var html = '<p class="lede">Building permits are required to erect, enlarge, alter, demolish, or repair a structure in the City of Arab — everything from garages to commercial construction, signs and additions. Pick the form that matches your project below.</p>';
+
+    html += '<a class="calpromo" href="#calendar"><div class="ic">'+ICONS.calendar+'</div><div class="body"><p class="ttl">City Calendar</p><p class="dsc">Planning Commission meetings, submission deadlines and office closures.</p></div><div class="btn">View live calendar<span aria-hidden="true">&rsaquo;</span></div></a>';
+
+    if (CURRENT_CITIZEN){
+      html += '<a class="calpromo" href="#account"><div class="ic">'+ICONS.account+'</div><div class="body"><p class="ttl">My Account</p><p class="dsc">Signed in as '+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+' — view the status of every permit on your account.</p></div><div class="btn">View my permits<span aria-hidden="true">&rsaquo;</span></div></a>';
+    } else {
+      html += '<a class="calpromo" href="#account"><div class="ic">'+ICONS.account+'</div><div class="body"><p class="ttl">My Account</p><p class="dsc">Create a free account to keep every permit you apply for — and its status — in one place.</p></div><div class="btn">Sign in or create account<span aria-hidden="true">&rsaquo;</span></div></a>';
+    }
+
+    html += '<a class="calpromo" href="#search"><div class="ic">'+ICONS.search+'</div><div class="body"><p class="ttl">Search My Permit</p><p class="dsc">Already applied? Look up your permit status with your permit number.</p></div><div class="btn">Search my permit<span aria-hidden="true">&rsaquo;</span></div></a>';
+
+    if (!isStandaloneMode()){
+      html += '<button type="button" class="calpromo gold-promo" id="installPromoBtn"><div class="ic">'+ICONS.install+'</div><div class="body"><p class="ttl">Get the App</p><p class="dsc">Add this to your phone or iPad’s home screen — it opens full-screen, just like an app.</p></div><div class="btn">Install<span aria-hidden="true">&rsaquo;</span></div></button>';
+    }
+
+    html += '<h2 class="section">Apply online</h2>';
+    html += '<div class="cardgrid">';
+    apply.forEach(function(f){
+      html += '<a class="formcard" href="#'+f.view+'"><div class="ic">'+f.ic+'</div><div class="body"><p class="ttl">'+f.ttl+'</p><p class="dsc">'+f.dsc+'</p><p class="fee">'+f.fee+'</p></div><div class="chev">&rsaquo;</div></a>';
+    });
+    html += '</div>';
+
+    main.innerHTML = html;
+    var installBtn = document.getElementById('installPromoBtn');
+    if (installBtn) installBtn.addEventListener('click', openInstallModal);
+  }
+
+  /* ---------- building permit (owner + contractor share this schema) ---------- */
+  function renderBuildingForm(main, kind){
+    var isOwner = kind === 'owner';
+    var html = '<form id="bldgForm" novalidate>';
+
+    html += '<fieldset><legend>Applicant</legend>';
+    html += '<div class="two-col">' + fText('appFirst','First Name',{required:true}) + fText('appLast','Last Name',{required:true}) + '</div>';
+    html += fText('appEmail','Applicant Email',{type:'email',required:true,hint:'This email receives a copy of the submission and updates about it.'});
+    html += fText('appPhone','Applicant Phone #',{type:'tel',placeholder:'(000) 000-0000'});
+    html += fText('appDate','Date',{required:true,value:todayStr(),hint:'MM-DD-YYYY'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property</legend>';
+    html += fText('address','Address',{required:true,hint:'Enter the address where work will be performed.'});
+    html += '<div class="two-col">' + fText('lot','Lot #') + fText('zoning','Zoning',{hint:'R1, R2, R3, AG, General Business, etc.'}) + '</div>';
+    html += fText('propOwner','Property Owner',{hint:'Enter owner’s first and last name.'});
+    html += '<div class="two-col">' + fText('propOwnerPhone','Property Owner Phone #',{type:'tel',placeholder:'(000) 000-0000'}) + fText('propOwnerEmail','Property Owner Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Contractor'+(isOwner?' (if any)':'')+'</legend>';
+    html += fText('gcLicense','Contractor/GC License #',{hint:'Enter contractor or general contractor license number.'});
+    html += '<div class="two-col">' + fText('contrName','Contractor Name',{hint:'First and last name.'}) + fText('bizName','Business Name',{hint:'Include DBA or LLC.'}) + '</div>';
+    html += '<div class="two-col">' + fText('contrPhone','Contractor Phone #',{type:'tel',placeholder:'(000) 000-0000'}) + fText('contrEmail','Contractor Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Project</legend>';
+    html += fRadio('buildType','What Type of Build?',['Residential','Commercial'],{required:true});
+
+    html += '<div id="resBlock">';
+    html += fRadio('projectType','What type of Project is This?',['New Build','Addition','Remodel or Single Trade','Other'],{required:false,stack:false});
+    html += '<div id="sqftBlock">';
+    html += '<div class="two-col">' + fText('heatedSqft','Amount of Heated SQFT',{type:'number'}) + fText('unheatedSqft','Amount of Unheated SQFT',{type:'number'}) + '</div>';
+    html += '</div>';
+    html += '<div id="estCostResBlock">' + fText('estCostRes','Estimated Cost',{type:'number',hint:'Total cost of the project.'}) + '</div>';
+    html += '</div>';
+
+    html += '<div id="comBlock">';
+    html += fText('commValue','Commercial Construction Value',{type:'number',hint:'Actual contract bid, plus applicable engineering fees.'});
+    html += '</div>';
+
+    html += fTextarea('workDesc','Brief Description of Work',{required:true});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Licensing</legend>';
+    html += fRadio('authEmp','Are you an authorized employee of a Federal, State, or Local Government, a General Contractor licensed prior to January 1, 1992, or a Property Owner acting as your own contractor?',['Yes','No'],{required:true,value:isOwner?'Yes':'No'});
+    html += '<div id="declareBlock">';
+    html += fRadio('declare','Which applies to you?',[
+      {value:'gov', label:'Authorized employee of a federal, state, or local government, exempt under Ala. Code 34-14A-6(2).'},
+      {value:'preGc', label:'General Contractor holding a current, valid license issued prior to January 1, 1992, under Ala. Code 34-14A-6(3).'},
+      {value:'ownerBuilder', label:'Property Owner acting as your own contractor, supplying all material supervision yourself, not for sale, under Ala. Code 34-14A-6(5).'}
+    ],{stack:true,value:isOwner?'ownerBuilder':''});
+    html += '</div>';
+    if (!isOwner){
+      html += '<div id="swornBlock" hidden>' + fTerms('agreeSworn','swornStatement') + '</div>';
+    }
+    html += '<div class="field checkrow"><label style="display:flex;gap:9px;align-items:flex-start;margin:0;font-size:13.5px;font-weight:400;color:var(--ink)"><input type="checkbox" id="startedEarly"><span>Work has already started without a permit. <span class="hint" style="margin-top:2px">Per city code, fees for work started before a permit is obtained are doubled.</span></span></label></div>';
+    html += fFile('uploads','Upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Terms &amp; agreement</legend>';
+    html += fTerms('agreeBuilding','buildingAgreement');
+    html += fTerms('agreeInspections','inspectionRequirements');
+    html += fTerms('agreeOccupancy','occupancyResponsibilities');
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      var buildType = radioVal('buildType');
+      var isRes = buildType === 'Residential';
+      var isCom = buildType === 'Commercial';
+      document.getElementById('resBlock').hidden = !isRes;
+      document.getElementById('comBlock').hidden = !isCom;
+
+      var projectType = radioVal('projectType');
+      var isNewAdd = projectType==='New Build' || projectType==='Addition';
+      var isOtherProj = isRes && !isNewAdd;
+      document.getElementById('sqftBlock').hidden = !isNewAdd;
+      document.getElementById('estCostResBlock').hidden = !isOtherProj;
+
+      var declareBlock = document.getElementById('declareBlock');
+      declareBlock.hidden = radioVal('authEmp') !== 'Yes';
+
+      var swornBlock = document.getElementById('swornBlock');
+      if (swornBlock){
+        var showSworn = !declareBlock.hidden && radioVal('declare') === 'ownerBuilder';
+        swornBlock.hidden = !showSworn;
+        var swornCb = document.getElementById('agreeSworn');
+        if (swornCb) swornCb.required = showSworn;
+      }
+
+      var value = 0;
+      if (isRes){
+        value = isNewAdd ? (nv('heatedSqft')*75 + nv('unheatedSqft')*50) : nv('estCostRes');
+      } else if (isCom){
+        value = nv('commValue');
+      }
+      var permitFee = permitFeeFromValue(value);
+      var doubled = checked('startedEarly');
+      var permitFeeShown = doubled ? permitFee*2 : permitFee;
+      var cict = isCom ? cictFeeFromValue(value) : 0;
+      var total = permitFeeShown + cict;
+
+      var fb = '<div class="row"><span>Construction value</span><span>'+money(value)+'</span></div>';
+      fb += '<div class="row"><span>Permit fee'+(doubled?' (doubled — unpermitted start)':'')+'</span><span>'+money(permitFeeShown)+'</span></div>';
+      if (isCom) fb += '<div class="row"><span>CICT fee (commercial only, $1 / $1,000)</span><span>'+money(cict)+'</span></div>';
+      fb += '<div class="row total"><span>Estimated total</span><b>'+money(total)+'</b></div>';
+      fb += '<div class="note">Estimate only, based on the construction-value slide scale. Final fee is set by the Building Department and paid in person by cash or check.</div>';
+      document.getElementById('feebox').innerHTML = fb;
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('bldgForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var buildType = radioVal('buildType');
+      var isRes = buildType === 'Residential';
+      var isCom = buildType === 'Commercial';
+      var projectType = radioVal('projectType');
+      var isNewAdd = projectType==='New Build' || projectType==='Addition';
+      var value = isRes ? (isNewAdd ? (nv('heatedSqft')*75+nv('unheatedSqft')*50) : nv('estCostRes')) : nv('commValue');
+      var permitFee = permitFeeFromValue(value);
+      var doubled = checked('startedEarly');
+      var permitFeeShown = doubled ? permitFee*2 : permitFee;
+      var cict = isCom ? cictFeeFromValue(value) : 0;
+      var fields = {
+        applicantName: v('appFirst')+' '+v('appLast'), applicantEmail: v('appEmail'), applicantPhone: v('appPhone'), date: v('appDate'),
+        address: v('address'), lot: v('lot'), zoning: v('zoning'),
+        propertyOwner: v('propOwner'), propertyOwnerPhone: v('propOwnerPhone'), propertyOwnerEmail: v('propOwnerEmail'),
+        gcLicense: v('gcLicense'), contractorName: v('contrName'), businessName: v('bizName'), contractorPhone: v('contrPhone'), contractorEmail: v('contrEmail'),
+        buildType: buildType, projectType: projectType, heatedSqft: v('heatedSqft'), unheatedSqft: v('unheatedSqft'), estimatedCost: v('estCostRes')||v('commValue'),
+        workDescription: v('workDesc'), authorizedEmployee: radioVal('authEmp'), declaration: radioVal('declare'), startedWithoutPermit: doubled,
+        termsAgreed: { buildingAgreement: checked('agreeBuilding'), inspectionRequirements: checked('agreeInspections'), occupancyResponsibilities: checked('agreeOccupancy'), swornStatement: !isOwner ? checked('agreeSworn') : undefined }
+      };
+      submitApplication(kind, fields, {constructionValue: value, permitFee: permitFeeShown, cictFee: cict, total: permitFeeShown+cict});
+    });
+  }
+
+  /* ---------- sub-contractor permit ---------- */
+  function renderSubForm(main){
+    var html = '<form id="subForm" novalidate>';
+    html += '<fieldset><legend>Applicant</legend>';
+    html += fText('appName','Applicant Name or Business Name',{required:true});
+    html += fText('appEmail','Applicant Email',{type:'email',required:true});
+    html += fText('appPhone','Applicant Phone #',{type:'tel',placeholder:'(000) 000-0000'});
+    html += fText('appDate','Date',{required:true,value:todayStr()});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property</legend>';
+    html += fText('address','Address',{required:true,hint:'Enter the address where work will be performed.'});
+    html += '<div class="two-col">' + fText('lot','Lot #') + fText('zoning','Zoning',{hint:'R1, R2, R3, AG, General Business, etc.'}) + '</div>';
+    html += fText('propOwner','Property Owner',{hint:'Enter owner’s first and last name.'});
+    html += '<div class="two-col">' + fText('propOwnerPhone','Property Owner Phone #',{type:'tel',placeholder:'(000) 000-0000'}) + fText('propOwnerEmail','Property Owner Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Trade</legend>';
+    html += '<p class="section-note" style="margin-top:-4px">Electrical, HVAC, plumbing, gas and roofing sub-trades must hold a valid State of Alabama trade license. Every sub-trade must pull its own permit.</p>';
+    html += fText('trade','Trade',{hint:'HVAC, Electrical, Plumbing, etc.'});
+    html += fText('tradeLicense','Trade License #',{required:true});
+    html += '<div class="two-col">' + fText('subName','Sub-Contractor Name',{hint:'First and last name.'}) + fText('bizName','Business Name',{hint:'Include DBA or LLC.'}) + '</div>';
+    html += '<div class="two-col">' + fText('subPhone','Sub-Contractor Phone #',{type:'tel',placeholder:'(000) 000-0000'}) + fText('subEmail','Sub-Contractor Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Project</legend>';
+    html += fRadio('buildType','What Type of Build?',['Residential','Commercial'],{required:true});
+    html += fText('estCost','Estimated Project Cost',{type:'number',required:true});
+    html += fTextarea('workDesc','Brief Description of Work',{required:true});
+    html += '<div class="field checkrow"><label style="display:flex;gap:9px;align-items:flex-start;margin:0;font-size:13.5px;font-weight:400;color:var(--ink)"><input type="checkbox" id="startedEarly"><span>Work has already started without a permit. <span class="hint" style="margin-top:2px">Per city code, fees for work started before a permit is obtained are doubled.</span></span></label></div>';
+    html += fFile('uploads','Upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Terms &amp; agreement</legend>';
+    html += fTerms('agreeBuilding','buildingAgreement');
+    html += fTerms('agreeInspections','inspectionRequirements');
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      var isCom = radioVal('buildType') === 'Commercial';
+      var value = nv('estCost');
+      var permitFee = permitFeeFromValue(value);
+      var doubled = checked('startedEarly');
+      var permitFeeShown = doubled ? permitFee*2 : permitFee;
+      var cict = isCom ? cictFeeFromValue(value) : 0;
+      var total = permitFeeShown + cict;
+      var fb = '<div class="row"><span>Estimated project cost</span><span>'+money(value)+'</span></div>';
+      fb += '<div class="row"><span>Permit fee'+(doubled?' (doubled — unpermitted start)':'')+'</span><span>'+money(permitFeeShown)+'</span></div>';
+      if (isCom) fb += '<div class="row"><span>CICT fee (commercial only, $1 / $1,000)</span><span>'+money(cict)+'</span></div>';
+      fb += '<div class="row total"><span>Estimated total</span><b>'+money(total)+'</b></div>';
+      fb += '<div class="note">Estimate only. Final fee is set by the Building Department and paid in person by cash or check.</div>';
+      document.getElementById('feebox').innerHTML = fb;
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('subForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var isCom = radioVal('buildType') === 'Commercial';
+      var value = nv('estCost');
+      var permitFee = permitFeeFromValue(value);
+      var doubled = checked('startedEarly');
+      var permitFeeShown = doubled ? permitFee*2 : permitFee;
+      var cict = isCom ? cictFeeFromValue(value) : 0;
+      var fields = {
+        applicantName: v('appName'), applicantEmail: v('appEmail'), applicantPhone: v('appPhone'), date: v('appDate'),
+        address: v('address'), lot: v('lot'), zoning: v('zoning'),
+        propertyOwner: v('propOwner'), propertyOwnerPhone: v('propOwnerPhone'), propertyOwnerEmail: v('propOwnerEmail'),
+        trade: v('trade'), tradeLicense: v('tradeLicense'), subContractorName: v('subName'), businessName: v('bizName'), subContractorPhone: v('subPhone'), subContractorEmail: v('subEmail'),
+        buildType: radioVal('buildType'), estimatedCost: value, workDescription: v('workDesc'), startedWithoutPermit: doubled,
+        termsAgreed: { buildingAgreement: checked('agreeBuilding'), inspectionRequirements: checked('agreeInspections') }
+      };
+      submitApplication('subcontractor', fields, {constructionValue: value, permitFee: permitFeeShown, cictFee: cict, total: permitFeeShown+cict});
+    });
+  }
+
+  /* ---------- sign permit ---------- */
+  function renderSignForm(main){
+    var html = '<form id="signForm" novalidate>';
+    html += '<p class="section-note" style="margin-top:-6px">A separate form must be submitted for each sign. For properties with three or more signs, contact the Building Department directly.</p>';
+
+    html += '<fieldset><legend>Applicant</legend>';
+    html += '<div class="two-col">' + fText('appFirst','First Name',{required:true}) + fText('appLast','Last Name',{required:true}) + '</div>';
+    html += fText('appEmail','Applicant Email',{type:'email',required:true});
+    html += fText('appPhone','Applicant Phone Number',{type:'tel',placeholder:'(000) 000-0000'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Sign location</legend>';
+    html += fText('signAddress','Address of Sign',{required:true});
+    html += fText('estCost','Estimated Cost of Work',{type:'number',required:true});
+    html += fText('zone','Zone');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property owner &amp; tenant</legend>';
+    html += '<div class="two-col">' + fText('ownFirst','Owner First Name') + fText('ownLast','Owner Last Name') + '</div>';
+    html += '<div class="two-col">' + fText('ownEmail','Property Owner Email',{type:'email'}) + fText('ownPhone','Property Owner Phone',{type:'tel',placeholder:'(000) 000-0000'}) + '</div>';
+    html += '<div class="two-col">' + fText('tenFirst','Tenant First Name') + fText('tenLast','Tenant Last Name') + '</div>';
+    html += '<div class="two-col">' + fText('tenEmail','Property Tenant Email',{type:'email'}) + fText('tenPhone','Property Tenant Phone',{type:'tel',placeholder:'(000) 000-0000'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Contractor</legend>';
+    html += fText('contrName','Contractor or DBA Name');
+    html += '<div class="two-col">' + fText('contrEmail','Contractor Email',{type:'email'}) + fText('contrPhone','Contractor Phone',{type:'tel',placeholder:'(000) 000-0000'}) + '</div>';
+    html += '<div class="two-col">' + fText('gcLicense','General Contractor License Number') + fText('bizLicense','City of Arab Business License Number') + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Sign details</legend>';
+    html += fTextarea('workDesc','Brief Description of Work',{required:true});
+    html += fRadio('signType','What type of sign are you applying for?',['Free standing ground sign','Building sign'],{required:true,stack:true});
+
+    html += '<div id="groundBlock">';
+    html += fRadio('groundType','Select the type of freestanding ground sign',['Monument Sign','Pylon Sign','Pole sign / shopping complex sign','Other'],{stack:true});
+    html += '<div class="two-col">' + fText('signHeight','Sign Height (ft.)',{type:'number'}) + fText('signWidth','Sign Width (ft.)',{type:'number'}) + '</div>';
+    html += '<div class="two-col">' + fText('signFace','Sign Face (sqft.)',{type:'number'}) + fText('renderBoard','Render Board (sqft.)',{type:'number',hint:'If applicable.'}) + '</div>';
+    html += '</div>';
+
+    html += '<div id="buildingBlock">';
+    html += fRadio('buildingType','Select the type of building sign',['Wall sign','Cabinet/box','Channel letters on raceway','Awning/canopy/banner sign','Hand-lettered painted/vinyl/metal sign','Projecting/hanging sign','Other'],{stack:true});
+    html += '<div class="two-col">' + fText('bldgHeight','Height of Building/Suite (ft.)',{type:'number'}) + fText('bldgWidth','Width of Building/Suite (ft.)',{type:'number'}) + '</div>';
+    html += fText('bldgArea','Total Area of Building/Suite (ft.)',{type:'number'});
+    html += '<div class="two-col">' + fText('newSignFace','New Sign Face (sqft.)',{type:'number'}) + fText('existingSignFace','Existing and Remaining Sign (sqft.)',{type:'number'}) + '</div>';
+    html += '</div>';
+
+    html += fRadio('feature','Which feature applies to this sign?',['Non-illuminated','Illuminated','Electronic Message Display (Changing Message)'],{required:true,stack:true,hint:'Non-illuminated is billed at $50. Illuminated and electronic-message signs are billed at the $75 illuminated rate.'});
+    html += fFile('uploads','Upload the Plot Plan or Building Suite Photo/Rendering, sign rendering(s), and proof of your City of Arab Business License');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Terms &amp; agreement</legend>';
+    html += fTerms('agreeSign','signAgreement');
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      var signType = radioVal('signType');
+      document.getElementById('groundBlock').hidden = signType !== 'Free standing ground sign';
+      document.getElementById('buildingBlock').hidden = signType !== 'Building sign';
+      var feature = radioVal('feature');
+      var fee = feature === 'Non-illuminated' ? 50 : (feature ? 75 : 0);
+      var fb = '<div class="row"><span>Sign permit fee</span><span>'+(feature?money(fee):'—')+'</span></div>';
+      fb += '<div class="row total"><span>Estimated total</span><b>'+(feature?money(fee):'select a feature above'  )+'</b></div>';
+      fb += '<div class="note">Non-illuminated: $50. Illuminated or electronic message display: $75. Final fee is set by the Building Department and paid in person by cash or check.</div>';
+      document.getElementById('feebox').innerHTML = fb;
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('signForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var feature = radioVal('feature');
+      var fee = feature === 'Non-illuminated' ? 50 : 75;
+      var fields = {
+        applicantName: v('appFirst')+' '+v('appLast'), applicantEmail: v('appEmail'), applicantPhone: v('appPhone'),
+        signAddress: v('signAddress'), estimatedCost: v('estCost'), zone: v('zone'),
+        propertyOwnerName: v('ownFirst')+' '+v('ownLast'), propertyOwnerEmail: v('ownEmail'), propertyOwnerPhone: v('ownPhone'),
+        tenantName: v('tenFirst')+' '+v('tenLast'), tenantEmail: v('tenEmail'), tenantPhone: v('tenPhone'),
+        contractorName: v('contrName'), contractorEmail: v('contrEmail'), contractorPhone: v('contrPhone'), gcLicense: v('gcLicense'), businessLicense: v('bizLicense'),
+        workDescription: v('workDesc'), signType: radioVal('signType'), groundType: radioVal('groundType'), buildingType: radioVal('buildingType'),
+        feature: feature,
+        termsAgreed: { signAgreement: checked('agreeSign') }
+      };
+      submitApplication('sign', fields, {permitFee: fee, cictFee: 0, total: fee});
+    });
+  }
+
+  /* ---------- simple flat-fee permits: pool / demolition / moving ---------- */
+  var SIMPLE_META = {
+    pool:       { fee:50,  descLabel:'Describe the pool',       descHint:'Type (in-ground / above-ground), size, and location on the lot.', terms:['buildingAgreement','inspectionRequirements'] },
+    demolition: { fee:100, descLabel:'Describe the structure being demolished', descHint:'What is being torn down, and how.', terms:['buildingAgreement'] },
+    moving:     { fee:100, descLabel:'Describe the move',        descHint:'What is being moved, and the from/to address if it is coming into or leaving the city.', terms:['buildingAgreement'] }
+  };
+  function renderSimpleForm(main, kind){
+    var meta = SIMPLE_META[kind];
+    var html = '<form id="simpleForm" novalidate>';
+    html += '<fieldset><legend>Applicant</legend>';
+    html += '<div class="two-col">' + fText('appFirst','First Name',{required:true}) + fText('appLast','Last Name',{required:true}) + '</div>';
+    html += fText('appEmail','Applicant Email',{type:'email',required:true});
+    html += fText('appPhone','Applicant Phone #',{type:'tel',placeholder:'(000) 000-0000'});
+    html += fText('appDate','Date',{required:true,value:todayStr()});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property</legend>';
+    html += fText('address','Property Address',{required:true});
+    html += fText('propOwner','Property Owner',{hint:'If different from the applicant.'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Project</legend>';
+    html += fTextarea('workDesc',meta.descLabel,{required:true,hint:meta.descHint});
+    html += '<div class="field checkrow"><label style="display:flex;gap:9px;align-items:flex-start;margin:0;font-size:13.5px;font-weight:400;color:var(--ink)"><input type="checkbox" id="startedEarly"><span>Work has already started without a permit. <span class="hint" style="margin-top:2px">Per city code, fees for work started before a permit is obtained are doubled.</span></span></label></div>';
+    html += fFile('uploads','Upload supporting documents (optional)');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Terms &amp; agreement</legend>';
+    meta.terms.forEach(function(termKey, i){ html += fTerms('agreeTerm'+i, termKey); });
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      var doubled = checked('startedEarly');
+      var fee = doubled ? meta.fee*2 : meta.fee;
+      var fb = '<div class="row"><span>Permit fee'+(doubled?' (doubled — unpermitted start)':'')+'</span><span>'+money(fee)+'</span></div>';
+      fb += '<div class="row total"><span>Total due</span><b>'+money(fee)+'</b></div>';
+      fb += '<div class="note">Flat fee. Paid in person by cash or check at the Building Department.</div>';
+      document.getElementById('feebox').innerHTML = fb;
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('simpleForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var doubled = checked('startedEarly');
+      var fee = doubled ? meta.fee*2 : meta.fee;
+      var termsAgreed = {};
+      meta.terms.forEach(function(termKey, i){ termsAgreed[termKey] = checked('agreeTerm'+i); });
+      var fields = {
+        applicantName: v('appFirst')+' '+v('appLast'), applicantEmail: v('appEmail'), applicantPhone: v('appPhone'), date: v('appDate'),
+        address: v('address'), propertyOwner: v('propOwner'), workDescription: v('workDesc'), startedWithoutPermit: doubled,
+        termsAgreed: termsAgreed
+      };
+      submitApplication(kind, fields, {permitFee: fee, cictFee: 0, total: fee});
+    });
+  }
+
+  /* ---------- submit + confirmation ---------- */
+  var PERMIT_PREFIX = { owner:'BP', contractor:'BP', subcontractor:'SUB', sign:'SGN', pool:'POOL', demolition:'DEM', moving:'MOV', subdivision:'SD', annexation:'ANX' };
+  var BUILDING_PERMIT_TYPES = ['owner','contractor','subcontractor'];
+  function isBuildingPermitType(kind){ return BUILDING_PERMIT_TYPES.indexOf(kind) !== -1; }
+  function genPermitNumber(kind){
+    var d = new Date();
+    var stamp = d.getFullYear() + pad2(d.getMonth()+1) + pad2(d.getDate());
+    var rand = Math.random().toString(36).slice(2,6).toUpperCase();
+    return (PERMIT_PREFIX[kind]||'APP') + '-' + stamp + '-' + rand;
+  }
+  function freshReview(kind){
+    if (isBuildingPermitType(kind)){
+      var mkInsp = function(){ return { done:false, date:'', completedBy:'', dateRecorded:'', comment:'' }; };
+      return {
+        inspections: { footing:mkInsp(), framing:mkInsp(), electrical:mkInsp(), plumbing:mkInsp(), final:mkInsp() },
+        certOfOccupancy: { given:'', comments:'', initials:'', date:'' },
+        feePaid: false
+      };
+    }
+    return { approved:false, signedBy:'', dateSignedOff:'' };
+  }
+  function submitApplication(kind, fields, fee){
+    var permitNumber = genPermitNumber(kind);
+    var record = { type: kind, fields: fields, fee: fee, permitNumber: permitNumber, review: freshReview(kind), submittedAt: new Date().toISOString() };
+    if (CURRENT_CITIZEN){ record.citizenId = CURRENT_CITIZEN.id; record.citizenEmail = CURRENT_CITIZEN.email; }
+    renderConfirmation(kind, fee, 'saving', permitNumber);
+    if (window.__db){
+      window.__db.collection('submissions').add(record).then(function(){
+        renderConfirmation(kind, fee, 'saved', permitNumber);
+      }).catch(function(err){
+        renderConfirmation(kind, fee, 'error', permitNumber);
+      });
+    } else {
+      setTimeout(function(){ renderConfirmation(kind, fee, 'nodb', permitNumber); }, 250);
+    }
+  }
+  function renderConfirmation(kind, fee, status, permitNumber){
+    var main = document.getElementById('main');
+    var note = status === 'saving' ? 'Saving your test submission…'
+      : status === 'saved' ? 'Saved to the staff preview list below the fold — this is a design test, not a real permit application.'
+      : status === 'error' ? 'Could not save this test submission (the design database was unavailable). The fee math above is still accurate.'
+      : 'This preview isn’t connected to a database in this view, so nothing was saved — the fee math above is still accurate.';
+    var html = '<div class="confirm"><div class="badge">&#10003;</div><h2>Application received</h2>';
+    html += '<p>'+note+'</p>';
+    html += '<div class="receiptcard">';
+    if (permitNumber){
+      var followUp = CURRENT_CITIZEN
+        ? 'This permit has been added to your account — check its status anytime under <a href="#account">My Account</a>.'
+        : 'Save this number — use <a href="#search">Search My Permit</a> anytime to check its status, or <a href="#account">create an account</a> to keep every permit you apply for in one place.';
+      html += '<div class="permitsec"><p class="lbl">Your permit number</p><p class="num">'+esc(permitNumber)+'</p>' +
+        '<p class="hint">'+followUp+'</p></div>';
+    }
+    html += '<div class="feesec"><div class="row"><span>Estimated total</span><b>'+money(fee.total)+'</b></div>' +
+      '<div class="note">Fees are paid in person by cash or check at the City of Arab Building Department, 740 N Main St, Arab, AL 35016.</div></div>';
+    html += '</div>';
+    html += '<button class="ghost" onclick="location.hash=\'\'">Back to Online Forms</button>';
+    html += '</div>';
+    main.innerHTML = html;
+  }
+
+  /* ---------- citizen accounts (sign up / sign in, per-account permit list, role-gated staff access) ---------- */
+  var CURRENT_CITIZEN = null; /* {id, email, name, role} once signed in, else null. role: 'citizen' (default) | 'staff' | 'admin' */
+  var ROLE_LABEL = { citizen:'Citizen', staff:'Staff', admin:'Administrator' };
+  function roleLabel(r){ return ROLE_LABEL[r] || ROLE_LABEL.citizen; }
+  function hasStaffAccess(){ return !!(CURRENT_CITIZEN && (CURRENT_CITIZEN.role === 'staff' || CURRENT_CITIZEN.role === 'admin')); }
+  function isAdminUser(){ return !!(CURRENT_CITIZEN && CURRENT_CITIZEN.role === 'admin'); }
+  function citizenKey(email){ return String(email||'').trim().toLowerCase().replace(/[^a-z0-9@._-]/g,''); }
+  function loadCitizenSession(){
+    try {
+      var raw = localStorage.getItem('arabCitizenSession') || sessionStorage.getItem('arabCitizenSession');
+      CURRENT_CITIZEN = raw ? JSON.parse(raw) : null;
+    } catch(e){ CURRENT_CITIZEN = null; }
+  }
+  /* remember=true (default) keeps the session across browser restarts (localStorage);
+     remember=false keeps it only for this tab/window (sessionStorage) — the honest,
+     no-real-backend equivalent of an unchecked "remember me" box. */
+  function saveCitizenSession(c, remember){
+    CURRENT_CITIZEN = c;
+    if (remember === undefined) remember = true;
+    try {
+      if (remember){ localStorage.setItem('arabCitizenSession', JSON.stringify(c)); sessionStorage.removeItem('arabCitizenSession'); }
+      else { sessionStorage.setItem('arabCitizenSession', JSON.stringify(c)); localStorage.removeItem('arabCitizenSession'); }
+    } catch(e){}
+  }
+  function clearCitizenSession(){
+    CURRENT_CITIZEN = null;
+    try { localStorage.removeItem('arabCitizenSession'); sessionStorage.removeItem('arabCitizenSession'); } catch(e){}
+  }
+  /*
+   * Password hashing for this design prototype only. SHA-256 via SubtleCrypto where available
+   * (secure context), with a non-cryptographic fallback so the flow still works if it's not.
+   * This is NOT a substitute for real backend authentication — a live deployment needs a real
+   * auth system (e.g. the same kind of server-checked login already used for staff on the live
+   * permit-status-checker site), never a client-side hash checked against a shared design db.
+   */
+  function hashPassword(pw){
+    var text = String(pw||'');
+    if (window.crypto && window.crypto.subtle && window.isSecureContext){
+      try {
+        var enc = new TextEncoder().encode(text);
+        return window.crypto.subtle.digest('SHA-256', enc).then(function(buf){
+          return Array.prototype.map.call(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+        });
+      } catch(e){}
+    }
+    var h = 0;
+    for (var i=0;i<text.length;i++){ h = (Math.imul(31,h) + text.charCodeAt(i))|0; }
+    return Promise.resolve('fb'+(h>>>0).toString(16));
+  }
+  function renderAccountPage(main){
+    if (CURRENT_CITIZEN) renderAccountDashboard(main);
+    else renderAccountAuth(main);
+  }
+  function renderAccountAuth(main){
+    var rememberedEmail = '';
+    try { rememberedEmail = localStorage.getItem('arabRememberedEmail') || ''; } catch(e){}
+    var html = '<div class="acctwrap"><div class="acctcard">';
+    html += '<div class="acctbrand"><div class="ic">'+ICONS.account+'</div><h2>My Account</h2><p>Sign in to track your permits, or create an account to get started.</p></div>';
+    html += '<div class="accttabs"><button type="button" class="accttab active" id="tabSignIn">Sign in</button><button type="button" class="accttab" id="tabSignUp">Create account</button></div>';
+    html += '<div id="signInPane">';
+    html += fText('siEmail','Email',{type:'email',required:true,value:rememberedEmail});
+    html += fText('siPass','Password',{type:'password',required:true});
+    html += '<div class="rememberrow"><input type="checkbox" id="siRemember" checked><label for="siRemember">Remember me &amp; sign in faster next time</label></div>';
+    html += '<button type="button" class="primary" id="siBtn">Sign in</button>';
+    html += '<p class="reportstatus" id="siStatus"></p>';
+    html += '</div>';
+    html += '<div id="signUpPane" hidden>';
+    html += fText('suName','Name',{required:true});
+    html += fText('suEmail','Email',{type:'email',required:true});
+    html += fText('suPass','Password',{type:'password',required:true,hint:'At least 6 characters.'});
+    html += fText('suConfirm','Confirm password',{type:'password',required:true});
+    html += '<div class="rememberrow"><input type="checkbox" id="suRemember" checked><label for="suRemember">Remember me &amp; sign in faster next time</label></div>';
+    html += '<button type="button" class="primary" id="suBtn">Create account</button>';
+    html += '<p class="reportstatus" id="suStatus"></p>';
+    html += '</div>';
+    html += '<p class="acctnote">Building Department staff use this same sign-in — once your access has been granted by an administrator, signing in here also unlocks the staff dashboard.</p>';
+    html += '<p class="acctpasskeynote"><b>About “sign in faster”:</b> this design preview can’t register a real passkey — that needs a live, secure domain to work. Checking “Remember me” keeps you signed in on this device instead, so you skip retyping your password next time. <b>Design-prototype note:</b> this login exists to test the feature and isn’t a production authentication system yet.</p>';
+    html += '</div></div>';
+    main.innerHTML = html;
+
+    var tabSI = document.getElementById('tabSignIn'), tabSU = document.getElementById('tabSignUp');
+    var paneSI = document.getElementById('signInPane'), paneSU = document.getElementById('signUpPane');
+    tabSI.addEventListener('click', function(){ tabSI.classList.add('active'); tabSU.classList.remove('active'); paneSI.hidden=false; paneSU.hidden=true; });
+    tabSU.addEventListener('click', function(){ tabSU.classList.add('active'); tabSI.classList.remove('active'); paneSU.hidden=false; paneSI.hidden=true; });
+
+    function setStatus(el, msg, ok){ el.textContent = msg; el.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':''); }
+
+    document.getElementById('siBtn').addEventListener('click', function(){
+      var email = v('siEmail').trim(), pass = v('siPass');
+      var stEl = document.getElementById('siStatus');
+      if (!email || !pass){ setStatus(stEl,'Enter your email and password.',false); return; }
+      if (!window.__db){ setStatus(stEl,'Sign-in isn’t connected to the design database in this view.',false); return; }
+      setStatus(stEl,'Signing in…');
+      var key = citizenKey(email);
+      window.__db.doc('citizens/'+key).get().then(function(doc){
+        if (!doc || !doc.exists){ setStatus(stEl,'No account found with that email.',false); return; }
+        var data = doc.data();
+        return hashPassword(pass).then(function(hash){
+          if (hash !== data.passHash){ setStatus(stEl,'Incorrect password.',false); return; }
+          var remember = document.getElementById('siRemember');
+          remember = !remember || remember.checked;
+          try {
+            if (remember) localStorage.setItem('arabRememberedEmail', data.email);
+            else localStorage.removeItem('arabRememberedEmail');
+          } catch(e){}
+          saveCitizenSession({ id:key, email:data.email, name:data.name, role:data.role||'citizen' }, remember);
+          if (hasStaffAccess()) navigate('staff');
+          else renderAccountPage(document.getElementById('main'));
+        });
+      }).catch(function(){ setStatus(stEl,'Something went wrong signing in — please try again.',false); });
+    });
+
+    document.getElementById('suBtn').addEventListener('click', function(){
+      var name = v('suName').trim(), email = v('suEmail').trim(), pass = v('suPass'), confirmPass = v('suConfirm');
+      var stEl = document.getElementById('suStatus');
+      if (!name || !email || !pass || !confirmPass){ setStatus(stEl,'All fields are required.',false); return; }
+      if (!/^\S+@\S+\.\S+$/.test(email)){ setStatus(stEl,'Enter a valid email address.',false); return; }
+      if (pass.length < 6){ setStatus(stEl,'Password must be at least 6 characters.',false); return; }
+      if (pass !== confirmPass){ setStatus(stEl,'Passwords don’t match.',false); return; }
+      if (!window.__db){ setStatus(stEl,'Sign-up isn’t connected to the design database in this view.',false); return; }
+      setStatus(stEl,'Creating your account…');
+      var key = citizenKey(email);
+      window.__db.doc('citizens/'+key).get().then(function(doc){
+        if (doc && doc.exists){ setStatus(stEl,'An account with that email already exists — sign in instead.',false); return; }
+        return hashPassword(pass).then(function(hash){
+          return window.__db.doc('citizens/'+key).set({ email:email, name:name, passHash:hash, role:'citizen', createdAt:new Date().toISOString() }).then(function(){
+            var remember = document.getElementById('suRemember');
+            remember = !remember || remember.checked;
+            try {
+              if (remember) localStorage.setItem('arabRememberedEmail', email);
+              else localStorage.removeItem('arabRememberedEmail');
+            } catch(e){}
+            saveCitizenSession({ id:key, email:email, name:name, role:'citizen' }, remember);
+            renderAccountPage(document.getElementById('main'));
+          });
+        });
+      }).catch(function(){ setStatus(stEl,'Something went wrong creating your account — please try again.',false); });
+    });
+  }
+  function renderAccountDashboard(main){
+    var html = '<div class="acctwelcome"><div class="who"><p class="name">'+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+'</p><p class="email">'+esc(CURRENT_CITIZEN.email)+'</p></div><button type="button" class="ghost" id="signOutBtn">Sign out</button></div>';
+    if (hasStaffAccess()){
+      html += '<a class="calpromo gold-promo" href="#staff"><div class="ic">'+ICONS.clipboard+'</div><div class="body"><p class="ttl">Staff Dashboard</p><p class="dsc">You have '+esc(roleLabel(CURRENT_CITIZEN.role))+' access — open the dashboard to review submissions and inspections.</p></div><div class="btn">Open dashboard<span aria-hidden="true">&rsaquo;</span></div></a>';
+    }
+    html += '<h2 class="section" style="margin-top:0">My permits</h2>';
+    html += '<div id="myPermitsList"><p class="reportstatus">Loading…</p></div>';
+    main.innerHTML = html;
+    document.getElementById('signOutBtn').addEventListener('click', function(){
+      clearCitizenSession();
+      renderAccountPage(document.getElementById('main'));
+    });
+    var listEl = document.getElementById('myPermitsList');
+    if (!window.__db){ listEl.innerHTML = '<p class="reportstatus err">Not connected to the design database in this view.</p>'; return; }
+    window.__db.collection('submissions').where('citizenId','==',CURRENT_CITIZEN.id).limit(50).onSnapshot(function(snap){
+      var docs = (snap.docs||[]).slice().sort(function(a,b){
+        var ra = a.data(), rb = b.data();
+        return (rb.submittedAt||'').localeCompare(ra.submittedAt||'');
+      });
+      if (!docs.length){
+        listEl.innerHTML = '<div class="acctempty">You haven’t applied for any permits under this account yet.<br><a href="#">Browse permit types</a></div>';
+        return;
+      }
+      listEl.innerHTML = docs.map(function(d){ return renderPermitStatusCard(d.data()); }).join('');
+    }, function(){
+      listEl.innerHTML = '<p class="reportstatus err">Couldn’t load your permits — please try again.</p>';
+    });
+  }
+
+  /* ---------- search my permit (public, view-only status lookup) ---------- */
+  var INSPECTION_ORDER = ['footing','framing','electrical','plumbing','final'];
+  var INSPECTION_LABEL = { footing:'Footing', framing:'Framing', electrical:'Electrical', plumbing:'Plumbing', final:'Final' };
+  function applicantOf(f){ return f.applicantName || [f.appFirst,f.appLast].filter(Boolean).join(' ') || f.ownerName || f.propertyOwner || ''; }
+  function addressOf(f){ return f.address || f.signAddress || f.subdivisionName || f.streetAddress || ''; }
+
+  /* ---------- editable (fillable) inspection PDF ---------- */
+  function downloadInspectionPdf(rec, statusEl){
+    function setStatus(msg, ok){
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':'');
+    }
+    if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF){
+      setStatus('The PDF library did not load — check your connection and try again.', false);
+      return;
+    }
+    var jsPDFctor = window.jspdf.jsPDF;
+    /* jsPDF exposes the AcroForm field classes at a couple of different paths depending on build; check them all. */
+    var AF = jsPDFctor.AcroForm || (jsPDFctor.API && jsPDFctor.API.AcroForm) || null;
+    var TextFieldCtor = (AF && AF.TextField) || jsPDFctor.AcroFormTextField || (jsPDFctor.API && jsPDFctor.API.AcroFormTextField);
+    var CheckBoxCtor = (AF && AF.CheckBox) || jsPDFctor.AcroFormCheckBox || (jsPDFctor.API && jsPDFctor.API.AcroFormCheckBox);
+    if (!TextFieldCtor || !CheckBoxCtor){
+      setStatus('This build of the PDF library does not support fillable fields.', false);
+      return;
+    }
+    try {
+      var f = rec.fields || {};
+      var review = rec.review || {};
+      var insp = review.inspections || {};
+      var coo = review.certOfOccupancy || {};
+      var doc = new jsPDFctor({ unit:'mm', format:'letter' });
+      var pageW = 215.9;
+      var marginX = 14;
+      var contentW = pageW - marginX*2;
+      var fieldN = 0;
+
+      function addTF(x, w, y, val, multiline){
+        var tf = new TextFieldCtor();
+        tf.fieldName = 'field' + (fieldN++);
+        tf.x = x; tf.y = y; tf.width = w; tf.height = multiline ? 14 : 7.5;
+        tf.value = val || '';
+        tf.fontSize = 9;
+        if (multiline) tf.multiline = true;
+        doc.addField(tf);
+        return tf;
+      }
+      function addCB(x, y, isChecked){
+        var cb = new CheckBoxCtor();
+        cb.fieldName = 'field' + (fieldN++);
+        cb.x = x; cb.y = y; cb.width = 6; cb.height = 6;
+        doc.addField(cb);
+        cb.appearanceState = isChecked ? 'On' : 'Off';
+        return cb;
+      }
+      function label(text, x, y){ doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90,90,90); doc.text(text, x, y); }
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(15,50,115);
+      doc.text('City of Arab Building Department', marginX, 15);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(20,20,20);
+      doc.text('Inspection Record  ·  ' + (TYPE_LABEL[rec.type]||rec.type) + '  ·  ' + (rec.permitNumber||''), marginX, 21.5);
+      doc.setFontSize(9); doc.setTextColor(90,90,90);
+      doc.text('Address: ' + (addressOf(f)||'—') + '   ·   Applicant: ' + (applicantOf(f)||'—'), marginX, 27);
+      doc.setDrawColor(222,218,203);
+      doc.line(marginX, 30, pageW-marginX, 30);
+
+      var y = 36;
+      var colW = (contentW - 10) / 3;
+      INSPECTION_ORDER.forEach(function(k){
+        var it = insp[k] || {};
+        doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(22,35,63);
+        doc.text(INSPECTION_LABEL[k] + ' inspection', marginX, y);
+        addCB(marginX+contentW-28, y-4.5, !!it.done);
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
+        doc.text('Done', marginX+contentW-20, y);
+        y += 5;
+        label('DATE OF INSPECTION', marginX, y);
+        label('COMPLETED BY', marginX+colW+5, y);
+        label('DATE RECORDED', marginX+colW*2+10, y);
+        y += 2;
+        addTF(marginX, colW, y, it.date);
+        addTF(marginX+colW+5, colW, y, it.completedBy);
+        addTF(marginX+colW*2+10, colW, y, it.dateRecorded);
+        y += 7.5 + 3.5;
+        label('COMMENTS', marginX, y);
+        y += 2;
+        addTF(marginX, contentW, y, it.comment, true);
+        y += 14 + 5;
+      });
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(15,50,115);
+      doc.text('Certificate of occupancy', marginX, y);
+      y += 6;
+      addCB(marginX, y-4.5, coo.given === 'given');
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(20,20,20);
+      doc.text('Given', marginX+8, y);
+      addCB(marginX+32, y-4.5, coo.given === 'not_given');
+      doc.text('Not given', marginX+40, y);
+      y += 7;
+      label('C OF O COMMENTS', marginX, y);
+      y += 2;
+      addTF(marginX, contentW, y, coo.comments, true);
+      y += 14 + 5;
+      var colW2 = (contentW-10)/2;
+      label('INITIALS SIGN OFF', marginX, y);
+      label('DATE INITIALED', marginX+colW2+10, y);
+      y += 2;
+      addTF(marginX, colW2, y, coo.initials);
+      addTF(marginX+colW2+10, colW2, y, coo.date);
+      y += 7.5 + 8;
+
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(130,130,130);
+      var footY = Math.min(y, 269);
+      doc.text('This is a fillable PDF — open it in Preview, Acrobat or the Files app to tap and fill in each field.', marginX, footY);
+      doc.text('Generated ' + new Date().toLocaleString() + '  ·  City of Arab Building Department, 740 N Main St, Arab, AL 35016  ·  256-586-5968', marginX, footY+4.5);
+
+      var fname = 'arab-inspection-' + (rec.permitNumber||'permit').toLowerCase().replace(/[^a-z0-9-]+/g,'') + '.pdf';
+      saveGeneratedFile(fname, doc.output('blob'), statusEl);
+    } catch(err){
+      setStatus('Could not build the inspection PDF — please try again.', false);
+    }
+  }
+  function renderPermitStatusCard(r){
+    var f = r.fields || {};
+    var review = r.review || {};
+    var html = '<div class="statuscard">';
+    html += '<p class="lbl">Permit #'+esc(r.permitNumber||'—')+'</p>';
+    html += '<h3>'+esc(TYPE_LABEL[r.type]||r.type)+'</h3>';
+    html += '<p class="dsc">'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'</p>';
+    html += '<p class="dsc">Submitted '+esc(r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '—')+'</p>';
+    if (isBuildingPermitType(r.type)){
+      var insp = review.inspections || {};
+      html += '<div class="statusblock"><p class="statuslbl">Inspections</p><ul class="statuslist">';
+      INSPECTION_ORDER.forEach(function(k){
+        var it = insp[k] || {};
+        html += '<li class="'+(it.done?'done':'')+'">'+(it.done?'&#10003;':'&#9675;')+' '+esc(INSPECTION_LABEL[k])+(it.done && it.date ? ' — '+esc(it.date) : '')+'</li>';
+      });
+      html += '</ul></div>';
+      var coo = review.certOfOccupancy || {};
+      var cooLabel = coo.given === 'given' ? 'Given' : coo.given === 'not_given' ? 'Not given' : 'Pending';
+      html += '<div class="statusblock"><p class="statuslbl">Certificate of occupancy</p><p class="statusval">'+esc(cooLabel)+'</p></div>';
+      html += '<div class="statusblock"><p class="statuslbl">Fee status</p><p class="statusval">'+(review.feePaid?'Paid':'Not yet paid — payable in person once your Certificate of Occupancy is given')+'</p></div>';
+    } else {
+      html += '<div class="statusblock"><p class="statuslbl">Status</p><p class="statusval">'+(review.approved?'Approved':'Pending review')+'</p></div>';
+      if (review.approved && review.dateSignedOff) html += '<p class="dsc" style="margin-top:6px">Signed off '+esc(review.dateSignedOff)+'</p>';
+    }
+    html += '</div>';
+    return html;
+  }
+  function renderSearchPage(main){
+    var html = '<div class="searchcard">';
+    html += '<p class="lede" style="margin-top:0">Enter your permit number along with the property address and applicant name exactly as they appear on your application.</p>';
+    html += fText('searchPermit','Permit #',{required:true,placeholder:'e.g. BP-20260915-A1B2'});
+    html += fText('searchAddress','Property address',{required:true});
+    html += fText('searchApplicant','Applicant name',{required:true});
+    html += '<button type="button" class="primary" id="searchBtn">Search</button>';
+    html += '<p class="reportstatus" id="searchStatus"></p>';
+    html += '<div id="searchResult"></div>';
+    html += '</div>';
+    main.innerHTML = html;
+
+    var statusEl = document.getElementById('searchStatus');
+    var resultEl = document.getElementById('searchResult');
+    function setStatus(msg, ok){
+      statusEl.textContent = msg;
+      statusEl.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':'');
+    }
+    document.getElementById('searchBtn').addEventListener('click', function(){
+      var permit = v('searchPermit').trim();
+      var address = v('searchAddress').trim();
+      var applicant = v('searchApplicant').trim();
+      resultEl.innerHTML = '';
+      if (!permit || !address || !applicant){
+        setStatus('Permit #, address and applicant name are all required.', false);
+        return;
+      }
+      if (!window.__db){ setStatus('Search isn’t connected to the design database in this view.', false); return; }
+      setStatus('Searching…');
+      window.__db.collection('submissions').where('permitNumber','==',permit).limit(1).get().then(function(snap){
+        var doc = snap.docs[0];
+        if (!doc){ setStatus('No permit found with that number. Double-check it and try again.', false); return; }
+        var r = doc.data();
+        var f = r.fields || {};
+        var norm = function(s){ return String(s||'').trim().toLowerCase(); };
+        var addrMatch = norm(addressOf(f)) === norm(address);
+        var nameMatch = norm(applicantOf(f)) === norm(applicant);
+        if (!addrMatch || !nameMatch){
+          setStatus('That permit number doesn’t match the address and applicant name given. Double-check and try again.', false);
+          return;
+        }
+        setStatus('');
+        resultEl.innerHTML = renderPermitStatusCard(r);
+      }).catch(function(){ setStatus('Something went wrong searching — please try again.', false); });
+    });
+  }
+
+  /* ---------- calendar: view-only for applicants, editable from staff ---------- */
+  var CAL_TYPES = {
+    meeting: { label:'Planning Commission', color:'var(--primary)' },
+    deadline:{ label:'Submission deadline', color:'var(--gold-ink)' },
+    closed:  { label:'Office closed',       color:'var(--danger)' },
+    other:   { label:'Other',               color:'var(--ink-soft)' }
+  };
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function ymd(y,m,d){ return y+'-'+pad2(m+1)+'-'+pad2(d); }
+  function icsEscape(s){ return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
+
+  function renderCalendarPage(container, editable){
+    var html = '';
+    if (editable){
+      html += '<h2 class="section" style="margin-top:28px">Calendar</h2>';
+      html += '<p class="section-note">Meetings, deadlines and closures shown on the public calendar (linked from the landing page). Add, edit or remove dates below — applicants only ever see the view below, never these controls.</p>';
+    }
+    html += '<div class="calcard">';
+    html += '<div class="calnav"><button type="button" class="ghost" id="calPrev">&larr;</button><p class="calmonth" id="calMonthLbl"></p><button type="button" class="ghost" id="calNext">&rarr;</button></div>';
+    html += '<div class="calgrid" id="calGrid"></div>';
+    html += '<div class="callegend">' + Object.keys(CAL_TYPES).map(function(k){
+      return '<span class="calleg"><i style="background:'+CAL_TYPES[k].color+'"></i>'+esc(CAL_TYPES[k].label)+'</span>';
+    }).join('') + '</div>';
+    html += '</div>';
+    html += '<div id="calAgenda"></div>';
+    html += '<button type="button" class="ghost" id="calDownload">Download calendar (.ics)</button>';
+
+    if (editable){
+      html += '<div class="card" style="margin-top:18px">';
+      html += '<p class="filterlbl" id="calFormLbl" style="margin-bottom:12px">Add a date</p>';
+      html += '<div class="two-col">' + fText('calDate','Date',{type:'date',required:true}) + fText('calTitle','Title',{required:true}) + '</div>';
+      html += fRadio('calType','Type',[
+        {value:'meeting', label:'Planning Commission'},
+        {value:'deadline', label:'Submission deadline'},
+        {value:'closed', label:'Office closed'},
+        {value:'other', label:'Other'}
+      ],{value:'meeting'});
+      html += fTextarea('calNote','Note (optional)');
+      html += '<div class="modalbtns"><button type="button" class="ghost" id="calCancelEdit" hidden>Cancel</button><button type="button" class="primary" id="calAddBtn" style="margin-top:0">Add to calendar</button></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+
+    var cursor = new Date(); cursor.setDate(1); cursor.setHours(0,0,0,0);
+    var CAL_EVENTS = [];
+
+    function paint(){
+      var y = cursor.getFullYear(), m = cursor.getMonth();
+      document.getElementById('calMonthLbl').textContent = cursor.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+      var first = new Date(y,m,1);
+      var startOffset = first.getDay();
+      var totalDays = new Date(y,m+1,0).getDate();
+      var todayStr2 = ymd(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      var cells = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(function(w){ return '<div class="calwd">'+w+'</div>'; }).join('');
+      for (var i=0;i<startOffset;i++) cells += '<div class="calday empty"></div>';
+      for (var d=1; d<=totalDays; d++){
+        var dateStr = ymd(y,m,d);
+        var evs = CAL_EVENTS.filter(function(e){ return e.date === dateStr; });
+        var dots = evs.slice(0,3).map(function(e){ var t=CAL_TYPES[e.type]||CAL_TYPES.other; return '<i style="background:'+t.color+'"></i>'; }).join('');
+        var cls = 'calday' + (dateStr===todayStr2?' today':'') + (evs.length?' has':'');
+        cells += '<div class="'+cls+'"><span>'+d+'</span>'+(dots?'<div class="caldots">'+dots+'</div>':'')+'</div>';
+      }
+      document.getElementById('calGrid').innerHTML = cells;
+
+      var monthPrefix = y+'-'+pad2(m+1);
+      var monthEvents = CAL_EVENTS.filter(function(e){ return e.date && e.date.indexOf(monthPrefix)===0; })
+        .sort(function(a,b){ return a.date<b.date?-1:(a.date>b.date?1:0); });
+      var agenda = document.getElementById('calAgenda');
+      if (!monthEvents.length){
+        agenda.innerHTML = '<p class="empty">No dates on the calendar this month.</p>';
+      } else {
+        agenda.innerHTML = monthEvents.map(function(e){
+          var t = CAL_TYPES[e.type]||CAL_TYPES.other;
+          var dd = new Date(e.date+'T00:00:00');
+          var dayLbl = dd.toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric'});
+          var editCtl = editable ? ('<div style="display:flex;gap:8px;margin-top:8px">' +
+            '<button type="button" class="ghost" data-edit="'+e.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px">Edit</button>' +
+            '<button type="button" class="ghost" data-del="'+e.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px;color:var(--danger)">Delete</button></div>') : '';
+          return '<div class="calagenda-row" style="border-left-color:'+t.color+'">' +
+            '<div class="calagenda-date">'+esc(dayLbl)+'</div>' +
+            '<div class="calagenda-body"><p class="ttl">'+esc(e.title)+'</p>' +
+            '<span class="pill">'+esc(t.label)+'</span>' +
+            (e.note?'<p class="dsc" style="margin-top:6px">'+esc(e.note)+'</p>':'') + editCtl +
+            '</div></div>';
+        }).join('');
+      }
+    }
+
+    document.getElementById('calPrev').addEventListener('click', function(){ cursor.setMonth(cursor.getMonth()-1); paint(); });
+    document.getElementById('calNext').addEventListener('click', function(){ cursor.setMonth(cursor.getMonth()+1); paint(); });
+
+    document.getElementById('calDownload').addEventListener('click', function(){
+      if (!CAL_EVENTS.length || !window.__downloads) return;
+      var lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//City of Arab//Building Department Calendar//EN'];
+      CAL_EVENTS.forEach(function(e){
+        var d = e.date.replace(/-/g,'');
+        lines.push('BEGIN:VEVENT');
+        lines.push('UID:'+e.id+'@arab-building-forms');
+        lines.push('DTSTART;VALUE=DATE:'+d);
+        lines.push('DTEND;VALUE=DATE:'+d);
+        lines.push('SUMMARY:'+icsEscape((CAL_TYPES[e.type]||CAL_TYPES.other).label+': '+e.title));
+        if (e.note) lines.push('DESCRIPTION:'+icsEscape(e.note));
+        lines.push('END:VEVENT');
+      });
+      lines.push('END:VCALENDAR');
+      var blob = new Blob([lines.join('\r\n')], {type:'text/calendar'});
+      window.__downloads.save({filename:'arab-building-department-calendar.ics', data: blob}).catch(function(){});
+    });
+
+    if (editable){
+      var addBtn = document.getElementById('calAddBtn');
+      var cancelBtn = document.getElementById('calCancelEdit');
+      function resetForm(){
+        document.getElementById('calDate').value = '';
+        document.getElementById('calTitle').value = '';
+        document.getElementById('calNote').value = '';
+        addBtn.textContent = 'Add to calendar';
+        addBtn.removeAttribute('data-editing');
+        cancelBtn.hidden = true;
+        document.getElementById('calFormLbl').textContent = 'Add a date';
+      }
+      cancelBtn.addEventListener('click', resetForm);
+      addBtn.addEventListener('click', function(){
+        var date = v('calDate'), title = v('calTitle');
+        if (!date || !title){ document.getElementById(date?'calTitle':'calDate').focus(); return; }
+        if (!window.__db) return;
+        var editingId = addBtn.getAttribute('data-editing');
+        var data = { date: date, title: title, type: radioVal('calType')||'meeting', note: v('calNote'), updatedAt: new Date().toISOString() };
+        if (editingId){
+          window.__db.doc('calendar/'+editingId).set(data).then(resetForm);
+        } else {
+          data.createdAt = new Date().toISOString();
+          window.__db.collection('calendar').add(data).then(resetForm);
+        }
+      });
+      document.getElementById('calAgenda').addEventListener('click', function(e){
+        var editT = e.target.closest('[data-edit]');
+        var delT = e.target.closest('[data-del]');
+        if (editT){
+          var ev = CAL_EVENTS.filter(function(x){ return x.id === editT.getAttribute('data-edit'); })[0];
+          if (!ev) return;
+          document.getElementById('calDate').value = ev.date;
+          document.getElementById('calTitle').value = ev.title;
+          document.getElementById('calNote').value = ev.note || '';
+          var radio = document.querySelector('input[name="calType"][value="'+ev.type+'"]');
+          if (radio && !radio.checked){ radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+          addBtn.textContent = 'Save changes';
+          addBtn.setAttribute('data-editing', ev.id);
+          cancelBtn.hidden = false;
+          document.getElementById('calFormLbl').textContent = 'Edit date';
+          document.getElementById('calDate').scrollIntoView({behavior:'smooth', block:'center'});
+        }
+        if (delT){
+          var id = delT.getAttribute('data-del');
+          if (window.__db) window.__db.doc('calendar/'+id).delete();
+        }
+      });
+    }
+
+    if (window.__db){
+      window.__db.collection('calendar').orderBy('date','asc').limit(200).onSnapshot(function(snap){
+        CAL_EVENTS = snap.docs.map(function(d){ var data = d.data() || {}; var out = {}; for (var k in data) out[k] = data[k]; out.id = d.id; return out; });
+        paint();
+      }, function(){ CAL_EVENTS = []; paint(); });
+    } else {
+      paint();
+    }
+  }
+
+  /* ---------- staff preview: sync toggle + overview + report export + submitted test applications ---------- */
+  var TYPE_LABEL = { owner:'Building — Homeowner', contractor:'Building — Contractor', subcontractor:'Sub-Contractor', sign:'Sign', pool:'Pool', demolition:'Demolition', moving:'Moving', subdivision:'Subdivision', annexation:'Annexation' };
+  var TYPE_ORDER = ['owner','contractor','subcontractor','sign','pool','demolition','moving','subdivision','annexation'];
+
+  function computeTotals(records){
+    var t = { count: records.length, permit: 0, cict: 0, grand: 0, byType: {} };
+    records.forEach(function(r){
+      var fee = r.fee || {};
+      var permit = Number(fee.permitFee)||0, cict = Number(fee.cictFee)||0;
+      var total = fee.total != null ? Number(fee.total)||0 : permit+cict;
+      t.permit += permit; t.cict += cict; t.grand += total;
+      var bt = t.byType[r.type] || (t.byType[r.type] = {count:0,permit:0,cict:0,total:0});
+      bt.count++; bt.permit += permit; bt.cict += cict; bt.total += total;
+    });
+    return t;
+  }
+
+  function dayStr(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d)) return ''; return d.toISOString().slice(0,10); }
+
+  /* City of Arab fiscal year: October 1 – September 30, labeled by the calendar year it ends in. */
+  function fiscalYearMonths(anchor){
+    var d = anchor || new Date();
+    var y = d.getFullYear(), m = d.getMonth();
+    var fyStartYear = (m >= 9) ? y : y - 1;
+    var months = [];
+    for (var i=0;i<12;i++){
+      var mm = (9+i) % 12;
+      var yy = fyStartYear + (mm < 9 ? 1 : 0);
+      months.push({y:yy, m:mm});
+    }
+    return months;
+  }
+  function fyEndYear(months){ return months[months.length-1].y; }
+  function monthLabel(y,m){ return new Date(y,m,1).toLocaleString('en-US',{month:'long', year:'numeric'}); }
+
+  function renderStaff(main){
+    var html = '<div class="acctwelcome"><div class="who"><p class="name">'+esc(CURRENT_CITIZEN.name||CURRENT_CITIZEN.email)+'</p><p class="email">'+esc(CURRENT_CITIZEN.email)+' — '+esc(roleLabel(CURRENT_CITIZEN.role))+'</p></div><button type="button" class="ghost" id="staffSignOutBtn">Sign out</button></div>';
+
+    if (isAdminUser()){
+      html += '<h2 class="section" style="margin-top:0">Access &amp; users</h2>';
+      html += '<p class="section-note">Every account starts as a Citizen with no dashboard access. Grant Staff or Administrator access here once you’ve approved someone.</p>';
+      html += '<div class="scrollx"><table class="sublist" id="usersTable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead><tbody><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>';
+      html += '<p class="reportstatus" id="usersStatus"></p>';
+    }
+
+    html += '<div class="togglebar"><div><p class="ttl">Sync to Google Sheets / Excel</p><p class="dsc">Off by default. Turning it on will let staff export new online applications straight to a shared sheet.</p></div>' +
+      '<label class="switch"><input type="checkbox" id="syncToggle"><span class="track"></span><span class="thumb"></span></label></div>';
+    html += '<div id="syncPanel" hidden></div>';
+
+    html += '<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
+      '<div><p class="ttl" style="font-weight:600;font-size:14px;margin:0 0 2px">Kiosk mode</p>' +
+      '<p class="dsc" style="font-size:12px;color:var(--ink-soft);margin:0;max-width:340px">Turn this device into a self-service lobby kiosk showing only the forms — no staff tools visible. An "Exit kiosk mode" button stays at the bottom of every page.</p></div>' +
+      '<button type="button" class="ghost" id="kioskEnterBtn" style="width:auto;margin-top:0;white-space:nowrap;padding:11px 16px">Enter kiosk mode</button></div>';
+
+    html += '<div id="calSection"></div>';
+
+    html += '<h2 class="section" style="margin-top:28px">Overview</h2>';
+    html += '<p class="section-note">Totals across the test submissions below.</p>';
+    html += '<div class="statgrid" id="ovTiles"></div>';
+    html += '<div class="scrollx"><table class="breakdown" id="ovBreakdown"></table></div>';
+
+    html += '<h2 class="section">CICT fee report</h2>';
+    html += '<p class="section-note">Commercial Impact / CICT fees by month, for FY'+fyEndYear(fiscalYearMonths())+' (Oct 1 – Sep 30). Defaults to the current month.</p>';
+    html += '<div class="reportpanel">';
+    html += '<div class="field" style="max-width:280px;margin:0 0 14px"><label for="cictMonthSel">Month</label><select id="cictMonthSel"></select></div>';
+    html += '<div class="statgrid" id="cictTiles"></div>';
+    html += '<div class="scrollx"><table class="sublist" id="cictTable"><thead><tr><th>Permit #</th><th>Type</th><th>Applicant</th><th>Address</th><th>CICT fee</th><th>Submitted</th></tr></thead><tbody></tbody></table></div>';
+    html += '<div class="exportrow"><button type="button" class="gold" id="cictExportExcelBtn">Export to Excel</button><button type="button" class="ghost" id="cictExportPdfBtn">Export to PDF</button></div>';
+    html += '<p class="reportstatus" id="cictStatus"></p>';
+    html += '</div>';
+
+    html += '<h2 class="section">Run a report</h2>';
+    html += '<div class="reportpanel">';
+    html += '<p class="filterlbl">Permit types</p>';
+    html += '<div class="chiprow" id="typeChips">' + TYPE_ORDER.map(function(k){
+      return '<label class="chip on"><input type="checkbox" data-type="'+k+'" checked>'+esc(TYPE_LABEL[k])+'</label>';
+    }).join('') + '</div>';
+    html += '<p class="filterlbl">Date range (optional)</p>';
+    html += '<div class="daterow"><div class="field" style="margin:0"><label for="repFrom">From</label><input type="date" id="repFrom"></div>' +
+      '<div class="field" style="margin:0"><label for="repTo">To</label><input type="date" id="repTo"></div></div>';
+    html += '<p class="reporthint" id="reportCount">Loading submissions…</p>';
+    html += '<p class="filterlbl" style="margin-top:16px">Preview</p>';
+    html += '<div class="scrollx"><table class="sublist" id="reportPreview"><thead><tr><th>Type</th><th>Applicant</th><th>Address</th><th>Permit fee</th><th>CICT fee</th><th>Total</th><th>Submitted</th></tr></thead><tbody></tbody></table></div>';
+    html += '<div class="exportrow"><button type="button" class="gold" id="exportExcelBtn">Export to Excel</button><button type="button" class="ghost" id="exportPdfBtn">Export to PDF</button></div>';
+    html += '<p class="reportstatus" id="reportStatus"></p>';
+    html += '<p class="reporthint">Each export includes the overview totals for the filtered range plus one row per matching application. The Excel file opens directly in Google Sheets too — upload it, or drag it in from Drive.</p>';
+    html += '</div>';
+
+    html += '<h2 class="section">Test submissions</h2>';
+    html += '<p class="section-note">Anything submitted through the forms above lands here so you can check the fields and fee math before this goes live.</p>';
+    html += '<div class="scrollx"><table class="sublist" id="subsTable"><thead><tr><th>Permit #</th><th>Type</th><th>Applicant</th><th>Address</th><th>Total</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>';
+
+    html += '<h2 class="section">Suggestions from reviewers</h2>';
+    html += '<p class="section-note">Notes sent with the "Suggest a change" button on each form. This design preview can’t send real email, so notes are captured here for jadecruz@starsonn.com to review instead.</p>';
+    html += '<div class="scrollx"><table class="sublist" id="suggestTable"><thead><tr><th>Page</th><th>Type</th><th>Note</th><th>Submitted</th></tr></thead><tbody><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>';
+    main.innerHTML = html;
+
+    document.getElementById('staffSignOutBtn').addEventListener('click', function(){
+      clearCitizenSession();
+      navigate('account');
+    });
+
+    if (isAdminUser()){
+      var usersTbody = document.querySelector('#usersTable tbody');
+      var usersStatus = document.getElementById('usersStatus');
+      function setUsersStatus(msg, ok){ usersStatus.textContent = msg; usersStatus.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':''); }
+      function paintUsers(docs){
+        if (!docs.length){ usersTbody.innerHTML = '<tr><td colspan="4" class="empty">No accounts yet.</td></tr>'; return; }
+        usersTbody.innerHTML = docs.map(function(d){
+          var u = d.data() || {};
+          var id = d.id;
+          var created = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—';
+          var isSelf = CURRENT_CITIZEN && id === CURRENT_CITIZEN.id;
+          var roleCell = isSelf
+            ? '<b>'+esc(roleLabel(u.role))+'</b> (you)'
+            : '<select data-uid="'+esc(id)+'" class="roleSel">' + ['citizen','staff','admin'].map(function(r){
+                return '<option value="'+r+'"'+((u.role||'citizen')===r?' selected':'')+'>'+esc(roleLabel(r))+'</option>';
+              }).join('') + '</select>';
+          return '<tr><td>'+esc(u.name||'—')+'</td><td>'+esc(u.email||'—')+'</td><td>'+roleCell+'</td><td>'+esc(created)+'</td></tr>';
+        }).join('');
+        usersTbody.querySelectorAll('.roleSel').forEach(function(sel){
+          sel.addEventListener('change', function(){
+            var uid = sel.getAttribute('data-uid');
+            var newRole = sel.value;
+            window.__db.doc('citizens/'+uid).update({ role: newRole }).then(function(){
+              setUsersStatus('Updated to '+roleLabel(newRole)+'.', true);
+            }).catch(function(){ setUsersStatus('Could not update that account — please try again.', false); });
+          });
+        });
+      }
+      if (window.__db){
+        window.__db.collection('citizens').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
+          paintUsers(snap.docs || []);
+        }, function(){ usersTbody.innerHTML = '<tr><td colspan="4" class="empty">Couldn’t load accounts.</td></tr>'; });
+      } else {
+        usersTbody.innerHTML = '<tr><td colspan="4" class="empty">Not connected to the design database in this view.</td></tr>';
+      }
+    }
+
+    renderCalendarPage(document.getElementById('calSection'), true);
+
+    document.getElementById('kioskEnterBtn').addEventListener('click', function(){ setKiosk(true); navigate('home'); });
+
+    var syncDoc = window.__db ? window.__db.doc('settings/sync') : null;
+    var toggle = document.getElementById('syncToggle');
+    var panel = document.getElementById('syncPanel');
+    function paintSync(data){
+      var on = !!(data && data.enabled);
+      toggle.checked = on;
+      panel.hidden = !on;
+      if (on){
+        panel.innerHTML = '<div class="card"><p class="hint" style="margin:0 0 12px">Connect flows are mocked in this design preview — wiring up a real Google Sheets or Excel export happens when this moves to the live site.</p>' +
+          '<button type="button" class="ghost" style="margin-top:0">Connect Google Sheets</button>' +
+          '<button type="button" class="ghost">Connect Excel / OneDrive</button></div>';
+      }
+    }
+    if (syncDoc){
+      syncDoc.onSnapshot(function(snap){ paintSync(snap.data()); }, function(){ paintSync({enabled:false}); });
+      toggle.addEventListener('change', function(){ syncDoc.set({ enabled: toggle.checked, updatedAt: new Date().toISOString() }); });
+    } else {
+      paintSync({enabled:false});
+      toggle.disabled = true;
+    }
+
+    /* ---- overview tiles + breakdown ---- */
+    var ovTiles = document.getElementById('ovTiles');
+    var ovBreak = document.getElementById('ovBreakdown');
+    function paintOverview(records){
+      var t = computeTotals(records);
+      ovTiles.innerHTML =
+        '<div class="stattile"><p class="lbl">Applications</p><p class="num">'+t.count+'</p></div>' +
+        '<div class="stattile"><p class="lbl">Permit fees</p><p class="num">'+money(t.permit)+'</p></div>' +
+        '<div class="stattile"><p class="lbl">CICT fees</p><p class="num">'+money(t.cict)+'</p></div>' +
+        '<div class="stattile grand"><p class="lbl">Grand total</p><p class="num">'+money(t.grand)+'</p></div>';
+      var rows = TYPE_ORDER.filter(function(k){ return t.byType[k]; }).map(function(k){
+        var bt = t.byType[k];
+        return '<tr><td>'+esc(TYPE_LABEL[k])+'</td><td class="num">'+bt.count+'</td><td class="num">'+money(bt.permit)+'</td><td class="num">'+money(bt.cict)+'</td><td class="num">'+money(bt.total)+'</td></tr>';
+      });
+      if (!rows.length){
+        ovBreak.innerHTML = '<tbody><tr><td class="empty" style="padding:16px 8px">No test submissions yet.</td></tr></tbody>';
+        return;
+      }
+      ovBreak.innerHTML = '<thead><tr><th>Permit type</th><th class="num">Count</th><th class="num">Permit fees</th><th class="num">CICT fees</th><th class="num">Total</th></tr></thead><tbody>' +
+        rows.join('') + '<tr class="tot"><td>All types</td><td class="num">'+t.count+'</td><td class="num">'+money(t.permit)+'</td><td class="num">'+money(t.cict)+'</td><td class="num">'+money(t.grand)+'</td></tr></tbody>';
+    }
+
+    /* ---- CICT fee report (fiscal year Oct 1 – Sep 30) ---- */
+    var FY_MONTHS = fiscalYearMonths();
+    var todayD = new Date();
+    var cictSel = document.getElementById('cictMonthSel');
+    cictSel.innerHTML = FY_MONTHS.map(function(mo, i){
+      return '<option value="'+i+'">'+monthLabel(mo.y, mo.m)+'</option>';
+    }).join('');
+    var curIdx = -1;
+    FY_MONTHS.forEach(function(mo, i){ if (mo.y===todayD.getFullYear() && mo.m===todayD.getMonth()) curIdx = i; });
+    cictSel.value = String(curIdx === -1 ? FY_MONTHS.length-1 : curIdx);
+    var cictTiles = document.getElementById('cictTiles');
+    var cictBody = document.querySelector('#cictTable tbody');
+    var cictStatusEl = document.getElementById('cictStatus');
+    function cictRowsForMonth(idx){
+      var mo = FY_MONTHS[idx];
+      return ALL_RECORDS.filter(function(r){
+        if (!r.submittedAt) return false;
+        var d = new Date(r.submittedAt);
+        return d.getFullYear()===mo.y && d.getMonth()===mo.m && Number(r.fee && r.fee.cictFee) > 0;
+      });
+    }
+    function paintCict(){
+      var idx = Number(cictSel.value);
+      var mo = FY_MONTHS[idx];
+      var rows = cictRowsForMonth(idx);
+      var total = rows.reduce(function(s,r){ return s + (Number(r.fee.cictFee)||0); }, 0);
+      var isCurrent = mo.y===todayD.getFullYear() && mo.m===todayD.getMonth();
+      cictTiles.innerHTML =
+        '<div class="stattile"><p class="lbl">'+(isCurrent?'This month':'Selected month')+'</p><p class="num" style="font-size:16px">'+monthLabel(mo.y,mo.m)+'</p></div>' +
+        '<div class="stattile"><p class="lbl">Applications with CICT</p><p class="num">'+rows.length+'</p></div>' +
+        '<div class="stattile grand"><p class="lbl">CICT total</p><p class="num">'+money(total)+'</p></div>';
+      if (!rows.length){
+        cictBody.innerHTML = '<tr><td colspan="6" class="empty">No CICT fees recorded for '+esc(monthLabel(mo.y,mo.m))+'.</td></tr>';
+        return;
+      }
+      cictBody.innerHTML = rows.map(function(r){
+        var f = r.fields||{};
+        return '<tr><td>'+esc(r.permitNumber||'—')+'</td><td><span class="pill">'+esc(TYPE_LABEL[r.type]||r.type)+'</span></td><td>'+esc(applicantOf(f)||'—')+'</td><td>'+esc(addressOf(f)||'—')+'</td><td>'+money(r.fee.cictFee)+'</td><td>'+esc(r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—')+'</td></tr>';
+      }).join('');
+    }
+    cictSel.addEventListener('change', paintCict);
+    function cictShowStatus(msg, ok){
+      cictStatusEl.textContent = msg;
+      cictStatusEl.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':'');
+    }
+    document.getElementById('cictExportExcelBtn').addEventListener('click', function(){
+      var idx = Number(cictSel.value), mo = FY_MONTHS[idx], rows = cictRowsForMonth(idx);
+      if (!rows.length){ cictShowStatus('No CICT fees for this month — nothing to export.', false); return; }
+      if (typeof XLSX === 'undefined'){ cictShowStatus('The Excel export library did not load — check your connection and try again.', false); return; }
+      try {
+        var total = rows.reduce(function(s,r){ return s+(Number(r.fee.cictFee)||0); }, 0);
+        var summaryRows = [{Metric:'Month', Value: monthLabel(mo.y,mo.m)}, {Metric:'Applications with CICT', Value: rows.length}, {Metric:'CICT total', Value: total}];
+        var detailRows = rows.map(function(r){
+          var f = r.fields||{};
+          return { 'Permit #': r.permitNumber||'—', Type: TYPE_LABEL[r.type]||r.type, Applicant: applicantOf(f)||'—', Address: addressOf(f)||'—', 'CICT fee': Number(r.fee.cictFee)||0, Submitted: r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—' };
+        });
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'Summary');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows), 'CICT detail');
+        var buf = XLSX.write(wb, {type:'array', bookType:'xlsx'});
+        var blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        offerDownload('arab-cict-' + mo.y + '-' + (mo.m+1 < 10 ? '0'+(mo.m+1) : String(mo.m+1)) + '.xlsx', blob);
+      } catch(err){ cictShowStatus('Could not build the Excel file — please try again.', false); }
+    });
+    document.getElementById('cictExportPdfBtn').addEventListener('click', function(){
+      var idx = Number(cictSel.value), mo = FY_MONTHS[idx], rows = cictRowsForMonth(idx);
+      if (!rows.length){ cictShowStatus('No CICT fees for this month — nothing to export.', false); return; }
+      if (typeof window.jspdf === 'undefined'){ cictShowStatus('The PDF export library did not load — check your connection and try again.', false); return; }
+      try {
+        var total = rows.reduce(function(s,r){ return s+(Number(r.fee.cictFee)||0); }, 0);
+        var doc = new window.jspdf.jsPDF();
+        doc.setFontSize(14); doc.text('City of Arab Building Department — CICT Fee Report', 14, 16);
+        doc.setFontSize(10); doc.text(monthLabel(mo.y,mo.m) + ' · Generated ' + new Date().toLocaleString(), 14, 22);
+        doc.autoTable({
+          startY: 28,
+          head: [['Metric','Value']],
+          body: [['Applications with CICT', String(rows.length)], ['CICT total', money(total)]],
+          styles: {fontSize:10}, headStyles: {fillColor:[15,50,115]}
+        });
+        var y = doc.lastAutoTable.finalY + 10;
+        doc.autoTable({
+          startY: y,
+          head: [['Permit #','Type','Applicant','Address','CICT fee','Submitted']],
+          body: rows.map(function(r){ var f=r.fields||{}; return [r.permitNumber||'—', TYPE_LABEL[r.type]||r.type, applicantOf(f)||'—', addressOf(f)||'—', money(r.fee.cictFee), r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—']; }),
+          styles: {fontSize:8}, headStyles: {fillColor:[15,50,115]}
+        });
+        offerDownload('arab-cict-' + mo.y + '-' + (mo.m+1 < 10 ? '0'+(mo.m+1) : String(mo.m+1)) + '.pdf', doc.output('blob'));
+      } catch(err){ cictShowStatus('Could not build the PDF file — please try again.', false); }
+    });
+
+    /* ---- submissions table ---- */
+    var tbody = document.querySelector('#subsTable tbody');
+    var SUBMISSION_DOCS = {};
+    function reviewStatusLabel(r){
+      var review = r.review || {};
+      if (isBuildingPermitType(r.type)){
+        var insp = review.inspections || {};
+        var doneCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].done; }).length;
+        var coo = (review.certOfOccupancy||{}).given;
+        if (coo === 'given') return review.feePaid ? 'C of O given · fee paid' : 'C of O given';
+        if (doneCount) return doneCount+'/'+INSPECTION_ORDER.length+' inspections';
+        return 'Not started';
+      }
+      return review.approved ? 'Approved' : 'Pending';
+    }
+    function paintSubs(docs){
+      if (!docs.length){ tbody.innerHTML = '<tr><td colspan="8" class="empty">No test submissions yet — try one of the forms.</td></tr>'; return; }
+      SUBMISSION_DOCS = {};
+      tbody.innerHTML = docs.map(function(d){
+        var r = d.data();
+        SUBMISSION_DOCS[d.id] = r;
+        var f = r.fields||{};
+        var addr = addressOf(f) || '—';
+        var when = r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—';
+        return '<tr><td>'+esc(r.permitNumber||'—')+'</td><td><span class="pill">'+esc(TYPE_LABEL[r.type]||r.type)+'</span></td><td>'+esc(applicantOf(f)||'—')+'</td><td>'+esc(addr)+'</td><td>'+money((r.fee&&r.fee.total)||0)+'</td><td>'+esc(when)+'</td><td>'+esc(reviewStatusLabel(r))+'</td>' +
+          '<td><button type="button" class="ghost" data-review="'+d.id+'" style="width:auto;margin:0;padding:6px 12px;font-size:12px;white-space:nowrap">Review</button></td></tr>';
+      }).join('');
+    }
+    tbody.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-review]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-review');
+      var rec = SUBMISSION_DOCS[id];
+      if (rec) openReviewModal(id, rec);
+    });
+
+    /* ---- suggestions table ---- */
+    var suggestBody = document.querySelector('#suggestTable tbody');
+    function paintSuggestions(docs){
+      if (!docs.length){ suggestBody.innerHTML = '<tr><td colspan="4" class="empty">No suggestions yet.</td></tr>'; return; }
+      suggestBody.innerHTML = docs.map(function(d){
+        var r = d.data();
+        var when = r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—';
+        return '<tr><td>'+esc(r.pageLabel||r.page||'—')+'</td><td><span class="pill">'+esc(r.type||'Suggestion')+'</span></td><td>'+esc(r.text||'—')+'</td><td>'+esc(when)+'</td></tr>';
+      }).join('');
+    }
+    if (window.__db){
+      window.__db.collection('suggestions').orderBy('submittedAt','desc').limit(50).onSnapshot(function(snap){ paintSuggestions(snap.docs); }, function(){ paintSuggestions([]); });
+    } else {
+      paintSuggestions([]);
+    }
+
+    /* ---- report filters + export ---- */
+    var ALL_RECORDS = [];
+    var countEl = document.getElementById('reportCount');
+    var statusEl = document.getElementById('reportStatus');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('#typeChips .chip'));
+    function activeTypes(){
+      return chips.filter(function(c){ return c.querySelector('input').checked; }).map(function(c){ return c.querySelector('input').getAttribute('data-type'); });
+    }
+    function filteredRecords(){
+      var types = activeTypes();
+      var from = v('repFrom'), to = v('repTo');
+      return ALL_RECORDS.filter(function(r){
+        if (types.indexOf(r.type) === -1) return false;
+        var d = dayStr(r.submittedAt);
+        if (from && d && d < from) return false;
+        if (to && d && d > to) return false;
+        return true;
+      });
+    }
+    var previewBody = document.querySelector('#reportPreview tbody');
+    function paintPreview(rows){
+      if (!rows.length){
+        previewBody.innerHTML = '<tr><td colspan="7" class="empty">Nothing matches these filters yet.</td></tr>';
+        return;
+      }
+      var MAX = 8;
+      previewBody.innerHTML = rows.slice(0, MAX).map(function(r){
+        return '<tr><td><span class="pill">'+esc(r.Type)+'</span></td><td>'+esc(r.Applicant)+'</td><td>'+esc(r.Address)+'</td><td>'+money(r['Permit fee'])+'</td><td>'+money(r['CICT fee'])+'</td><td>'+money(r.Total)+'</td><td>'+esc(r.Submitted)+'</td></tr>';
+      }).join('') + (rows.length > MAX ? '<tr><td colspan="7" class="empty">+ '+(rows.length-MAX)+' more row'+(rows.length-MAX===1?'':'s')+' in the export…</td></tr>' : '');
+    }
+    function refreshCount(){
+      var rows = reportRows();
+      var n = rows.length;
+      countEl.textContent = ALL_RECORDS.length ? (n + ' of ' + ALL_RECORDS.length + ' test submissions match these filters.') : 'No test submissions yet — try one of the forms, then come back to build a report.';
+      paintPreview(rows);
+    }
+    chips.forEach(function(c){
+      c.querySelector('input').addEventListener('change', function(){ c.classList.toggle('on', this.checked); refreshCount(); });
+    });
+    document.getElementById('repFrom').addEventListener('change', refreshCount);
+    document.getElementById('repTo').addEventListener('change', refreshCount);
+
+    function reportRows(){
+      return filteredRecords().map(function(r){
+        var f = r.fields || {}, fee = r.fee || {};
+        return {
+          Type: TYPE_LABEL[r.type] || r.type,
+          Applicant: f.applicantName || [f.appFirst,f.appLast].filter(Boolean).join(' ') || f.ownerName || f.propertyOwner || '—',
+          Address: f.address || f.signAddress || f.subdivisionName || f.streetAddress || '—',
+          'Permit fee': Number(fee.permitFee)||0,
+          'CICT fee': Number(fee.cictFee)||0,
+          Total: fee.total != null ? Number(fee.total)||0 : (Number(fee.permitFee)||0)+(Number(fee.cictFee)||0),
+          Submitted: r.submittedAt ? new Date(r.submittedAt).toLocaleString() : '—'
+        };
+      });
+    }
+    function showStatus(msg, ok){
+      statusEl.textContent = msg;
+      statusEl.className = 'reportstatus' + (ok===true?' ok':ok===false?' err':'');
+    }
+
+    document.getElementById('exportExcelBtn').addEventListener('click', function(){
+      var rows = reportRows();
+      if (!rows.length){ showStatus('No submissions match these filters — nothing to export.', false); return; }
+      if (typeof XLSX === 'undefined'){ showStatus('The Excel export library did not load — check your connection and try again.', false); return; }
+      try {
+        var t = computeTotals(filteredRecords());
+        var overviewRows = [
+          {Metric:'Applications', Value:t.count},
+          {Metric:'Total permit fees', Value:t.permit},
+          {Metric:'Total CICT fees', Value:t.cict},
+          {Metric:'Grand total', Value:t.grand}
+        ];
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(overviewRows), 'Overview');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Submissions');
+        var buf = XLSX.write(wb, {type:'array', bookType:'xlsx'});
+        var blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        offerDownload('arab-permits-report-' + todayISO() + '.xlsx', blob);
+      } catch(err){
+        showStatus('Could not build the Excel file — please try again.', false);
+      }
+    });
+
+    document.getElementById('exportPdfBtn').addEventListener('click', function(){
+      var rows = reportRows();
+      if (!rows.length){ showStatus('No submissions match these filters — nothing to export.', false); return; }
+      if (typeof window.jspdf === 'undefined'){ showStatus('The PDF export library did not load — check your connection and try again.', false); return; }
+      try {
+        var t = computeTotals(filteredRecords());
+        var doc = new window.jspdf.jsPDF();
+        doc.setFontSize(14); doc.text('City of Arab Building Department — Report', 14, 16);
+        doc.setFontSize(10); doc.text('Generated ' + new Date().toLocaleString(), 14, 22);
+        doc.autoTable({
+          startY: 28,
+          head: [['Metric','Value']],
+          body: [
+            ['Applications', String(t.count)],
+            ['Total permit fees', money(t.permit)],
+            ['Total CICT fees', money(t.cict)],
+            ['Grand total', money(t.grand)]
+          ],
+          styles: {fontSize:10}, headStyles: {fillColor:[15,50,115]}
+        });
+        var y = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12); doc.text('Applications', 14, y);
+        doc.autoTable({
+          startY: y+4,
+          head: [['Type','Applicant','Address','Permit fee','CICT fee','Total','Submitted']],
+          body: rows.map(function(r){ return [r.Type, r.Applicant, r.Address, money(r['Permit fee']), money(r['CICT fee']), money(r.Total), r.Submitted]; }),
+          styles: {fontSize:8}, headStyles: {fillColor:[15,50,115]}
+        });
+        offerDownload('arab-permits-report-' + todayISO() + '.pdf', doc.output('blob'));
+      } catch(err){
+        showStatus('Could not build the PDF file — please try again.', false);
+      }
+    });
+
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+    function offerDownload(filename, blob){
+      if (!window.__downloads){
+        showStatus('Downloads aren’t available in this preview view — this works once the site is live.', false);
+        return;
+      }
+      showStatus('Preparing ' + filename + '…');
+      window.__downloads.save({filename: filename, data: blob}).then(function(){
+        showStatus('Saved ' + filename + '.', true);
+      }).catch(function(err){
+        var code = err && err.code;
+        if (code === 'declined') showStatus('Download cancelled.');
+        else showStatus('Could not save the file (' + (code||'unknown error') + ').', false);
+      });
+    }
+
+    if (window.__db){
+      window.__db.collection('submissions').orderBy('submittedAt','desc').limit(50).onSnapshot(function(snap){
+        paintSubs(snap.docs);
+        ALL_RECORDS = snap.docs.map(function(d){ return d.data(); });
+        paintOverview(ALL_RECORDS);
+        refreshCount();
+        paintCict();
+      }, function(){ paintSubs([]); ALL_RECORDS = []; paintOverview([]); refreshCount(); paintCict(); });
+    } else {
+      paintSubs([]);
+      paintOverview([]);
+      refreshCount();
+      paintCict();
+    }
+  }
+
+  /* ---------- inspection mode: touch-optimized iPad view for the building inspector ---------- */
+  function renderInspectionMode(main){
+    var html = '<p class="inspintro">Tap a permit to record footing, framing, electrical, plumbing and final inspections, and the Certificate of Occupancy. This view is sized for use on an iPad or iPhone in the field.</p>';
+    html += '<div id="inspListWrap"><div class="insplist" id="inspList"><p class="empty">Loading…</p></div></div>';
+    html += '<div id="inspDetailWrap" hidden></div>';
+    main.innerHTML = html;
+
+    var listEl = document.getElementById('inspList');
+    var listWrap = document.getElementById('inspListWrap');
+    var detailWrap = document.getElementById('inspDetailWrap');
+    var RECORDS = {};
+
+    function progressInfo(r){
+      var review = r.review || {};
+      var insp = review.inspections || {};
+      var doneCount = INSPECTION_ORDER.filter(function(k){ return insp[k] && insp[k].done; }).length;
+      var given = (review.certOfOccupancy||{}).given;
+      if (given === 'given') return { text: 'C of O given', done: true };
+      return { text: doneCount+'/'+INSPECTION_ORDER.length+' inspections done', done: doneCount === INSPECTION_ORDER.length };
+    }
+
+    function paintList(docs){
+      if (!docs.length){ listEl.innerHTML = '<p class="empty">No building or sub-contractor permits yet — submit one of those forms to test this view.</p>'; return; }
+      RECORDS = {};
+      listEl.innerHTML = docs.map(function(d){
+        var r = d.data();
+        RECORDS[d.id] = r;
+        var f = r.fields || {};
+        var prog = progressInfo(r);
+        return '<button type="button" class="inspcard" data-open="'+d.id+'">' +
+          '<span class="body"><span class="pnum">'+esc(r.permitNumber||'—')+' &middot; '+esc(TYPE_LABEL[r.type]||r.type)+'</span>' +
+          '<span class="meta">'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'</span>' +
+          '<span class="progress'+(prog.done?' done':'')+'">'+esc(prog.text)+'</span></span>' +
+          '<span class="chev" aria-hidden="true">&rsaquo;</span></button>';
+      }).join('');
+    }
+
+    if (window.__db){
+      window.__db.collection('submissions').orderBy('submittedAt','desc').limit(50).onSnapshot(function(snap){
+        paintList(snap.docs.filter(function(d){ return isBuildingPermitType(d.data().type); }));
+      }, function(){ paintList([]); });
+    } else {
+      listEl.innerHTML = '<p class="empty">Not connected to the design database in this view.</p>';
+    }
+
+    listEl.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-open]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-open');
+      var rec = RECORDS[id];
+      if (rec) openInspectionDetail(id, rec);
+    });
+
+    function closeDetail(){
+      detailWrap.hidden = true;
+      detailWrap.innerHTML = '';
+      listWrap.hidden = false;
+      window.scrollTo(0,0);
+    }
+
+    function openInspectionDetail(id, rec){
+      listWrap.hidden = true;
+      var review = rec.review || freshReview(rec.type);
+      var f = rec.fields || {};
+      var insp = review.inspections || {};
+
+      var dh = '<div class="inspdetailhd"><div><h2>'+esc(rec.permitNumber||'')+' &middot; '+esc(TYPE_LABEL[rec.type]||rec.type)+'</h2>' +
+        '<p>'+esc(addressOf(f)||'—')+' &middot; '+esc(applicantOf(f)||'—')+'</p></div>' +
+        '<button type="button" class="ghost insplistbtn" id="inspBackToList">&larr; Back to list</button></div>';
+
+      var body = '';
+      INSPECTION_ORDER.forEach(function(k){
+        var it = insp[k] || {};
+        body += '<div class="inspitem"><div class="hd"><span class="lbl">'+esc(INSPECTION_LABEL[k])+'</span>' +
+          '<label class="switch big" for="ix_'+k+'_done"><input type="checkbox" id="ix_'+k+'_done" '+(it.done?'checked':'')+'><span class="track"></span><span class="thumb"></span></label></div>' +
+          '<div class="inspgrid3">' +
+          '<div class="field"><label for="ix_'+k+'_date">Date of inspection</label><input type="date" id="ix_'+k+'_date" value="'+esc(it.date||'')+'"></div>' +
+          '<div class="field"><label for="ix_'+k+'_by">Completed by</label><input type="text" id="ix_'+k+'_by" placeholder="Initials" value="'+esc(it.completedBy||'')+'"></div>' +
+          '<div class="field"><label for="ix_'+k+'_rec">Date recorded</label><input type="date" id="ix_'+k+'_rec" value="'+esc(it.dateRecorded||'')+'"></div>' +
+          '</div>' +
+          '<div class="field" style="margin-top:10px;margin-bottom:0"><label for="ix_'+k+'_comment">Comments</label><textarea id="ix_'+k+'_comment" placeholder="Notes from the inspection…">'+esc(it.comment||'')+'</textarea></div>' +
+          '</div>';
+      });
+
+      var coo = review.certOfOccupancy || {};
+      body += '<div class="inspitem inspcoo"><div class="hd"><span class="lbl">Certificate of occupancy</span></div>';
+      body += fRadio('ixCoo','Certificate of occupancy given?',[{value:'given',label:'Given'},{value:'not_given',label:'Not given'}],{value:coo.given||''});
+      body += '<div class="field" style="margin-top:12px"><label for="ixCooComments">C of O comments</label><textarea id="ixCooComments">'+esc(coo.comments||'')+'</textarea></div>';
+      body += '<div class="inspgrid3" style="grid-template-columns:1fr 1fr">' +
+        '<div class="field"><label for="ixCooInitials">Initials sign off</label><input type="text" id="ixCooInitials" value="'+esc(coo.initials||'')+'"></div>' +
+        '<div class="field"><label for="ixCooDate">Date</label><input type="date" id="ixCooDate" value="'+esc(coo.date||'')+'"></div>' +
+        '</div>';
+      body += '<label class="checkline" for="ixFeePaid" style="margin-top:14px;display:flex"><input type="checkbox" id="ixFeePaid" '+(review.feePaid?'checked':'')+'> Fee paid</label>' +
+        '<p class="feegate" id="ixFeeGateNote"></p></div>';
+
+      body += '<p class="reportstatus" id="ixStatus"></p>';
+      body += '<div class="inspsavebar"><button type="button" class="ghost" id="ixDownloadPdf">Download editable inspection PDF</button><button type="button" class="primary" id="ixSave">Save inspection</button></div>';
+
+      detailWrap.innerHTML = dh + body;
+      detailWrap.hidden = false;
+      window.scrollTo(0,0);
+
+      document.getElementById('inspBackToList').addEventListener('click', closeDetail);
+
+      var updateFeeGate = function(){
+        var given = radioVal('ixCoo');
+        var feeCb = document.getElementById('ixFeePaid');
+        var note = document.getElementById('ixFeeGateNote');
+        if (given !== 'given'){ feeCb.checked = false; feeCb.disabled = true; note.textContent = 'Fee can be marked paid only after the Certificate of Occupancy is given.'; }
+        else { feeCb.disabled = false; note.textContent = ''; }
+      };
+      updateFeeGate();
+      detailWrap.addEventListener('change', function(e){ if (e.target && e.target.name === 'ixCoo') updateFeeGate(); });
+
+      function liveReviewFromForm(){
+        var lr = { inspections:{}, certOfOccupancy:{}, feePaid: checked('ixFeePaid') };
+        INSPECTION_ORDER.forEach(function(k){
+          lr.inspections[k] = { done: checked('ix_'+k+'_done'), date: v('ix_'+k+'_date'), completedBy: v('ix_'+k+'_by'), dateRecorded: v('ix_'+k+'_rec'), comment: v('ix_'+k+'_comment') };
+        });
+        lr.certOfOccupancy = { given: radioVal('ixCoo'), comments: v('ixCooComments'), initials: v('ixCooInitials'), date: v('ixCooDate') };
+        return lr;
+      }
+
+      document.getElementById('ixDownloadPdf').addEventListener('click', function(){
+        var statusEl = document.getElementById('ixStatus');
+        downloadInspectionPdf({ type: rec.type, permitNumber: rec.permitNumber, fields: f, review: liveReviewFromForm() }, statusEl);
+      });
+
+      document.getElementById('ixSave').addEventListener('click', function(){
+        var statusEl = document.getElementById('ixStatus');
+        var newReview = liveReviewFromForm();
+        if (!window.__db){ statusEl.textContent = 'Not connected to the design database in this view.'; statusEl.className = 'reportstatus err'; return; }
+        statusEl.textContent = 'Saving…'; statusEl.className = 'reportstatus';
+        window.__db.doc('submissions/'+id).update({ review: newReview }).then(function(){
+          statusEl.textContent = 'Saved.'; statusEl.className = 'reportstatus ok';
+          rec.review = newReview;
+        }).catch(function(){ statusEl.textContent = 'Could not save — please try again.'; statusEl.className = 'reportstatus err'; });
+      });
+    }
+  }
+
+  /* ---------- subdivision / development approval ---------- */
+  function renderSubdivisionForm(main){
+    var html = '<form id="subdivForm" novalidate>';
+    html += '<p class="section-note" style="margin-top:-6px">This collects your information ahead of time. The Planning Commission still requires paper drawing sets (three for residential, five for commercial) and reviews applications at its 3rd-Tuesday meeting — submit at least 25 days ahead (30 if Construction Plans are included).</p>';
+
+    html += '<fieldset><legend>Application type</legend>';
+    html += fRadio('approvalType','Type of Approval',['Sketch','Preliminary','Final'],{required:true});
+    html += fText('subName','Subdivision/Development Name',{required:true});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property owner</legend>';
+    html += fText('ownerName','Property Owner(s)',{required:true});
+    html += fText('ownerAddress','Mailing Address',{required:true});
+    html += '<div class="two-col">' + fText('ownerPhone','Phone',{type:'tel'}) + fText('ownerCell','Cell',{type:'tel'}) + '</div>';
+    html += fText('ownerEmail','Email',{type:'email'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Registered surveyor</legend>';
+    html += '<div class="two-col">' + fText('survName','Surveyor Name') + fText('survFirm','Firm') + '</div>';
+    html += '<div class="two-col">' + fText('survLic','License #') + fText('survAddress','Mailing Address') + '</div>';
+    html += '<div class="two-col">' + fText('survPhone','Phone',{type:'tel'}) + fText('survEmail','Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Civil engineer</legend>';
+    html += '<div class="two-col">' + fText('engName','Engineer Name') + fText('engFirm','Firm') + '</div>';
+    html += fText('engAddress','Mailing Address');
+    html += '<div class="two-col">' + fText('engPhone','Phone',{type:'tel'}) + fText('engEmail','Email',{type:'email'}) + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property details</legend>';
+    html += '<div class="two-col">' + fText('phase','Phase (if any)') + fText('sketchDate','Date of Sketch Plat approval (if any)') + '</div>';
+    html += fText('acreage','Gross Acreage to be Subdivided or Combined',{type:'number',required:true});
+    html += '<div class="two-col">' + fText('lotCount','Total # of Lots',{type:'number'}) + fText('avgLotSize','Avg Lot Size (sq ft)',{type:'number'}) + '</div>';
+    html += fText('zoning','Zoning');
+    html += '<div class="field"><label>Available</label><div class="radiogroup" style="flex-wrap:wrap">' +
+      '<label class="opt" style="flex:1 1 auto"><input type="checkbox" id="availSewer" style="position:static;opacity:1;width:auto;height:auto;margin-right:6px">City Sewer</label>' +
+      '<label class="opt" style="flex:1 1 auto"><input type="checkbox" id="availWater" style="position:static;opacity:1;width:auto;height:auto;margin-right:6px">City Water Lines</label>' +
+      '<label class="opt" style="flex:1 1 auto"><input type="checkbox" id="availElectric" style="position:static;opacity:1;width:auto;height:auto;margin-right:6px">Electric Power Lines</label></div></div>';
+    html += fRadio('adjoining','Do you own land adjoining the parcel(s) being reviewed?',['Yes','No'],{required:true});
+    html += '<div id="adjoiningFollowup">' + fText('adjoiningPlan','Will the adjoining land be subdivided later?') + '</div>';
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Drawings</legend>';
+    html += fFile('uploads','Upload your plat/drawings and supporting documents');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Certification</legend>';
+    html += fTerms('certify','subdivisionCertification');
+    html += fText('signName','Print your name (in place of signature)',{required:true});
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"><div class="row total"><span>Fee</span><b>NO FEE</b></div><div class="note">Reviewed by the Planning Commission — no fee is charged for this application. The Planning Commission meets the 3rd Tuesday of each month. There are no special meetings.</div></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      document.getElementById('adjoiningFollowup').hidden = radioVal('adjoining') !== 'Yes';
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('subdivForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var fields = {
+        approvalType: radioVal('approvalType'), subdivisionName: v('subName'),
+        propertyOwner: v('ownerName'), ownerAddress: v('ownerAddress'), ownerPhone: v('ownerPhone'), ownerCell: v('ownerCell'), ownerEmail: v('ownerEmail'),
+        surveyorName: v('survName'), surveyorFirm: v('survFirm'), surveyorLicense: v('survLic'), surveyorAddress: v('survAddress'), surveyorPhone: v('survPhone'), surveyorEmail: v('survEmail'),
+        engineerName: v('engName'), engineerFirm: v('engFirm'), engineerAddress: v('engAddress'), engineerPhone: v('engPhone'), engineerEmail: v('engEmail'),
+        phase: v('phase'), sketchPlatDate: v('sketchDate'), acreage: v('acreage'), lotCount: v('lotCount'), avgLotSize: v('avgLotSize'), zoning: v('zoning'),
+        availableSewer: checked('availSewer'), availableWater: checked('availWater'), availableElectric: checked('availElectric'),
+        ownsAdjoiningLand: radioVal('adjoining'), adjoiningPlan: v('adjoiningPlan'),
+        certified: checked('certify'), signedName: v('signName')
+      };
+      submitApplication('subdivision', fields, {permitFee:0, cictFee:0, total:0});
+    });
+  }
+
+  /* ---------- application for annexation ---------- */
+  function renderAnnexationForm(main){
+    var html = '<form id="annexForm" novalidate>';
+    html += '<p class="section-note" style="margin-top:-6px">Property must be contiguous to the current city limits. This collects your information ahead of time — the Petition for Annexation must still be signed and notarized. The full process typically takes one to two months.</p>';
+
+    html += '<fieldset><legend>Applicant</legend>';
+    html += '<div class="two-col">' + fText('appFirst','First Name',{required:true}) + fText('appLast','Last Name',{required:true}) + '</div>';
+    html += fText('appEmail','Email',{type:'email',required:true});
+    html += fText('appPhone','Phone',{type:'tel',placeholder:'(000) 000-0000'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property to be annexed</legend>';
+    html += fText('acreage','Acreage',{type:'number',required:true});
+    html += fText('streetAddress','Street address of properties to be annexed',{required:true});
+    html += fText('subdivisionName','Name of subdivision, if applicable');
+    html += fFile('deeds','Current recorded deeds for the properties to be annexed',{hint:'Required — must be included with this application.'});
+    html += fFile('taxMap','Current tax parcel map');
+    html += fRadio('surveyAvailable','Survey of the properties available?',['Yes','No']);
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Property owner</legend>';
+    html += fText('ownerName','Name',{required:true});
+    html += fText('ownerAddress','Address',{required:true});
+    html += '<div class="two-col">' + fText('ownerCity','City') + fText('ownerState','State') + '</div>';
+    html += '<div class="two-col">' + fText('ownerZip','Zip') + fText('ownerPhone','Phone',{type:'tel'}) + '</div>';
+    html += fTextarea('additionalOwners','Additional owners',{hint:'Name, address and phone number of each additional owner, if any.'});
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Why annex?</legend>';
+    html += fTextarea('reason','Reason for Requesting Annexation',{required:true});
+    html += fTextarea('additionalInfo','Additional Information');
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Demographic questionnaire</legend>';
+    html += '<div class="two-col">' + fText('householdMembers','Total members in household',{type:'number'}) + fText('votingAge','Total persons of voting age',{type:'number'}) + '</div>';
+    html += '<div class="two-col">' + fText('registeredVoters','Registered voters',{type:'number'}) + fText('housingUnits','Number of housing units',{type:'number'}) + '</div>';
+    html += fText('housingAddresses','Street addresses of housing units');
+    html += '<div class="two-col">' + fText('trailers','Number of trailers',{type:'number'}) + fText('trailerAddresses','Street addresses of trailers') + '</div>';
+    html += fTextarea('businesses','Names and addresses of all businesses on the property');
+    html += fText('businessOwnerContact','Business owner/manager mailing address and phone');
+    html += fText('signsBillboards','Signs/billboards on the property');
+    html += fRadio('homeOccupation','If residential, is there a home occupation (business) in use on this property?',['Yes','No']);
+    html += fText('accessoryStructures','How many accessory structures are on the property, and what is their use?');
+    html += fRadio('hasAnimals','Are there any animals besides cats and dogs kept on the property?',['Yes','No']);
+    html += '<div id="animalDetail">' + fText('animalDetailText','What kind, and how many?') + '</div>';
+    html += fText('animalEnclosure','Where are the animal enclosures located, including fencing?');
+    html += fRadio('desiredZoning','What zoning classification is desired for this area?',['Agriculture','Residential','Commercial','Industrial'],{required:true});
+    html += fTextarea('drainage','Are there any drainage issues that affect this property?');
+    html += fTextarea('otherFeatures','Are there any other significant features the city should be aware of?');
+    html += fText('childrenAges','Ages and grades of all children');
+    html += fRadio('busPickup','Will you require bus pick-up?',['Yes','No']);
+    html += '</fieldset>';
+
+    html += '<fieldset><legend>Certification</legend>';
+    html += fRadio('submittingAs','You are submitting this application as the',['Property Owner','Legally Authorized Representative'],{required:true});
+    html += '<div class="field checkrow"><label style="display:flex;gap:9px;align-items:flex-start;margin:0;font-size:13.5px;font-weight:400;color:var(--ink)"><input type="checkbox" id="certify" required><span>I certify that I have read this application and that all information contained in it is true and correct. I understand the Petition for Annexation must still be signed in the presence of a notary.</span></label></div>';
+    html += fText('signName','Print your name (in place of signature)',{required:true});
+    html += fTerms('agreeServices','annexationServiceStatement');
+    html += '</fieldset>';
+
+    html += '<div class="feebox" id="feebox"><div class="row total"><span>Fee</span><b>NO FEE</b></div><div class="note">Reviewed by the Planning Commission — no fee is charged for this application. The annexation process typically takes one to two months. You’ll receive a letter of notification once it is complete.</div></div>';
+    html += '<button type="submit" class="primary">Submit application</button>';
+    html += '</form>';
+    main.innerHTML = html;
+
+    function update(){
+      document.getElementById('animalDetail').hidden = radioVal('hasAnimals') !== 'Yes';
+    }
+    window.__curUpdate = update;
+    update();
+
+    document.getElementById('annexForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!this.reportValidity()) return;
+      var fields = {
+        applicantName: v('appFirst')+' '+v('appLast'), applicantEmail: v('appEmail'), applicantPhone: v('appPhone'),
+        acreage: v('acreage'), address: v('streetAddress'), subdivisionName: v('subdivisionName'), surveyAvailable: radioVal('surveyAvailable'),
+        propertyOwner: v('ownerName'), ownerAddress: v('ownerAddress'), ownerCity: v('ownerCity'), ownerState: v('ownerState'), ownerZip: v('ownerZip'), ownerPhone: v('ownerPhone'),
+        additionalOwners: v('additionalOwners'), reason: v('reason'), additionalInfo: v('additionalInfo'),
+        householdMembers: v('householdMembers'), votingAge: v('votingAge'), registeredVoters: v('registeredVoters'), housingUnits: v('housingUnits'), housingAddresses: v('housingAddresses'),
+        trailers: v('trailers'), trailerAddresses: v('trailerAddresses'), businesses: v('businesses'), businessOwnerContact: v('businessOwnerContact'), signsBillboards: v('signsBillboards'),
+        homeOccupation: radioVal('homeOccupation'), accessoryStructures: v('accessoryStructures'), hasAnimals: radioVal('hasAnimals'), animalDetail: v('animalDetailText'), animalEnclosure: v('animalEnclosure'),
+        desiredZoning: radioVal('desiredZoning'), drainage: v('drainage'), otherFeatures: v('otherFeatures'), childrenAges: v('childrenAges'), busPickup: radioVal('busPickup'),
+        submittingAs: radioVal('submittingAs'), certified: checked('certify'), signedName: v('signName'), agreedToServices: checked('agreeServices')
+      };
+      submitApplication('annexation', fields, {permitFee:0, cictFee:0, total:0});
+    });
+  }
+
+  /* ---------- boot ---------- */
+  function boot(){
+    loadCitizenSession();
+    render();
+    setupPWA();
+    if (window.claude && window.claude.use){
+      window.claude.use('db').then(function(db){ window.__db = db; var v = (location.hash||'').replace('#',''); if (v==='staff' || v==='calendar' || (v==='account' && CURRENT_CITIZEN)) render(); });
+      window.claude.use('downloads').then(function(dl){ window.__downloads = dl; });
+    }
+  }
+  if (window.claude && window.claude.hot){
+    window.claude.hot.ready ? window.claude.hot.ready(boot) : boot();
+  } else {
+    boot();
+  }
+})();
+</script>
