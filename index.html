@@ -462,6 +462,16 @@
   .exportrow{grid-template-columns:1fr;}
   .stabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;}
 }
+.iconlib{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
+.iconlib .lbl{font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:0 0 8px;}
+.glyphgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+@media (max-width:640px){ .glyphgrid{grid-template-columns:repeat(4,1fr);} }
+.glyphgrid button{width:100%;margin:0;padding:6px 4px 5px;border:2px solid transparent;border-radius:12px;background:transparent;cursor:pointer;font:inherit;font-size:11px;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:5px;}
+.glyphgrid button img{width:44px;height:44px;border-radius:10px;display:block;}
+.glyphgrid button[aria-pressed="true"]{border-color:var(--primary);background:var(--surface-alt);color:var(--ink);}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.swatches button{width:32px;height:32px;margin:0;padding:0;border-radius:50%;border:2px solid var(--border);cursor:pointer;}
+.swatches button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink);}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
@@ -1201,6 +1211,53 @@
       }
     } catch(e){}
   }
+
+  /* ---------- Ready-made app icons (pick one instead of uploading) ---------- */
+  var PRESET_GLYPHS = [
+    { key:'shield',   label:'Shield',      svg:'<path d="M12 2.5l8 3.5v5c0 5-3.3 8.8-8 10.5-4.7-1.7-8-5.5-8-10.5v-5l8-3.5z"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/>' },
+    { key:'cityhall', label:'City Hall',   svg:'<path d="M3 21h18"/><path d="M5 21V10h14v11"/><path d="M4 10l8-5 8 5"/><path d="M12 5V3"/><path d="M8.5 21v-6h7v6"/><path d="M8 13.5v0M16 13.5v0"/>' },
+    { key:'house',    label:'House',       svg:'<path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/>' },
+    { key:'hardhat',  label:'Hard hat',    svg:'<path d="M4 16.5V14a8 8 0 0 1 16 0v2.5"/><path d="M2.5 16.5h19v2h-19z"/><path d="M12 6v4"/>' },
+    { key:'clipboard',label:'Permit',      svg:'<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M9 4V2.8h6V4"/><path d="M8.5 11.3l2 2 4-4.3"/><path d="M8.5 16.5h7"/>' },
+    { key:'wrench',   label:'Tools',       svg:'<path d="M14.5 6.5a4 4 0 0 0 5 5l-9.5 9.5a2.1 2.1 0 0 1-3-3L16.5 8.5a4 4 0 0 0-2-2z"/>' },
+    { key:'pin',      label:'Map pin',     svg:'<path d="M12 21.5s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10.5" r="2.4"/>' },
+    { key:'calendar', label:'Calendar',    svg:'<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/>' },
+    { key:'tree',     label:'Tree',        svg:'<path d="M12 3l5 6h-2.5l3.5 5h-3l3 4.5H6l3-4.5H6l3.5-5H7l5-6z"/><path d="M12 18.5V21.5"/>' },
+    { key:'star',     label:'Star',        svg:'<path d="M12 3.2l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.2l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3.2z"/>' },
+    { key:'flag',     label:'Flag',        svg:'<path d="M5.5 21V4"/><path d="M5.5 4.5h12l-2.5 4 2.5 4h-12"/>' },
+    { key:'document', label:'Application', svg:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M9.5 13h6M9.5 16.5h6M9.5 9.5h2"/>' }
+  ];
+  var PRESET_COLORS = [
+    { bg:'#0F3273', fg:'#FBF9F4', label:'Navy' },
+    { bg:'#F2C230', fg:'#0F3273', label:'Gold' },
+    { bg:'#2F6B3A', fg:'#FBF9F4', label:'Green' },
+    { bg:'#1F6F78', fg:'#FBF9F4', label:'Teal' },
+    { bg:'#A23B3B', fg:'#FBF9F4', label:'Brick' },
+    { bg:'#2B2F36', fg:'#F2C230', label:'Charcoal' }
+  ];
+  function presetIconSvg(glyph, bg, fg, size){
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 512 512">' +
+      '<rect width="512" height="512" fill="' + bg + '"/>' +
+      '<g transform="translate(112 112) scale(12)" fill="none" stroke="' + fg + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + glyph + '</g></svg>';
+  }
+  function renderPresetIcon(glyph, bg, fg){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      img.onload = function(){
+        try {
+          var out = {};
+          [512, 192, 180].forEach(function(size){
+            var c = document.createElement('canvas'); c.width = size; c.height = size;
+            c.getContext('2d').drawImage(img, 0, 0, size, size);
+            out['icon' + size] = c.toDataURL('image/png');
+          });
+          resolve(out);
+        } catch(e){ reject(e); }
+      };
+      img.onerror = function(){ reject(new Error('Could not draw that icon.')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(presetIconSvg(glyph, bg, fg, 512));
+    });
+  }
   /* Resize an uploaded image to the three PNG sizes the app needs. */
   function makeIconSet(file){
     return new Promise(function(resolve, reject){
@@ -1232,6 +1289,7 @@
     var html = '<h2 class="section">App</h2><p class="section-note">Customize the installed app: its home-screen icon, an opening splash screen, and notifications shown to everyone who opens the site or the app.</p>';
     html += '<div class="appset">';
     html += '<div class="card"><p class="ttl" style="font-weight:700;margin:0 0 8px">App icon</p><div class="iconprev"><img id="appIconPrev" src="' + esc(appIconSrc(192)) + '" alt="App icon"><div><p class="lbl" style="margin:0 0 6px">Square image, at least 512 &times; 512 (PNG or JPG). It is resized automatically.</p><input type="file" id="appIconFile" accept="image/png,image/jpeg,image/webp"></div></div>';
+    html += '<div class="iconlib"><p class="lbl">Or pick a ready-made icon</p><div class="glyphgrid" id="glyphGrid"></div><div class="swatches" id="swatchRow"></div></div>';
     html += '<div class="btnrow2"><button type="button" class="primary" id="appIconSave" disabled>Save icon</button><button type="button" class="ghost" id="appIconReset">Use default icon</button></div><p class="reportstatus" id="appIconStatus"></p>';
     html += '<p class="hint" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 0">Android and desktop installs use the new icon from their next install. iPhone home-screen icons come from a file on the site itself &mdash; send the icon image to Claude to bake it in for iPhone too.</p></div>';
     html += '<div class="card"><div class="togglebar" style="margin:0 0 12px;padding:0;border:0;background:transparent;box-shadow:none"><div><p class="ttl">Splash screen</p><p class="dsc">A short branded screen when the app opens.</p></div><label class="switch"><input type="checkbox" id="spEnabled" ' + (sp.enabled ? 'checked' : '') + '><span class="track"></span><span class="thumb"></span></label></div>';
@@ -1266,6 +1324,28 @@
         st('appIconStatus', 'Looks good — click Save icon to use it.');
       }).catch(function(err){ st('appIconStatus', err.message || 'Could not read that image.', false); });
     });
+    var libGlyph = null, libColor = PRESET_COLORS[0];
+    var glyphGrid = document.getElementById('glyphGrid'), swatchRow = document.getElementById('swatchRow');
+    function paintLibrary(){
+      glyphGrid.innerHTML = PRESET_GLYPHS.map(function(g){
+        return '<button type="button" data-glyph="' + g.key + '" aria-pressed="' + (libGlyph === g.key ? 'true' : 'false') + '"><img alt="" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(presetIconSvg(g.svg, libColor.bg, libColor.fg, 88)) + '">' + g.label + '</button>';
+      }).join('');
+      swatchRow.innerHTML = PRESET_COLORS.map(function(c){ return '<button type="button" data-bg="' + c.bg + '" title="' + c.label + '" aria-label="' + c.label + '" style="background:' + c.bg + '" aria-pressed="' + (c === libColor ? 'true' : 'false') + '"></button>'; }).join('');
+    }
+    function chooseLibraryIcon(){
+      if (!libGlyph) return;
+      var g = PRESET_GLYPHS.filter(function(x){ return x.key === libGlyph; })[0];
+      st('appIconStatus', 'Preparing icon\u2026');
+      renderPresetIcon(g.svg, libColor.bg, libColor.fg).then(function(set){
+        pendingIcons = set;
+        document.getElementById('appIconPrev').src = set.icon192;
+        document.getElementById('appIconSave').disabled = false;
+        st('appIconStatus', g.label + ' on ' + libColor.label.toLowerCase() + ' \u2014 click Save icon to use it.');
+      }).catch(function(err){ st('appIconStatus', err.message || 'Could not build that icon.', false); });
+    }
+    glyphGrid.addEventListener('click', function(e){ var b = e.target.closest('[data-glyph]'); if (!b) return; libGlyph = b.getAttribute('data-glyph'); paintLibrary(); chooseLibraryIcon(); });
+    swatchRow.addEventListener('click', function(e){ var b = e.target.closest('[data-bg]'); if (!b) return; libColor = PRESET_COLORS.filter(function(c){ return c.bg === b.getAttribute('data-bg'); })[0] || libColor; paintLibrary(); chooseLibraryIcon(); });
+    paintLibrary();
     document.getElementById('appIconSave').addEventListener('click', function(){
       if (!pendingIcons) return;
       var next = {}; Object.keys(APP_SETTINGS || {}).forEach(function(k){ next[k] = APP_SETTINGS[k]; });
