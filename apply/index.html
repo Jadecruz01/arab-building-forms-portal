@@ -219,6 +219,13 @@ input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer
 .card h2{font:700 16px var(--f-body)}
 .creds{background:var(--okbg);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:14px}
 .creds code{font-size:15px;user-select:all}
+a.brandbar{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+.clogo{width:44px;height:44px;border-radius:50%;display:block;flex:none;background:#1e2a4a;box-shadow:0 0 0 2px rgba(242,194,48,.55)}
+.bdiv{width:1px;align-self:stretch;margin:4px 0;background:currentColor;opacity:.35}
+.bname{display:flex;flex-direction:column;font:700 17px/1.15 var(--f-disp);letter-spacing:.01em;min-width:0}
+.bname small{font:500 12px/1.3 var(--f-body);letter-spacing:.04em;opacity:.8;text-transform:uppercase}
+.jt-top a.brandbar{color:#fff}
+.jt-top .clogo{width:40px;height:40px}
 /* submission panel */
 .veil{position:fixed;inset:0;background:rgba(6,10,40,.35);z-index:30}
 .panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--surface);z-index:31;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(6,10,40,.2);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -250,7 +257,10 @@ input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer
 .confirm{background:var(--redbg);border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;width:100%}
 .pin{max-width:380px;margin:12vh auto 0;background:var(--surface);border-radius:14px;padding:28px;box-shadow:var(--shadow);display:grid;gap:12px;text-align:center}
 .pin input{border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;letter-spacing:.4em;font-size:20px;background:var(--surface)}
-.mobile-top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);padding:10px 16px;border-bottom:1px solid var(--line);margin:-24px -16px 20px}
+.mobile-top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0b2559;color:#fff;padding:12px 18px;border-bottom:3px solid #f2c230;margin:-24px -16px 20px}
+.mobile-top .staffbtn{color:#fff}
+.stage{min-height:100vh}
+a.btn{text-decoration:none}
 .sbanner{display:flex;gap:6px 14px;align-items:center;flex-wrap:wrap;background:var(--amberbg);color:var(--ink);padding:10px 18px;font-size:14px;border-bottom:1px solid var(--line)}
 .sbanner.full{background:var(--redbg)}
 .sbanner b{color:var(--amber)} .sbanner.full b{color:var(--red)}
@@ -307,6 +317,8 @@ html.embed .tile .ico{width:38px;height:38px}
 "use strict";
 const EMBED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 if (EMBED) document.documentElement.classList.add('embed');
+const CITY_LOGO = 'city-logo.jpg';   // official City of Arab seal (cropped from arabcity.org), stored next to this page
+const brandHtml = sub => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" onerror="this.style.visibility=\'hidden\'"><span class="bdiv" aria-hidden="true"></span><span class="bname">Building Department<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
@@ -528,7 +540,7 @@ function tile(k){ const f = FORMS[k];
   return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
 function viewApps(){
   return '<div class="app">'+sideNav()+'<main class="stage">'+
-  '<div class="mobile-top"><div class="brand" style="padding:0"><div class="seal">ARAB</div>Building Department Portal</div><button class="btn sm ghost" onclick="go(\'staff\')">'+ic('lock')+'Staff</button></div>'+
+  '<div class="mobile-top">'+brandHtml()+'<button class="btn sm ghost staffbtn" onclick="go(\'staff\')">'+ic('lock')+'Staff</button></div>'+
   '<div class="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('subtrade')+'</div></section>'+
@@ -556,7 +568,8 @@ function viewApps(){
 
 /* ================= PUBLIC: a form ================= */
 let FILES = [];        // File objects queued for upload
-let FVALS = {};        // live field values
+let FVALS = {};
+let LAST_RECEIPT = null;   // shown on the confirmation page        // live field values
 function fieldHtml(x, f){
   if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
   if (x.type==='note') return '<div class="fld full hint" style="color:var(--ink2);font-size:14px">'+esc(x.text)+'</div>';
@@ -583,7 +596,7 @@ function feeBoxHtml(key){
 }
 function viewForm(){
   const F = FORMS[S.form];
-  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top"><div class="brand" style="padding:0"><div class="seal">ARAB</div>Building Department</div></div>'+
+  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
    '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="https://app.jotform.com/261578162936164/page/18">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
    '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
@@ -642,16 +655,18 @@ async function submitForm(e){
   try{
     btn.textContent = 'Submitting…';
     const fees = computeFees(S.form, vals, false);
-    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt:new Date().toISOString(), read:false, starred:false, fields:vals, fees, files, staff:{ permitNo:'', payment:'' } } });
+    const createdAt = new Date().toISOString();
+    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, staff:{ permitNo:'', payment:'' } } });
     for (let i=0;i<FILES.length;i++){
       btn.textContent = 'Uploading document '+(i+1)+' of '+FILES.length+'…';
       const data = await readDataUrl(FILES[i]);
       await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:{ app:APP_TAG, submissionId:subId, index:i, name:FILES[i].name, type:FILES[i].type, size:FILES[i].size, data } });
     }
+    LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, files };
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
-      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r t" style="border:0;padding:0"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Pay in person by cash or check at 740 N Main St, Arab, AL 35016.</small></div>'+
-      '<a class="btn" href="https://app.jotform.com/261578162936164/page/18">Back to Applications &amp; Fees</a></div>';
+      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and bring it (printed or on your phone) to the Building Department, 740 N Main St. Pay by cash or check.</small></div>'+
+      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="https://app.jotform.com/261578162936164/page/18">Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -686,8 +701,8 @@ function visibleCols(k){
   return colsFor(k).filter(c => S.cols.on.includes(c.k));
 }
 function topBar(){
-  return '<header class="jt-top"><div class="jt-logo"><span class="mk"></span>Permit Desk</div><span class="jt-ws">Building Department</span><span class="sp"></span>'+
-   '<button class="tl hide-sm" title="My account" onclick="go(\'me\')">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</button><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="Building Department">ARAB</span></header>'+storageBanner();
+  return '<header class="jt-top">'+brandHtml('Staff dashboard')+'<span class="sp"></span>'+
+   '<button class="tl hide-sm" title="My account" onclick="go(\'me\')">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</button><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="'+esc((S.me&&S.me.name)||'')+'">'+esc(((S.me&&(S.me.name||S.me.email))||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())+'</span></header>'+storageBanner();
 }
 async function lockStaff(){ const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
 const isAdmin = () => !!(S.me && S.me.role==='admin');
@@ -700,7 +715,7 @@ function storageBanner(){
 }
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
-  return '<div style="padding:16px"><form class="pin" id="pinf"><div style="margin:0 auto" class="avatar">ARAB</div><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
+  return '<div style="padding:16px"><form class="pin" id="pinf"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" style="width:84px;height:84px;margin:0 auto"><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by a Building Department administrator.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
@@ -711,7 +726,7 @@ function viewPin(){
 function viewWorkspace(){
   const q = S.wsQ.toLowerCase();
   const rows = FORM_ORDER.filter(k => !q || FORMS[k].title.toLowerCase().includes(q)).sort((a,b)=>FORMS[a].title.localeCompare(FORMS[b].title));
-  return topBar()+'<div class="ws"><aside class="ws-side"><button class="create" onclick="go(\'apps\')">+ NEW APPLICATION</button>'+
+  return topBar()+'<div class="ws"><aside class="ws-side">'+
    meterHtml()+
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
    (isAdmin()?'<a class="navi" href="#purge" onclick="event.preventDefault();go(\'purge\')">'+ic('trash')+'Free up space</a><a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a><a class="navi" href="#import" onclick="event.preventDefault();S.imp=null;go(\'import\')">'+ic('upload')+'Import from Jotform</a>':'')+
@@ -736,7 +751,7 @@ function filteredRows(){
   if (S.filter==='starred') rows = rows.filter(s=>s.starred);
   if (S.filter==='unpaid') rows = rows.filter(s=>!isPaid(s));
   if (S.filter==='paid') rows = rows.filter(isPaid);
-  if (q) rows = rows.filter(s => (JSON.stringify(s.fields)+' '+((s.staff&&s.staff.permitNo)||'')).toLowerCase().includes(q));
+  if (q) rows = rows.filter(s => (JSON.stringify(s.fields)+' '+((s.staff&&s.staff.permitNo)||'')+' '+refNo(s.id)).toLowerCase().includes(q));
   const c = cols.find(c=>c.k===S.sort.k) || cols[0];
   return rows.slice().sort((a,b)=>{ const x=c.get(a), y=c.get(b); return (x<y?-1:x>y?1:0)*S.sort.d; });
 }
@@ -752,7 +767,7 @@ function viewTable(){
    '<div class="ttl"><b>'+esc(F.title)+'</b><small>'+(last?'Last submission '+fmtDT(last.createdAt):'No submissions yet')+'</small></div><span style="width:96px"></span></div>'+
    '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
    dashHtml(k)+
-   '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
+   '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
    '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
    '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
    (isAdmin()?'<button class="btn sm" onclick="S.imp={form:S.form};go(\'import\')">'+ic('upload')+'Import from Jotform</button>':'')+'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
@@ -835,10 +850,10 @@ function panelHtml(){
       ? '<button class="btn primary" onclick="saveEdit()">'+ic('check')+'Save changes</button><button class="btn" onclick="S.editing=false;render()">Cancel</button><span class="sp"></span><span class="hint" style="color:var(--muted);font-size:13px">Fees recalculate when you save.</span>'
       : S.tab==='office'
         ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span><button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
-        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
+        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
    '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
    '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
@@ -1361,6 +1376,73 @@ async function runImport(){
     }
     const form = I.form; S.imp = null; await loadSubs(); toast('Imported '+done+' application'+(done===1?'':'s')); go('table', form);
   }catch(e){ I.err = 'Import stopped after '+done+': '+e.message; await loadSubs(); render(); }
+}
+/* ================= applicant receipt (PDF) ================= */
+const refNo = id => String(id||'').replace(/-/g,'').slice(0,8).toUpperCase();
+async function buildReceipt(r){
+  const { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const pdf = await PDFDocument.create(), W = 612, H = 792, M = 54;
+  const page = pdf.addPage([W,H]);
+  const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const navy = rgb(0.06,0.2,0.45), gold = rgb(0.95,0.76,0.19), ink = rgb(0.04,0.08,0.3), grey = rgb(0.42,0.45,0.6), line = rgb(0.86,0.88,0.92);
+  const F = FORMS[r.form] || {title:r.form, short:r.form}, f = r.fields || {}, fe = r.fees || {};
+  // header band with the City seal
+  page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
+  let tx = M;
+  try{ const lb = new Uint8Array(await (await fetch(CITY_LOGO)).arrayBuffer());
+    const img = lb[0]===0x89 ? await pdf.embedPng(lb) : await pdf.embedJpg(lb);
+    page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
+  page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
+  page.drawText('Building Department', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
+  page.drawText('740 N Main St, Arab, AL 35016  ·  buildingdept@arabcity.org', {x:tx, y:H-86, size:9.5, font:reg, color:rgb(0.85,0.88,1)});
+  let y = H-150;
+  page.drawText('APPLICATION RECEIPT', {x:M, y, size:11, font:bold, color:grey});
+  y -= 26; { const tl = []; let cur = ''; pdfSafe(F.title).split(' ').forEach(w => { const t = cur ? cur+' '+w : w; if (bold.widthOfTextAtSize(t, 15) > W-2*M-190 && cur){ tl.push(cur); cur = w; } else cur = t; }); tl.push(cur);
+    tl.forEach((t,i) => page.drawText(t, {x:M, y:y-i*19, size:15, font:bold, color:ink})); y -= (tl.length-1)*19; }
+  // reference box (right side)
+  const ref = refNo(r.id);
+  page.drawRectangle({x:W-M-170, y:H-196, width:170, height:58, borderColor:navy, borderWidth:1.5, color:rgb(0.96,0.97,1)});
+  page.drawText('REFERENCE #', {x:W-M-158, y:H-158, size:8.5, font:bold, color:grey});
+  page.drawText(ref, {x:W-M-158, y:H-184, size:20, font:bold, color:navy});
+  y -= 34;
+  const row = (l, v, opts) => { if (!v) return; const lines = []; let cur = ''; pdfSafe(v).split(/\s+/).forEach(w => { const t = cur ? cur+' '+w : w; if (reg.widthOfTextAtSize(t, 11) > W-2*M-170 && cur){ lines.push(cur); cur = w; } else cur = t; }); lines.push(cur);
+    page.drawText(l, {x:M, y, size:10, font:bold, color:grey});
+    lines.slice(0,3).forEach((t,i) => page.drawText(t, {x:M+170, y:y-i*14, size:11, font:(opts&&opts.bold)?bold:reg, color:ink}));
+    y -= Math.min(lines.length,3)*14 + 8; };
+  row('Submitted', fmtDT(r.createdAt));
+  row('Applicant', f.applicant, {bold:true});
+  row('Applicant phone / email', [f.phone, f.email].filter(Boolean).join('  ·  '));
+  row('Property address', f.address + (f.lot ? '  (Lot '+f.lot+')' : ''), {bold:true});
+  if (r.form === 'moving') row('Moving to', f.toAddress);
+  row('Property owner', f.owner);
+  row('Contractor / business', [f.contractor || f.subName, f.business].filter(Boolean).join(' · '));
+  row('Trade', f.trade);
+  row('License #', f.tradeLicense || f.gcLicense);
+  row('Type of work', [f.buildType, f.projectType, f.signType, f.signFeature, f.poolType].filter(Boolean).join(' · '));
+  row('Description', f.description);
+  row('Documents uploaded', (r.files||[]).length ? (r.files.length+' file'+(r.files.length===1?'':'s')) : 'None');
+  y -= 6; page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1, color:line}); y -= 22;
+  page.drawText('FEES', {x:M, y, size:10, font:bold, color:grey}); y -= 20;
+  const fee = (l, v, b) => { page.drawText(l, {x:M, y, size:11.5, font:b?bold:reg, color:ink}); const t = money(v); page.drawText(t, {x:W-M-(b?bold:reg).widthOfTextAtSize(t, b?14:11.5), y, size:b?14:11.5, font:b?bold:reg, color:ink}); y -= b ? 26 : 18; };
+  if (fe.value) fee('Construction value', fe.value);
+  fee('Permit fee'+(fe.doubled?' (doubled)':''), fe.permit||0);
+  if (r.form==='building' || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
+  page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
+  fee('Amount due', fe.total||0, true);
+  y -= 8;
+  page.drawRectangle({x:M, y:y-58, width:W-2*M, height:66, color:rgb(1,0.96,0.86)});
+  page.drawText('How to pay', {x:M+14, y:y-12, size:11, font:bold, color:ink});
+  page.drawText('Bring this receipt to the Building Department, 740 N Main St, Arab, AL 35016.', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
+  page.drawText('Pay by cash or check made payable to "City of Arab." The clerk will assign your permit number.', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
+  page.drawText(pdfSafe('This receipt confirms your application was received. It is not proof of payment or an issued permit.  ·  Reference '+ref), {x:M, y:40, size:8.5, font:reg, color:grey});
+  return pdf.save();
+}
+async function downloadReceipt(sid){
+  const r = sid ? S.subs.find(x=>x.id===sid) : LAST_RECEIPT; if (!r) return;
+  if (!window.PDFLib){ toast('The receipt tool did not load. Check your connection and try again.'); return; }
+  try{ const bytes = await buildReceipt(r);
+    await DL.save({ filename: ('Receipt-'+refNo(r.id)+'-'+((r.fields&&r.fields.applicant)||'')).replace(/[^A-Za-z0-9]+/g,'-').replace(/-+$/,'')+'.pdf', data: bytes }); }
+  catch(e){ toast('Could not build the receipt: '+((e&&e.message)||'try again')); }
 }
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
