@@ -643,11 +643,12 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
+const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function sideNav(){ return '';
   /* full Jotform app navigation intentionally not recreated */
   const items = [['news',"What's New"],['doc','Applications & Fees',true],['info','Important Information'],['pin','Annexation'],['gavel','Regulations'],['user','About Us'],['map','Zoning Map']];
   return '<aside class="side"><div class="brand"><div class="seal">ARAB</div>Building Department</div>'+
-    items.map(i=>'<a class="navi '+(i[2]?'on':'dim')+'" href="https://app.jotform.com/261578162936164" target="_blank" rel="noopener" '+(i[2]?'onclick="event.preventDefault();go(\'apps\')"':'')+'>'+ic(i[0])+esc(i[1])+'</a>').join('')+
+    items.map(i=>'<a class="navi '+(i[2]?'on':'dim')+'" href="'+(i[2]?APPS_URL+'" target="_top"':'https://app.jotform.com/261578162936164" target="_blank" rel="noopener"')+(i[2]&&S.view==='apps'?' onclick="event.preventDefault();go(\'apps\')"':'')+'>'+ic(i[0])+esc(i[1])+'</a>').join('')+
     '<div class="grow"></div><button class="btn" onclick="go(\'staff\')">'+ic('lock')+'Staff dashboard</button></aside>';
 }
 function tile(k){ const f = FORMS[k];
@@ -712,7 +713,7 @@ function feeBoxHtml(key){
 function viewForm(){
   const F = FORMS[S.form];
   return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
-   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="https://app.jotform.com/261578162936164/page/18">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
    '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
 }
@@ -785,7 +786,7 @@ async function submitForm(e){
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
-      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="https://app.jotform.com/261578162936164/page/18">Back to Applications &amp; Fees</a></div></div>';
+      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+APPS_URL+'" target="_top">Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -839,7 +840,7 @@ function viewPin(){
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
-   '<button type="button" class="btn ghost" onclick="go(\'apps\')">Back to Applications &amp; Fees</button></form></div>';
+   '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
 function viewWorkspace(){
@@ -1193,7 +1194,7 @@ function viewPdfForm(){
   const key = S.form, D = PDF_FORMS[key], I = PDF_INFO[key];
   const step = (n, t, body) => '<li class="pstep"><span class="pn">'+n+'</span><div><b>'+t+'</b>'+body+'</div></li>';
   return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
-   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="#">← All applications</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
    '<ol class="psteps">'+
      step(1, 'Open the fillable form', '<p>Every blank on every page can be typed in, and every box can be checked. Sign where shown (type your name or sign after printing).</p>'+
        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="pdfGo_open" onclick="pdfFormAction(\''+key+'\',\'open\')">'+ic('ext')+'Open fillable form</button><button class="btn" id="pdfGo_save" onclick="pdfFormAction(\''+key+'\',\'save\')">'+ic('down')+'Download PDF</button></div><span class="formerr" id="pdfErr"></span>')+
