@@ -310,6 +310,7 @@ html.embed .tile small{display:none}
 html.embed .tile .fee{margin-top:4px}
 html.embed .tile .ico{width:38px;height:38px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.fcard .fsz{font-size:12px;color:var(--muted);padding:0 10px;margin-top:-4px}
 </style>
 
 
@@ -400,7 +401,7 @@ const LICENSE_OPTS = [
   'I am a General Contractor holding a current and valid license issued prior to January 1, 1992. Ala. Code 34-14A-6(3).',
   'I am the Property Owner acting as my own contractor and providing all material supervision myself on property for my own occupancy or use, and not offered for sale. Ala. Code 34-14A-6(5).'
 ];
-const UPLOAD = T('files','Please upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance',{type:'file',full:true,hint:'PDF, JPG or PNG. Up to 10 files, 8 MB each. Phone photos work too.'});
+const UPLOAD = T('files','Please upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance',{type:'file',req:true,full:true,hint:'PDF, JPG or PNG. Up to 10 files, 30 MB each. Phone photos work too.'});
 const APPLICANT = [
   T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true,hint:'Receives updates about this application.'}),
   T('phone','Applicant Phone #',{type:'tel',hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true})
@@ -522,6 +523,97 @@ async function loadAtt(subId){
 }
 const dataUrlBytes = d => { const b = atob(String(d).split(',')[1]||''); const u = new Uint8Array(b.length); for (let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; };
 const readDataUrl = f => new Promise((ok,no)=>{ const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('Could not read '+f.name)); r.readAsDataURL(f); });
+/* ================= behind-the-scenes document compression =================
+   Applicants can pick files up to MAX_UPLOAD_MB. Each file is optimized in the
+   browser as soon as it is added (photos resized + re-saved as JPG; large PDFs
+   re-saved, and scanned/large PDFs re-drawn at print quality), so only the small
+   version is stored. The original name, type and size are kept with the record. */
+const MAX_UPLOAD_MB = 30;
+const STORE_MAX = MAX_FILE_MB*1048576;
+const PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+let pdfjsP = null;
+function loadPdfJs(){
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  return pdfjsP = pdfjsP || new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFJS_CDN+'pdf.min.js';
+    s.onload = () => { if (!window.pdfjsLib){ pdfjsP = null; return no(new Error('PDF tool did not load')); } pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_CDN+'pdf.worker.min.js'; ok(pdfjsLib); };
+    s.onerror = () => { pdfjsP = null; no(new Error('PDF tool did not load')); }; document.head.appendChild(s); });
+}
+const canvasJpeg = (c, q) => new Promise((ok, no) => c.toBlob(b => b ? ok(b) : no(new Error('Could not compress')), 'image/jpeg', q));
+const jpgName = n => String(n||'photo').replace(/\.[^./]+$/,'')+'.jpg';
+async function shrinkImage(f){
+  const keepable = /^image\/(jpeg|png)$/.test(f.type) && f.size <= STORE_MAX;
+  if (keepable && f.size <= 400*1024) return null;                       // already small
+  let bmp;
+  try{ bmp = await createImageBitmap(f, {imageOrientation:'from-image'}); }
+  catch(e){ try{ bmp = await createImageBitmap(f); }catch(e2){ if (keepable) return null; throw new Error(f.name+' could not be opened. Save it as a JPG, PNG or PDF and try again.'); } }
+  try{
+    for (const [px, q] of [[2400,.75],[1800,.65],[1400,.55]]){
+      const sc = Math.min(1, px/Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(bmp.width*sc)); c.height = Math.max(1, Math.round(bmp.height*sc));
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+      const b = await canvasJpeg(c, q); c.width = c.height = 0;
+      if (keepable && b.size >= f.size) return null;                      // compressing would not help
+      if (b.size <= STORE_MAX) return { blob:b, type:'image/jpeg', name:jpgName(f.name) };
+    }
+  } finally { if (bmp.close) bmp.close(); }
+  return null;
+}
+async function rasterPdf(buf, target){
+  const lib = await loadPdfJs();
+  const doc = await lib.getDocument({ data: buf.slice(), isEvalSupported:false }).promise;
+  try{
+    let last = null;
+    for (const [dpi, q] of [[150,.7],[110,.6],[80,.5]]){
+      const out = await PDFLib.PDFDocument.create();
+      for (let i = 1; i <= doc.numPages; i++){
+        const pg = await doc.getPage(i), v1 = pg.getViewport({scale:1});
+        const vp = pg.getViewport({ scale: Math.min(dpi/72, 3600/Math.max(v1.width, v1.height)) });
+        const c = document.createElement('canvas'); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+        await pg.render({ canvasContext:g, viewport:vp }).promise;
+        const jpg = await out.embedJpg(new Uint8Array(await (await canvasJpeg(c, q)).arrayBuffer()));
+        out.addPage([v1.width, v1.height]).drawImage(jpg, { x:0, y:0, width:v1.width, height:v1.height });
+        c.width = c.height = 0; pg.cleanup();
+      }
+      last = await out.save({ useObjectStreams:true });
+      if (last.length <= target) break;
+    }
+    return new Blob([last], {type:'application/pdf'});
+  } finally { doc.destroy(); }
+}
+async function shrinkPdf(f){
+  if (f.size <= 1.5*1048576) return null;                                 // small PDFs are stored as they are
+  const buf = new Uint8Array(await f.arrayBuffer());
+  let best = f;
+  try{ if (window.PDFLib){ const d = await PDFLib.PDFDocument.load(buf, {ignoreEncryption:true, updateMetadata:false});
+    const out = await d.save({ useObjectStreams:true }); if (out.length < best.size) best = new Blob([out], {type:'application/pdf'}); } }catch(e){}
+  if (best.size > 3*1048576 && window.PDFLib){
+    // Re-draw each page at print quality (150 dpi). Used only when it saves at least 30%, or when needed to fit.
+    // Give up after 2 minutes (e.g. the phone put the page to sleep) and keep the re-saved copy.
+    try{ const r = await Promise.race([ rasterPdf(buf, Math.min(best.size*0.7, STORE_MAX)), new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 120000)) ]);
+      if (r.size < best.size*0.7 || (best.size > STORE_MAX && r.size < best.size)) best = r; }catch(e){}
+  }
+  return best === f ? null : { blob:best, type:'application/pdf', name:f.name };
+}
+async function optimizeFile(f){
+  const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+  let r = null;
+  try{ r = isPdf ? await shrinkPdf(f) : await shrinkImage(f); }
+  catch(e){ if (!(f.size <= STORE_MAX && /^(application\/pdf|image\/(jpeg|png))$/.test(f.type))) throw e; }
+  const blob = r ? r.blob : f;
+  if (blob.size > STORE_MAX) throw new Error(f.name+' is too large to store even after compressing ('+mb(blob.size)+'). Split it into smaller files and try again.');
+  return { blob, name: r ? r.name : f.name, type: r ? r.type : (f.type || (isPdf ? 'application/pdf' : 'image/jpeg')), size: blob.size,
+           origName: f.name, origType: f.type || '', origSize: f.size, compressed: !!r };
+}
+// files are optimized one at a time, in the order they were added
+const OPT = new WeakMap(); let OPTQ = Promise.resolve();
+function queueOptimize(f){
+  const p = OPTQ.then(() => optimizeFile(f)); OPTQ = p.catch(() => {}); OPT.set(f, p);
+  p.then(() => paintFiles(), e => { const i = FILES.indexOf(f); if (i >= 0) FILES.splice(i, 1); const err = document.getElementById('ferr'); if (err) err.textContent = e.message; paintFiles(); });
+  return p;
+}
+// size note used on the Documents tab and in the PDF
+const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
 function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; try{ localStorage.removeItem('bdStaffToken'); }catch(e){} }
 const mb = n => (Number(n||0)/1048576).toFixed(n>=10485760?0:1)+' MB';
@@ -584,7 +676,7 @@ function fieldHtml(x, f){
   if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup">'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
   else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
   else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+'>'+esc(v)+'</textarea>';
-  else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button">'+ic('upload')+'<div><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/jpeg,image/png,image/*" hidden></div><div class="filelist" id="flist"></div>';
+  else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button">'+ic('upload')+'<div><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
     inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
   return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+(x.type==='radio'?'_0':'')+'">'+esc(x.label)+star+'</label>'+inner+(x.hint?'<span class="hint">'+esc(x.hint)+'</span>':'')+'</div>';
@@ -637,9 +729,9 @@ function addFiles(list){
   const err = document.getElementById('ferr'); err.textContent='';
   for (const f of list){
     if (FILES.length >= 10){ err.textContent = 'You can attach up to 10 files.'; break; }
-    if (!/^(application\/pdf|image\/(jpeg|png))$/.test(f.type)){ err.textContent = f.name+' is not a PDF, JPG or PNG. Save it as one of those and try again.'; continue; }
-    if (f.size > MAX_FILE_MB*1024*1024){ err.textContent = f.name+' is larger than '+MAX_FILE_MB+' MB. Take a smaller photo or split the PDF.'; continue; }
-    FILES.push(f);
+    if (!(f.type==='application/pdf' || /^image\//.test(f.type) || /\.(pdf|jpe?g|png|heic|heif)$/i.test(f.name))){ err.textContent = f.name+' is not a PDF or a photo. Save it as a PDF, JPG or PNG and try again.'; continue; }
+    if (f.size > MAX_UPLOAD_MB*1048576){ err.textContent = f.name+' is larger than '+MAX_UPLOAD_MB+' MB. Split the PDF into smaller files or take a smaller photo.'; continue; }
+    FILES.push(f); queueOptimize(f);
   }
   paintFiles();
 }
@@ -651,20 +743,24 @@ async function submitForm(e){
   e.preventDefault();
   const form = e.target, err = document.getElementById('ferr'), btn = document.getElementById('subBtn');
   if (!form.checkValidity()){ form.reportValidity(); err.textContent = 'Please complete the required fields.'; return; }
+  if (FORMS[S.form].fields.some(x => x.type==='file' && (!x.show || x.show(FVALS))) && !FILES.length){ err.textContent = 'Please upload at least one document. This application requires documents.'; const d = document.getElementById('drop'); if (d){ d.scrollIntoView({block:'center'}); d.focus(); } return; }
   if (S.pubFull){ err.textContent = 'Online storage is full, so applications cannot be submitted right now. Please contact the Building Department.'; return; }
   btn.disabled = true; err.textContent='';
   const F = FORMS[S.form], vals = {};
   valueFields(F).forEach(x => { if ((!x.show || x.show(FVALS)) && FVALS[x.id]!=null && FVALS[x.id]!=='') vals[x.id] = String(FVALS[x.id]); });
-  const files = FILES.map(f => ({ name:f.name, type:f.type, size:f.size }));
+  let opt;
+  try{ btn.textContent = 'Preparing documents…'; opt = await Promise.all(FILES.map(f => OPT.get(f) || queueOptimize(f))); }
+  catch(x){ err.textContent = x.message; btn.disabled=false; btn.textContent='Submit application'; return; }
+  const files = opt.map(o => ({ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed }));
   try{
     btn.textContent = 'Submitting…';
     const fees = computeFees(S.form, vals, false);
     const createdAt = new Date().toISOString();
     const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, staff:{ permitNo:'', payment:'' } } });
-    for (let i=0;i<FILES.length;i++){
-      btn.textContent = 'Uploading document '+(i+1)+' of '+FILES.length+'…';
-      const data = await readDataUrl(FILES[i]);
-      await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:{ app:APP_TAG, submissionId:subId, index:i, name:FILES[i].name, type:FILES[i].type, size:FILES[i].size, data } });
+    for (let i=0;i<opt.length;i++){
+      btn.textContent = 'Uploading document '+(i+1)+' of '+opt.length+'…';
+      const data = await readDataUrl(opt[i].blob);
+      await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:Object.assign({ app:APP_TAG, submissionId:subId, index:i, data }, files[i]) });
     }
     LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, files };
     const done = document.getElementById('sheet');
@@ -846,7 +942,7 @@ function panelHtml(){
     else if (at.err) body = '<p class="empty">Could not load documents: '+esc(at.err)+'</p>';
     else body = extHtml + (at.length < own.length ? '<p class="formerr">'+(own.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
       '<div class="files">'+at.map((f,i)=>'<div class="fcard"><div class="th">'+(/^image/.test(f.type)?'<img src="'+esc(f.data)+'" alt="'+esc(f.name)+'">':'<span class="pdfi" style="width:44px;height:54px;font-size:11px">PDF</span>')+'</div>'+
-      '<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div><div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
+      '<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div>'+(sizeNote(f)?'<div class="fsz">'+esc(sizeNote(f))+'</div>':'')+'<div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
   }
   const actions = S.confirmDel
     ? '<div class="confirm"><b>Delete this application and its '+(s.files||[]).length+' document(s)?</b> This cannot be undone.<span style="flex:1"></span><button class="btn sm" onclick="S.confirmDel=false;render()">Keep it</button><button class="btn sm danger" onclick="deleteSub()">Delete</button></div>'
@@ -945,7 +1041,7 @@ async function buildPdf(s){
   if (st.comments) row('Staff comments', st.comments);
   const fl = await loadAtt(s.id), ext = (s.files||[]).filter(f=>f.url);
   head('Documents attached ('+(fl.length+ext.length)+')');
-  fl.forEach((f,i)=>row('Document '+(i+1), f.name));
+  fl.forEach((f,i)=>row('Document '+(i+1), f.name+(f.compressed&&f.origSize?'\nOriginal size '+mb(f.origSize)+(f.origName&&f.origName!==f.name?' ('+f.origName+')':'')+' - compressed to '+mb(f.size)+' for storage':(f.size?'\n'+mb(f.size):''))));
   ext.forEach((f,i)=>row('Document '+(fl.length+i+1), f.name+'\nStored in Jotform: '+f.url));
   const formPages = pdf.getPageCount();
   // attachments
@@ -955,7 +1051,7 @@ async function buildPdf(s){
       if (/pdf/.test(f.type)){ const src = await PDFDocument.load(buf,{ignoreEncryption:true}); const pgs = await pdf.copyPages(src, src.getPageIndices()); pgs.forEach(p=>pdf.addPage(p)); }
       else if (/image\/(png|jpe?g)/.test(f.type)){
         const img = /png/.test(f.type) ? await pdf.embedPng(buf) : await pdf.embedJpg(buf);
-        const p = pdf.addPage([W,H]); p.drawText(pdfSafe(f.name),{x:M,y:H-34,size:9,font:reg,color:grey});
+        const p = pdf.addPage([W,H]); p.drawText(pdfSafe(f.name+(sizeNote(f)?'  ·  '+sizeNote(f):'')),{x:M,y:H-34,size:9,font:reg,color:grey});
         const sc = Math.min((W-2*M)/img.width, (H-2*M-20)/img.height, 1); const w=img.width*sc, h=img.height*sc;
         p.drawImage(img,{x:(W-w)/2,y:(H-20-h)/2,width:w,height:h});
       } else throw 0;
