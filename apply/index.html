@@ -665,7 +665,7 @@ async function submitForm(e){
     LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, files };
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
-      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and bring it (printed or on your phone) to the Building Department, 740 N Main St. Pay by cash or check.</small></div>'+
+      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
       '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="https://app.jotform.com/261578162936164/page/18">Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
@@ -1344,7 +1344,7 @@ function viewImport(){
        : '<p class="empty">Everything in this file has already been imported.</p>')+
      '<p style="margin:0;color:var(--ink2);font-size:14px;max-width:72ch">Uploaded documents stay in Jotform. Each imported application keeps a link to them, so download any you need before you delete those records from Jotform.</p>'+
      (sel.length ? '<div class="row"><button class="btn primary" id="impGo" onclick="runImport()">'+ic('upload')+'Import '+sel.length+' application'+(sel.length===1?'':'s')+'</button></div>' : '')
-   : '')+'</div>';
+   : '')+zipCardHtml()+'</div>';
 }
 function readImportFile(file){
   if (!file) return; const fr = new FileReader();
@@ -1430,10 +1430,11 @@ async function buildReceipt(r){
   page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
   fee('Amount due', fe.total||0, true);
   y -= 8;
-  page.drawRectangle({x:M, y:y-58, width:W-2*M, height:66, color:rgb(1,0.96,0.86)});
+  page.drawRectangle({x:M, y:y-74, width:W-2*M, height:82, color:rgb(1,0.96,0.86)});
   page.drawText('How to pay', {x:M+14, y:y-12, size:11, font:bold, color:ink});
-  page.drawText('Bring this receipt to the Building Department, 740 N Main St, Arab, AL 35016.', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
-  page.drawText('Pay by cash or check made payable to "City of Arab." The clerk will assign your permit number.', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
+  page.drawText('Pay in person at City of Arab, 740 N Main St, Arab, AL 35016, by cash or check', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
+  page.drawText('made payable to "City of Arab." Show this receipt (printed or on your phone) when you pay', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
+  page.drawText('so your payment is matched to reference # '+ref+'. The Building Department will contact you.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
   page.drawText(pdfSafe('This receipt confirms your application was received. It is not proof of payment or an issued permit.  ·  Reference '+ref), {x:M, y:40, size:8.5, font:reg, color:grey});
   return pdf.save();
 }
@@ -1443,6 +1444,92 @@ async function downloadReceipt(sid){
   try{ const bytes = await buildReceipt(r);
     await DL.save({ filename: ('Receipt-'+refNo(r.id)+'-'+((r.fields&&r.fields.applicant)||'')).replace(/[^A-Za-z0-9]+/g,'-').replace(/-+$/,'')+'.pdf', data: bytes }); }
   catch(e){ toast('Could not build the receipt: '+((e&&e.message)||'try again')); }
+}
+/* ================= attach documents from a Jotform attachments ZIP (administrators) ================= */
+async function readZip(buf){
+  const dv = new DataView(buf), u8 = new Uint8Array(buf), td = new TextDecoder();
+  let e = -1; for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 70000); i--) if (dv.getUint32(i, true) === 0x06054b50){ e = i; break; }
+  if (e < 0) throw new Error('That file is not a ZIP file.');
+  let p = dv.getUint32(e + 16, true); const n = dv.getUint16(e + 10, true), out = [];
+  for (let k = 0; k < n; k++){
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true), comp = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lo = dv.getUint32(p + 42, true);
+    const name = td.decode(u8.subarray(p + 46, p + 46 + nl));
+    if (!name.endsWith('/') && !/(^|\/)(__MACOSX|\.DS_Store)/.test(name)){
+      const start = lo + 30 + dv.getUint16(lo + 26, true) + dv.getUint16(lo + 28, true);
+      out.push({ name, base: name.split('/').pop(), method, data: u8.subarray(start, start + comp) });
+    }
+    p += 46 + nl + xl + cl;
+  }
+  return out;
+}
+async function unzipEntry(en){
+  if (en.method === 0) return en.data.slice();
+  if (en.method !== 8) throw new Error('Unsupported compression');
+  return new Uint8Array(await new Response(new Blob([en.data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+}
+const normName = s => String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+function jfUrlParts(url){ const m = String(url).match(/\/uploads\/[^/]+\/(\d+)\/(\d+)\/([^/?#]+)/); if (!m) return null; let f = m[3]; try{ f = decodeURIComponent(f); }catch(e){} return { form:m[1], sub:m[2], file:f }; }
+function matchZip(entries){
+  const byBase = {}; entries.forEach(en => { const k = normName(en.base); (byBase[k] = byBase[k] || []).push(en); });
+  const plan = [], missing = [];
+  S.subs.filter(s => (s.files||[]).some(f => f.url)).forEach(s => {
+    s.files.forEach((f, i) => { if (!f.url) return;
+      const pp = jfUrlParts(f.url), cands = byBase[normName(pp ? pp.file : f.name)] || [];
+      const en = (pp && cands.find(c => c.name.includes(pp.sub))) || (cands.length === 1 ? cands[0] : null);
+      if (en) plan.push({ s, i, f, en }); else missing.push({ s, f });
+    });
+  });
+  return { plan, missing };
+}
+function zipCardHtml(){
+  const Z = S.zip || {}, waiting = S.subs.reduce((a,s)=>a+(s.files||[]).filter(f=>f.url).length, 0);
+  return '<div class="card"><h2>Add documents from Jotform</h2>'+
+    '<p style="margin:0;color:var(--ink2);max-width:72ch">Imported applications only link to their documents in Jotform. To copy the documents here so they show in the Documents tab and in the PDF: in Jotform Tables, click <b>Download All → Download Attachments</b>. Jotform emails you a link to a ZIP file. Upload that ZIP here and each document is matched to its application.</p>'+
+    '<p class="num" style="margin:0"><b>'+waiting+'</b> document'+(waiting===1?'':'s')+' still stored only in Jotform.</p>'+
+    (waiting ? '<div class="fld"><label class="l" for="zipFile">Jotform attachments ZIP</label><input id="zipFile" type="file" accept=".zip,application/zip" onchange="readJfZip(this.files[0])"><span class="hint">'+(Z.file?esc(Z.file):'You can upload ZIPs from several forms, one at a time.')+'</span></div>' : '')+
+    (Z.err?'<p class="formerr">'+esc(Z.err)+'</p>':'')+
+    (Z.plan ? '<p class="num" style="margin:0">'+Z.plan.length+' document'+(Z.plan.length===1?'':'s')+' matched to '+new Set(Z.plan.map(x=>x.s.id)).size+' application'+(new Set(Z.plan.map(x=>x.s.id)).size===1?'':'s')+(Z.missing.length?' · '+Z.missing.length+' not in this ZIP':'')+(Z.big?' · '+Z.big+' over 8 MB (left in Jotform)':'')+'</p>'+
+      (Z.plan.length ? '<div class="row"><button class="btn primary" id="zipGo" onclick="runZipAttach()">'+ic('upload')+'Copy '+Z.plan.length+' document'+(Z.plan.length===1?'':'s')+' here</button></div>' : '') : '')+
+    (Z.done ? '<div class="creds" role="status"><b>'+esc(Z.done)+'</b></div>' : '')+
+  '</div>';
+}
+async function readJfZip(file){
+  if (!file) return; S.zip = { file:file.name };
+  try{
+    if (typeof DecompressionStream === 'undefined') throw new Error('This browser cannot open ZIP files. Use a current version of Chrome, Edge or Safari.');
+    const entries = await readZip(await file.arrayBuffer());
+    const m = matchZip(entries);
+    S.zip.big = m.plan.filter(x => x.en.data.length > MAX_FILE_MB*1048576*1.2).length;   // compressed size check; real size checked again below
+    S.zip.plan = m.plan; S.zip.missing = m.missing;
+    if (!entries.length) S.zip.err = 'That ZIP file is empty.';
+  }catch(e){ S.zip.err = e.message; }
+  render();
+}
+async function runZipAttach(){
+  const Z = S.zip, b = document.getElementById('zipGo'); let done = 0, skipped = 0;
+  const bySub = new Map(); Z.plan.forEach(x => { if (!bySub.has(x.s.id)) bySub.set(x.s.id, []); bySub.get(x.s.id).push(x); });
+  try{
+    for (const [sid, items] of bySub){
+      const s = S.subs.find(x => x.id === sid); if (!s) continue;
+      const files = s.files.map(f => Object.assign({}, f));
+      for (const x of items){
+        if (b){ b.disabled = true; b.textContent = 'Copying '+(done+skipped+1)+' of '+Z.plan.length+'…'; }
+        const bytes = await unzipEntry(x.en);
+        if (bytes.length > MAX_FILE_MB*1048576){ skipped++; continue; }
+        const ext = (x.en.base.split('.').pop()||'').toLowerCase();
+        const type = ext==='pdf' ? 'application/pdf' : ext==='png' ? 'image/png' : /^(jpe?g)$/.test(ext) ? 'image/jpeg' : (x.f.type || 'application/octet-stream');
+        const data = await readDataUrl(new Blob([bytes], {type}));
+        await sbRpc('bf_add', { p_token:TOKEN, p_collection:'attachments', p_data:{ app:APP_TAG, submissionId:sid, index:x.i, name:x.f.name, type, size:bytes.length, data, fromJotform:true } });
+        files[x.i] = { name:x.f.name, type, size:bytes.length, copiedFromJotform:true };
+        done++;
+      }
+      await sbRpc('bf_update', { p_token:TOKEN, p_collection:'submissions', p_id:sid, p_patch:{ files } });
+      s.files = files; delete ATT[sid];
+    }
+    S.zip = { done: 'Copied '+done+' document'+(done===1?'':'s')+' into this system'+(skipped?'; '+skipped+' over 8 MB stayed in Jotform':'')+'. They now open from the Documents tab and print in the PDF.' };
+  }catch(e){ S.zip.err = 'Stopped after '+done+': '+e.message; }
+  await loadStorage(); render();
 }
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
