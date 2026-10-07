@@ -311,6 +311,11 @@ html.embed .tile .fee{margin-top:4px}
 html.embed .tile .ico{width:38px;height:38px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .fcard .fsz{font-size:12px;color:var(--muted);padding:0 10px;margin-top:-4px}
+.psteps{list-style:none;margin:8px 0 18px;padding:0;display:grid;gap:18px}
+.pstep{display:flex;gap:14px;align-items:flex-start}
+.pstep p{margin:4px 0 10px;color:var(--ink2);font-size:14.5px}
+.pn{flex:none;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}
+.pmail{font-weight:700;font-size:15px}
 </style>
 
 
@@ -326,6 +331,7 @@ const CITY_LOGO = 'city-logo.jpg';   // official City of Arab seal (cropped from
 const brandHtml = sub => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" onerror="this.style.visibility=\'hidden\'"><span class="bdiv" aria-hidden="true"></span><span class="bname">Building Department<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
   house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
   wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
@@ -643,8 +649,8 @@ function viewApps(){
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission <span style="text-transform:none;letter-spacing:0;font-weight:500">paper forms for now</span></h2><div class="tiles">'+
-     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/18" target="'+(EMBED?'_top':'_blank')+'" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Download, complete and return to the Building Department</small><span class="fee">PDF form · no fee</span></span></a>'+
-     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/99" target="'+(EMBED?'_top':'_blank')+'" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost</small><span class="fee">PDF form · no fee</span></span></a>'+
+     '<a class="tile paper" href="#pdf-subdivision" style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
+     '<a class="tile paper" href="#pdf-annexation" style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost. Fill in and email the form</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
    '</div></section>'+
    '<details class="sched"><summary>Building permit fee schedule</summary><div class="sched-body"><table class="fees num"><thead><tr><th>Total construction value</th><th>Permit fee</th></tr></thead><tbody>'+
      '<tr><td>$1 to $2,500</td><td>$25</td></tr>'+
@@ -1071,11 +1077,77 @@ async function downloadPdf(sid){
   finally{ render(); }
 }
 
+const PDF_FORMS = {"annexation":{"title":"Annexation Application","src":"forms/DepartmentBuilding_form_files_Annexation-Application.6a603f61a9c7b4.45103884_1.pdf","file":"Annexation-Application-City-of-Arab.pdf","fields":[[0,0,371.2,697.2,168.6,13,"p1 ID"],[0,0,393.7,669.2,146.3,13,"p1 RECOMMENDATION"],[0,0,138.1,373.2,162.1,13,"p1 First Name"],[0,0,366.8,373.2,162.1,13,"p1 Last Name"],[0,0,155.9,334.3,223.8,13,"p1 Email Address"],[0,0,217.4,295.7,316.4,13,"p1 Contact Phone Number s"],[2,0,153.1,277.0,61.7,13,"p3 B Acreage"],[2,0,337.2,262.1,200.6,13,"p3 reet address of properties to be annexed"],[2,0,287.0,247.5,246.9,13,"p3 D Name of subdivision if applicable"],[2,0,178.5,130.1,355.0,13,"p3 Name"],[2,0,189.8,107.5,339.6,13,"p3 Address"],[2,0,171.1,84.7,84.9,13,"p3 City"],[2,0,288.6,84.7,30.9,13,"p3 State"],[2,0,342.8,84.7,77.2,13,"p3 Zip"],[2,0,459.5,84.7,69.5,13,"p3 Phone"],[3,0,178.5,706.3,355.0,13,"p4 Name"],[3,0,189.8,683.5,347.2,13,"p4 Address"],[3,0,170.6,661.0,92.6,13,"p4 City"],[3,0,292.8,661.0,30.9,13,"p4 State"],[3,0,346.6,661.0,77.2,13,"p4 Zip"],[3,0,462.8,661.0,77.2,13,"p4 Phone"],[3,0,108.0,409.0,208.4,13,"p4 Field"],[3,0,360.0,409.0,162.1,13,"p4 Field 2"],[3,0,108.0,237.4,208.4,13,"p4 Field 3"],[3,0,360.0,237.4,169.8,13,"p4 Field 4"],[3,0,178.5,159.1,355.0,13,"p4 Name 2"],[3,0,189.8,136.6,339.6,13,"p4 Address 2"],[3,0,168.2,113.8,100.3,13,"p4 City 2"],[3,0,301.1,113.8,30.9,13,"p4 State 2"],[3,0,355.4,113.8,61.7,13,"p4 Zip 2"],[3,0,456.6,113.8,77.2,13,"p4 Phone 2"],[4,0,156.2,650.2,378.1,13,"p5 for annexation"],[4,0,221.6,629.5,308.7,13,"p5 Total Persons of Voting Age"],[4,0,168.9,608.7,362.7,13,"p5 Registered Voters"],[4,0,212.1,588.0,316.4,13,"p5 Number of Housing Units"],[4,0,199.2,573.4,331.8,13,"p5 Street Addresses"],[4,0,108.0,558.7,424.4,13,"p5 Field"],[4,0,176.4,537.9,355.0,13,"p5 Number of Trailers"],[4,0,199.2,523.2,331.8,13,"p5 Street Addresses 2"],[4,0,108.0,508.6,424.4,13,"p5 Field 2"],[4,0,326.6,481.7,208.4,13,"p5 ing Names and Address of all Businesses"],[4,0,108.0,467.1,424.4,13,"p5 Field 3"],[4,0,108.0,452.4,424.4,13,"p5 Field 4"],[4,0,408.9,437.5,123.5,13,"p5 Manager Mailing Address and Phone Number"],[4,0,108.0,422.9,424.4,13,"p5 Field 5"],[4,0,229.3,408.3,301.0,13,"p5 Signs Billboards on Property"],[4,0,481.7,387.4,54.0,13,"p5 tion business in use on this property"],[4,0,98.5,346.1,439.9,13,"p5 use"],[4,0,417.7,325.5,38.6,13,"p5 sides cats dogs kept on the property"],[4,0,158.4,310.6,378.1,13,"p5 and how many"],[4,0,102.8,275.3,432.2,13,"p5 plan"],[4,1,114.1,234.8,11,11,"p5 Check box"],[4,1,222.1,234.8,11,11,"p5 Agriculture"],[4,1,330.1,234.8,11,11,"p5 Residential"],[4,1,438.1,234.8,11,11,"p5 Commercial"],[4,0,432.0,207.1,108.0,13,"p5 ainage issues that affect this property"],[4,0,108.0,186.3,424.4,13,"p5 Field 6"],[4,0,509.1,165.6,30.9,13,"p5 he property the city should be aware of"],[4,0,72.0,145.0,463.0,13,"p5 Field 7"],[4,0,300.8,118.1,239.2,13,"p5 Schools Ages and Grades of all Children"],[4,0,108.0,103.5,424.4,13,"p5 Field 8"],[4,0,108.0,88.8,424.4,13,"p5 Field 9"],[4,0,231.4,74.2,301.0,13,"p5 Will you require bus pick up"],[5,0,258.9,706.3,270.1,13,"p6 Reason for Requesting Annexation"],[5,0,108.0,685.7,424.4,13,"p6 Field"],[5,0,108.0,662.9,424.4,13,"p6 Field 2"],[5,0,173.4,147.4,194.1,13,"p6 Petitioner"],[5,0,405.3,147.4,118.1,13,"p6 Date"],[5,0,173.4,124.6,194.1,13,"p6 Petitioner 2"],[5,0,405.3,124.6,118.1,13,"p6 Date 2"],[6,0,84.3,590.4,210.9,13,"p7 I"],[6,0,72.0,553.0,278.4,13,"p7 Field"],[6,0,463.3,448.6,42.2,13,"p7 y hand and official seal of office this"],[6,0,159.4,433.9,101.2,13,"p7 of"],[6,0,286.5,433.9,33.7,13,"p7 20"],[6,0,288.0,365.8,185.6,13,"p7 Field 2"],[6,0,445.0,297.6,92.8,13,"p7 My Commission Expires"],[2,1,452.5,295.5,11,11,"p3 Deeds attached"],[2,1,305.5,234.5,11,11,"p3 Tax parcel map attached"],[2,1,391,217.5,11,11,"p3 Survey available Yes"],[2,1,451,217.5,11,11,"p3 Survey available No"],[3,2,78,522,468,84,"p4 Additional information"]]},"subdivision":{"title":"Application for Subdivision Consideration","src":"forms/DepartmentBuilding_form_files_Application-for-Subdivision-Consideration.6a60473b3915f5.95904627_1.pdf","file":"Subdivision-Application-City-of-Arab.pdf","fields":[[1,0,253.7,629.1,189.6,13,"p2 Office Use Only Application No"],[1,0,242.1,610.6,202.1,13,"p2 Minor Plat Date Submitted"],[1,0,244.1,592.1,201.9,13,"p2 Major Plat Date of Meeting"],[1,0,252.6,547.9,269.3,13,"p2 Subdivision Development Name"],[1,0,181.1,523.4,342.5,13,"p2 Property Owner s"],[1,0,166.6,504.6,360.9,13,"p2 Mailing Address"],[1,0,123.0,486.1,73.5,13,"p2 Phone"],[1,0,224.5,486.1,79.5,13,"p2 Cell"],[1,0,343.9,486.1,183.6,13,"p2 Email"],[1,0,192.8,461.3,330.0,13,"p2 Registered Surveyor"],[1,0,110.2,442.6,238.6,13,"p2 Firm"],[1,0,381.4,442.6,146.8,13,"p2 Lic"],[1,0,166.6,424.1,360.6,13,"p2 Mailing Address 2"],[1,0,123.0,405.3,152.9,13,"p2 Phone 2"],[1,0,312.9,405.3,214.1,13,"p2 Email 2"],[1,0,158.6,380.8,366.6,13,"p2 Civil Engineer"],[1,0,110.2,362.1,415.8,13,"p2 Firm 2"],[1,0,166.4,343.3,360.9,13,"p2 Mailing Address 3"],[1,0,123.0,324.8,152.9,13,"p2 Phone 3"],[1,0,309.6,324.8,214.2,13,"p2 Email 3"],[1,0,162.5,299.1,73.5,13,"p2 Phase if any"],[1,0,451.7,299.1,73.5,13,"p2 Date of SKETCH PLAT approval if any"],[1,0,392.2,279.3,86.9,13,"p2 of Property to be Subdivided or Combined"],[1,0,227.1,260.0,66.8,13,"p2 If Subdivided Total of Lots"],[1,0,362.6,260.0,61.3,13,"p2 Avg Lot Size"],[1,0,451.1,260.0,50.0,13,"p2 ft by"],[1,0,159.0,239.8,86.9,13,"p2 Avg Lot Size 2"],[1,0,341.3,239.8,73.4,13,"p2 sq ft Zoning"],[1,0,390.1,200.0,133.5,13,"p2 adjoining the parcel s being reviewed"],[1,0,328.7,180.3,193.5,13,"p2 ill adjoining lands be subdivided later"],[1,1,266.3,667.9,11,11,"p2 Sketch Prelim"],[1,1,338.4,667.9,11,11,"p2 Preliminary"],[1,1,425.4,667.9,11,11,"p2 Final"],[1,1,86.2,611.1,11,11,"p2 Minor Plat Dat"],[1,1,86.2,592.6,11,11,"p2 Major Plat Dat"],[1,1,146.8,220.6,11,11,"p2 City Sewer Ci"],[1,1,230.8,220.6,11,11,"p2 City Water Lines"],[1,1,352.0,220.6,11,11,"p2 Electric Power Lin"],[2,0,161.5,455.6,234.0,13,"p3 SIGNATURE"],[2,0,437.3,455.6,86.9,13,"p3 DATE"],[2,0,161.5,429.9,234.0,13,"p3 SIGNATURE 2"],[2,0,437.3,429.9,86.9,13,"p3 DATE 2"],[2,0,85.0,276.8,147.0,13,"p3 Field"],[2,0,258.4,276.8,93.7,13,"p3 Field 2"],[2,0,378.4,276.8,147.1,13,"p3 Field 3"],[2,0,85.0,116.8,147.0,13,"p3 Field 4"],[2,0,258.4,116.8,87.0,13,"p3 Field 5"],[2,0,371.6,116.8,154.0,13,"p3 Field 6"],[3,0,273.8,497.1,246.2,13,"p4 Email"],[3,0,273.8,414.3,246.2,13,"p4 Email 2"],[3,0,129.3,331.5,108.0,13,"p4 Phone"],[3,0,275.0,331.5,246.2,13,"p4 Email 3"],[3,1,99.5,236.4,11,11,"p4 check"],[3,1,99.5,222.6,11,11,"p4 check 2"],[3,1,99.5,208.8,11,11,"p4 check 3"],[3,1,99.5,195.0,11,11,"p4 check 4"],[3,1,99.5,181.2,11,11,"p4 check 5"],[3,1,99.5,167.4,11,11,"p4 check 6"],[3,1,99.5,153.6,11,11,"p4 check 7"],[3,1,99.5,139.8,11,11,"p4 check 8"],[3,1,99.5,126.0,11,11,"p4 check 9"],[3,1,99.5,112.2,11,11,"p4 check 10"],[3,0,247.1,609.0,271.6,13,"p4 Subdivison Development Name"],[3,0,132.6,581.2,389.7,13,"p4 Location"],[3,0,128.1,553.7,393.2,13,"p4 Owner"],[3,0,132.6,526.2,383.7,13,"p4 Address"],[3,0,123.8,470.9,394.4,13,"p4 Agent"],[3,0,132.6,443.1,383.7,13,"p4 Address 2"],[3,0,140.3,388.1,379.9,13,"p4 Surveyor"],[3,0,132.6,360.4,383.7,13,"p4 Address 3"],[3,0,286.6,305.4,233.6,13,"p4 Date submitted for preliminary approval"],[4,1,100.0,527.8,11,11,"p5 Check box"],[4,0,85.0,398.9,442.5,13,"p5 Field"],[4,0,85.0,361.6,442.5,13,"p5 Field 2"],[4,0,182.6,328.5,342.2,13,"p5 Variances granted"],[4,0,85.0,300.8,438.0,13,"p5 Field 3"],[4,0,153.6,273.2,90.0,13,"p5 Disapproved"],[4,0,413.0,273.2,114.0,13,"p5 DATE for the following reasons"],[4,0,85.0,245.7,438.0,13,"p5 Field 4"],[4,0,85.0,218.0,438.0,13,"p5 Field 5"],[4,0,157.1,176.7,198.0,13,"p5 Field 6"],[4,1,99.5,707.6,11,11,"p5 check"],[4,1,99.5,666.2,11,11,"p5 check 2"],[4,1,99.5,652.5,11,11,"p5 check 3"],[4,1,99.5,638.6,11,11,"p5 check 4"],[4,1,99.5,611.0,11,11,"p5 check 5"],[4,1,99.5,597.2,11,11,"p5 check 6"],[4,1,99.5,583.5,11,11,"p5 check 7"],[4,1,99.5,569.6,11,11,"p5 check 8"],[4,1,99.5,555.9,11,11,"p5 check 9"],[4,1,99.5,500.6,11,11,"p5 check 10"],[4,1,99.5,473.1,11,11,"p5 check 11"],[4,1,99.5,459.2,11,11,"p5 check 12"],[4,0,141.0,430.6,54.0,13,"p5 Approved"],[3,0,127,500,108,13,"p4 Owner phone"],[3,0,127,417,108,13,"p4 Agent phone"]]}};
+/* ================= fillable PDF forms (Annexation, Subdivision) =================
+   The original City PDFs live in /apply/forms/. When an applicant opens one here,
+   pdf-lib adds a typeable field over every blank and a checkbox over every box,
+   so the whole document can be completed on a computer and emailed back. */
+const PDF_EMAILS = ['buildingdept@arabcity.org', 'kjohnson@arabcity.org'];
+const PDF_INFO = {
+  annexation: { icon:'pin', blurb:'Apply to have property annexed into the City of Arab. There is no fee.',
+    attach:'a copy of the current recorded deed(s) and the current tax parcel map',
+    after:'Planning staff will review it. If the property qualifies, they will prepare the official Petition for Annexation for the owners to sign and have notarized. The process takes about 1 to 2 months.' },
+  subdivision: { icon:'map', blurb:'Preliminary, sketch or final plat approval from the Arab Planning Commission. There is no fee.',
+    attach:'your plat drawings, if you have them as PDFs',
+    after:'Complete applications and drawings (3 sets for residential, 5 for commercial) must reach the office at least 25 days before the Planning Commission meeting, which is the 3rd Tuesday of each month.' }
+};
+const PDF_CACHE = {};
+async function buildFillable(key){
+  if (PDF_CACHE[key]) return PDF_CACHE[key];
+  const D = PDF_FORMS[key], { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const r = await fetch(D.src); if (!r.ok) throw new Error('The form could not be loaded ('+r.status+').');
+  const pdf = await PDFDocument.load(await r.arrayBuffer(), { ignoreEncryption:true });
+  const font = await pdf.embedFont(StandardFonts.Helvetica), form = pdf.getForm(), pages = pdf.getPages();
+  const bg = rgb(0.91, 0.95, 1), border = rgb(0.45, 0.5, 0.65);
+  D.fields.forEach(([p, k, x, y, w, h, name]) => {
+    const page = pages[p]; if (!page) return;
+    if (k === 1){ const cb = form.createCheckBox(name); cb.addToPage(page, { x, y, width:w, height:h, backgroundColor:bg, borderColor:border, borderWidth:0.6 }); }
+    else { const tf = form.createTextField(name); if (k === 2) tf.enableMultiline();
+      tf.addToPage(page, { x, y, width:w, height:h, font, backgroundColor:bg, borderWidth:0 }); tf.setFontSize(k === 2 ? 10 : (h < 12 ? 8 : 9)); }
+  });
+  form.updateFieldAppearances(font);
+  pdf.setTitle(D.title+' - City of Arab');
+  return PDF_CACHE[key] = await pdf.save();
+}
+async function pdfFormAction(key, how){
+  const b = document.getElementById('pdfGo_'+how), err = document.getElementById('pdfErr');
+  if (!window.PDFLib){ err.textContent = 'The PDF tool did not load. Check your connection and refresh the page.'; return; }
+  const label = b ? b.innerHTML : ''; if (b){ b.disabled = true; b.textContent = 'Preparing the form…'; } err.textContent = '';
+  try{
+    const bytes = await buildFillable(key), blob = new Blob([bytes], {type:'application/pdf'});
+    if (how === 'open'){ const u = URL.createObjectURL(blob), w = window.open(u, '_blank'); if (!w) await DL.save({ filename:PDF_FORMS[key].file, data:blob }); setTimeout(() => URL.revokeObjectURL(u), 600000); }
+    else await DL.save({ filename:PDF_FORMS[key].file, data:blob });
+  }catch(e){ err.textContent = 'Could not prepare the form: '+((e&&e.message)||'please try again.'); }
+  if (b){ b.disabled = false; b.innerHTML = label; }
+}
+function pdfMailto(key){
+  const D = PDF_FORMS[key];
+  return 'mailto:'+PDF_EMAILS.join(',')+'?subject='+encodeURIComponent(D.title+' - [property address]')+'&body='+encodeURIComponent('Hello,\n\nAttached is my completed '+D.title+' for the property at: \n\nName:\nPhone:\n\nAttachments:\n- Completed '+D.title+' (PDF)\n- '+PDF_INFO[key].attach.replace(/^./,c=>c.toUpperCase())+'\n\nThank you.');
+}
+function viewPdfForm(){
+  const key = S.form, D = PDF_FORMS[key], I = PDF_INFO[key];
+  const step = (n, t, body) => '<li class="pstep"><span class="pn">'+n+'</span><div><b>'+t+'</b>'+body+'</div></li>';
+  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="#">← All applications</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
+   '<ol class="psteps">'+
+     step(1, 'Open the fillable form', '<p>Every blank on every page can be typed in, and every box can be checked. Sign where shown (type your name or sign after printing).</p>'+
+       '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="pdfGo_open" onclick="pdfFormAction(\''+key+'\',\'open\')">'+ic('ext')+'Open fillable form</button><button class="btn" id="pdfGo_save" onclick="pdfFormAction(\''+key+'\',\'save\')">'+ic('down')+'Download PDF</button></div><span class="formerr" id="pdfErr"></span>')+
+     step(2, 'Fill it in and save it', '<p>Use Adobe Acrobat Reader, your browser, or Preview on a Mac, then save the completed PDF to your computer or phone.</p>')+
+     step(3, 'Email it to the Building Department', '<p>Attach the completed form'+(I.attach?' and '+esc(I.attach):'')+' and send it to both addresses:</p>'+
+       '<p class="pmail">'+PDF_EMAILS.map(e=>'<span style="user-select:all">'+e+'</span>').join('<br>')+'</p>'+
+       '<a class="btn primary" href="'+esc(pdfMailto(key))+'" target="_top">'+ic('mail')+'Start the email</a>')+
+   '</ol>'+
+   '<div class="callout pay"><b>What happens next</b>'+esc(I.after)+'</div>'+
+   '<p class="hint" style="margin-top:14px;color:var(--muted);font-size:13px">Prefer paper? Print the form, fill it in by hand and bring it to City Hall, 740 N Main St, Arab, AL 35016.</p>'+
+   '</div></main></div>';
+}
+
 /* ================= render & boot ================= */
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
   if (S.view==='apps') root.innerHTML = viewApps();
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
+  else if (S.view==='pdf' && PDF_FORMS[S.form]) root.innerHTML = viewPdfForm();
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
@@ -1085,7 +1157,7 @@ function render(){
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
   else if (S.view==='table' && S.form) root.innerHTML = viewTable();
   else root.innerHTML = viewWorkspace();
-  if (S.staff && S.view!=='apps' && S.view!=='form') root.insertAdjacentHTML('beforeend', staffFooter());
+  if (S.staff && S.view!=='apps' && S.view!=='form' && S.view!=='pdf') root.insertAdjacentHTML('beforeend', staffFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
@@ -1098,7 +1170,9 @@ window.addEventListener('hashchange', () => initRoute());
 function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
-  if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
+  const pm = h.match(/^pdf-(\w+)$/);
+  if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
+  else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='staff'||h==='purge'||h==='users'||h==='me'||h==='import'||h==='bugs') S.view = h==='staff' ? 'staff' : h;
   render(); window.scrollTo(0,0);
 }
