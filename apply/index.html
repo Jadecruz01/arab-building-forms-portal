@@ -264,6 +264,18 @@ table.grid th.rn{z-index:3}
   .ihead{display:none}
   .grid-wrap{max-height:none}
 }
+/* ---------- shown inside the Jotform app (iframe) ---------- */
+html.embed body,html.embed .stage{background:transparent}
+html.embed .stage{padding:0}
+html.embed .mobile-top{display:none}
+html.embed .sheet{box-shadow:none;border-radius:0;padding:4px 2px 12px;max-width:none;background:transparent}
+html.embed .pg-h,html.embed .pg-sub{display:none}
+html.embed .grp{margin-top:18px}
+html.embed .grp:first-of-type{margin-top:0}
+html.embed .tile{padding:12px 14px;text-decoration:none;color:inherit;align-items:center}
+html.embed .tile small{display:none}
+html.embed .tile .fee{margin-top:4px}
+html.embed .tile .ico{width:38px;height:38px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -274,6 +286,8 @@ table.grid th.rn{z-index:3}
 <div id="root"></div>
 <script>
 "use strict";
+const EMBED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+if (EMBED) document.documentElement.classList.add('embed');
 /* ================= icons ================= */
 const IC = {
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
@@ -491,6 +505,7 @@ function sideNav(){ return '';
     '<div class="grow"></div><button class="btn" onclick="go(\'staff\')">'+ic('lock')+'Staff dashboard</button></aside>';
 }
 function tile(k){ const f = FORMS[k];
+  if (EMBED) return '<a class="tile" target="_top" href="https://arabcityapplications.jadecruz.dev/apply/#form-'+k+'"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.title)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></a>';
   return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
 function viewApps(){
   return '<div class="app">'+sideNav()+'<main class="stage">'+
@@ -501,8 +516,8 @@ function viewApps(){
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission <span style="text-transform:none;letter-spacing:0;font-weight:500">paper forms for now</span></h2><div class="tiles">'+
-     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/18" target="_blank" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Download, complete and return to the Building Department</small><span class="fee">PDF form · no fee</span></span></a>'+
-     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/99" target="_blank" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost</small><span class="fee">PDF form · no fee</span></span></a>'+
+     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/18" target="'+(EMBED?'_top':'_blank')+'" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Download, complete and return to the Building Department</small><span class="fee">PDF form · no fee</span></span></a>'+
+     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/99" target="'+(EMBED?'_top':'_blank')+'" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost</small><span class="fee">PDF form · no fee</span></span></a>'+
    '</div></section>'+
    '<details class="sched"><summary>Building permit fee schedule</summary><div class="sched-body"><table class="fees num"><thead><tr><th>Total construction value</th><th>Permit fee</th></tr></thead><tbody>'+
      '<tr><td>$1 to $2,500</td><td>$25</td></tr>'+
