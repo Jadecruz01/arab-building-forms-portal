@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Permit Applications · City of Arab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Public+Sans:wght@700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+/* Layout: public side = city portal (navy/gold) with app-style left nav; staff side = Jotform-style workspace + green table + right-hand submission panel. */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface2:#f7f8fb; --line:#dfe2ea; --line2:#eceef3;
+  --ink:#0a1551; --ink2:#343c6a; --muted:#6c73a8;
+  --navy:#0a1551; --city:#0f3273; --gold:#f2c230; --orange:#ff6100; --green:#0d8a3f; --green2:#e7f5ec;
+  --blue:#0075e3; --red:#d61f38; --redbg:#fde8eb; --amber:#a86400; --amberbg:#fff4dc; --okbg:#e2f6e9; --ok:#0b7a37;
+  --rowhover:#f2f6ff; --sel:#e6eeff; --shadow:0 1px 2px rgba(10,21,81,.06),0 4px 16px rgba(10,21,81,.06);
+  --f-body:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-disp:"Public Sans","DM Sans",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1230; --surface:#161b3d; --surface2:#1b2149; --line:#2c3466; --line2:#242b58;
+  --ink:#eef0ff; --ink2:#c7cbef; --muted:#9097c9; --city:#7fa2ff; --green:#3ec276; --green2:#173a2a;
+  --blue:#5aa8ff; --red:#ff6b80; --redbg:#3d1822; --amber:#ffc35a; --amberbg:#3a2c10; --okbg:#143524; --ok:#5fd98e;
+  --rowhover:#1f2652; --sel:#26306a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1230; --surface:#161b3d; --surface2:#1b2149; --line:#2c3466; --line2:#242b58;
+  --ink:#eef0ff; --ink2:#c7cbef; --muted:#9097c9; --city:#7fa2ff; --green:#3ec276; --green2:#173a2a;
+  --blue:#5aa8ff; --red:#ff6b80; --redbg:#3d1822; --amber:#ffc35a; --amberbg:#3a2c10; --okbg:#143524; --ok:#5fd98e;
+  --rowhover:#1f2652; --sel:#26306a; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{font-size:16px}
+a{color:var(--blue)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{text-wrap:balance;margin:0}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:8px 14px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+.btn.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.danger{color:var(--red);border-color:var(--red);background:transparent}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- PUBLIC: app shell ---------- */
+.app{display:grid;grid-template-columns:minmax(0,1fr);min-height:100%}
+.side{background:var(--surface);border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px;font-weight:700;font-size:16px}
+.brand .seal{width:34px;height:34px;border-radius:8px;background:var(--city);display:grid;place-items:center;color:var(--gold);font:800 9.5px var(--f-disp);letter-spacing:.02em}
+.navi{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:var(--ink2);text-decoration:none;font-weight:500;font-size:14px}
+.navi.on{background:var(--sel);color:var(--ink);font-weight:600}
+.navi.dim{opacity:.55}
+.side .grow{flex:1}
+.stage{background:var(--city);padding:24px 16px 48px;min-width:0}
+.sheet{max-width:860px;margin:0 auto;background:var(--surface);border-radius:14px;padding:30px 28px;box-shadow:var(--shadow)}
+.preview-note{max-width:860px;margin:0 auto 14px;color:#dfe6ff;font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.preview-note b{color:var(--gold)}
+.pg-h{font:800 30px/1.15 var(--f-disp);color:var(--ink);text-align:center}
+.pg-sub{color:var(--muted);text-align:center;margin:6px auto 0;max-width:52ch}
+.grp{margin-top:28px}
+.grp h2{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;gap:10px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{display:flex;gap:14px;align-items:flex-start;text-align:left;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--surface);cursor:pointer;width:100%}
+.tile:hover{border-color:var(--city);box-shadow:var(--shadow)}
+.tile .ico{width:42px;height:42px;border-radius:9px;background:var(--sel);color:var(--city);display:grid;place-items:center;flex:none}
+.tile .ico svg{width:22px;height:22px}
+.tile b{display:block;font-size:15.5px;line-height:1.3;color:var(--ink)}
+.tile small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.tile .fee{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--ok);background:var(--okbg);border-radius:6px;padding:2px 9px}
+.tile.paper .fee{color:var(--amber);background:var(--amberbg)}
+details.sched{border:1px solid var(--line);border-radius:10px;margin-top:12px;background:var(--surface2)}
+details.sched summary{cursor:pointer;padding:13px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+details.sched summary::after{content:"Show";color:var(--blue);font-weight:500;font-size:14px}
+details.sched[open] summary::after{content:"Hide"}
+.sched-body{padding:0 16px 16px;overflow-x:auto}
+table.fees{border-collapse:collapse;width:100%;font-size:14px;min-width:420px}
+table.fees th,table.fees td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2)}
+table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.callout{border-radius:10px;padding:14px 16px;font-size:14px;margin-top:14px}
+.callout.pay{background:var(--amberbg);color:var(--ink)}
+.callout.warn{background:var(--redbg)}
+.callout b{display:block;margin-bottom:2px}
+
+/* ---------- PUBLIC: form ---------- */
+.form-h{display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+.form-h h1{font:800 24px/1.2 var(--f-disp)}
+.back{align-self:flex-start;background:none;border:0;color:var(--blue);cursor:pointer;padding:0;font-weight:600;font-size:14px;margin-bottom:6px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld label.l{font-weight:600;font-size:14px;color:var(--ink)}
+.fld .req{color:var(--red)}
+.fld .hint{color:var(--muted);font-size:12.5px}
+.fld input[type=text],.fld input[type=email],.fld input[type=tel],.fld input[type=date],.fld input[type=number],.fld select,.fld textarea{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--surface);width:100%;min-width:0}
+.fld textarea{min-height:90px;resize:vertical}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--blue);outline-offset:0;border-color:transparent}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:14px;background:var(--surface)}
+.opt:has(input:checked){border-color:var(--blue);background:var(--sel)}
+.opts.stack{flex-direction:column}
+.sect{grid-column:1/-1;font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:10px;border-top:1px solid var(--line2);margin-top:4px}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);background:var(--surface2);cursor:pointer}
+.drop.on{border-color:var(--blue);background:var(--sel)}
+.filelist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.fchip{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:13.5px;background:var(--surface)}
+.fchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.feebox{grid-column:1/-1;border:1px solid var(--line);border-radius:10px;background:var(--surface2);padding:14px 16px;display:grid;gap:6px}
+.feebox .r{display:flex;justify-content:space-between;gap:10px}
+.feebox .r.t{border-top:1px solid var(--line);padding-top:8px;font-weight:700;font-size:17px}
+.feebox small{color:var(--muted)}
+.formerr{color:var(--red);font-weight:600;font-size:14px}
+.submitrow{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.done{text-align:center;padding:24px 8px}
+.done .ck{width:56px;height:56px;border-radius:50%;background:var(--okbg);color:var(--ok);display:grid;place-items:center;margin:0 auto 12px}
+
+/* ---------- STAFF ---------- */
+.jt-top{background:var(--navy);color:#fff;display:flex;align-items:center;gap:18px;padding:0 18px;height:60px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.jt-logo{display:flex;align-items:center;gap:9px;font:700 21px var(--f-body);letter-spacing:-.01em}
+.jt-logo .mk{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#ff6100 0 50%,#ffb629 50% 100%)}
+.jt-ws{color:#dfe3ff;font-weight:500;padding-left:16px;border-left:1px solid rgba(255,255,255,.18)}
+.jt-top .sp{flex:1}
+.jt-top .tl{color:#dfe3ff;background:none;border:0;cursor:pointer;font-weight:500;font-size:14px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--city);border:2px solid var(--orange);display:grid;place-items:center;font:800 10px var(--f-disp);color:var(--gold)}
+.ws{display:grid;grid-template-columns:285px minmax(0,1fr);min-height:calc(100% - 60px)}
+.ws-side{background:var(--surface);border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:10px}
+.ws-side .create{background:var(--orange);color:#fff;border:0;border-radius:4px;padding:11px;font-weight:700;letter-spacing:.02em;cursor:pointer}
+.meter{border-radius:6px;background:var(--okbg);padding:12px;font-size:13px}
+.meter .bar{height:6px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--ok);width:3%}
+.ws-side h4{margin:8px 6px 0;font-size:14px;color:var(--ink2);font-weight:600}
+.ws-side .navi.on{background:#c9d3f2;color:var(--navy)}
+:root[data-theme="dark"] .ws-side .navi.on{background:var(--sel);color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ws-side .navi.on{background:var(--sel);color:var(--ink)}}
+.ws-main{background:var(--surface);min-width:0}
+.ws-bar{display:flex;justify-content:flex-end;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:4px;padding:0 10px;background:var(--surface);min-width:0}
+.search input{border:0;outline:0;padding:9px 0;background:transparent;width:220px;max-width:100%}
+.flist{list-style:none;margin:0;padding:10px 18px 40px}
+.flist li{display:grid;grid-template-columns:22px 22px 44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 8px;border-radius:6px;cursor:pointer}
+.flist li:hover{background:var(--rowhover)}
+.ficon{width:40px;height:40px;border-radius:6px;background:#2c55c9;color:#fff;display:grid;place-items:center;position:relative}
+.ficon.tbl{background:#14904a}
+.ficon.app{background:var(--navy);border:1px solid var(--line)}
+.ficon .badge{position:absolute;top:-7px;right:-8px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;border-radius:99px;min-width:19px;height:19px;display:grid;place-items:center;padding:0 5px;border:2px solid var(--surface)}
+.flist b{font-size:17px;font-weight:500;color:var(--ink);display:block}
+.flist small{color:var(--muted);font-size:13.5px;font-weight:500}
+.cbx{width:17px;height:17px;border:1.5px solid #b8bdd6;border-radius:3px}
+.star{color:#b5bbdb;background:none;border:0;cursor:pointer;padding:0;display:grid;place-items:center}
+.star.on{color:#f5a700}
+.star svg{width:18px;height:18px}
+.star.on svg{fill:currentColor}
+
+.tb-head{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.tb-head .ttl{flex:1;text-align:center;min-width:0}
+.tb-head .ttl b{font-size:19px;font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-head .ttl small{color:var(--green);font-size:12.5px;font-weight:600}
+.tabbar{background:var(--green);padding:8px 10px 0;display:flex;gap:8px;align-items:flex-end;overflow-x:auto}
+.tabbar .tab{background:var(--surface);color:var(--ink);border-radius:6px 6px 0 0;padding:9px 14px;font-weight:700;font-size:13.5px;display:flex;gap:8px;align-items:center;white-space:nowrap}
+.tabbar .newt{color:#fff;font-weight:600;font-size:13.5px;padding:9px 8px;opacity:.9;white-space:nowrap}
+.tb-tools{display:flex;gap:10px;padding:12px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+.tb-tools .search{flex:1;min-width:200px;max-width:420px}
+.tb-tools .search input{width:100%}
+.tb-tools .sp{flex:1}
+select.mini{border:1px solid var(--line);border-radius:4px;padding:8px 10px;background:var(--surface);font-size:14px}
+.colmenu{position:relative}
+.colmenu .pop{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:8px;z-index:15;width:230px;display:grid;gap:2px}
+.colmenu .pop label{display:flex;gap:8px;padding:6px 8px;border-radius:5px;font-size:14px;cursor:pointer}
+.colmenu .pop label:hover{background:var(--rowhover)}
+.grid-wrap{overflow:auto;max-height:calc(100vh - 260px);min-height:240px}
+table.grid{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:14px}
+table.grid th{position:sticky;top:0;background:var(--surface2);z-index:2;text-align:left;font-weight:600;padding:0 12px;height:42px;border-bottom:1px solid var(--line);border-right:1px solid var(--line2);white-space:nowrap;cursor:pointer;user-select:none}
+table.grid th .hd{display:flex;align-items:center;gap:7px}
+table.grid th .ty{width:16px;height:16px;border-radius:3px;background:var(--ink2);color:var(--surface);font-size:10px;font-weight:700;display:grid;place-items:center}
+table.grid td{padding:0 12px;height:41px;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;background:var(--surface)}
+table.grid tr:hover td{background:var(--rowhover);cursor:pointer}
+table.grid tr.sel td{background:var(--sel)}
+table.grid tr.unread td{font-weight:700}
+table.grid td.rn,table.grid th.rn{width:84px;color:var(--muted);position:sticky;left:0;z-index:1}
+table.grid th.rn{z-index:3}
+.rn-in{display:flex;align-items:center;gap:10px}
+.pdfs{display:flex;gap:5px}
+.pdfi{width:24px;height:28px;border-radius:3px;background:#7b2cbf;color:#fff;font-size:7px;font-weight:800;display:grid;place-items:end center;padding-bottom:2px}
+.pdfi.img{background:#1b78d0}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12.5px;font-weight:700}
+.pill.paid{background:var(--okbg);color:var(--ok)}
+.pill.unpaid{background:var(--amberbg);color:var(--amber)}
+.pill.new{background:var(--redbg);color:var(--red)}
+.pill.src{background:var(--sel);color:var(--city);font-weight:600}
+.grid-foot{display:flex;gap:18px;padding:10px 14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);flex-wrap:wrap}
+.grid-foot b{color:var(--ink)}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+
+/* submission panel */
+.veil{position:fixed;inset:0;background:rgba(6,10,40,.35);z-index:30}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--surface);z-index:31;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(6,10,40,.2);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.p-head{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.p-head .who{flex:1;min-width:0}
+.p-head .who b{display:block;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-head .who small{color:var(--muted)}
+.p-tabs{display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--line)}
+.p-tabs button{background:none;border:0;padding:11px 12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.p-tabs button.on{color:var(--ink);border-bottom-color:var(--green)}
+.p-body{flex:1;overflow:auto;padding:18px 16px 30px}
+.p-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.p-actions .sp{flex:1}
+.qa{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.qa div{padding:9px 12px;border-bottom:1px solid var(--line2);font-size:14px;overflow-wrap:anywhere}
+.qa div:nth-child(odd){background:var(--surface2);color:var(--ink2);font-weight:600}
+.qa .h{grid-column:1/-1;background:var(--navy)!important;color:#fff!important;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.fcard{border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.fcard .th{height:110px;background:var(--surface2);display:grid;place-items:center;overflow:hidden}
+.fcard .th img{width:100%;height:100%;object-fit:cover}
+.fcard .nm{padding:7px 9px;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fcard .ac{display:flex;gap:4px;padding:0 6px 7px}
+.insp{display:grid;grid-template-columns:110px repeat(3,minmax(0,1fr));gap:8px;align-items:center}
+.insp > b{font-size:14px}
+.insp input{border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:var(--surface);width:100%;min-width:0;font-size:14px}
+.ihead{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;z-index:50;font-weight:600;font-size:14px;max-width:calc(100% - 32px)}
+.confirm{background:var(--redbg);border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;width:100%}
+.pin{max-width:380px;margin:12vh auto 0;background:var(--surface);border-radius:14px;padding:28px;box-shadow:var(--shadow);display:grid;gap:12px;text-align:center}
+.pin input{border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;letter-spacing:.4em;font-size:20px;background:var(--surface)}
+.mobile-top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);padding:10px 16px;border-bottom:1px solid var(--line);margin:-24px -16px 20px}
+.sbanner{display:flex;gap:6px 14px;align-items:center;flex-wrap:wrap;background:var(--amberbg);color:var(--ink);padding:10px 18px;font-size:14px;border-bottom:1px solid var(--line)}
+.sbanner.full{background:var(--redbg)}
+.sbanner b{color:var(--amber)} .sbanner.full b{color:var(--red)}
+.meter.warn{background:var(--amberbg)} .meter.warn .bar i{background:var(--orange)}
+.meter.full{background:var(--redbg)} .meter.full .bar i{background:var(--red)}
+.purge{max-width:1000px;margin:0 auto;padding:20px 18px 40px;display:grid;gap:14px}
+.purge h1{font:800 24px var(--f-disp)}
+.purge .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .mobile-top{margin:-14px -12px 14px}
+  .ws{grid-template-columns:1fr}
+  .ws-side{display:none}
+  .jt-ws,.jt-top .tl.hide-sm{display:none}
+}
+@media (max-width:640px){
+  .sheet{padding:22px 16px;border-radius:12px}
+  .stage{padding:14px 12px 40px}
+  .tiles,.fgrid{grid-template-columns:1fr}
+  .pg-h{font-size:25px}
+  .flist{padding:6px 4px 30px}
+  .flist li{grid-template-columns:44px minmax(0,1fr);gap:12px}
+  .flist li .cbx,.flist li .star{display:none}
+  .qa{grid-template-columns:1fr}
+  .qa div:nth-child(odd){border-bottom:0;padding-bottom:2px}
+  .insp{grid-template-columns:1fr 1fr}
+  .insp > b{grid-column:1/-1}
+  .ihead{display:none}
+  .grid-wrap{max-height:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+
+
+</head>
+<body>
+<div id="root"></div>
+<script>
+"use strict";
+/* ================= icons ================= */
+const IC = {
+  doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
+  house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+  sign:'<rect x="3" y="4" width="18" height="10" rx="1.5"/><path d="M8 14v7M16 14v7M7 9h10"/>',
+  pool:'<path d="M3 17c2 0 2-1.5 4.5-1.5S9.5 17 12 17s2-1.5 4.5-1.5S19 17 21 17"/><path d="M3 21c2 0 2-1.5 4.5-1.5S9.5 21 12 21s2-1.5 4.5-1.5S19 21 21 21"/><path d="M8 14V5a2 2 0 0 1 4 0M14 14V5a2 2 0 0 1 4 0M8 9h6"/>',
+  demo:'<path d="M4 21V9l6-4 6 4v12"/><path d="M10 21v-5M2 21h20"/><path d="M14 5l3-2 4 4-2 3"/>',
+  truck:'<rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/>',
+  map:'<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+  pin:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  news:'<path d="M5 5a14 14 0 0 1 14 14M5 11a8 8 0 0 1 8 8"/><circle cx="6" cy="18" r="1.2"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
+  gavel:'<path d="M14 4l6 6M11 7l6 6M13 5l-5 5 3 3 5-5M9.5 11.5L3 18l3 3 6.5-6.5"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  star:'<path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  down:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<path d="M5 12l5 5L20 7"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  left:'<path d="M15 6l-6 6 6 6"/>', right:'<path d="M9 6l6 6-6 6"/>',
+  cols:'<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M9 4v16M15 4v16"/>',
+  filter:'<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  ext:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'
+};
+const ic = (n, cls) => '<svg class="i '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '$' + (Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num = v => { const n = parseFloat(String(v==null?'':v).replace(/[$,\s]/g,'')); return isFinite(n) ? n : 0; };
+
+/* ================= fee schedule (copied from the live Jotform calculation rules) ================= */
+function permitFeeFor(value){
+  const v = num(value);
+  if (v < 1) return 0;
+  if (v <= 2500) return 25;
+  if (v <= 50000)  return 25   + Math.ceil((v - 2500)   / 1000) * 5;
+  if (v <= 100000) return 260  + Math.ceil((v - 50000)  / 1000) * 4;
+  if (v <= 500000) return 460  + Math.ceil((v - 100000) / 1000) * 3;
+  return 1660 + Math.ceil((v - 500000) / 1000) * 2;
+}
+const cictFor = (value, commercial) => commercial ? Math.round(num(value) / 1000 * 100) / 100 : 0;
+const SIGN_FEE = { 'Illuminated':75, 'Electronic Message Display (Changing Message)':75, 'Non-illuminated':50 };
+
+/* compute fees for any submission's field values; `doubled` = staff-applied penalty */
+function computeFees(form, f, doubled){
+  let value = 0, permit = 0, cict = 0, basis = '';
+  if (form === 'building'){
+    const com = f.buildType === 'Commercial';
+    if (com){ value = num(f.comValue); basis = 'Commercial construction value'; }
+    else if (f.projectType === 'New Build' || f.projectType === 'Addition'){
+      value = num(f.heated) * 75 + num(f.unheated) * 50;
+      basis = num(f.heated).toLocaleString()+' heated sq ft × $75 + '+num(f.unheated).toLocaleString()+' unheated sq ft × $50';
+    } else { value = num(f.estCost); basis = 'Estimated cost'; }
+    permit = permitFeeFor(value); cict = cictFor(value, com);
+  } else if (form === 'subtrade'){
+    value = num(f.estCost); basis = 'Estimated project cost';
+    permit = permitFeeFor(value); cict = cictFor(value, f.buildType === 'Commercial');
+  } else if (form === 'sign'){ permit = SIGN_FEE[f.signFeature] || 0; basis = f.signFeature || 'Choose sign features'; }
+  else if (form === 'pool'){ permit = 50; basis = 'Flat fee'; }
+  else if (form === 'demo' || form === 'moving'){ permit = 100; basis = 'Flat fee'; }
+  if (doubled) permit *= 2;
+  permit = Math.round(permit*100)/100;
+  return { value, basis, permit, cict, total: Math.round((permit + cict)*100)/100, doubled: !!doubled };
+}
+
+/* ================= form definitions (fields mirror the live Jotform forms) ================= */
+const T = (id,label,o) => Object.assign({id,label,type:'text'},o||{});
+const LICENSE_OPTS = [
+  'I am an authorized employee of a federal, state, or local government exempt from this law and do not hold myself out for hire or otherwise engage in contracting except in accordance with my employment. Ala. Code 34-14A-6(2).',
+  'I am a General Contractor holding a current and valid license issued prior to January 1, 1992. Ala. Code 34-14A-6(3).',
+  'I am the Property Owner acting as my own contractor and providing all material supervision myself on property for my own occupancy or use, and not offered for sale. Ala. Code 34-14A-6(5).'
+];
+const UPLOAD = T('files','Please upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance',{type:'file',full:true,hint:'PDF, JPG or PNG. Up to 10 files, 8 MB each. Phone photos work too.'});
+const APPLICANT = [
+  T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true,hint:'Receives updates about this application.'}),
+  T('phone','Applicant Phone #',{type:'tel',hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true})
+];
+const PROPERTY = [
+  T('address','Address',{req:true,full:true,hint:'Address where work will be performed'}),
+  T('lot','Lot #'), T('zoning','Zoning',{hint:'R1, R2, R3, AG, General Business, etc.'}),
+  T('owner','Property Owner'), T('ownerPhone','Property Owner Phone #',{type:'tel'}), T('ownerEmail','Property Owner Email',{type:'email',full:true})
+];
+const FORMS = {
+  building:{ key:'building', title:'Contractor or Homeowner Application for Building Permit', short:'Building Permit (Contractor or Homeowner)', icon:'house', group:'Building Permits', feeLabel:'Fee based on construction value', created:'Jun 7, 2026',
+    fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY,
+      {type:'section',label:'Contractor'},
+      T('gcLicense','Contractor/GC License #'), T('contractor','Contractor Name'), T('business','Business Name',{hint:'Include DBA or LLC'}),
+      T('cPhone','Contractor Phone #',{type:'tel'}), T('cEmail','Contractor Email',{type:'email',full:true}),
+      {type:'section',label:'Project & construction value'},
+      T('buildType','What type of build?',{type:'radio',req:true,opts:['Residential','Commercial'],full:true}),
+      T('projectType','What type of project is this?',{type:'radio',req:true,opts:['New Build','Addition','Remodel or Single Trade','Other'],full:true,show:f=>f.buildType==='Residential'}),
+      T('heated','Amount of heated sq ft',{type:'number',req:true,show:f=>f.buildType==='Residential'&&(f.projectType==='New Build'||f.projectType==='Addition'),hint:'Valued at $75 per sq ft'}),
+      T('unheated','Amount of unheated sq ft',{type:'number',req:true,show:f=>f.buildType==='Residential'&&(f.projectType==='New Build'||f.projectType==='Addition'),hint:'Valued at $50 per sq ft'}),
+      T('estCost','Estimated cost',{type:'money',req:true,show:f=>f.buildType==='Residential'&&(f.projectType==='Remodel or Single Trade'||f.projectType==='Other')}),
+      T('comValue','Commercial construction value',{type:'money',req:true,show:f=>f.buildType==='Commercial'}),
+      T('description','Brief description of work',{type:'textarea',req:true,full:true}),
+      {type:'section',label:'Licensing'},
+      T('exempt','Are you an authorized employee of a Federal, State, or Local Government, General Contractor (licensed prior to January 1, 1992), or Property Owner acting as your own contractor?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
+      T('exemptReason','I do hereby solemnly swear that I, or the entity of which I am a qualifying representative, am exempt from the licensing requirements of the State of Alabama Home Builders Licensure law for the following reason:',{type:'radio',stack:true,req:true,opts:LICENSE_OPTS,full:true,show:f=>f.exempt==='Yes'}),
+      UPLOAD ] },
+  subtrade:{ key:'subtrade', title:'Sub Trade Application for Building Permit', short:'Sub Trade Permit', icon:'wrench', group:'Building Permits', feeLabel:'Fee based on estimated project cost', created:'Jun 7, 2026',
+    fields:[ T('applicant','Applicant Name or Business Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone #',{type:'tel'}), T('date','Date',{type:'date',req:true}),
+      {type:'section',label:'Property'}, ...PROPERTY,
+      {type:'section',label:'Sub-contractor'},
+      {type:'note',text:'All subtrades are required to pull a permit. These trades must hold a valid State of Alabama trade license: Electrical, HVAC, Plumbing, Gas, Roofing and Pool.'},
+      T('trade','Trade',{hint:'HVAC, Electrical, Plumbing, etc.'}), T('tradeLicense','Trade License #',{req:true}),
+      T('subName','Sub Contractor Name'), T('business','Business Name'), T('cPhone','Sub Contractor Phone #',{type:'tel'}), T('cEmail','Sub Contractor Email',{type:'email'}),
+      {type:'section',label:'Project'},
+      T('buildType','What type of build?',{type:'radio',req:true,opts:['Residential','Commercial'],full:true}),
+      T('estCost','Estimated project cost',{type:'money',req:true}),
+      T('description','Brief description of work',{type:'textarea',req:true,full:true}),
+      UPLOAD ] },
+  sign:{ key:'sign', title:'Sign Permit Application', short:'Sign Permit', icon:'sign', group:'Sign Permit', feeLabel:'$50 non-illuminated · $75 illuminated', created:'Jul 11, 2026',
+    fields:[ T('date','Date',{type:'date',req:true}), T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone Number',{type:'tel'}),
+      T('address','Address of Sign',{req:true,full:true}), T('estCost','Estimated Cost of Work',{type:'money',req:true}), T('zoning','Zone'),
+      {type:'section',label:'Owner, tenant & contractor'},
+      T('owner','Property Owner Name'), T('ownerEmail','Property Owner Email',{type:'email'}), T('ownerPhone','Property Owner Phone Number',{type:'tel'}),
+      T('tenant','Property Tenant Name'), T('tenantEmail','Property Tenant Email',{type:'email'}), T('tenantPhone','Property Tenant Phone Number',{type:'tel'}),
+      T('contractor','Contractor or DBA Name'), T('cEmail','Contractor Email',{type:'email'}), T('cPhone','Contractor Phone Number',{type:'tel'}),
+      T('gcLicense','General Contractor License Number'), T('bizLicense','City of Arab Business License Number'),
+      T('description','Brief Description of Work',{type:'textarea',req:true,full:true}),
+      {type:'section',label:'Sign details'},
+      T('signType','What type of sign are you applying for?',{type:'radio',req:true,opts:['Free standing ground sign','Building sign'],full:true}),
+      T('signFeature','Which feature applies to this sign?',{type:'radio',req:true,opts:['Illuminated','Electronic Message Display (Changing Message)','Non-illuminated'],full:true}),
+      T('groundType','Type of freestanding ground sign',{type:'select',req:true,opts:['Monument Sign','Pylon Sign','Pole sign/shopping complex sign','Other'],show:f=>f.signType==='Free standing ground sign'}),
+      T('buildingType','Type of building sign',{type:'select',req:true,opts:['Wall sign','Cabinet/box','Channel letters on raceway','Awning/canopy/banner sign','Hand-lettered painted/vinyl sign/metal sign','Projecting/hanging sign','Other'],show:f=>f.signType==='Building sign'}),
+      T('signH','Sign Height (ft.)',{type:'number',req:true,show:f=>f.signType==='Free standing ground sign'}), T('signW','Sign Width (ft.)',{type:'number',req:true,show:f=>f.signType==='Free standing ground sign'}),
+      T('signFace','Sign Face (sq ft)',{type:'number',req:true,show:f=>f.signType==='Free standing ground sign'}), T('renderBoard','Render Board (sq ft)',{type:'number',req:true,show:f=>f.signType==='Free standing ground sign'}),
+      T('bldH','Height of Building/Suite (ft.)',{type:'number',req:true,show:f=>f.signType==='Building sign'}), T('bldW','Width of Building/Suite (ft.)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
+      T('bldArea','Total Area of Building/Suite (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}), T('newFace','New Sign Face (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
+      T('existingFace','Existing and Remaining Sign (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
+      Object.assign({},UPLOAD,{label:'Upload the required documents for your sign type, including the plot plan or building suite drawing'}) ] },
+  pool:{ key:'pool', title:'Swimming Pool Permit Application', short:'Swimming Pool Permit', icon:'pool', group:'Other Permits', feeLabel:'$50 flat fee', created:'Oct 6, 2026',
+    fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY, {type:'section',label:'Pool'},
+      T('poolType','Pool type',{type:'radio',req:true,opts:['In-ground','Above-ground'],full:true}),
+      T('contractor','Pool Contractor Name'), T('tradeLicense','Contractor License #'),
+      T('description','Brief description of work',{type:'textarea',req:true,full:true}), UPLOAD ] },
+  demo:{ key:'demo', title:'Demolition Permit Application', short:'Demolition Permit', icon:'demo', group:'Other Permits', feeLabel:'$100 flat fee', created:'Oct 6, 2026',
+    fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY, {type:'section',label:'Demolition'},
+      T('structure','Building or structure being demolished',{req:true,full:true}),
+      T('contractor','Demolition Contractor Name'), T('gcLicense','Contractor License #'),
+      T('description','Brief description of work',{type:'textarea',req:true,full:true}), UPLOAD ] },
+  moving:{ key:'moving', title:'Moving Permit Application', short:'Moving Permit', icon:'truck', group:'Other Permits', feeLabel:'$100 flat fee', created:'Oct 6, 2026',
+    fields:[ ...APPLICANT, {type:'section',label:'Moving from'}, ...PROPERTY,
+      T('toAddress','Moving to (new address)',{req:true,full:true}), T('moveDate','Planned moving date',{type:'date'}),
+      T('structure','Building or structure being moved',{req:true,full:true}),
+      T('contractor','Mover / Contractor Name'), T('gcLicense','Contractor License #'),
+      T('description','Brief description of work',{type:'textarea',req:true,full:true}), UPLOAD ] }
+};
+const FORM_ORDER = ['building','subtrade','sign','pool','demo','moving'];
+const valueFields = f => f.fields.filter(x => x.id && x.type!=='file');
+
+/* ================= state & capabilities ================= */
+const S = { view:'apps', form:null, staff:false, subs:[], loaded:false, sel:null, tab:'app', editing:false,
+  q:'', filter:'all', sort:{k:'createdAt',d:-1}, cols:null, colsOpen:false, wsQ:'', confirmDel:false, usage:null };
+/* ---------- Supabase backend (same project + bf_* functions as arabcityapplications.jadecruz.dev) ---------- */
+const SB_URL = 'https://yighcuismepfmappcfui.supabase.co';
+const SB_KEY = 'sb_publishable_nGh6iXqOO0iKTPo6uOvXSA_x4ZjIEUi';   // Supabase > Project Settings > API Keys > publishable key (meant to be public)
+const APP_TAG = 'jf';                                    // marks records made by these forms
+const MAX_FILE_MB = 8;
+async function sbRpc(fn, args){
+  const r = await fetch(SB_URL+'/rest/v1/rpc/'+fn, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' }, body:JSON.stringify(args||{}) });
+  const t = await r.text(); let j = null; try{ j = t ? JSON.parse(t) : null; }catch(e){}
+  if (!r.ok) throw new Error(((j && (j.message || j.hint)) || ('Server error '+r.status)).replace(/^STORAGE_FULL:\s*/,''));
+  return j;
+}
+let TOKEN = null; try{ TOKEN = localStorage.getItem('bdStaffToken'); }catch(e){}
+const DL = { save: async ({filename, data}) => { const b = data instanceof Blob ? data : new Blob([data], {type: /\.pdf$/.test(filename)?'application/pdf':/\.csv$/.test(filename)?'text/csv':'application/octet-stream'});
+  const u = URL.createObjectURL(b), a = document.createElement('a'); a.href=u; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 5000); } };
+const DB = {
+  doc: path => { const id = path.split('/')[1]; return {
+    update: async patch => { await sbRpc('bf_update', {p_token:TOKEN, p_collection:'submissions', p_id:id, p_patch:patch}); const s = S.subs.find(x=>x.id===id); if (s) Object.assign(s, patch); render(); },
+    set: async body => DB.doc(path).update(body),
+    delete: async () => { await sbRpc('bf_purge_submission', {p_token:TOKEN, p_id:id}); S.subs = S.subs.filter(x=>x.id!==id); loadStorage(); }
+  }; }
+};
+async function loadSubs(){
+  if (!TOKEN) return;
+  try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'submissions', p_where_field:'app', p_where_value:APP_TAG, p_order_field:'createdAt', p_order_dir:'desc', p_limit:500});
+    S.subs = (r||[]).map(x => Object.assign({fields:{}, staff:{}, files:[]}, x.data, {id:x.id})); S.loaded = true; S.loadErr = '';
+  }catch(e){ S.loaded = true; S.loadErr = e.message; }
+  await loadStorage();
+  const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest('.panel,#pf,.pin,.purge');
+  if ((S.view==='staff'||S.view==='table'||S.view==='purge') && !S.editing && !typing) render();
+}
+async function loadStorage(){ try{ S.storage = await sbRpc('bf_storage_status', {}); }catch(e){} }
+const ATT = {};   // submissionId -> [{id,name,type,size,data(dataURL)}]
+async function loadAtt(subId){
+  if (ATT[subId] && !ATT[subId].err) return ATT[subId];
+  const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'attachments', p_where_field:'submissionId', p_where_value:subId, p_order_field:'index', p_order_dir:'asc', p_limit:50});
+  ATT[subId] = (r||[]).map(x => Object.assign({}, x.data, {id:x.id})); return ATT[subId];
+}
+const dataUrlBytes = d => { const b = atob(String(d).split(',')[1]||''); const u = new Uint8Array(b.length); for (let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; };
+const readDataUrl = f => new Promise((ok,no)=>{ const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('Could not read '+f.name)); r.readAsDataURL(f); });
+async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; try{ localStorage.removeItem('bdStaffToken'); }catch(e){} }
+const mb = n => (Number(n||0)/1048576).toFixed(n>=10485760?0:1)+' MB';
+const root = document.getElementById('root');
+function toast(msg){ const t = document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
+function go(view, form){ S.view = view; S.form = form||null; S.sel=null; S.editing=false; S.confirmDel=false; S.colsOpen=false;
+  try{ history.replaceState(null,'', '#'+(form? view+'-'+form : view)); }catch(e){}
+  render(); window.scrollTo(0,0); }
+
+/* ================= PUBLIC: Applications & Fees ================= */
+function sideNav(){ return '';
+  /* full Jotform app navigation intentionally not recreated */
+  const items = [['news',"What's New"],['doc','Applications & Fees',true],['info','Important Information'],['pin','Annexation'],['gavel','Regulations'],['user','About Us'],['map','Zoning Map']];
+  return '<aside class="side"><div class="brand"><div class="seal">ARAB</div>Building Department</div>'+
+    items.map(i=>'<a class="navi '+(i[2]?'on':'dim')+'" href="https://app.jotform.com/261578162936164" target="_blank" rel="noopener" '+(i[2]?'onclick="event.preventDefault();go(\'apps\')"':'')+'>'+ic(i[0])+esc(i[1])+'</a>').join('')+
+    '<div class="grow"></div><button class="btn" onclick="go(\'staff\')">'+ic('lock')+'Staff dashboard</button></aside>';
+}
+function tile(k){ const f = FORMS[k];
+  return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
+function viewApps(){
+  return '<div class="app">'+sideNav()+'<main class="stage">'+
+  '<div class="mobile-top"><div class="brand" style="padding:0"><div class="seal">ARAB</div>Building Department Portal</div><button class="btn sm ghost" onclick="go(\'staff\')">'+ic('lock')+'Staff</button></div>'+
+  '<div class="sheet">'+
+   '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
+   '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('subtrade')+'</div></section>'+
+   '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
+   '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
+   '<section class="grp"><h2>Planning Commission <span style="text-transform:none;letter-spacing:0;font-weight:500">paper forms for now</span></h2><div class="tiles">'+
+     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/18" target="_blank" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Download, complete and return to the Building Department</small><span class="fee">PDF form · no fee</span></span></a>'+
+     '<a class="tile paper" href="https://app.jotform.com/261578162936164/page/99" target="_blank" rel="noopener" style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost</small><span class="fee">PDF form · no fee</span></span></a>'+
+   '</div></section>'+
+   '<details class="sched"><summary>Building permit fee schedule</summary><div class="sched-body"><table class="fees num"><thead><tr><th>Total construction value</th><th>Permit fee</th></tr></thead><tbody>'+
+     '<tr><td>$1 to $2,500</td><td>$25</td></tr>'+
+     '<tr><td>$2,501 to $50,000</td><td>$25 for the first $2,500, plus $5 per additional $1,000 or fraction</td></tr>'+
+     '<tr><td>$50,001 to $100,000</td><td>$260 for the first $50,000, plus $4 per additional $1,000 or fraction</td></tr>'+
+     '<tr><td>$100,001 to $500,000</td><td>$460 for the first $100,000, plus $3 per additional $1,000 or fraction</td></tr>'+
+     '<tr><td>$500,001 and up</td><td>$1,660 for the first $500,000, plus $2 per additional $1,000 or fraction</td></tr>'+
+     '<tr><td>CICT fee (commercial only)</td><td>$1 per $1,000 of commercial construction value</td></tr>'+
+     '<tr><td>Residential new build / addition value</td><td>Heated sq ft × $75 + unheated sq ft × $50</td></tr>'+
+     '<tr><td>Sign</td><td>$50 non-illuminated · $75 illuminated or electronic message</td></tr>'+
+     '<tr><td>Swimming pool</td><td>$50</td></tr><tr><td>Demolition of any building or structure</td><td>$100</td></tr><tr><td>Moving any building or structure</td><td>$100</td></tr>'+
+   '</tbody></table></div></details>'+
+   '<div class="callout warn"><b>Penalty</b>Where work that requires a permit is started before the permit is obtained, the fees are doubled. Paying the double fee does not relieve anyone from fully complying with the code.</div>'+
+   '<div class="callout pay"><b>How to pay</b>Fees are paid in person by cash or check at the City of Arab Building Department, 740 N Main St, Arab, AL 35016. Make checks payable to “City of Arab.” Questions: <span style="user-select:all">buildingdept@arabcity.org</span></div>'+
+  '</div></main></div>';
+}
+
+/* ================= PUBLIC: a form ================= */
+let FILES = [];        // File objects queued for upload
+let FVALS = {};        // live field values
+function fieldHtml(x, f){
+  if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
+  if (x.type==='note') return '<div class="fld full hint" style="color:var(--ink2);font-size:14px">'+esc(x.text)+'</div>';
+  if (x.show && !x.show(f)) return '';
+  const id='f_'+x.id, req = x.req ? ' required' : '', star = x.req ? ' <span class="req">*</span>' : '';
+  const v = f[x.id]==null ? '' : f[x.id];
+  let inner='';
+  if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup">'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
+  else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+  else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+'>'+esc(v)+'</textarea>';
+  else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button">'+ic('upload')+'<div><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/jpeg,image/png,image/*" hidden></div><div class="filelist" id="flist"></div>';
+  else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
+    inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
+  return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+(x.type==='radio'?'_0':'')+'">'+esc(x.label)+star+'</label>'+inner+(x.hint?'<span class="hint">'+esc(x.hint)+'</span>':'')+'</div>';
+}
+function feeBoxHtml(key){
+  const fe = computeFees(key, FVALS, false);
+  const showVal = key==='building'||key==='subtrade';
+  return (showVal?'<div class="r"><span>Construction value <small>('+esc(fe.basis||'enter project details')+')</small></span><b class="num">'+money(fe.value)+'</b></div>':'')+
+    '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
+    (showVal?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
+    '<div class="r t"><span>Grand total</span><span class="num">'+money(fe.total)+'</span></div>'+
+    '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>';
+}
+function viewForm(){
+  const F = FORMS[S.form];
+  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top"><div class="brand" style="padding:0"><div class="seal">ARAB</div>Building Department</div></div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="https://app.jotform.com/261578162936164/page/18">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
+   (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
+   '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
+}
+function formFieldsHtml(){
+  const F = FORMS[S.form];
+  return F.fields.map(x=>fieldHtml(x,FVALS)).join('')+
+    '<div class="sect">Fees</div><div class="feebox" id="feebox" aria-live="polite">'+feeBoxHtml(S.form)+'</div>'+
+    '<div class="submitrow"><button class="btn primary" type="submit" id="subBtn">Submit application</button><span class="formerr" id="ferr"></span></div>';
+}
+function bindForm(){
+  const form = document.getElementById('pf'); if (!form) return;
+  form.oninput = form.onchange = e => {
+    const k = e.target.dataset && e.target.dataset.k; if (!k) return;
+    FVALS[k] = e.target.value;
+    const F = FORMS[S.form];
+    // re-render only when a conditional field's visibility changes
+    const vis = F.fields.filter(x=>x.show).map(x=>x.show(FVALS)).join();
+    if (vis !== form.dataset.vis){ form.dataset.vis = vis; const a = document.activeElement && document.activeElement.id; form.innerHTML = formFieldsHtml(); bindFiles(); paintFiles(); if (a){ const el = document.getElementById(a); if (el) el.focus(); } }
+    else document.getElementById('feebox').innerHTML = feeBoxHtml(S.form);
+  };
+  form.dataset.vis = FORMS[S.form].fields.filter(x=>x.show).map(x=>x.show(FVALS)).join();
+  form.onsubmit = submitForm; bindFiles(); paintFiles();
+}
+function bindFiles(){
+  const d = document.getElementById('drop'), inp = document.getElementById('fileIn'); if (!d) return;
+  d.onclick = () => inp.click(); d.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); inp.click(); } };
+  inp.onchange = () => { addFiles(inp.files); inp.value=''; };
+  d.ondragover = e => { e.preventDefault(); d.classList.add('on'); };
+  d.ondragleave = () => d.classList.remove('on');
+  d.ondrop = e => { e.preventDefault(); d.classList.remove('on'); addFiles(e.dataTransfer.files); };
+}
+function addFiles(list){
+  const err = document.getElementById('ferr'); err.textContent='';
+  for (const f of list){
+    if (FILES.length >= 10){ err.textContent = 'You can attach up to 10 files.'; break; }
+    if (!/^(application\/pdf|image\/(jpeg|png))$/.test(f.type)){ err.textContent = f.name+' is not a PDF, JPG or PNG. Save it as one of those and try again.'; continue; }
+    if (f.size > MAX_FILE_MB*1024*1024){ err.textContent = f.name+' is larger than '+MAX_FILE_MB+' MB. Take a smaller photo or split the PDF.'; continue; }
+    FILES.push(f);
+  }
+  paintFiles();
+}
+function paintFiles(){
+  const l = document.getElementById('flist'); if (!l) return;
+  l.innerHTML = FILES.map((f,i)=>'<div class="fchip"><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" class="btn ghost sm" aria-label="Remove '+esc(f.name)+'" onclick="FILES.splice('+i+',1);paintFiles()">'+ic('x')+'</button></div>').join('');
+}
+async function submitForm(e){
+  e.preventDefault();
+  const form = e.target, err = document.getElementById('ferr'), btn = document.getElementById('subBtn');
+  if (!form.checkValidity()){ form.reportValidity(); err.textContent = 'Please complete the required fields.'; return; }
+  if (S.pubFull){ err.textContent = 'Online storage is full, so applications cannot be submitted right now. Please contact the Building Department.'; return; }
+  btn.disabled = true; err.textContent='';
+  const F = FORMS[S.form], vals = {};
+  valueFields(F).forEach(x => { if ((!x.show || x.show(FVALS)) && FVALS[x.id]!=null && FVALS[x.id]!=='') vals[x.id] = String(FVALS[x.id]); });
+  const files = FILES.map(f => ({ name:f.name, type:f.type, size:f.size }));
+  try{
+    btn.textContent = 'Submitting…';
+    const fees = computeFees(S.form, vals, false);
+    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt:new Date().toISOString(), read:false, starred:false, fields:vals, fees, files, staff:{ permitNo:'', payment:'' } } });
+    for (let i=0;i<FILES.length;i++){
+      btn.textContent = 'Uploading document '+(i+1)+' of '+FILES.length+'…';
+      const data = await readDataUrl(FILES[i]);
+      await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:{ app:APP_TAG, submissionId:subId, index:i, name:FILES[i].name, type:FILES[i].type, size:FILES[i].size, data } });
+    }
+    const done = document.getElementById('sheet');
+    done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
+      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r t" style="border:0;padding:0"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Pay in person by cash or check at 740 N Main St, Arab, AL 35016.</small></div>'+
+      '<a class="btn" href="https://app.jotform.com/261578162936164/page/18">Back to Applications &amp; Fees</a></div>';
+    FILES = []; FVALS = {};
+  }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
+}
+
+/* ================= STAFF: shared bits ================= */
+const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const fmtDT = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); };
+const isPaid = s => !!(s.staff && s.staff.payment && s.staff.payment!=='Please Select');
+const subsFor = k => S.subs.filter(s => s.form===k);
+const INSPECT = ['Footing','Framing','Electrical','Plumbing','Final'];
+const COLS = [
+  {k:'createdAt', l:'Submission Date', t:'D', get:s=>s.createdAt, fmt:s=>fmtDate(s.createdAt)},
+  {k:'permitNo', l:'Permit #', t:'T', get:s=>(s.staff&&s.staff.permitNo)||'', fmt:s=>esc((s.staff&&s.staff.permitNo)||'')||'<span style="color:var(--muted)">—</span>'},
+  {k:'address', l:'Address', t:'T', get:s=>s.fields.address||''},
+  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign']},
+  {k:'files', l:'Uploads', t:'F', get:s=>(s.files||[]).length, fmt:s=>'<span class="pdfs">'+(s.files||[]).slice(0,5).map(f=>'<span class="pdfi'+(/^image/.test(f.type)?' img':'')+'">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span>').join('')+((s.files||[]).length>5?'<small>+'+((s.files.length)-5)+'</small>':'')+'</span>'},
+  {k:'total', l:'Grand Total Fee', t:'$', get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
+  {k:'permitFee', l:'Permit Fee', t:'$', hide:true, get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
+  {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
+  {k:'payment', l:'Payment', t:'S', get:s=>isPaid(s)?1:0, fmt:s=>isPaid(s)?'<span class="pill paid">'+esc(s.staff.payment)+'</span>':'<span class="pill unpaid">Unpaid</span>'},
+  {k:'buildType', l:'Build Type', t:'T', only:['building','subtrade'], get:s=>s.fields.buildType||''},
+  {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
+  {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||''},
+  {k:'email', l:'Applicant Email', t:'@', get:s=>s.fields.email||''},
+  {k:'phone', l:'Applicant Phone', t:'T', hide:true, get:s=>s.fields.phone||''},
+  {k:'description', l:'Description of Work', t:'T', hide:true, get:s=>s.fields.description||''}
+];
+const colsFor = k => COLS.filter(c => (!c.only || c.only.includes(k)) && (!c.not || !c.not.includes(k)));
+function visibleCols(k){
+  if (!S.cols || S.cols.form!==k){ let saved=null; try{ saved = JSON.parse(localStorage.getItem('bdCols_'+k)||'null'); }catch(e){}
+    S.cols = { form:k, on: saved || colsFor(k).filter(c=>!c.hide).map(c=>c.k) }; }
+  return colsFor(k).filter(c => S.cols.on.includes(c.k));
+}
+function topBar(){
+  return '<header class="jt-top"><div class="jt-logo"><span class="mk"></span>Permit Desk</div><span class="jt-ws">Building Department</span><span class="sp"></span>'+
+   '<span class="tl hide-sm" style="cursor:default">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</span><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="Building Department">ARAB</span></header>'+storageBanner();
+}
+async function lockStaff(){ const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
+const isAdmin = () => !!(S.me && S.me.role==='admin');
+function storageBanner(){
+  const st = S.storage; if (!st || st.pct < 80) return '';
+  const full = st.pct >= 100;
+  return '<div class="sbanner'+(full?' full':'')+'" role="alert"><b>'+(full?'Storage is full. New online applications are being turned away.':'You have almost reached your storage limit ('+st.pct+'% used).')+'</b>'+
+   '<span>'+(full?'Residents see a message telling them to contact the Building Department. ':'')+'Free up space by purging finished permits that have a Certificate of Occupancy.</span>'+
+   (isAdmin()?'<button class="btn sm" onclick="go(\'purge\')">Free up space</button>':'<span>Ask an administrator to free up space.</span>')+'</div>';
+}
+function viewPin(){
+  const up = S.authTab==='up';
+  const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
+  return '<div style="padding:16px"><form class="pin" id="pinf"><div style="margin:0 auto" class="avatar">ARAB</div><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
+   '<div class="p-tabs" style="justify-content:center;padding:0"><button type="button" class="'+(up?'':'on')+'" onclick="S.authTab=\'in\';render()">Sign in</button><button type="button" class="'+(up?'on':'')+'" onclick="S.authTab=\'up\';render()">Create account</button></div>'+
+   (up?fld('lgName','Your name','text','name'):'')+fld('lgEmail','Email','email','username')+fld('lgPass','Password','password',up?'new-password':'current-password')+
+   (up?'<p style="margin:0;color:var(--muted);font-size:13.5px;text-align:left">New accounts can\'t see applications until an administrator turns on staff access for them.</p>':'<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>')+
+   '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">'+(up?'Create account':'Sign in')+'</button>'+
+   '<button type="button" class="btn ghost" onclick="go(\'apps\')">Back to Applications &amp; Fees</button></form></div>';
+}
+/* ================= STAFF: workspace (form list) ================= */
+function viewWorkspace(){
+  const q = S.wsQ.toLowerCase();
+  const rows = FORM_ORDER.filter(k => !q || FORMS[k].title.toLowerCase().includes(q)).sort((a,b)=>FORMS[a].title.localeCompare(FORMS[b].title));
+  return topBar()+'<div class="ws"><aside class="ws-side"><button class="create" onclick="go(\'apps\')">+ NEW APPLICATION</button>'+
+   meterHtml()+
+   '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
+   (isAdmin()?'<a class="navi" href="#purge" onclick="event.preventDefault();go(\'purge\')">'+ic('trash')+'Free up space</a><a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
+   '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
+   '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
+   '<div class="navi" style="justify-content:space-between"><span>Unpaid</span><b class="num">'+S.subs.filter(s=>!isPaid(s)).length+'</b></div></aside>'+
+   '<main class="ws-main"><div class="ws-bar"><span class="btn sm" style="cursor:default">'+ic('filter')+'Title [a-z]</span><label class="search">'+ic('search')+'<input id="wsq" placeholder="Search" value="'+esc(S.wsQ)+'" aria-label="Search forms"></label></div>'+
+   '<ul class="flist">'+
+    '<li onclick="go(\'apps\')"><span class="cbx"></span><span class="star">'+'<svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon app">'+ic('doc')+'</span><span><b>Building Department Portal</b><small>Public Applications &amp; Fees page · '+FORM_ORDER.length+' forms</small></span><span></span></li>'+
+    rows.map(k=>{ const all = subsFor(k), un = all.filter(s=>!s.read).length;
+      return '<li onclick="go(\'table\',\''+k+'\')"><span class="cbx"></span><span class="star"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon tbl">'+ic(FORMS[k].icon)+(un?'<span class="badge num">'+un+'</span>':'')+'</span>'+
+       '<span><b>'+esc(FORMS[k].title)+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+'. Created on '+FORMS[k].created+'</small></span><span></span></li>'; }).join('')+
+   '</ul>'+(S.loaded?'':'<p class="empty">Loading applications…</p>')+(S.loadErr?'<p class="empty">Could not load applications: '+esc(S.loadErr)+'</p>':'')+'</main></div>';
+}
+
+/* ================= STAFF: table ================= */
+function filteredRows(){
+  const k = S.form, cols = colsFor(k), q = S.q.trim().toLowerCase();
+  let rows = subsFor(k);
+  if (S.filter==='unread') rows = rows.filter(s=>!s.read);
+  if (S.filter==='starred') rows = rows.filter(s=>s.starred);
+  if (S.filter==='unpaid') rows = rows.filter(s=>!isPaid(s));
+  if (S.filter==='paid') rows = rows.filter(isPaid);
+  if (q) rows = rows.filter(s => (JSON.stringify(s.fields)+' '+((s.staff&&s.staff.permitNo)||'')).toLowerCase().includes(q));
+  const c = cols.find(c=>c.k===S.sort.k) || cols[0];
+  return rows.slice().sort((a,b)=>{ const x=c.get(a), y=c.get(b); return (x<y?-1:x>y?1:0)*S.sort.d; });
+}
+function viewTable(){
+  const k = S.form, F = FORMS[k], cols = visibleCols(k), rows = filteredRows();
+  const last = subsFor(k)[0];
+  const head = '<tr><th class="rn"><div class="rn-in"><span class="cbx"></span></div></th>'+cols.map(c=>'<th onclick="sortBy(\''+c.k+'\')" aria-sort="'+(S.sort.k===c.k?(S.sort.d>0?'ascending':'descending'):'none')+'"><div class="hd"><span class="ty">'+c.t+'</span>'+esc(c.l)+(S.sort.k===c.k?(S.sort.d>0?' ▲':' ▼'):'')+'</div></th>').join('')+'</tr>';
+  const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn"><div class="rn-in"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
+    cols.map(c=>'<td>'+(c.fmt?c.fmt(s):esc(c.get(s)))+'</td>').join('')+'</tr>').join('');
+  const sumT = rows.reduce((a,s)=>a+(s.fees?s.fees.total:0),0), sumC = rows.reduce((a,s)=>a+(s.fees?s.fees.cict:0),0);
+  return topBar()+'<div class="ws-main" style="min-height:calc(100% - 60px)"><div class="tb-head"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button>'+
+   '<div class="ttl"><b>'+esc(F.title)+'</b><small>'+(last?'Last submission '+fmtDT(last.createdAt):'No submissions yet')+'</small></div><span style="width:96px"></span></div>'+
+   '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
+   '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
+   '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+   '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
+   '<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
+   '<div class="grid-wrap">'+(rows.length?'<table class="grid"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
+   '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((k==='building'||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
+   (S.sel?panelHtml():'');
+}
+function sortBy(k){ S.sort = { k, d: S.sort.k===k ? -S.sort.d : (k==='createdAt'?-1:1) }; render(); }
+function toggleCol(k){ const on = S.cols.on; const i = on.indexOf(k); if (i>=0) on.splice(i,1); else on.push(k); try{ localStorage.setItem('bdCols_'+S.form, JSON.stringify(on)); }catch(e){} render(); }
+async function toggleStar(id){ const s = S.subs.find(x=>x.id===id); if (!s||!DB) return; try{ await DB.doc('submissions/'+id).update({starred:!s.starred}); }catch(e){ toast('Could not update star.'); } }
+async function openSub(id){ S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
+  loadAtt(id).then(()=>{ if (S.sel===id) render(); }).catch(e=>{ ATT[id] = {err:e.message}; if (S.sel===id) render(); });
+  const s = S.subs.find(x=>x.id===id); if (s && !s.read && DB){ try{ await DB.doc('submissions/'+id).update({read:true}); }catch(e){} } }
+function closeSub(){ S.sel=null; S.editing=false; render(); }
+function stepSub(d){ const rows = filteredRows(), i = rows.findIndex(s=>s.id===S.sel); const n = rows[i+d]; if (n) openSub(n.id); }
+
+/* ================= STAFF: submission panel ================= */
+function panelHtml(){
+  const s = S.subs.find(x=>x.id===S.sel); if (!s) return '';
+  const F = FORMS[s.form], st = s.staff||{};
+  let body='';
+  if (S.tab==='app'){
+    if (S.editing){
+      body = '<form id="editf" class="fgrid">'+F.fields.filter(x=>x.type!=='file').map(x=>{
+        if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
+        if (x.type==='note') return '';
+        const v = s.fields[x.id]||'', id='e_'+x.id;
+        let inp;
+        if (x.type==='radio'||x.type==='select') inp = '<select id="'+id+'" data-k="'+x.id+'"><option value="">—</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o.length>70?o.slice(0,70)+'…':o)+'</option>').join('')+'</select>';
+        else if (x.type==='textarea') inp = '<textarea id="'+id+'" data-k="'+x.id+'">'+esc(v)+'</textarea>';
+        else inp = '<input type="text" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'">';
+        return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+'">'+esc(x.label.length>90?x.label.slice(0,90)+'…':x.label)+'</label>'+inp+'</div>';
+      }).join('')+'</form>';
+    } else {
+      const qa = [];
+      F.fields.forEach(x=>{ if (x.type==='section'){ qa.push('<div class="h">'+esc(x.label)+'</div><div class="h" style="display:none"></div>'); return; }
+        if (!x.id || x.type==='file' || x.type==='note') return; const v = s.fields[x.id]; if (v==null||v==='') return;
+        qa.push('<div>'+esc(x.label.length>80?x.label.slice(0,80)+'…':x.label)+'</div><div>'+esc(x.type==='money'?money(num(v)):v)+'</div>'); });
+      // drop empty section headers
+      const clean = qa.filter((h,i)=>!(h.startsWith('<div class="h">') && (i===qa.length-1 || qa[i+1].startsWith('<div class="h">'))));
+      const fe = s.fees||{};
+      body = '<div class="qa">'+clean.join('')+'<div class="h">Fees</div><div class="h" style="display:none"></div>'+
+        ((s.form==='building'||s.form==='subtrade')?'<div>Construction value</div><div class="num">'+money(fe.value)+'</div>':'')+
+        '<div>Permit fee</div><div class="num">'+money(fe.permit)+(fe.doubled?' (doubled)':'')+'</div>'+
+        ((s.form==='building'||s.form==='subtrade')?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
+        '<div>Grand total</div><div class="num"><b>'+money(fe.total)+'</b></div></div>'+
+        (s.editedAt?'<p class="hint" style="color:var(--muted);font-size:13px">Edited by staff '+fmtDT(s.editedAt)+'</p>':'');
+    }
+  } else if (S.tab==='office'){
+    const ins = st.inspections||{};
+    const hasInsp = ['building','subtrade','pool'].includes(s.form);
+    body = '<form id="offf" class="fgrid">'+
+      '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
+      '<div class="fld"><label class="l" for="o_payment">Type of payment received</label><select id="o_payment">'+['Please Select','Check','Cash'].map(o=>'<option'+((st.payment||'Please Select')===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
+      '<div class="fld"><label class="l" for="o_checkNo">Check # / receipt #</label><input type="text" id="o_checkNo" value="'+esc(st.checkNo||'')+'"></div>'+
+      '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> Work started without a permit (double the permit fee)</label></div>'+
+      '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
+      '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>'+
+      (hasInsp?'<div class="sect">Inspections</div><div class="fld full"><div class="insp"><span></span><span class="ihead">Date of inspection</span><span class="ihead">Completed by</span><span class="ihead">Date recorded</span>'+
+        INSPECT.map(n=>{ const r = ins[n]||{}; return '<b>'+n+'</b><input type="date" id="i_'+n+'_d" aria-label="'+n+' date of inspection" value="'+esc(r.date||'')+'"><input type="text" id="i_'+n+'_b" aria-label="'+n+' completed by" placeholder="Completed by" value="'+esc(r.by||'')+'"><input type="date" id="i_'+n+'_r" aria-label="'+n+' date recorded" value="'+esc(r.recorded||'')+'">'; }).join('')+'</div></div>':'')+
+      ((s.form==='building'||s.form==='subtrade')?'<div class="sect">Certificate of Occupancy</div><div class="fld"><label class="l" for="o_co">Certificate of Occupancy given?</label><select id="o_co">'+['','Given','Not Given'].map(o=>'<option'+((st.co||'')===o?' selected':'')+' value="'+o+'">'+(o||'—')+'</option>').join('')+'</select></div>'+
+        '<div class="fld"><label class="l" for="o_coInit">Initials sign off</label><input type="text" id="o_coInit" value="'+esc(st.coInit||'')+'"></div>'+
+        '<div class="fld full"><label class="l" for="o_coComments">C of O comments</label><textarea id="o_coComments">'+esc(st.coComments||'')+'</textarea></div>':'')+
+      '<div class="fld full"><label class="l" for="o_comments">Staff comments</label><textarea id="o_comments">'+esc(st.comments||'')+'</textarea></div></form>';
+  } else {
+    const at = ATT[s.id];
+    if (!(s.files||[]).length) body = '<p class="empty">No documents were uploaded with this application.</p>';
+    else if (!at) body = '<p class="empty">Loading documents…</p>';
+    else if (at.err) body = '<p class="empty">Could not load documents: '+esc(at.err)+'</p>';
+    else body = (at.length < s.files.length ? '<p class="formerr">'+(s.files.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
+      '<div class="files">'+at.map((f,i)=>'<div class="fcard"><div class="th">'+(/^image/.test(f.type)?'<img src="'+esc(f.data)+'" alt="'+esc(f.name)+'">':'<span class="pdfi" style="width:44px;height:54px;font-size:11px">PDF</span>')+'</div>'+
+      '<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div><div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
+  }
+  const actions = S.confirmDel
+    ? '<div class="confirm"><b>Delete this application and its '+(s.files||[]).length+' document(s)?</b> This cannot be undone.<span style="flex:1"></span><button class="btn sm" onclick="S.confirmDel=false;render()">Keep it</button><button class="btn sm danger" onclick="deleteSub()">Delete</button></div>'
+    : (S.tab==='app' && S.editing
+      ? '<button class="btn primary" onclick="saveEdit()">'+ic('check')+'Save changes</button><button class="btn" onclick="S.editing=false;render()">Cancel</button><span class="sp"></span><span class="hint" style="color:var(--muted);font-size:13px">Fees recalculate when you save.</span>'
+      : S.tab==='office'
+        ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span><button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
+        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
+  return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
+   '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+fmtDT(s.createdAt)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
+   '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
+   '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
+   '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
+}
+const curSub = () => S.subs.find(x=>x.id===S.sel);
+async function saveEdit(){
+  const s = curSub(); if (!s||!DB) return;
+  const f = Object.assign({}, s.fields);
+  document.querySelectorAll('#editf [data-k]').forEach(el=>{ if (el.value==='') delete f[el.dataset.k]; else f[el.dataset.k]=el.value; });
+  const fees = computeFees(s.form, f, s.fees&&s.fees.doubled);
+  const body = JSON.parse(JSON.stringify(s)); delete body.id;
+  Object.assign(body, { fields:f, fees, editedAt:new Date().toISOString() });
+  try{ await DB.doc('submissions/'+s.id).set(body);
+    S.editing=false; toast('Changes saved'); render(); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
+}
+async function saveOffice(){
+  const s = curSub(); if (!s||!DB) return;
+  const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
+  const st = { permitNo:g('o_permitNo')||'', payment:g('o_payment')||'', checkNo:g('o_checkNo')||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' };
+  if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'' }; }); }
+  if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||''; }
+  const doubled = document.getElementById('o_double').checked;
+  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:computeFees(s.form, s.fields, doubled) }); toast('Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
+}
+async function deleteSub(){
+  const s = curSub(); if (!s||!DB) return;
+  try{ await DB.doc('submissions/'+s.id).delete();
+    delete ATT[s.id]; S.sel=null; S.confirmDel=false; toast('Application deleted'); render();
+  }catch(e){ toast('Could not delete: '+(e.message||'try again')); }
+}
+async function saveFile(i){
+  const s = curSub(), f = s && ATT[s.id] && ATT[s.id][i]; if (!f) return;
+  await DL.save({ filename:f.name, data:new Blob([dataUrlBytes(f.data)], {type:f.type}) });
+}
+function openFile(i){
+  const s = curSub(), f = s && ATT[s.id] && ATT[s.id][i]; if (!f) return;
+  const u = URL.createObjectURL(new Blob([dataUrlBytes(f.data)], {type:f.type})); const w = window.open(u, '_blank'); if (!w) saveFile(i);
+}
+function exportCsv(){
+  const k=S.form, cols=colsFor(k), rows=filteredRows();
+  const all = [...cols.filter(c=>c.k!=='files').map(c=>c.l), 'Documents'];
+  const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const lines = [all.map(q).join(',')].concat(rows.map(s=>[...cols.filter(c=>c.k!=='files').map(c=>{ const v=c.get(s); return c.k==='createdAt'?fmtDate(v):c.k==='payment'?(isPaid(s)?s.staff.payment:'Unpaid'):v; }), (s.files||[]).map(f=>f.name).join('; ')].map(q).join(',')));
+  DL.save({ filename: FORMS[k].short.replace(/[^A-Za-z0-9]+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.csv', data: lines.join('\r\n') }).catch(e=>{ if(e&&e.code!=='declined') toast('Download failed.'); });
+}
+
+/* ================= PDF: application + every uploaded document, one file ================= */
+const pdfSafe = t => String(t==null?'':t).replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/[^\x0A\x20-\x7E\xA0-\xFF]/g,'?');
+async function buildPdf(s){
+  const { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const pdf = await PDFDocument.create();
+  const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const F = FORMS[s.form], st = s.staff||{}, W=612, H=792, M=46;
+  const navy = rgb(0.06,0.2,0.45), grey = rgb(0.42,0.45,0.6), line = rgb(0.86,0.88,0.92);
+  let page, y;
+  const wrap = (t, font, size, width) => { const out=[]; pdfSafe(t).split('\n').forEach(par=>{ let cur=''; par.split(/\s+/).forEach(w=>{ const tryL = cur?cur+' '+w:w; if (font.widthOfTextAtSize(tryL,size) > width && cur){ out.push(cur); cur=w; } else cur=tryL; }); out.push(cur); }); return out; };
+  const newPage = () => { page = pdf.addPage([W,H]);
+    page.drawRectangle({x:0,y:H-70,width:W,height:70,color:navy});
+    page.drawText('City of Arab Building Department', {x:M,y:H-32,size:15,font:bold,color:rgb(1,1,1)});
+    page.drawText(pdfSafe(F.title), {x:M,y:H-52,size:10.5,font:reg,color:rgb(0.95,0.76,0.19)});
+    page.drawText(pdfSafe('Permit # '+(st.permitNo||'not assigned')), {x:W-M-bold.widthOfTextAtSize('Permit # '+(st.permitNo||'not assigned'),10.5),y:H-32,size:10.5,font:bold,color:rgb(1,1,1)});
+    y = H-96; };
+  const head = t => { if (y<90) newPage(); y-=6; page.drawText(pdfSafe(t.toUpperCase()), {x:M,y,size:9,font:bold,color:grey}); y-=6; page.drawLine({start:{x:M,y},end:{x:W-M,y},thickness:.7,color:line}); y-=14; };
+  const row = (l, v) => { const ll = wrap(l,bold,9.5,170), vl = wrap(v,reg,10,W-2*M-185); const h = Math.max(ll.length, vl.length)*13+5;
+    if (y-h < 50) newPage();
+    ll.forEach((t,i)=>page.drawText(t,{x:M,y:y-i*13,size:9.5,font:bold,color:rgb(0.2,0.24,0.42)}));
+    vl.forEach((t,i)=>page.drawText(t,{x:M+185,y:y-i*13,size:10,font:reg,color:rgb(0.04,0.08,0.3)}));
+    y -= h; };
+  newPage();
+  row('Submitted', fmtDT(s.createdAt)); row('Applicant', s.fields.applicant||''); row('Property address', s.fields.address||'');
+  let sec = null;
+  F.fields.forEach(x=>{ if (x.type==='section'){ sec = x.label; return; } if (!x.id||x.type==='file'||x.type==='note') return;
+    const v = s.fields[x.id]; if (v==null||v==='') return; if (sec){ head(sec); sec=null; }
+    row(x.label, x.type==='money'?money(num(v)):v); });
+  const fe = s.fees||{}; head('Fees');
+  if (s.form==='building'||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
+  row('Permit fee', money(fe.permit)+(fe.doubled?'  (doubled - work started without permit)':''));
+  if (s.form==='building'||s.form==='subtrade') row('CICT fee', money(fe.cict));
+  row('Grand total', money(fe.total));
+  head('Office use');
+  row('Payment received', isPaid(s)?st.payment+(st.checkNo?'  #'+st.checkNo:''):'Unpaid');
+  row('Approval', [st.approvedBy, st.approvedDate].filter(Boolean).join('  ·  ')||'-');
+  if (st.inspections) INSPECT.forEach(n=>{ const r=st.inspections[n]||{}; if (r.date||r.by||r.recorded) row(n+' inspection', [r.date&&'Inspected '+r.date, r.by&&'by '+r.by, r.recorded&&'recorded '+r.recorded].filter(Boolean).join(', ')); });
+  if (st.co) row('Certificate of Occupancy', st.co+(st.coInit?'  ·  '+st.coInit:'')+(st.coComments?'\n'+st.coComments:''));
+  if (st.comments) row('Staff comments', st.comments);
+  const fl = await loadAtt(s.id);
+  head('Documents attached ('+fl.length+')');
+  fl.forEach((f,i)=>row('Document '+(i+1), f.name));
+  const formPages = pdf.getPageCount();
+  // attachments
+  for (const f of fl){
+    try{
+      const buf = dataUrlBytes(f.data);
+      if (/pdf/.test(f.type)){ const src = await PDFDocument.load(buf,{ignoreEncryption:true}); const pgs = await pdf.copyPages(src, src.getPageIndices()); pgs.forEach(p=>pdf.addPage(p)); }
+      else if (/image\/(png|jpe?g)/.test(f.type)){
+        const img = /png/.test(f.type) ? await pdf.embedPng(buf) : await pdf.embedJpg(buf);
+        const p = pdf.addPage([W,H]); p.drawText(pdfSafe(f.name),{x:M,y:H-34,size:9,font:reg,color:grey});
+        const sc = Math.min((W-2*M)/img.width, (H-2*M-20)/img.height, 1); const w=img.width*sc, h=img.height*sc;
+        p.drawImage(img,{x:(W-w)/2,y:(H-20-h)/2,width:w,height:h});
+      } else throw 0;
+    }catch(e){ const p = pdf.addPage([W,H]); p.drawText(pdfSafe('Could not include '+f.name+'. Open it from the Documents tab.'),{x:M,y:H-60,size:11,font:reg}); }
+  }
+  pdf.getPages().forEach((p,i)=>{ if (i<formPages) p.drawText(pdfSafe('Page '+(i+1)+' of '+formPages+'  ·  generated '+fmtDT(new Date().toISOString())),{x:M,y:24,size:8,font:reg,color:grey}); });
+  return pdf.save();
+}
+async function downloadPdf(sid){
+  const s = sid ? S.subs.find(x=>x.id===sid) : curSub(); if (!s) return; const b = document.getElementById('pdfBtn');
+  if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
+  try{ if (b){ b.disabled=true; b.textContent='Building PDF…'; }
+    const bytes = await buildPdf(s);
+    const nm = ('Permit-'+((s.staff&&s.staff.permitNo)||fmtDate(s.createdAt))+'-'+(s.fields.applicant||'')).replace(/[^A-Za-z0-9]+/g,'-').replace(/-+$/,'')+'.pdf';
+    await DL.save({ filename:nm, data:bytes });
+  }catch(e){ toast('Could not build the PDF: '+((e&&e.message)||'try again')); }
+  finally{ render(); }
+}
+
+/* ================= render & boot ================= */
+function render(){
+  const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
+  if (S.view==='apps') root.innerHTML = viewApps();
+  else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
+  else if (!S.staff){ root.innerHTML = viewPin();
+    document.getElementById('pinf').onsubmit = staffSignIn; }
+  else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
+  else if (S.view==='users' && isAdmin()){ root.innerHTML = viewUsers(); if (!S.users) loadUsers(); }
+  else if (S.view==='table' && S.form) root.innerHTML = viewTable();
+  else root.innerHTML = viewWorkspace();
+  const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
+  const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
+  if (aid && (aid==='wsq'||aid==='tq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
+}
+function startForm(){ FVALS = { date: new Date().toISOString().slice(0,10) }; FILES = []; }
+const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); };
+window.addEventListener('hashchange', () => initRoute());
+function initRoute(){
+  S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
+  const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
+  if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
+  else if (h==='staff'||h==='purge'||h==='users') S.view = h==='staff' ? 'staff' : h;
+  render(); window.scrollTo(0,0);
+}
+/* ================= storage meter, purge, staff accounts ================= */
+function meterHtml(){
+  const st = S.storage;
+  if (!st) return '<div class="meter"><b>Storage</b><div class="bar"><i style="width:0"></i></div><div style="margin-top:6px">Checking…</div></div>';
+  const pct = Math.min(100, Number(st.pct)||0), cls = pct>=100?' full':pct>=80?' warn':'';
+  return '<div class="meter'+cls+'"><div style="display:flex;justify-content:space-between;gap:8px"><b>Storage</b><span class="num"><b>'+mb(st.used)+'</b> of '+mb(st.limit)+' used</span></div>'+
+    '<div class="bar" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+Math.max(pct,1)+'%"></i></div>'+
+    '<div style="margin-top:6px;font-size:12.5px;color:var(--ink2)">Free plan limit. '+(pct>=80?'Purge finished permits to make room.':'Documents count toward this.')+'</div>'+
+    (pct>=80&&isAdmin()?'<button class="btn sm" style="margin-top:8px" onclick="go(\'purge\')">Free up space</button>':'')+'</div>';
+}
+const estBytes = s => Math.round((s.files||[]).reduce((a,f)=>a+(f.size||0),0)*1.37 + 4000);
+function purgeCandidates(){
+  const months = Number(S.purgeAge==null?12:S.purgeAge), cut = new Date(); cut.setMonth(cut.getMonth()-months);
+  return S.subs.filter(s => s.staff && s.staff.co==='Given' && new Date(s.createdAt) <= cut);
+}
+function viewPurge(){
+  const rows = purgeCandidates(); S.purgeSel = S.purgeSel || {};
+  const sel = rows.filter(s=>S.purgeSel[s.id]), freed = sel.reduce((a,s)=>a+estBytes(s),0);
+  const allOn = rows.length && sel.length===rows.length;
+  return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div>'+
+   '<h1>Free up space</h1><p style="margin:0;color:var(--ink2);max-width:70ch">Only permits marked <b>Certificate of Occupancy: Given</b> in Office use are listed. Purging deletes the application and every document uploaded with it, permanently. Download a PDF first for any permit you need to keep on file.</p>'+
+   meterHtml()+
+   '<div class="row"><label for="pAge"><b>Submitted</b></label><select id="pAge" class="mini" onchange="S.purgeAge=this.value;S.purgeSel={};render()">'+[[0,'Any time'],[6,'More than 6 months ago'],[12,'More than 1 year ago'],[24,'More than 2 years ago'],[36,'More than 3 years ago']].map(o=>'<option value="'+o[0]+'"'+(String(S.purgeAge==null?12:S.purgeAge)===String(o[0])?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+   '<span style="color:var(--muted)" class="num">'+rows.length+' permit'+(rows.length===1?'':'s')+' with a C of O</span></div>'+
+   (rows.length?'<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th class="rn"><label class="rn-in"><input type="checkbox" aria-label="Select all" '+(allOn?'checked':'')+' onchange="purgeAll(this.checked)"></label></th><th>Permit #</th><th>Applicant</th><th>Address</th><th>Form</th><th>Submitted</th><th>Documents</th><th>About</th><th></th></tr></thead><tbody>'+
+     rows.map(s=>'<tr><td class="rn"><label class="rn-in"><input type="checkbox" aria-label="Select '+esc(s.fields.applicant||'')+'" '+(S.purgeSel[s.id]?'checked':'')+' onchange="S.purgeSel[\''+s.id+'\']=this.checked;render()"></label></td><td>'+esc(s.staff.permitNo||'—')+'</td><td>'+esc(s.fields.applicant||'')+'</td><td>'+esc(s.fields.address||'')+'</td><td>'+esc(FORMS[s.form]?FORMS[s.form].short:s.form)+'</td><td>'+fmtDate(s.createdAt)+'</td><td class="num">'+(s.files||[]).length+'</td><td class="num">'+mb(estBytes(s))+'</td>'+
+       '<td><button class="btn sm" onclick="downloadPdf(\''+s.id+'\')">'+ic('down')+'PDF</button></td></tr>').join('')+'</tbody></table></div>'
+     :'<p class="empty">No permits with a Certificate of Occupancy match this filter.</p>')+
+   (S.purgeConfirm&&sel.length
+     ? '<div class="confirm"><b>Permanently delete '+sel.length+' permit'+(sel.length===1?'':'s')+' and their documents?</b> This cannot be undone.<span style="flex:1"></span><button class="btn sm" onclick="S.purgeConfirm=false;render()">Cancel</button><button class="btn sm danger" id="purgeGo" onclick="runPurge()">Delete '+sel.length+'</button></div>'
+     : '<div class="row"><button class="btn danger" '+(sel.length?'':'disabled')+' onclick="S.purgeConfirm=true;render()">'+ic('trash')+'Purge '+sel.length+' selected</button><span class="num" style="color:var(--muted)">'+(sel.length?'Frees about '+mb(freed):'Select the permits to purge')+'</span></div>')+
+   '</div>';
+}
+function purgeAll(on){ S.purgeSel = {}; if (on) purgeCandidates().forEach(s=>S.purgeSel[s.id]=true); render(); }
+async function runPurge(){
+  const ids = purgeCandidates().filter(s=>S.purgeSel[s.id]).map(s=>s.id), b = document.getElementById('purgeGo');
+  let done = 0;
+  for (const id of ids){
+    if (b){ b.disabled = true; b.textContent = 'Deleting '+(done+1)+' of '+ids.length+'…'; }
+    try{ await sbRpc('bf_purge_submission', {p_token:TOKEN, p_id:id}); done++; delete ATT[id]; S.subs = S.subs.filter(x=>x.id!==id); }
+    catch(e){ toast('Stopped: '+e.message); break; }
+  }
+  S.purgeSel = {}; S.purgeConfirm = false; await loadStorage(); render(); toast('Purged '+done+' permit'+(done===1?'':'s'));
+}
+async function loadUsers(){
+  try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'citizens', p_limit:500}); S.users = (r||[]).map(x=>x.data); }
+  catch(e){ S.users = {err:e.message}; }
+  if (S.view==='users') render();
+}
+function viewUsers(){
+  const u = S.users;
+  return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div><h1>Staff accounts</h1>'+
+   '<p style="margin:0;color:var(--ink2);max-width:70ch">Staff create their own account on the sign-in screen (Create account). Then set their access here. <b>Staff</b> can view, edit and download applications. <b>Administrator</b> can also delete, purge and manage accounts.</p>'+
+   (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
+   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Email</th><th>Created</th><th>Access</th></tr></thead><tbody>'+
+    u.map(a=>'<tr><td>'+esc(a.name||'')+'</td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(S.me&&a.id===S.me.id?'<span class="pill src">Administrator (you)</span>':
+      '<label for="r_'+esc(a.id)+'" style="position:absolute;left:-9999px">Access for '+esc(a.email)+'</label><select class="mini" id="r_'+esc(a.id)+'" onchange="setRole(\''+esc(a.id)+'\',this.value)">'+[['citizen','No staff access'],['staff','Staff'],['admin','Administrator']].map(o=>'<option value="'+o[0]+'"'+(a.role===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+'</td></tr>').join('')+'</tbody></table></div>')+'</div>';
+}
+async function setRole(id, role){
+  try{ await sbRpc('bf_update', {p_token:TOKEN, p_collection:'citizens', p_id:id, p_patch:{role}}); const a = S.users.find(x=>x.id===id); if (a) a.role = role; toast('Access updated'); }
+  catch(e){ toast('Could not update: '+e.message); }
+  render();
+}
+async function staffSignIn(e){
+  e.preventDefault(); const err = document.getElementById('pinErr'), btn = document.getElementById('lgBtn');
+  if (SB_KEY.indexOf('PASTE_')===0){ err.textContent = 'This page is not connected to the database yet.'; return; }
+  btn.disabled = true; err.textContent = '';
+  const email = document.getElementById('lgEmail').value, pass = await sha256hex(document.getElementById('lgPass').value);
+  try{
+    if (S.authTab==='up'){
+      const r = await sbRpc('bf_sign_up', { p_email:email, p_name:document.getElementById('lgName').value, p_pass:pass, p_remember:false });
+      try{ await sbRpc('bf_sign_out', {p_token:r.token}); }catch(x){}
+      S.authTab = 'in'; render(); document.getElementById('pinErr').textContent = ''; toast('Account created. An administrator needs to turn on staff access before you can sign in.');
+      return;
+    }
+    const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:document.getElementById('lgRem').checked });
+    if (!r || !r.account || !['staff','admin'].includes(r.account.role)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
+    TOKEN = r.token; S.me = r.account; S.staff = true; try{ localStorage.setItem('bdStaffToken', TOKEN); }catch(x){}
+    S.loaded = false; render(); loadSubs();
+  }catch(x){ err.textContent = x.message; btn.disabled = false; }
+}
+initRoute();
+(async function boot(){
+  if (SB_KEY.indexOf('PASTE_')===0) return;
+  sbRpc('bf_storage_status', {}).then(st => { S.storage = st; if (st && st.full){ S.pubFull = true; if (S.view==='form'){ const k = S.form; render(); } } }).catch(()=>{});
+  if (TOKEN){
+    try{ const me = await sbRpc('bf_me', {p_token:TOKEN});
+      if (me && ['staff','admin'].includes(me.role)){ S.me = me; S.staff = true; render(); await loadSubs(); }
+      else { signOutLocal(); render(); }
+    }catch(e){}
+  }
+  setInterval(()=>{ if (S.staff && document.visibilityState==='visible' && (S.view==='staff'||S.view==='table')) loadSubs(); }, 30000);
+})();
+</script>
+</body>
+</html>
