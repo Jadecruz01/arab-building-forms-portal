@@ -836,10 +836,12 @@ function storageBanner(){
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div style="padding:16px"><form class="pin" id="pinf"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" style="width:84px;height:84px;margin:0 auto"><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
-   '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by a Building Department administrator.</p>'+
+   '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
+   '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
+   '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
    '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
