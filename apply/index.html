@@ -200,6 +200,25 @@ table.grid th.rn{z-index:3}
 .grid-foot b{color:var(--ink)}
 .empty{padding:50px 20px;text-align:center;color:var(--muted)}
 
+input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer;flex:none}
+.flist li.picked{background:var(--sel)}
+.flist li.ws-head{display:flex;align-items:center;gap:12px;padding:6px 8px 10px;border-bottom:1px solid var(--line2);border-radius:0;flex-wrap:wrap;font-size:14px;color:var(--ink2);cursor:default}
+.flist li.ws-head:hover{background:transparent}
+.bulk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;background:var(--sel);border-bottom:1px solid var(--line);font-size:14px}
+.bulk b{margin-right:6px}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:12px 12px 4px}
+.dtile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);text-align:left;cursor:pointer;display:grid;gap:2px}
+.dtile:hover{border-color:var(--blue)}
+.dtile.on{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.dtile .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dtile .big{font:800 24px/1.15 var(--f-disp);color:var(--ink)}
+.dtile .sub{font-size:13px;color:var(--ink2)}
+.dtile.unpaid .big{color:var(--amber)} .dtile.paid .big{color:var(--ok)}
+.dash-period{display:flex;align-items:center;gap:8px;padding:10px 12px 0;font-size:14px;color:var(--ink2);flex-wrap:wrap}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px;display:grid;gap:12px}
+.card h2{font:700 16px var(--f-body)}
+.creds{background:var(--okbg);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:14px}
+.creds code{font-size:15px;user-select:all}
 /* submission panel */
 .veil{position:fixed;inset:0;background:rgba(6,10,40,.35);z-index:30}
 .panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--surface);z-index:31;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(6,10,40,.2);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -446,7 +465,7 @@ const FORM_ORDER = ['building','subtrade','sign','pool','demo','moving'];
 const valueFields = f => f.fields.filter(x => x.id && x.type!=='file');
 
 /* ================= state & capabilities ================= */
-const S = { view:'apps', form:null, staff:false, subs:[], loaded:false, sel:null, tab:'app', editing:false,
+const S = { rowSel:{}, wsSel:{}, view:'apps', form:null, staff:false, subs:[], loaded:false, sel:null, tab:'app', editing:false,
   q:'', filter:'all', sort:{k:'createdAt',d:-1}, cols:null, colsOpen:false, wsQ:'', confirmDel:false, usage:null };
 /* ---------- Supabase backend (same project + bf_* functions as arabcityapplications.jadecruz.dev) ---------- */
 const SB_URL = 'https://yighcuismepfmappcfui.supabase.co';
@@ -492,7 +511,7 @@ function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; try{ l
 const mb = n => (Number(n||0)/1048576).toFixed(n>=10485760?0:1)+' MB';
 const root = document.getElementById('root');
 function toast(msg){ const t = document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
-function go(view, form){ S.view = view; S.form = form||null; S.sel=null; S.editing=false; S.confirmDel=false; S.colsOpen=false;
+function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel={}; S.bulkDel=false; } S.view = view; S.form = form||null; S.sel=null; S.editing=false; S.confirmDel=false; S.colsOpen=false;
   try{ history.replaceState(null,'', '#'+(form? view+'-'+form : view)); }catch(e){}
   render(); window.scrollTo(0,0); }
 
@@ -668,7 +687,7 @@ function visibleCols(k){
 }
 function topBar(){
   return '<header class="jt-top"><div class="jt-logo"><span class="mk"></span>Permit Desk</div><span class="jt-ws">Building Department</span><span class="sp"></span>'+
-   '<span class="tl hide-sm" style="cursor:default">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</span><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="Building Department">ARAB</span></header>'+storageBanner();
+   '<button class="tl hide-sm" title="My account" onclick="go(\'me\')">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</button><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="Building Department">ARAB</span></header>'+storageBanner();
 }
 async function lockStaff(){ const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
 const isAdmin = () => !!(S.me && S.me.role==='admin');
@@ -680,13 +699,12 @@ function storageBanner(){
    (isAdmin()?'<button class="btn sm" onclick="go(\'purge\')">Free up space</button>':'<span>Ask an administrator to free up space.</span>')+'</div>';
 }
 function viewPin(){
-  const up = S.authTab==='up';
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div style="padding:16px"><form class="pin" id="pinf"><div style="margin:0 auto" class="avatar">ARAB</div><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
-   '<div class="p-tabs" style="justify-content:center;padding:0"><button type="button" class="'+(up?'':'on')+'" onclick="S.authTab=\'in\';render()">Sign in</button><button type="button" class="'+(up?'on':'')+'" onclick="S.authTab=\'up\';render()">Create account</button></div>'+
-   (up?fld('lgName','Your name','text','name'):'')+fld('lgEmail','Email','email','username')+fld('lgPass','Password','password',up?'new-password':'current-password')+
-   (up?'<p style="margin:0;color:var(--muted);font-size:13.5px;text-align:left">New accounts can\'t see applications until an administrator turns on staff access for them.</p>':'<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>')+
-   '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">'+(up?'Create account':'Sign in')+'</button>'+
+   '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by a Building Department administrator.</p>'+
+   fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
+   '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
+   '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
    '<button type="button" class="btn ghost" onclick="go(\'apps\')">Back to Applications &amp; Fees</button></form></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
@@ -702,17 +720,18 @@ function viewWorkspace(){
    '<div class="navi" style="justify-content:space-between"><span>Unpaid</span><b class="num">'+S.subs.filter(s=>!isPaid(s)).length+'</b></div></aside>'+
    '<main class="ws-main"><div class="ws-bar"><span class="btn sm" style="cursor:default">'+ic('filter')+'Title [a-z]</span><label class="search">'+ic('search')+'<input id="wsq" placeholder="Search" value="'+esc(S.wsQ)+'" aria-label="Search forms"></label></div>'+
    '<ul class="flist">'+
-    '<li onclick="go(\'apps\')"><span class="cbx"></span><span class="star">'+'<svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon app">'+ic('doc')+'</span><span><b>Building Department Portal</b><small>Public Applications &amp; Fees page · '+FORM_ORDER.length+' forms</small></span><span></span></li>'+
+    wsBulkHtml(rows)+
+    '<li onclick="go(\'apps\')"><span></span><span class="star">'+'<svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon app">'+ic('doc')+'</span><span><b>Building Department Portal</b><small>Public Applications &amp; Fees page · '+FORM_ORDER.length+' forms</small></span><span></span></li>'+
     rows.map(k=>{ const all = subsFor(k), un = all.filter(s=>!s.read).length;
-      return '<li onclick="go(\'table\',\''+k+'\')"><span class="cbx"></span><span class="star"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon tbl">'+ic(FORMS[k].icon)+(un?'<span class="badge num">'+un+'</span>':'')+'</span>'+
-       '<span><b>'+esc(FORMS[k].title)+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+'. Created on '+FORMS[k].created+'</small></span><span></span></li>'; }).join('')+
+      return '<li class="'+(S.wsSel&&S.wsSel[k]?'picked':'')+'" onclick="go(\'table\',\''+k+'\')"><input type="checkbox" class="ck" aria-label="Select '+esc(FORMS[k].title)+'" '+(S.wsSel&&S.wsSel[k]?'checked':'')+' onclick="event.stopPropagation()" onchange="wsPick(\''+k+'\',this.checked)"><span class="star"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon tbl">'+ic(FORMS[k].icon)+(un?'<span class="badge num">'+un+'</span>':'')+'</span>'+
+       '<span><b>'+esc(FORMS[k].title)+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+(all.length?' · '+all.filter(s=>!isPaid(s)).length+' unpaid':'')+'. Created on '+FORMS[k].created+'</small></span><span></span></li>'; }).join('')+
    '</ul>'+(S.loaded?'':'<p class="empty">Loading applications…</p>')+(S.loadErr?'<p class="empty">Could not load applications: '+esc(S.loadErr)+'</p>':'')+'</main></div>';
 }
 
 /* ================= STAFF: table ================= */
 function filteredRows(){
   const k = S.form, cols = colsFor(k), q = S.q.trim().toLowerCase();
-  let rows = subsFor(k);
+  let rows = inPeriod(subsFor(k));
   if (S.filter==='unread') rows = rows.filter(s=>!s.read);
   if (S.filter==='starred') rows = rows.filter(s=>s.starred);
   if (S.filter==='unpaid') rows = rows.filter(s=>!isPaid(s));
@@ -724,17 +743,20 @@ function filteredRows(){
 function viewTable(){
   const k = S.form, F = FORMS[k], cols = visibleCols(k), rows = filteredRows();
   const last = subsFor(k)[0];
-  const head = '<tr><th class="rn"><div class="rn-in"><span class="cbx"></span></div></th>'+cols.map(c=>'<th onclick="sortBy(\''+c.k+'\')" aria-sort="'+(S.sort.k===c.k?(S.sort.d>0?'ascending':'descending'):'none')+'"><div class="hd"><span class="ty">'+c.t+'</span>'+esc(c.l)+(S.sort.k===c.k?(S.sort.d>0?' ▲':' ▼'):'')+'</div></th>').join('')+'</tr>';
-  const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn"><div class="rn-in"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
+  const selN = rows.filter(s=>S.rowSel[s.id]).length;
+  const head = '<tr><th class="rn"><div class="rn-in"><input type="checkbox" class="ck" id="ckAll" aria-label="Select all shown applications" '+(rows.length&&selN===rows.length?'checked':'')+' onchange="rowPickAll(this.checked)"></div></th>'+cols.map(c=>'<th onclick="sortBy(\''+c.k+'\')" aria-sort="'+(S.sort.k===c.k?(S.sort.d>0?'ascending':'descending'):'none')+'"><div class="hd"><span class="ty">'+c.t+'</span>'+esc(c.l)+(S.sort.k===c.k?(S.sort.d>0?' ▲':' ▼'):'')+'</div></th>').join('')+'</tr>';
+  const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id||S.rowSel[s.id]?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn"><div class="rn-in"><input type="checkbox" class="ck" aria-label="Select '+esc(s.fields.applicant||'application')+'" '+(S.rowSel[s.id]?'checked':'')+' onclick="event.stopPropagation()" onchange="rowPick(\''+s.id+'\',this.checked)"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
     cols.map(c=>'<td>'+(c.fmt?c.fmt(s):esc(c.get(s)))+'</td>').join('')+'</tr>').join('');
   const sumT = rows.reduce((a,s)=>a+(s.fees?s.fees.total:0),0), sumC = rows.reduce((a,s)=>a+(s.fees?s.fees.cict:0),0);
   return topBar()+'<div class="ws-main" style="min-height:calc(100% - 60px)"><div class="tb-head"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button>'+
    '<div class="ttl"><b>'+esc(F.title)+'</b><small>'+(last?'Last submission '+fmtDT(last.createdAt):'No submissions yet')+'</small></div><span style="width:96px"></span></div>'+
    '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
+   dashHtml(k)+
    '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
    '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
    '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
    '<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
+   (selN?rowBulkHtml(rows):'')+
    '<div class="grid-wrap">'+(rows.length?'<table class="grid"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
    '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((k==='building'||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
    (S.sel?panelHtml():'');
@@ -939,9 +961,12 @@ function render(){
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
-  else if (S.view==='users' && isAdmin()){ root.innerHTML = viewUsers(); if (!S.users) loadUsers(); }
+  else if (S.view==='users' && isAdmin()){ root.innerHTML = viewUsers(); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
+  else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('mef').onsubmit = changeMyPassword; }
   else if (S.view==='table' && S.form) root.innerHTML = viewTable();
   else root.innerHTML = viewWorkspace();
+  const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
+  const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
   if (aid && (aid==='wsq'||aid==='tq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
@@ -953,7 +978,7 @@ function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
   if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
-  else if (h==='staff'||h==='purge'||h==='users') S.view = h==='staff' ? 'staff' : h;
+  else if (h==='staff'||h==='purge'||h==='users'||h==='me') S.view = h==='staff' ? 'staff' : h;
   render(); window.scrollTo(0,0);
 }
 /* ================= storage meter, purge, staff accounts ================= */
@@ -1005,19 +1030,55 @@ async function loadUsers(){
   catch(e){ S.users = {err:e.message}; }
   if (S.view==='users') render();
 }
+function genTempPw(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = new Uint32Array(10); crypto.getRandomValues(r); return [...r].map(x=>a[x%a.length]).join('').replace(/(.{5})/,'$1-'); }
 function viewUsers(){
-  const u = S.users;
+  const u = S.users, showAll = !!S.showResidents;
+  const list = Array.isArray(u) ? u.filter(a => showAll || a.role==='staff' || a.role==='admin') : [];
+  const hidden = Array.isArray(u) ? u.length - u.filter(a=>a.role==='staff'||a.role==='admin').length : 0;
+  const nc = S.newCreds;
   return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div><h1>Staff accounts</h1>'+
-   '<p style="margin:0;color:var(--ink2);max-width:70ch">Staff create their own account on the sign-in screen (Create account). Then set their access here. <b>Staff</b> can view, edit and download applications. <b>Administrator</b> can also delete, purge and manage accounts.</p>'+
+   '<p style="margin:0;color:var(--ink2);max-width:70ch"><b>Staff</b> can view, edit and download applications. <b>Administrator</b> can also delete, purge and manage staff logins.</p>'+
+   '<form class="card" id="addf"><h2>Add a staff member</h2><div class="fgrid">'+
+    '<div class="fld"><label class="l" for="nuName">Name</label><input id="nuName" type="text" required autocomplete="off"></div>'+
+    '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
+    '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="8" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
+    '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Staff</option><option value="admin">Administrator</option></select></div>'+
+   '</div><span class="formerr" id="nuErr"></span><div class="row"><button class="btn primary" id="nuBtn">'+ic('user')+'Add staff member</button></div>'+
+   (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
+   '</form>'+
    (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
-   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Email</th><th>Created</th><th>Access</th></tr></thead><tbody>'+
-    u.map(a=>'<tr><td>'+esc(a.name||'')+'</td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(S.me&&a.id===S.me.id?'<span class="pill src">Administrator (you)</span>':
-      '<label for="r_'+esc(a.id)+'" style="position:absolute;left:-9999px">Access for '+esc(a.email)+'</label><select class="mini" id="r_'+esc(a.id)+'" onchange="setRole(\''+esc(a.id)+'\',this.value)">'+[['citizen','No staff access'],['staff','Staff'],['admin','Administrator']].map(o=>'<option value="'+o[0]+'"'+(a.role===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+'</td></tr>').join('')+'</tbody></table></div>')+'</div>';
+   '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' resident account'+(hidden===1?'':'s')+' from the old forms site</label>':'')+'</div>'+
+   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Email</th><th>Added</th><th>Access</th><th>Password</th><th></th></tr></thead><tbody>'+
+    list.map(a=>{ const me = S.me && a.id===S.me.id, id = esc(a.id);
+      return '<tr><td>'+esc(a.name||'')+'</td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(me?'<span class="pill src">Administrator (you)</span>':
+      '<label for="r_'+id+'" style="position:absolute;left:-9999px">Access for '+esc(a.email)+'</label><select class="mini" id="r_'+id+'" onchange="setRole(\''+id+'\',this.value)">'+[['citizen','No access'],['staff','Staff'],['admin','Administrator']].map(o=>'<option value="'+o[0]+'"'+(a.role===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+'</td>'+
+      '<td>'+(me?'<button class="btn sm" onclick="go(\'me\')">Change mine</button>':(S.resetFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="rp_'+id+'" class="mini" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:130px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></span>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</td>'+
+      '<td>'+(me?'':(S.removeFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><span>Remove?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Remove</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button></span>':'<button class="btn sm ghost" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Remove</button>'))+'</td></tr>'; }).join('')+
+   '</tbody></table></div>')+'</div>';
 }
 async function setRole(id, role){
   try{ await sbRpc('bf_update', {p_token:TOKEN, p_collection:'citizens', p_id:id, p_patch:{role}}); const a = S.users.find(x=>x.id===id); if (a) a.role = role; toast('Access updated'); }
   catch(e){ toast('Could not update: '+e.message); }
   render();
+}
+async function addStaff(e){
+  e.preventDefault(); const err = document.getElementById('nuErr'), b = document.getElementById('nuBtn');
+  const name = document.getElementById('nuName').value.trim(), email = document.getElementById('nuEmail').value.trim(), pass = document.getElementById('nuPass').value, role = document.getElementById('nuRole').value;
+  if (pass.length < 8){ err.textContent = 'Use a temporary password of at least 8 characters.'; return; }
+  b.disabled = true; err.textContent = '';
+  try{ const acc = await sbRpc('bf_admin_create_account', {p_token:TOKEN, p_email:email, p_name:name, p_pass:await sha256hex(pass), p_role:role});
+    S.newCreds = {name, email:acc.email, pass}; S.users = null; await loadUsers(); toast('Staff member added'); }
+  catch(x){ err.textContent = x.message; b.disabled = false; }
+}
+async function resetPw(id){
+  const v = (document.getElementById('rp_'+id)||{}).value||''; if (v.length < 8){ toast('Use at least 8 characters.'); return; }
+  try{ await sbRpc('bf_admin_set_password', {p_token:TOKEN, p_id:id, p_pass:await sha256hex(v)}); const a = S.users.find(x=>x.id===id);
+    S.resetFor = null; S.newCreds = {name:a&&a.name, email:a&&a.email, pass:v}; render(); toast('Password reset. Share the new password with them.'); window.scrollTo(0,0); }
+  catch(e){ toast('Could not reset: '+e.message); }
+}
+async function removeAcct(id){
+  try{ await sbRpc('bf_admin_delete_account', {p_token:TOKEN, p_id:id}); S.users = S.users.filter(x=>x.id!==id); S.removeFor = null; render(); toast('Login removed'); }
+  catch(e){ toast('Could not remove: '+e.message); }
 }
 async function staffSignIn(e){
   e.preventDefault(); const err = document.getElementById('pinErr'), btn = document.getElementById('lgBtn');
@@ -1025,7 +1086,7 @@ async function staffSignIn(e){
   btn.disabled = true; err.textContent = '';
   const email = document.getElementById('lgEmail').value, pass = await sha256hex(document.getElementById('lgPass').value);
   try{
-    if (S.authTab==='up'){
+    if (false){
       const r = await sbRpc('bf_sign_up', { p_email:email, p_name:document.getElementById('lgName').value, p_pass:pass, p_remember:false });
       try{ await sbRpc('bf_sign_out', {p_token:r.token}); }catch(x){}
       S.authTab = 'in'; render(); document.getElementById('pinErr').textContent = ''; toast('Account created. An administrator needs to turn on staff access before you can sign in.');
@@ -1038,6 +1099,121 @@ async function staffSignIn(e){
   }catch(x){ err.textContent = x.message; btn.disabled = false; }
 }
 initRoute();
+/* ================= periods + per-type dashboard ================= */
+const PERIODS = [['all','All time'],['month','This month'],['lastmonth','Last month'],['fy','This fiscal year'],['lastfy','Last fiscal year']];
+function periodRange(p){
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  const fyStart = new Date(m >= 9 ? y : y-1, 9, 1);              // fiscal year starts Oct 1
+  if (p==='month') return [new Date(y,m,1), new Date(y,m+1,1)];
+  if (p==='lastmonth') return [new Date(y,m-1,1), new Date(y,m,1)];
+  if (p==='fy') return [fyStart, new Date(fyStart.getFullYear()+1,9,1)];
+  if (p==='lastfy') return [new Date(fyStart.getFullYear()-1,9,1), fyStart];
+  return null;
+}
+function inPeriod(rows){ const r = periodRange(S.period||'all'); if (!r) return rows; return rows.filter(s=>{ const d = new Date(s.createdAt); return d>=r[0] && d<r[1]; }); }
+const HAS_CICT = k => k==='building' || k==='subtrade';
+function dashHtml(k){
+  const all = inPeriod(subsFor(k)), paid = all.filter(isPaid), unpaid = all.filter(s=>!isPaid(s));
+  const sum = (rows,f) => rows.reduce((a,s)=>a+((s.fees&&s.fees[f])||0),0);
+  const tile = (cls,f,lbl,big,sub) => '<button class="dtile '+cls+(S.filter===f?' on':'')+'" onclick="S.filter=(S.filter===\''+f+'\'?\'all\':\''+f+'\');render()" aria-pressed="'+(S.filter===f)+'"><span class="lbl">'+lbl+'</span><span class="big num">'+big+'</span><span class="sub num">'+sub+'</span></button>';
+  const r = periodRange(S.period||'all');
+  return '<div class="dash-period"><label for="pSel"><b>Showing</b></label><select id="pSel" class="mini" onchange="S.period=this.value;S.rowSel={};render()">'+PERIODS.map(o=>'<option value="'+o[0]+'"'+((S.period||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+    (r?'<span class="num" style="color:var(--muted)">'+fmtDate(r[0].toISOString())+' – '+fmtDate(new Date(r[1]-1).toISOString())+'</span>':'')+'</div>'+
+    '<div class="dash">'+
+    tile('', 'all', 'Applications', all.length, all.filter(s=>!s.read).length+' unread · '+money(sum(all,'total'))+' in fees')+
+    tile('unpaid','unpaid','Unpaid', unpaid.length, money(sum(unpaid,'total'))+' due')+
+    tile('paid','paid','Paid', paid.length, money(sum(paid,'total'))+' collected')+
+    (HAS_CICT(k)?'<div class="dtile" style="cursor:default"><span class="lbl">CICT fees</span><span class="big num">'+money(sum(all,'cict'))+'</span><span class="sub num">'+money(sum(paid,'cict'))+' collected · '+money(sum(unpaid,'cict'))+' due</span></div>':'')+
+    '</div>';
+}
+
+/* ================= workspace selection ================= */
+function wsBulkHtml(rows){
+  S.wsSel = S.wsSel || {};
+  const sel = FORM_ORDER.filter(k=>S.wsSel[k]), n = sel.length, subs = S.subs.filter(s=>S.wsSel[s.form]);
+  return '<li class="ws-head"><input type="checkbox" class="ck" id="ckWs" aria-label="Select all forms" '+(n===FORM_ORDER.length?'checked':'')+' onchange="wsPickAll(this.checked)">'+
+    (n ? '<b>'+n+' form'+(n===1?'':'s')+' selected</b><span class="num">'+subs.length+' applications</span>'+
+      '<button class="btn sm" onclick="wsExport()">'+ic('down')+'Download CSV</button>'+
+      '<button class="btn sm" onclick="markMany(S.subs.filter(s=>S.wsSel[s.form]&&!s.read),{read:true})">Mark all as read</button>'+
+      '<button class="btn sm ghost" onclick="S.wsSel={};render()">Clear</button>'
+       : '<span>Select all</span>')+'</li>';
+}
+function wsPick(k,on){ S.wsSel = S.wsSel||{}; S.wsSel[k]=on; render(); }
+function wsPickAll(on){ S.wsSel = {}; if (on) FORM_ORDER.forEach(k=>S.wsSel[k]=true); render(); }
+function wsExport(){ const rows = S.subs.filter(s=>S.wsSel[s.form]); csvGeneric(rows, 'Applications-'+new Date().toISOString().slice(0,10)+'.csv'); }
+
+/* ================= table selection + bulk actions ================= */
+function rowPick(id,on){ S.rowSel[id]=on; if(!on) delete S.rowSel[id]; S.bulkDel=false; render(); }
+function rowPickAll(on){ S.rowSel = {}; S.bulkDel=false; if (on) filteredRows().forEach(s=>S.rowSel[s.id]=true); render(); }
+const pickedRows = () => filteredRows().filter(s=>S.rowSel[s.id]);
+function rowBulkHtml(rows){
+  const sel = rows.filter(s=>S.rowSel[s.id]), n = sel.length;
+  if (S.bulkDel) return '<div class="bulk" style="background:var(--redbg)"><b>Permanently delete '+n+' application'+(n===1?'':'s')+' and their documents?</b><span style="flex:1"></span><button class="btn sm" onclick="S.bulkDel=false;render()">Cancel</button><button class="btn sm danger" id="bulkDelGo" onclick="bulkDelete()">Delete '+n+'</button></div>';
+  return '<div class="bulk"><b>'+n+' selected</b>'+
+    '<button class="btn sm" onclick="csvGeneric(pickedRows(), FORMS[S.form].short.replace(/[^A-Za-z0-9]+/g,\'-\')+\'-selected.csv\')">'+ic('down')+'CSV</button>'+
+    '<button class="btn sm" id="bulkPdf" onclick="bulkPdf()">'+ic('down')+'PDF with documents</button>'+
+    '<button class="btn sm" onclick="markMany(pickedRows(),{read:true})">Mark read</button>'+
+    '<button class="btn sm" onclick="markMany(pickedRows(),{read:false})">Mark unread</button>'+
+    '<button class="btn sm" onclick="markMany(pickedRows(),{starred:!pickedRows().every(s=>s.starred)})">'+ic('star')+'Star</button>'+
+    (isAdmin()?'<button class="btn sm danger" onclick="S.bulkDel=true;render()">'+ic('trash')+'Delete</button>':'')+
+    '<span style="flex:1"></span><button class="btn sm ghost" onclick="S.rowSel={};render()">Clear selection</button></div>';
+}
+async function markMany(rows, patch){
+  let done = 0;
+  for (const s of rows){ const keys = Object.keys(patch); if (keys.every(k=>s[k]===patch[k])) continue;
+    try{ await sbRpc('bf_update', {p_token:TOKEN, p_collection:'submissions', p_id:s.id, p_patch:patch}); Object.assign(s, patch); done++; }
+    catch(e){ toast('Stopped: '+e.message); break; } }
+  render(); toast('Updated '+done+' application'+(done===1?'':'s'));
+}
+async function bulkDelete(){
+  const ids = pickedRows().map(s=>s.id), b = document.getElementById('bulkDelGo'); let done = 0;
+  for (const id of ids){
+    if (b){ b.disabled = true; b.textContent = 'Deleting '+(done+1)+' of '+ids.length+'…'; }
+    try{ await sbRpc('bf_purge_submission', {p_token:TOKEN, p_id:id}); done++; delete ATT[id]; delete S.rowSel[id]; S.subs = S.subs.filter(x=>x.id!==id); }
+    catch(e){ toast('Stopped: '+e.message); break; }
+  }
+  S.bulkDel = false; await loadStorage(); render(); toast('Deleted '+done+' application'+(done===1?'':'s'));
+}
+async function bulkPdf(){
+  if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
+  const rows = pickedRows(), b = document.getElementById('bulkPdf');
+  try{
+    const out = await PDFLib.PDFDocument.create();
+    for (let i=0;i<rows.length;i++){
+      if (b){ b.disabled = true; b.textContent = 'Building '+(i+1)+' of '+rows.length+'…'; }
+      const one = await PDFLib.PDFDocument.load(await buildPdf(rows[i]));
+      (await out.copyPages(one, one.getPageIndices())).forEach(p=>out.addPage(p));
+    }
+    await DL.save({ filename: FORMS[S.form].short.replace(/[^A-Za-z0-9]+/g,'-')+'-'+rows.length+'-applications.pdf', data: await out.save() });
+  }catch(e){ toast('Could not build the PDF: '+((e&&e.message)||'try again')); }
+  render();
+}
+function csvGeneric(rows, filename){
+  const head = ['Form','Submission Date','Permit #','Applicant','Email','Phone','Address','Lot #','Construction Value','Permit Fee','CICT Fee','Grand Total','Payment','Check #','C of O','Documents'];
+  const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const lines = [head.map(q).join(',')].concat(rows.map(s=>{ const f=s.fields||{}, st=s.staff||{}, fe=s.fees||{};
+    return [FORMS[s.form]?FORMS[s.form].short:s.form, fmtDate(s.createdAt), st.permitNo||'', f.applicant||'', f.email||'', f.phone||'', f.address||'', f.lot||'',
+      fe.value||'', fe.permit||0, fe.cict||0, fe.total||0, isPaid(s)?st.payment:'Unpaid', st.checkNo||'', st.co||'', (s.files||[]).map(x=>x.name).join('; ')].map(q).join(','); }));
+  DL.save({ filename, data: lines.join('\r\n') });
+}
+
+/* ================= my account: change password ================= */
+function viewMe(){
+  return topBar()+'<div class="purge" style="max-width:560px"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div><h1>My account</h1>'+
+   '<p style="margin:0;color:var(--ink2)">'+esc((S.me&&S.me.name)||'')+' · '+esc((S.me&&S.me.email)||'')+' · '+(isAdmin()?'Administrator':'Staff')+'</p>'+
+   '<form class="card" id="mef"><h2>Change password</h2>'+
+   '<div class="fld"><label class="l" for="meOld">Current password</label><input id="meOld" type="password" autocomplete="current-password" required></div>'+
+   '<div class="fld"><label class="l" for="meNew">New password</label><input id="meNew" type="password" autocomplete="new-password" minlength="8" required><span class="hint">At least 8 characters.</span></div>'+
+   '<div class="fld"><label class="l" for="meNew2">Type the new password again</label><input id="meNew2" type="password" autocomplete="new-password" required></div>'+
+   '<span class="formerr" id="meErr"></span><div class="row"><button class="btn primary" id="meBtn">Change password</button></div></form></div>';
+}
+async function changeMyPassword(e){
+  e.preventDefault(); const err = document.getElementById('meErr'), a = document.getElementById('meNew').value;
+  if (a.length < 8){ err.textContent = 'Use at least 8 characters.'; return; }
+  if (a !== document.getElementById('meNew2').value){ err.textContent = 'The two new passwords do not match.'; return; }
+  try{ await sbRpc('bf_change_password', {p_token:TOKEN, p_old:await sha256hex(document.getElementById('meOld').value), p_new:await sha256hex(a)}); toast('Password changed'); go('staff'); }
+  catch(x){ err.textContent = x.message; }
+}
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
   sbRpc('bf_storage_status', {}).then(st => { S.storage = st; if (st && st.full){ S.pubFull = true; if (S.view==='form'){ const k = S.form; render(); } } }).catch(()=>{});
