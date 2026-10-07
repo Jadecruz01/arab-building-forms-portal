@@ -329,6 +329,21 @@ html.embed .tile .ico{width:38px;height:38px}
 .fs{width:100%;border-collapse:collapse;margin-top:8px}
 .fs td,.fs th{padding:6px 4px;border-bottom:1px solid var(--line2);text-align:left}
 .fs th{font-size:13px;color:var(--ink2);padding-top:12px}
+.loginbg{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#0b1d47;display:flex;align-items:center;justify-content:center;padding:32px 16px 64px}
+.lb-photo{position:absolute;inset:-4%;background:#0b1d47 url('login-bg.jpg') center 40%/cover no-repeat;animation:lbPan 48s ease-in-out infinite alternate;will-change:transform}
+@keyframes lbPan{from{transform:scale(1.04) translate3d(-1%,0,0)}to{transform:scale(1.14) translate3d(1.5%,-1.5%,0)}}
+@media (prefers-reduced-motion:reduce){.lb-photo{animation:none;transform:scale(1.04)}}
+.lb-shade{position:absolute;inset:0;background:linear-gradient(110deg,rgba(7,20,56,.94) 0%,rgba(7,20,56,.78) 38%,rgba(7,20,56,.35) 72%,rgba(7,20,56,.55) 100%),radial-gradient(120% 90% at 70% 40%,transparent 40%,rgba(5,14,40,.55) 100%)}
+.lb-wrap{position:relative;z-index:1;width:100%;max-width:1040px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:56px;align-items:center}
+.lb-hero{color:#fff}
+.lb-kicker{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f2c230;padding-bottom:10px;border-bottom:2px solid #f2c230}
+.lb-hero h2{font:800 clamp(34px,4.6vw,54px)/1.04 var(--f-disp);margin:18px 0 14px;letter-spacing:-.01em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.lb-hero h2 em{font-style:normal;color:#f2c230}
+.lb-hero p{margin:0;max-width:34ch;font-size:17px;line-height:1.5;color:rgba(255,255,255,.85)}
+.loginbg .pin{margin:0;max-width:none;background:rgba(255,255,255,.96);border-top:4px solid #f2c230;box-shadow:0 30px 80px rgba(3,10,30,.55),0 2px 0 rgba(255,255,255,.4) inset;backdrop-filter:blur(6px)}
+.lb-cap{position:absolute;right:18px;bottom:16px;z-index:1;display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(255,255,255,.85);background:rgba(7,20,56,.55);padding:6px 12px;border-radius:999px;backdrop-filter:blur(4px)}
+.lb-cap .i{width:14px;height:14px;color:#f2c230}
+@media (max-width:860px){.lb-wrap{grid-template-columns:1fr;gap:22px;max-width:420px}.lb-hero{text-align:center}.lb-hero h2{font-size:30px;margin:12px 0 6px}.lb-hero p{display:none}.loginbg{align-items:flex-start;padding-top:28px}.lb-shade{background:linear-gradient(180deg,rgba(7,20,56,.6) 0%,rgba(7,20,56,.85) 60%,rgba(7,20,56,.95) 100%)}.lb-cap{left:50%;right:auto;transform:translateX(-50%);white-space:nowrap}}
 </style>
 
 
@@ -835,14 +850,17 @@ function storageBanner(){
 }
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
-  return '<div style="padding:16px"><form class="pin" id="pinf"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" style="width:84px;height:84px;margin:0 auto"><h1 style="font:800 22px var(--f-disp)">Building Department staff</h1>'+
+  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero"><span class="lb-kicker">City of Arab, Alabama</span><h2>Building Department<br><em>staff portal</em></h2><p>Permits, inspections and certificates of occupancy for <span style="white-space:nowrap">A City on the Rise.</span></p></div>'+
+   '<form class="pin" id="pinf"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" style="width:84px;height:84px;margin:0 auto"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
    '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
    '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
-   '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>';
+   '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
+   '<div class="lb-cap"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.pin+'</svg>Downtown Arab · Main Street from above</div></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
 function viewWorkspace(){
