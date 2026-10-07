@@ -321,6 +321,14 @@ html.embed .tile .ico{width:38px;height:38px}
 .vh{position:absolute;left:-9999px}
 .flist li .ord{display:flex;gap:2px}
 .flist li[draggable="true"]{cursor:grab}
+.feecalc{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;align-items:end;margin-top:8px}
+.feecalc .sfout{grid-column:1/-1;background:var(--surface2);border-radius:8px;padding:12px 14px}
+@media (max-width:600px){.feecalc{grid-template-columns:1fr}}
+.feesched{margin-top:12px;font-size:14px}
+.feesched summary{cursor:pointer;font-weight:700;color:var(--blue)}
+.fs{width:100%;border-collapse:collapse;margin-top:8px}
+.fs td,.fs th{padding:6px 4px;border-bottom:1px solid var(--line2);text-align:left}
+.fs th{font-size:13px;color:var(--ink2);padding-top:12px}
 </style>
 
 
@@ -654,7 +662,7 @@ function viewApps(){
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission <span style="text-transform:none;letter-spacing:0;font-weight:500">paper forms for now</span></h2><div class="tiles">'+
-     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
+     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span></span></a>'+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost. Fill in and email the form</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
    '</div></section>'+
    '<details class="sched"><summary>Building permit fee schedule</summary><div class="sched-body"><table class="fees num"><thead><tr><th>Total construction value</th><th>Permit fee</th></tr></thead><tbody>'+
@@ -1112,7 +1120,7 @@ const PDF_INFO = {
   annexation: { icon:'pin', blurb:'Apply to have property annexed into the City of Arab. There is no fee.',
     attach:'a copy of the current recorded deed(s) and the current tax parcel map',
     after:'Planning staff will review it. If the property qualifies, they will prepare the official Petition for Annexation for the owners to sign and have notarized. The process takes about 1 to 2 months.' },
-  subdivision: { icon:'map', blurb:'Preliminary, sketch or final plat approval from the Arab Planning Commission. There is no fee.',
+  subdivision: { icon:'map', blurb:'Sketch, preliminary or final plat approval from the Arab Planning Commission. Review fees apply (see below).',
     attach:'your plat drawings, if you have them as PDFs',
     after:'Complete applications and drawings (3 sets for residential, 5 for commercial) must reach the office at least 25 days before the Planning Commission meeting, which is the 3rd Tuesday of each month.' }
 };
@@ -1149,6 +1157,38 @@ function pdfMailto(key){
   const D = PDF_FORMS[key];
   return 'mailto:'+PDF_EMAILS.join(',')+'?subject='+encodeURIComponent(D.title+' - [property address]')+'&body='+encodeURIComponent('Hello,\n\nAttached is my completed '+D.title+' for the property at: \n\nName:\nPhone:\n\nAttachments:\n- Completed '+D.title+' (PDF)\n- '+PDF_INFO[key].attach.replace(/^./,c=>c.toUpperCase())+'\n\nThank you.');
 }
+/* Subdivision review fees: City of Arab Resolution 2024-25R, Attachment B (adopted June 17, 2024), charged per review period */
+const SUB_FEES = [
+  ['minor', 'Minor subdivision (no more than 3 lots, no road construction)', 100],
+  ['prelim', 'Preliminary plan, major subdivision', [100,150,300,500]],
+  ['eng', 'Engineering plan, major subdivision', [500,650,750,950]],
+  ['final', 'Final plat, major subdivision', [100,150,300,500]],
+  ['resub', 'Re-subdivision', 100],
+  ['cert', 'Certificate to subdivide and/or consolidate', 100],
+  ['site', 'Site plan', 200]
+];
+const LOT_TIERS = ['2–10 lots','11–25 lots','25–40 lots','40 or more lots'];
+const lotTier = n => n <= 10 ? 0 : n <= 25 ? 1 : n <= 40 ? 2 : 3;
+function subFee(){
+  const t = (document.getElementById('sfType')||{}).value || 'minor', f = SUB_FEES.find(x=>x[0]===t), lotsEl = document.getElementById('sfLots');
+  const lots = Math.max(0, parseInt((lotsEl||{}).value, 10) || 0), tiered = Array.isArray(f[2]);
+  const w = document.getElementById('sfLotsW'); if (w) w.style.display = tiered ? '' : 'none';
+  const out = document.getElementById('sfOut'); if (!out) return;
+  out.innerHTML = tiered && lots < 2 ? '<span style="color:var(--muted)">Enter the number of lots</span>' : '<b class="num" style="font-size:20px">'+money(tiered ? f[2][lotTier(lots)] : f[2])+'</b> <span style="color:var(--ink2)">per review period'+(tiered?' ('+LOT_TIERS[lotTier(lots)]+')':'')+'</span>';
+}
+function subFeeHtml(){
+  const row = (l, v) => '<tr><td>'+l+'</td><td class="num" style="text-align:right">'+v+'</td></tr>';
+  return '<div class="sect" style="margin-top:6px">Review fees</div>'+
+   '<div class="feecalc"><div class="fld"><label class="l" for="sfType">What are you submitting?</label><select id="sfType" onchange="subFee()">'+SUB_FEES.map(f=>'<option value="'+f[0]+'">'+f[1]+'</option>').join('')+'</select></div>'+
+   '<div class="fld" id="sfLotsW" style="display:none"><label class="l" for="sfLots">Number of lots</label><input id="sfLots" type="number" min="2" inputmode="numeric" oninput="subFee()"></div>'+
+   '<div class="sfout" id="sfOut" aria-live="polite"></div></div>'+
+   '<details class="feesched"><summary>Full fee schedule</summary><table class="fs">'+
+     row('Minor subdivision (no more than 3 lots with no road construction)', '$100.00')+
+     ['prelim','eng','final'].map(k=>{ const f = SUB_FEES.find(x=>x[0]===k); return '<tr><th colspan="2">'+f[1]+'</th></tr>'+f[2].map((v,i)=>row('&nbsp;&nbsp;'+LOT_TIERS[i], money(v))).join(''); }).join('')+
+     row('Re-subdivision', '$100.00')+row('Certificate to subdivide and/or consolidate', '$100.00')+row('Site plan', '$200.00')+
+   '</table><p class="hint" style="color:var(--muted);font-size:12.5px;margin:8px 0 0">Fees are per review period: one complete plan review cycle, including preliminary reviews, technical review and Planning Commission action. Source: City of Arab Resolution 2024-25R, Attachment B (June 17, 2024).</p></details>'+
+   '<p style="margin:10px 0 0;color:var(--ink2);font-size:14px">Pay in person at City Hall, 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</p>';
+}
 function viewPdfForm(){
   const key = S.form, D = PDF_FORMS[key], I = PDF_INFO[key];
   const step = (n, t, body) => '<li class="pstep"><span class="pn">'+n+'</span><div><b>'+t+'</b>'+body+'</div></li>';
@@ -1161,7 +1201,7 @@ function viewPdfForm(){
      step(3, 'Email it to the Building Department', '<p>Attach the completed form'+(I.attach?' and '+esc(I.attach):'')+' and send it to both addresses:</p>'+
        '<p class="pmail">'+PDF_EMAILS.map(e=>'<span style="user-select:all">'+e+'</span>').join('<br>')+'</p>'+
        '<a class="btn primary" href="'+esc(pdfMailto(key))+'" target="_top">'+ic('mail')+'Start the email</a>')+
-   '</ol>'+
+   '</ol>'+(key==='subdivision'?subFeeHtml():'')+
    '<div class="callout pay"><b>What happens next</b>'+esc(I.after)+'</div>'+
    '<p class="hint" style="margin-top:14px;color:var(--muted);font-size:13px">Prefer paper? Print the form, fill it in by hand and bring it to City Hall, 740 N Main St, Arab, AL 35016.</p>'+
    '</div></main></div>';
@@ -1172,7 +1212,7 @@ function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
   if (S.view==='apps') root.innerHTML = viewApps();
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
-  else if (S.view==='pdf' && PDF_FORMS[S.form]) root.innerHTML = viewPdfForm();
+  else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
