@@ -345,6 +345,36 @@ html.embed .tile .ico{width:38px;height:38px}
 .lb-cap{position:absolute;right:18px;bottom:16px;z-index:1;display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(255,255,255,.85);background:rgba(7,20,56,.55);padding:6px 12px;border-radius:999px;backdrop-filter:blur(4px)}
 .lb-cap .i{width:14px;height:14px;color:#f2c230}
 @media (max-width:860px){.lb-wrap{grid-template-columns:1fr;gap:22px;max-width:420px}.lb-hero{text-align:center}.lb-logo{width:72px;height:72px;margin:0 auto 14px}.lb-hero h2{font-size:30px;margin:12px 0 6px}.lb-hero p{display:none}.loginbg{align-items:flex-start;padding-top:28px}.lb-shade{background:linear-gradient(180deg,rgba(7,20,56,.6) 0%,rgba(7,20,56,.85) 60%,rgba(7,20,56,.95) 100%)}.lb-cap{left:50%;right:auto;transform:translateX(-50%);white-space:nowrap}}
+.verfoot{text-align:center;font-size:12px;color:var(--muted);padding:18px 16px 22px}
+.stage .verfoot,.app~.verfoot{color:rgba(255,255,255,.7)}
+html.embed .verfoot{color:var(--muted);padding:8px 0 4px}
+.sfoot .ver{color:var(--muted)}
+.lb-ver{position:absolute;left:18px;bottom:20px;z-index:1;font-size:12px;color:rgba(255,255,255,.6)}
+.ttl-in{width:170px}
+#hello{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 35%,#13306e 0%,#0a1a42 55%,#06102c 100%);color:#fff;text-align:center;padding:24px;overflow:hidden;animation:hlIn .35s ease both}
+#hello .hl-glow{position:absolute;width:70vmax;height:70vmax;left:50%;top:38%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(242,194,48,.16) 0%,rgba(242,194,48,0) 60%);animation:hlGlow 3.2s ease-in-out infinite alternate}
+#hello .hl-in{position:relative;display:grid;justify-items:center;gap:6px;max-width:640px}
+#hello .hl-seal{position:relative;width:96px;height:96px;margin-bottom:26px;animation:hlPop .7s cubic-bezier(.2,1.4,.4,1) both}
+#hello .hl-seal img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+#hello .hl-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(242,194,48,.7);animation:hlRing 1.8s ease-out .5s infinite}
+#hello .hl-part{margin:0;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f2c230;animation:hlUp .6s ease .25s both}
+#hello .hl-name{margin:4px 0 0;font:800 clamp(30px,6vw,52px)/1.1 var(--f-disp);letter-spacing:-.01em}
+#hello .hl-hi{display:inline-block;color:rgba(255,255,255,.75);font-weight:700;animation:hlUp .6s ease .3s both}
+#hello .hl-w{display:inline-block;animation:hlUp .6s cubic-bezier(.2,.8,.2,1) both}
+#hello .hl-title{margin:6px 0 0;font-size:18px;color:rgba(255,255,255,.85);animation:hlUp .6s ease .8s both}
+#hello .hl-bar{width:220px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;margin-top:30px;animation:hlUp .5s ease 1s both}
+#hello .hl-bar i{display:block;height:100%;width:40%;border-radius:3px;background:linear-gradient(90deg,#f2c230,#ffe08a);animation:hlLoad 1.1s ease-in-out infinite}
+#hello.done .hl-bar i{width:100%;animation:none;transition:width .3s ease}
+#hello .hl-msg{margin:10px 0 0;font-size:13px;color:rgba(255,255,255,.6);animation:hlUp .5s ease 1.1s both}
+#hello.out{animation:hlOut .6s ease forwards}
+@keyframes hlIn{from{opacity:0}to{opacity:1}}
+@keyframes hlOut{to{opacity:0;transform:scale(1.04);visibility:hidden}}
+@keyframes hlPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes hlRing{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(1.28)}}
+@keyframes hlUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hlLoad{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+@keyframes hlGlow{from{opacity:.6;transform:translate(-50%,-50%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+@media (prefers-reduced-motion:reduce){#hello *,#hello{animation:none!important}#hello.out{opacity:0;transition:opacity .3s}}
 </style>
 
 
@@ -659,6 +689,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
+const APP_VERSION = '2.5.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function sideNav(){ return '';
   /* full Jotform app navigation intentionally not recreated */
@@ -861,7 +892,7 @@ function viewPin(){
    '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
    '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
    '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
-   '<div class="lb-cap"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.pin+'</svg>Downtown Arab · Main Street from above</div></div>';
+   '<div class="lb-cap"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.pin+'</svg>Downtown Arab · Main Street from above</div><div class="lb-ver">Version '+APP_VERSION+'</div></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
 function viewWorkspace(){
@@ -1245,6 +1276,7 @@ function render(){
   else if (S.view==='table' && S.form) root.innerHTML = viewTable();
   else root.innerHTML = viewWorkspace();
   if (S.staff && S.view!=='apps' && S.view!=='form' && S.view!=='pdf') root.insertAdjacentHTML('beforeend', staffFooter());
+  else if (S.view==='apps' || S.view==='form' || S.view==='pdf') root.insertAdjacentHTML('beforeend', '<div class="verfoot">City of Arab Building Department · Version '+APP_VERSION+'</div>');
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
@@ -1322,6 +1354,7 @@ function viewUsers(){
    '<p style="margin:0;color:var(--ink2);max-width:70ch"><b>Staff</b> can view, edit and download applications. <b>Administrator</b> can also delete, purge and manage staff logins.</p>'+
    '<form class="card" id="addf"><h2>Add a staff member</h2><div class="fgrid">'+
     '<div class="fld"><label class="l" for="nuName">Name</label><input id="nuName" type="text" required autocomplete="off"></div>'+
+    '<div class="fld"><label class="l" for="nuTitle">Title <span class="hint">(optional, shown when they sign in)</span></label><input id="nuTitle" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Building Inspector"></div>'+
     '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="8" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
     '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Staff</option><option value="admin">Administrator</option></select></div>'+
@@ -1330,13 +1363,18 @@ function viewUsers(){
    '</form>'+
    (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
    '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' resident account'+(hidden===1?'':'s')+' from the old forms site</label>':'')+'</div>'+
-   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Email</th><th>Added</th><th>Access</th><th>Password</th><th></th></tr></thead><tbody>'+
+   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Title</th><th>Email</th><th>Added</th><th>Access</th><th>Password</th><th></th></tr></thead><tbody>'+
     list.map(a=>{ const me = S.me && a.id===S.me.id, id = esc(a.id);
-      return '<tr><td>'+esc(a.name||'')+'</td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(me?'<span class="pill src">Administrator (you)</span>':
+      return '<tr><td>'+esc(a.name||'')+'</td><td><label for="t_'+id+'" class="vh">Title for '+esc(a.name||a.email)+'</label><input class="mini ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(me?'<span class="pill src">Administrator (you)</span>':
       '<label for="r_'+id+'" style="position:absolute;left:-9999px">Access for '+esc(a.email)+'</label><select class="mini" id="r_'+id+'" onchange="setRole(\''+id+'\',this.value)">'+[['citizen','No access'],['staff','Staff'],['admin','Administrator']].map(o=>'<option value="'+o[0]+'"'+(a.role===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+'</td>'+
       '<td>'+(me?'<button class="btn sm" onclick="go(\'me\')">Change mine</button>':(S.resetFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="rp_'+id+'" class="mini" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:130px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></span>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</td>'+
       '<td>'+(me?'':(S.removeFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><span>Remove?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Remove</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button></span>':'<button class="btn sm ghost" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Remove</button>'))+'</td></tr>'; }).join('')+
    '</tbody></table></div>')+'</div>';
+}
+async function setTitle(id, title){
+  try{ const acc = await sbRpc('bf_admin_set_title', {p_token:TOKEN, p_id:id, p_title:title}); const a = S.users.find(x=>x.id===id); if (a) a.title = acc.title;
+    if (S.me && S.me.id===id) S.me.title = acc.title; toast(acc.title ? 'Title saved' : 'Title cleared'); }
+  catch(e){ toast('Could not save title: '+e.message); }
 }
 async function setRole(id, role){
   try{ await sbRpc('bf_update', {p_token:TOKEN, p_collection:'citizens', p_id:id, p_patch:{role}}); const a = S.users.find(x=>x.id===id); if (a) a.role = role; toast('Access updated'); }
@@ -1348,7 +1386,9 @@ async function addStaff(e){
   const name = document.getElementById('nuName').value.trim(), email = document.getElementById('nuEmail').value.trim(), pass = document.getElementById('nuPass').value, role = document.getElementById('nuRole').value;
   if (pass.length < 8){ err.textContent = 'Use a temporary password of at least 8 characters.'; return; }
   b.disabled = true; err.textContent = '';
+  const title = (document.getElementById('nuTitle')||{}).value || '';
   try{ const acc = await sbRpc('bf_admin_create_account', {p_token:TOKEN, p_email:email, p_name:name, p_pass:await sha256hex(pass), p_role:role});
+    if (title.trim()) { try{ await sbRpc('bf_admin_set_title', {p_token:TOKEN, p_id:acc.id, p_title:title}); }catch(x){ toast('Login added, but the title did not save: '+x.message); } }
     S.newCreds = {name, email:acc.email, pass}; S.users = null; await loadUsers(); toast('Staff member added'); }
   catch(x){ err.textContent = x.message; b.disabled = false; }
 }
@@ -1361,6 +1401,28 @@ async function resetPw(id){
 async function removeAcct(id){
   try{ await sbRpc('bf_admin_delete_account', {p_token:TOKEN, p_id:id}); S.users = S.users.filter(x=>x.id!==id); S.removeFor = null; render(); toast('Login removed'); }
   catch(e){ toast('Could not remove: '+e.message); }
+}
+/* ================= "Hello" screen while the dashboard loads after sign-in ================= */
+function helloStart(acc){
+  helloEnd(true);
+  const name = (acc.name || acc.email || '').trim(), title = (acc.title || '').trim() || (acc.role==='admin' ? 'Administrator' : 'Building Department staff');
+  const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const d = document.createElement('div'); d.id = 'hello'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
+  d.innerHTML = '<div class="hl-glow" aria-hidden="true"></div><div class="hl-in">'+
+    '<div class="hl-seal"><img src="'+CITY_LOGO+'" alt=""><span class="hl-ring" aria-hidden="true"></span></div>'+
+    '<p class="hl-part">'+esc(part)+'</p>'+
+    '<h1 class="hl-name"><span class="hl-hi">Hello,</span> '+name.split(/\s+/).map((w,i)=>'<span class="hl-w" style="animation-delay:'+(0.42+i*0.12).toFixed(2)+'s">'+esc(w)+'</span>').join(' ')+'</h1>'+
+    '<p class="hl-title">'+esc(title)+'</p>'+
+    '<div class="hl-bar" aria-hidden="true"><i></i></div><p class="hl-msg">Loading your dashboard…</p></div>';
+  document.body.appendChild(d);
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return new Promise(ok => setTimeout(ok, reduce ? 900 : 2300));
+}
+function helloEnd(now){
+  const d = document.getElementById('hello'); if (!d) return;
+  if (now){ d.remove(); return; }
+  d.classList.add('done'); const m = d.querySelector('.hl-msg'); if (m) m.textContent = 'Ready';
+  setTimeout(() => d.classList.add('out'), 380); setTimeout(() => d.remove(), 1000);
 }
 async function staffSignIn(e){
   e.preventDefault(); const err = document.getElementById('pinErr'), btn = document.getElementById('lgBtn');
@@ -1377,8 +1439,9 @@ async function staffSignIn(e){
     const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:document.getElementById('lgRem').checked });
     if (!r || !r.account || !['staff','admin'].includes(r.account.role)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
     TOKEN = r.token; S.me = r.account; S.staff = true; try{ localStorage.setItem('bdStaffToken', TOKEN); }catch(x){}
-    S.loaded = false; render(); loadSubs();
-  }catch(x){ err.textContent = x.message; btn.disabled = false; }
+    S.loaded = false; const hello = helloStart(r.account); render();
+    await Promise.all([loadSubs().catch(()=>{}), hello]); helloEnd();
+  }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; }
 }
 initRoute();
 /* ================= periods + per-type dashboard ================= */
@@ -1798,7 +1861,7 @@ async function runZipAttach(){
 const BUG_EMAIL = 'jade.cruz@collinsalexander.com';
 const AREAS = [['staff','Workspace (list of forms)'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['import','Import from Jotform'],['users','Staff accounts or passwords'],['other','Something else']];
 function staffFooter(){
-  return '<footer class="sfoot"><span>Designed and managed by Jade Cruz</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'</footer>';
+  return '<footer class="sfoot"><span>Designed and managed by Jade Cruz</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
 function openBug(){
   closeBug();
