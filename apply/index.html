@@ -351,7 +351,7 @@ html.embed .verfoot{color:var(--muted);padding:8px 0 4px}
 .sfoot .ver{color:var(--muted)}
 .lb-ver{position:absolute;left:18px;bottom:20px;z-index:1;font-size:12px;color:rgba(255,255,255,.6)}
 .ttl-in{width:170px}
-#hello{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 35%,#13306e 0%,#0a1a42 55%,#06102c 100%);color:#fff;text-align:center;padding:24px;overflow:hidden;animation:hlIn .35s ease both}
+#hello{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 35%,#13306e 0%,#0a1a42 55%,#06102c 100%);color:#fff;text-align:center;padding:24px;overflow:hidden;opacity:1}
 #hello .hl-glow{position:absolute;width:70vmax;height:70vmax;left:50%;top:38%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(242,194,48,.16) 0%,rgba(242,194,48,0) 60%);animation:hlGlow 3.2s ease-in-out infinite alternate}
 #hello .hl-in{position:relative;display:grid;justify-items:center;gap:6px;max-width:640px}
 #hello .hl-seal{position:relative;width:96px;height:96px;margin-bottom:26px;animation:hlPop .7s cubic-bezier(.2,1.4,.4,1) both}
@@ -689,7 +689,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.5.0';   // shown at the bottom of every page
+const APP_VERSION = '2.5.1';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function sideNav(){ return '';
   /* full Jotform app navigation intentionally not recreated */
