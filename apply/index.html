@@ -714,7 +714,7 @@ function viewWorkspace(){
   return topBar()+'<div class="ws"><aside class="ws-side"><button class="create" onclick="go(\'apps\')">+ NEW APPLICATION</button>'+
    meterHtml()+
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
-   (isAdmin()?'<a class="navi" href="#purge" onclick="event.preventDefault();go(\'purge\')">'+ic('trash')+'Free up space</a><a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
+   (isAdmin()?'<a class="navi" href="#purge" onclick="event.preventDefault();go(\'purge\')">'+ic('trash')+'Free up space</a><a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a><a class="navi" href="#import" onclick="event.preventDefault();S.imp=null;go(\'import\')">'+ic('upload')+'Import from Jotform</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unpaid</span><b class="num">'+S.subs.filter(s=>!isPaid(s)).length+'</b></div></aside>'+
@@ -755,7 +755,7 @@ function viewTable(){
    '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
    '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
    '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
-   '<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
+   (isAdmin()?'<button class="btn sm" onclick="S.imp={form:S.form};go(\'import\')">'+ic('upload')+'Import from Jotform</button>':'')+'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
    (selN?rowBulkHtml(rows):'')+
    '<div class="grid-wrap">'+(rows.length?'<table class="grid"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
    '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((k==='building'||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
@@ -819,11 +819,13 @@ function panelHtml(){
         '<div class="fld full"><label class="l" for="o_coComments">C of O comments</label><textarea id="o_coComments">'+esc(st.coComments||'')+'</textarea></div>':'')+
       '<div class="fld full"><label class="l" for="o_comments">Staff comments</label><textarea id="o_comments">'+esc(st.comments||'')+'</textarea></div></form>';
   } else {
-    const at = ATT[s.id];
+    const at = ATT[s.id], ext = (s.files||[]).filter(f=>f.url), own = (s.files||[]).filter(f=>!f.url);
+    const extHtml = ext.length ? '<p style="margin:0 0 8px;color:var(--ink2);font-size:14px">Imported from Jotform. These documents are still stored in Jotform; open one to view or download it.</p><div class="files" style="margin-bottom:14px">'+ext.map(f=>'<div class="fcard"><div class="th"><span class="pdfi'+(/^image/.test(f.type)?' img':'')+'" style="width:44px;height:54px;font-size:11px">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span></div><div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div><div class="ac"><a class="btn sm" href="'+esc(f.url)+'" target="_blank" rel="noopener">'+ic('ext')+'Open in Jotform</a></div></div>').join('')+'</div>' : '';
     if (!(s.files||[]).length) body = '<p class="empty">No documents were uploaded with this application.</p>';
+    else if (!own.length) body = extHtml;
     else if (!at) body = '<p class="empty">Loading documents…</p>';
     else if (at.err) body = '<p class="empty">Could not load documents: '+esc(at.err)+'</p>';
-    else body = (at.length < s.files.length ? '<p class="formerr">'+(s.files.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
+    else body = extHtml + (at.length < own.length ? '<p class="formerr">'+(own.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
       '<div class="files">'+at.map((f,i)=>'<div class="fcard"><div class="th">'+(/^image/.test(f.type)?'<img src="'+esc(f.data)+'" alt="'+esc(f.name)+'">':'<span class="pdfi" style="width:44px;height:54px;font-size:11px">PDF</span>')+'</div>'+
       '<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div><div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
   }
@@ -836,7 +838,7 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
    '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+fmtDT(s.createdAt)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
    '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
@@ -846,7 +848,7 @@ async function saveEdit(){
   const s = curSub(); if (!s||!DB) return;
   const f = Object.assign({}, s.fields);
   document.querySelectorAll('#editf [data-k]').forEach(el=>{ if (el.value==='') delete f[el.dataset.k]; else f[el.dataset.k]=el.value; });
-  const fees = computeFees(s.form, f, s.fees&&s.fees.doubled);
+  const fees = s.imported ? s.fees : computeFees(s.form, f, s.fees&&s.fees.doubled);
   const body = JSON.parse(JSON.stringify(s)); delete body.id;
   Object.assign(body, { fields:f, fees, editedAt:new Date().toISOString() });
   try{ await DB.doc('submissions/'+s.id).set(body);
@@ -859,7 +861,7 @@ async function saveOffice(){
   if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'' }; }); }
   if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||''; }
   const doubled = document.getElementById('o_double').checked;
-  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:computeFees(s.form, s.fields, doubled) }); toast('Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
+  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled) }); toast('Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
 }
 async function deleteSub(){
   const s = curSub(); if (!s||!DB) return;
@@ -922,9 +924,10 @@ async function buildPdf(s){
   if (st.inspections) INSPECT.forEach(n=>{ const r=st.inspections[n]||{}; if (r.date||r.by||r.recorded) row(n+' inspection', [r.date&&'Inspected '+r.date, r.by&&'by '+r.by, r.recorded&&'recorded '+r.recorded].filter(Boolean).join(', ')); });
   if (st.co) row('Certificate of Occupancy', st.co+(st.coInit?'  ·  '+st.coInit:'')+(st.coComments?'\n'+st.coComments:''));
   if (st.comments) row('Staff comments', st.comments);
-  const fl = await loadAtt(s.id);
-  head('Documents attached ('+fl.length+')');
+  const fl = await loadAtt(s.id), ext = (s.files||[]).filter(f=>f.url);
+  head('Documents attached ('+(fl.length+ext.length)+')');
   fl.forEach((f,i)=>row('Document '+(i+1), f.name));
+  ext.forEach((f,i)=>row('Document '+(fl.length+i+1), f.name+'\nStored in Jotform: '+f.url));
   const formPages = pdf.getPageCount();
   // attachments
   for (const f of fl){
@@ -962,6 +965,7 @@ function render(){
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
   else if (S.view==='users' && isAdmin()){ root.innerHTML = viewUsers(); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
+  else if (S.view==='import' && isAdmin()) root.innerHTML = viewImport();
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('mef').onsubmit = changeMyPassword; }
   else if (S.view==='table' && S.form) root.innerHTML = viewTable();
   else root.innerHTML = viewWorkspace();
@@ -978,7 +982,7 @@ function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
   if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
-  else if (h==='staff'||h==='purge'||h==='users'||h==='me') S.view = h==='staff' ? 'staff' : h;
+  else if (h==='staff'||h==='purge'||h==='users'||h==='me'||h==='import') S.view = h==='staff' ? 'staff' : h;
   render(); window.scrollTo(0,0);
 }
 /* ================= storage meter, purge, staff accounts ================= */
@@ -1213,6 +1217,150 @@ async function changeMyPassword(e){
   if (a !== document.getElementById('meNew2').value){ err.textContent = 'The two new passwords do not match.'; return; }
   try{ await sbRpc('bf_change_password', {p_token:TOKEN, p_old:await sha256hex(document.getElementById('meOld').value), p_new:await sha256hex(a)}); toast('Password changed'); go('staff'); }
   catch(x){ err.textContent = x.message; }
+}
+/* ================= Jotform CSV import (administrators) ================= */
+function parseCsv(text){
+  const rows = []; let row = [], f = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (q){ if (c === '"'){ if (text[i+1] === '"'){ f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === ','){ row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r'){ if (c === '\r' && text[i+1] === '\n') i++; row.push(f); f = ''; if (row.some(x => x !== '')) rows.push(row); row = []; }
+    else f += c;
+  }
+  row.push(f); if (row.some(x => x !== '')) rows.push(row);
+  return rows;
+}
+const normH = h => String(h||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function jfDate(s){                       // "Oct 6, 2026" -> Date (local noon)
+  const m = String(s||'').trim().match(/^([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})/);
+  if (m && MONTHS[m[1].toLowerCase()] != null) return new Date(+m[3], MONTHS[m[1].toLowerCase()], +m[2], 12);
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+const ymd = d => d ? d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') : '';
+const moneyNum = v => { const n = parseFloat(String(v||'').replace(/[$,\s]/g,'')); return isFinite(n) ? n : 0; };
+function guessForm(H){
+  const has = t => H.some(h => h.includes(t));
+  if (has('which feature apply to this sign') || has('what type of sign')) return 'sign';
+  if (has('trade license')) return 'subtrade';
+  if (has('contractor gc license') || has('heated sqft') || has('what type of project')) return 'building';
+  if (has('pool')) return 'pool';
+  return '';
+}
+/* Turn one Jotform CSV row into a submission document for this system. */
+function jfRowToSub(form, H, r){
+  const idx = names => { const out = []; H.forEach((h,i) => { if (names.includes(h)) out.push(i); }); return out; };
+  const get = (...names) => { for (const i of idx(names)) { const v = (r[i]||'').trim(); if (v) return v; } return ''; };
+  const after = (name, k=1) => { const i = H.indexOf(name); return i >= 0 ? (r[i+k]||'').trim() : ''; };
+  const f = {};
+  const put = (k, v) => { if (v) f[k] = v; };
+  put('applicant', form==='subtrade' ? get('applicant name or business name','applicant name') : get('applicant name','applicant name or business name'));
+  put('email', get('applicant email')); put('phone', get('applicant phone','applicant phone number'));
+  const d0 = jfDate(r[H.indexOf('date')] || ''); put('date', ymd(d0));
+  put('address', get('address','address of sign','property address'));
+  put('lot', get('lot')); put('zoning', get('zoning','zone'));
+  put('owner', get('property owner','property owner name')); put('ownerPhone', get('property owner phone','property owner phone number')); put('ownerEmail', get('property owner email'));
+  put('description', get('brief description of work'));
+  const bt = get('what type of build'); put('buildType', /^com/i.test(bt) ? 'Commercial' : bt ? 'Residential' : '');
+  if (form==='subtrade'){
+    put('trade', get('trade')); put('tradeLicense', get('trade license')); put('subName', get('sub contractor name'));
+    put('business', get('business name')); put('cPhone', get('sub contractor phone')); put('cEmail', get('sub contractor email'));
+    put('estCost', String(moneyNum(get('estimated project cost','estimated cost background')) || ''));
+  } else if (form==='building'){
+    put('gcLicense', get('contractor gc license')); put('contractor', get('contractor name')); put('business', get('business name'));
+    put('cPhone', get('contractor phone')); put('cEmail', get('contractor email'));
+    put('projectType', get('what type of project is this'));
+    put('heated', get('amount of heated sqft')); put('unheated', get('amount of unheated sqft'));
+    put('estCost', String(moneyNum(get('estimated cost','estimated cost background')) || ''));
+    put('comValue', String(moneyNum(get('commercial construction value','background commercial construction value')) || ''));
+    put('exempt', get('are you an authorized employee of a federal state or local government general contractor or property owner acting as your own contractor'));
+  } else if (form==='sign'){
+    put('estCost', String(moneyNum(get('estimated cost of work')) || ''));
+    put('tenant', get('property tenant name')); put('contractor', get('contractor or dba name')); put('cEmail', get('contractor email')); put('cPhone', get('contractor phone number'));
+    put('gcLicense', get('general contractor license number')); put('bizLicense', get('city of arab business license number'));
+    put('signType', get('what type of sign are you applying for')); put('signFeature', get('which feature apply to this sign'));
+  } else {
+    put('contractor', get('contractor name')); put('estCost', String(moneyNum(get('estimated cost','estimated project cost')) || ''));
+  }
+  const permit = moneyNum(get('permit fee background','permit fee')), cict = moneyNum(get('cict fee background','cict fee'));
+  const total = moneyNum(get('total fee amount background','grand total fee amount')) || (permit + cict);
+  const value = form==='building' ? (f.buildType==='Commercial' ? moneyNum(f.comValue) : (f.heated||f.unheated) ? moneyNum(f.heated)*75 + moneyNum(f.unheated)*50 : moneyNum(f.estCost)) : moneyNum(f.estCost);
+  const urls = get('please upload proof of arab city business license trade license contract invoice and insurance','upload the required documents for your selected sign type including the applicable plot plan or building suite drawing')
+    .split(/\s+/).filter(u => /^https?:\/\//.test(u));
+  const files = urls.map(u => { let n = u.split('/').pop(); try{ n = decodeURIComponent(n); }catch(e){} return { name:n, url:u, type: /\.(png|jpe?g|gif|heic)$/i.test(n) ? 'image/'+n.split('.').pop().toLowerCase() : 'application/pdf', external:true }; });
+  const st = { permitNo: get('permit','permit 3','permit 2'), payment: get('type of payment received') };
+  const ai = H.indexOf('authorized building department approval');
+  if (ai >= 0){ st.approvedBy = (r[ai]||'').trim(); st.approvedDate = ymd(jfDate(r[ai+1]||'')); }
+  const ii = H.indexOf('inspection');
+  if (ii >= 0){
+    st.inspections = {};
+    INSPECT.forEach((n,k) => { const b = ii + 1 + k*3; const rec = { date: ymd(jfDate(r[b]||'')), by: (r[b+1]||'').trim(), recorded: ymd(jfDate(r[b+2]||'')) };
+      const cIdx = H.indexOf(n.toLowerCase(), b+3); const com = cIdx >= 0 ? (r[cIdx]||'').trim() : ''; if (com) rec.comments = com;
+      if (rec.date || rec.by || rec.recorded || rec.comments) st.inspections[n] = rec; });
+    if (!Object.keys(st.inspections).length) delete st.inspections;
+  }
+  const co = get('certificate of occupancy given'); if (co) st.co = /not/i.test(co) ? 'Not Given' : 'Given';
+  const coC = get('c of o comments'); if (coC) st.coComments = coC;
+  const coI = get('initials sign off'); if (coI) st.coInit = coI;
+  const created = jfDate(r[0]) || new Date();
+  return { form, createdAt: created.toISOString(), read: true, starred: false, fields: f,
+    fees: { value, basis: 'Imported from Jotform', permit, cict, total, doubled: false },
+    files, staff: st };
+}
+const subKey = s => [(s.staff&&s.staff.permitNo)||'', (s.createdAt||'').slice(0,10), (s.fields.address||'').toLowerCase().replace(/\s+/g,' '), (s.fields.applicant||'').toLowerCase()].join('|');
+
+function viewImport(){
+  const I = S.imp || (S.imp = { form: S.form || '', rows: null, file: '', err: '' });
+  const existing = new Set(S.subs.map(subKey));
+  const rows = I.rows || [], fresh = rows.filter(s => !existing.has(subKey(s)));
+  const sel = fresh.filter(s => !I.skip || !I.skip[subKey(s)]);
+  return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="S.imp=null;go(\'staff\')">'+ic('left')+'Workspace</button></div>'+
+   '<h1>Import from Jotform</h1><p style="margin:0;color:var(--ink2);max-width:72ch">In Jotform, open the form\'s table and use <b>Download All → CSV</b>. Choose the form below and upload that file. Applications already here are skipped, so you can import the same export again safely. Imported applications keep Jotform\'s fees, permit #, payment, approval, inspection and C of O details.</p>'+
+   '<div class="card"><div class="fgrid">'+
+    '<div class="fld"><label class="l" for="impForm">Which form is this export from?</label><select id="impForm" onchange="S.imp.form=this.value;reparseImport()"><option value="">Choose a form</option>'+FORM_ORDER.map(k=>'<option value="'+k+'"'+(I.form===k?' selected':'')+'>'+esc(FORMS[k].title)+'</option>').join('')+'</select></div>'+
+    '<div class="fld"><label class="l" for="impFile">Jotform CSV export</label><input id="impFile" type="file" accept=".csv,text/csv" onchange="readImportFile(this.files[0])"><span class="hint">'+(I.file?esc(I.file):'A .csv file from Jotform Tables')+'</span></div>'+
+   '</div>'+(I.err?'<p class="formerr">'+esc(I.err)+'</p>':'')+'</div>'+
+   (I.rows ? '<div class="row"><b class="num">'+rows.length+' applications in the file</b><span class="num" style="color:var(--muted)">'+(rows.length-fresh.length)+' already here (skipped) · '+sel.length+' to import</span></div>'+
+     (fresh.length ? '<div class="grid-wrap" style="max-height:420px;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th class="rn"><input type="checkbox" class="ck" aria-label="Import all" '+(sel.length===fresh.length?'checked':'')+' onchange="impAll(this.checked)"></th><th>Submitted</th><th>Permit #</th><th>Applicant</th><th>Address</th><th>Total</th><th>Payment</th><th>Documents</th></tr></thead><tbody>'+
+       fresh.map(s => { const k = subKey(s); return '<tr><td class="rn"><input type="checkbox" class="ck" aria-label="Import '+esc(s.fields.applicant||'')+'" '+(!I.skip||!I.skip[k]?'checked':'')+' onchange="impPick('+I.rows.indexOf(s)+',this.checked)"></td><td>'+fmtDate(s.createdAt)+'</td><td>'+esc(s.staff.permitNo||'—')+'</td><td>'+esc(s.fields.applicant||'')+'</td><td>'+esc(s.fields.address||'')+'</td><td class="num">'+money(s.fees.total)+'</td><td>'+(s.staff.payment?'<span class="pill paid">'+esc(s.staff.payment)+'</span>':'<span class="pill unpaid">Unpaid</span>')+'</td><td class="num">'+s.files.length+'</td></tr>'; }).join('')+'</tbody></table></div>'
+       : '<p class="empty">Everything in this file has already been imported.</p>')+
+     '<p style="margin:0;color:var(--ink2);font-size:14px;max-width:72ch">Uploaded documents stay in Jotform. Each imported application keeps a link to them, so download any you need before you delete those records from Jotform.</p>'+
+     (sel.length ? '<div class="row"><button class="btn primary" id="impGo" onclick="runImport()">'+ic('upload')+'Import '+sel.length+' application'+(sel.length===1?'':'s')+'</button></div>' : '')
+   : '')+'</div>';
+}
+function readImportFile(file){
+  if (!file) return; const fr = new FileReader();
+  fr.onload = () => { S.imp.text = fr.result; S.imp.file = file.name; S.imp.skip = {}; reparseImport(); };
+  fr.onerror = () => { S.imp.err = 'Could not read that file.'; render(); };
+  fr.readAsText(file);
+}
+function reparseImport(){
+  const I = S.imp; I.err = ''; I.rows = null;
+  if (!I.text){ render(); return; }
+  const all = parseCsv(I.text); if (all.length < 2){ I.err = 'That file has no applications in it.'; render(); return; }
+  const H = all[0].map(normH);
+  if (!H.includes('submission date')){ I.err = 'This does not look like a Jotform export. It needs a "Submission Date" column.'; render(); return; }
+  if (!I.form) I.form = guessForm(H);
+  if (!I.form){ I.err = 'Choose which form this export is from.'; render(); return; }
+  try{ I.rows = all.slice(1).map(r => jfRowToSub(I.form, H, r)); }catch(e){ I.err = 'Could not read the file: '+e.message; }
+  render();
+}
+function impPick(i, on){ const k = subKey(S.imp.rows[i]); S.imp.skip = S.imp.skip || {}; if (on) delete S.imp.skip[k]; else S.imp.skip[k] = true; render(); }
+function impAll(on){ S.imp.skip = {}; if (!on) (S.imp.rows||[]).forEach(s => S.imp.skip[subKey(s)] = true); render(); }
+async function runImport(){
+  const I = S.imp, existing = new Set(S.subs.map(subKey));
+  const rows = I.rows.filter(s => !existing.has(subKey(s)) && !(I.skip && I.skip[subKey(s)]));
+  const b = document.getElementById('impGo'); let done = 0;
+  try{
+    for (let i = 0; i < rows.length; i += 50){
+      if (b){ b.disabled = true; b.textContent = 'Importing '+Math.min(i+50, rows.length)+' of '+rows.length+'…'; }
+      done += await sbRpc('bf_admin_import', { p_token: TOKEN, p_rows: rows.slice(i, i+50) });
+    }
+    const form = I.form; S.imp = null; await loadSubs(); toast('Imported '+done+' application'+(done===1?'':'s')); go('table', form);
+  }catch(e){ I.err = 'Import stopped after '+done+': '+e.message; await loadSubs(); render(); }
 }
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
