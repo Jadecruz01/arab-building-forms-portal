@@ -375,6 +375,68 @@ html.embed .verfoot{color:var(--muted);padding:8px 0 4px}
 @keyframes hlLoad{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
 @keyframes hlGlow{from{opacity:.6;transform:translate(-50%,-50%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
 @media (prefers-reduced-motion:reduce){#hello *,#hello{animation:none!important}#hello.out{opacity:0;transition:opacity .3s}}
+/* ---------- public pages, v2.6 redesign (not used inside the Jotform app) ---------- */
+.phead-wrap{background:var(--surface);border-bottom:1px solid var(--line)}
+.phead{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px}
+.pbrand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;min-width:0}
+.pbrand img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none}
+.pbrand span{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.pbrand small{font:800 10.5px/1.3 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pbrand b{font:800 18px/1.15 var(--f-disp);color:var(--ink)}
+.pstaff{display:inline-flex;align-items:center;gap:6px;flex:none;font-size:14px;font-weight:600;color:var(--ink2);text-decoration:none;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.pstaff:hover{border-color:var(--city);color:var(--city)}
+.pstaff svg{width:15px;height:15px}
+html.embed .phead-wrap,html.embed .pfoot{display:none}
+html:not(.embed) .app.pub{min-height:0}
+html:not(.embed) .app.pub .stage{background:var(--bg);padding:0 16px 56px;min-height:calc(100vh - 150px)}
+html:not(.embed) .app.pub .phead-wrap{margin:0 -16px}
+html:not(.embed) .app.pub .sheet{margin-top:32px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(10,21,81,.04),0 12px 32px rgba(10,21,81,.06)}
+html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
+.sheet.apps .pg-h{font-size:34px}
+.sheet.apps .pg-sub{font-size:16px}
+.tile{position:relative;align-items:center;transition:border-color .15s,box-shadow .15s,transform .15s}
+.tile > span:not(.ico){flex:1;min-width:0}
+.tile::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 0 6px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);transform:rotate(45deg);opacity:.75}
+.tile:hover::after{border-color:var(--city);opacity:1}
+.tile:active{transform:scale(.99)}
+.pfoot{background:var(--surface);border-top:1px solid var(--line);color:var(--ink2);font-size:13.5px}
+.pfoot-in{max-width:1120px;margin:0 auto;padding:22px 24px calc(22px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:14px 28px;flex-wrap:wrap}
+.pf-brand{display:flex;align-items:center;gap:12px}
+.pf-brand img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.pf-brand b{display:block;color:var(--ink);font-size:14px}
+.pf-brand span{color:var(--muted)}
+.pf-links{display:flex;gap:6px 18px;flex-wrap:wrap}
+.pf-links a{color:var(--ink2);text-decoration:none;font-weight:600}
+.pf-links a:hover{color:var(--city);text-decoration:underline}
+.pf-ver{color:var(--muted);font-size:12.5px}
+.verfoot{color:var(--muted)}
+@media (max-width:640px){
+  html:not(.embed) .app.pub .stage{padding:0 0 32px;min-height:calc(100vh - 220px)}
+  html:not(.embed) .app.pub .phead-wrap{margin:0}
+  .phead{padding:10px 16px}
+  .pbrand{gap:10px}
+  .pbrand img{width:38px;height:38px}
+  .pbrand b{font-size:16px}
+  .pbrand small{font-size:9.5px}
+  .pstaff{padding:6px 11px;font-size:13px}
+  html:not(.embed) .app.pub .sheet{margin:0;border:0;border-radius:0;box-shadow:none;padding:22px 16px 28px}
+  html:not(.embed) .app.pub .sheet.apps{background:transparent;padding:22px 16px 6px}
+  .sheet.apps .pg-h{font-size:27px;text-align:left}
+  .sheet.apps .pg-sub{font-size:15px;text-align:left;margin:6px 0 0}
+  .grp{margin-top:24px}
+  .tiles{gap:10px}
+  .tile{padding:14px;gap:12px;border-radius:12px;box-shadow:0 1px 2px rgba(10,21,81,.05)}
+  .tile .ico{width:40px;height:40px}
+  .tile b{font-size:15.5px}
+  .sheet.apps details.sched,.sheet.apps .callout{background-clip:padding-box}
+  .sheet.apps details.sched{background:var(--surface)}
+  .submitrow .btn.primary{width:100%;justify-content:center;padding:14px 18px;font-size:16px}
+  .psteps .btn{width:100%;justify-content:center}
+  .psteps .pstep > div{flex:1;min-width:0}
+  .form-h h1{font-size:22px}
+  .pfoot-in{flex-direction:column;align-items:flex-start;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+  .pf-links{flex-direction:column;gap:8px}
+}
 </style>
 
 
@@ -689,8 +751,19 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.5.1';   // shown at the bottom of every page
+const APP_VERSION = '2.6.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
+function pubHeader(){
+  return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
+    '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>';
+}
+function pubFooter(){
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Version '+APP_VERSION+'</div>';
+  return '<footer class="pfoot"><div class="pfoot-in">'+
+    '<div class="pf-brand"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="'+APPS_URL+'" target="_top">Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
+    '<div class="pf-ver">Version '+APP_VERSION+'</div></div></footer>';
+}
 function sideNav(){ return '';
   /* full Jotform app navigation intentionally not recreated */
   const items = [['news',"What's New"],['doc','Applications & Fees',true],['info','Important Information'],['pin','Annexation'],['gavel','Regulations'],['user','About Us'],['map','Zoning Map']];
@@ -702,14 +775,13 @@ function tile(k){ const f = FORMS[k];
   if (EMBED) return '<a class="tile" target="_top" href="https://arabcityapplications.jadecruz.dev/apply/#form-'+k+'"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.title)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></a>';
   return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>Apply online · upload documents</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
 function viewApps(){
-  return '<div class="app">'+sideNav()+'<main class="stage">'+
-  '<div class="mobile-top">'+brandHtml()+'<button class="btn sm ghost staffbtn" onclick="go(\'staff\')">'+ic('lock')+'Staff</button></div>'+
-  '<div class="sheet">'+
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
+  '<div class="sheet apps">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
-   '<section class="grp"><h2>Planning Commission <span style="text-transform:none;letter-spacing:0;font-weight:500">paper forms for now</span></h2><div class="tiles">'+
+   '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span></span></a>'+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost. Fill in and email the form</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
    '</div></section>'+
@@ -759,7 +831,7 @@ function feeBoxHtml(key){
 }
 function viewForm(){
   const F = FORMS[S.form];
-  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
    '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
@@ -1245,7 +1317,7 @@ function subFeeHtml(){
 function viewPdfForm(){
   const key = S.form, D = PDF_FORMS[key], I = PDF_INFO[key];
   const step = (n, t, body) => '<li class="pstep"><span class="pn">'+n+'</span><div><b>'+t+'</b>'+body+'</div></li>';
-  return '<div class="app">'+sideNav()+'<main class="stage"><div class="mobile-top">'+brandHtml()+'</div>'+
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
    '<ol class="psteps">'+
      step(1, 'Open the fillable form', '<p>Every blank on every page can be typed in, and every box can be checked. Sign where shown (type your name or sign after printing).</p>'+
@@ -1276,7 +1348,7 @@ function render(){
   else if (S.view==='table' && S.form) root.innerHTML = viewTable();
   else root.innerHTML = viewWorkspace();
   if (S.staff && S.view!=='apps' && S.view!=='form' && S.view!=='pdf') root.insertAdjacentHTML('beforeend', staffFooter());
-  else if (S.view==='apps' || S.view==='form' || S.view==='pdf') root.insertAdjacentHTML('beforeend', '<div class="verfoot">City of Arab Building Department · Version '+APP_VERSION+'</div>');
+  else if (S.view==='apps' || S.view==='form' || S.view==='pdf') root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
