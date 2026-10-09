@@ -599,6 +599,66 @@ tr.rev td{color:var(--muted)}
 .cict-tiles span{color:var(--ink2);font-size:13px}
 .cict-tiles b{font:800 24px var(--f-disp)}
 .cict .grid tfoot td{border-top:2px solid var(--line);padding:10px 12px;background:var(--surface)}
+
+/* v2.12.0: dropdowns, phone date fields, no sideways movement on phones */
+select.mini{-webkit-appearance:none;appearance:none;min-height:42px;min-width:220px;padding:9px 38px 9px 12px;border:1px solid var(--line);border-radius:7px;font-size:15px;line-height:1.3;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237a83a6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;cursor:pointer}
+.fld select{-webkit-appearance:none;appearance:none;padding-right:38px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237a83a6' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;min-height:44px}
+.fld input[type=date],.insp input[type=date]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;min-height:44px;text-align:left;line-height:1.3}
+.insp input[type=date]{min-height:36px}
+input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type=date]::-webkit-calendar-picker-indicator{margin-left:auto}
+html{overflow-x:clip}
+.app.pub,.app.pub .stage,.sheet{max-width:100%;min-width:0}
+.app.pub .stage{overflow-x:clip;touch-action:pan-y pinch-zoom}
+.sheet{overflow-wrap:break-word}
+.sheet .fld,.sheet .opts,.sheet .opt{min-width:0;max-width:100%}
+/* inspection comments + full-screen record */
+.insp .icomm{grid-column:2/-1;border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:var(--surface);width:100%;min-width:0;font-size:14px;resize:vertical;min-height:38px;margin-bottom:6px}
+.panel.full{width:100%;box-shadow:none}
+.panel.full .p-body{padding:22px max(16px,calc((100% - 1100px)/2)) 40px}
+.panel.full .p-head,.panel.full .p-tabs,.panel.full .p-actions{padding-left:max(16px,calc((100% - 1100px)/2));padding-right:max(16px,calc((100% - 1100px)/2))}
+.panel.full .insp{grid-template-columns:130px repeat(3,minmax(0,1fr));gap:10px}
+.panel.full .insp input,.panel.full .insp .icomm{font-size:16px;padding:10px 12px}
+.panel.full .insp > b{font-size:16px}
+/* public permit status */
+.statlink{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0 6px;text-decoration:none;color:var(--ink);background:var(--surface2)}
+.statlink:hover{border-color:var(--blue)}
+.statlink .ico{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:var(--sel);color:var(--city);flex:none}
+.statlink > span:nth-child(2){flex:1;min-width:0;display:grid}
+.statlink small{color:var(--muted);font-size:13px}
+.statlink .go{color:var(--muted)}
+.st-card{border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:18px;background:var(--surface);display:grid;gap:16px}
+.st-top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.st-top > div{display:grid;gap:2px;min-width:0}
+.st-top small{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.st-top b{font-size:18px}
+.st-top span:not(.pill){color:var(--ink2);font-size:13.5px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.steps > li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;position:relative;padding-bottom:16px}
+.steps > li:not(:last-child)::before{content:"";position:absolute;left:13px;top:28px;bottom:2px;width:2px;background:var(--line)}
+.steps > li.ok:not(:last-child)::before{background:var(--ok)}
+.steps .dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;background:var(--surface);color:#fff}
+.steps .dot .i{width:16px;height:16px}
+.steps > li.ok .dot{background:var(--ok);border-color:var(--ok)}
+.steps > li.part .dot{border-color:var(--amber);background:linear-gradient(90deg,var(--amber) 50%,var(--surface) 50%)}
+.steps > li > div{display:grid;gap:2px;padding-top:3px;min-width:0}
+.steps > li > div > span{color:var(--ink2);font-size:14px}
+.st-insp{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;max-width:360px}
+.st-insp li{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:5px 10px;border-radius:6px;background:var(--surface2);color:var(--muted)}
+.st-insp li.ok{color:var(--ink)}
+.st-fees{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.st-fees > div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.st-fees span{color:var(--muted);font-size:12.5px}
+.st-fees b{font-size:17px}
+.st-note{margin:0;font-size:13.5px;color:var(--ink2);background:var(--amberbg);border-radius:8px;padding:10px 12px}
+@media (max-width:640px){
+  select.mini{min-width:0;width:100%}
+  .insp .icomm{grid-column:1/-1}
+  .panel.full .insp{grid-template-columns:1fr 1fr}
+  .st-top{flex-direction:column}
+  .st-fees b{font-size:15px}
+  .hide-sm{display:none}
+}
 </style>
 
 
@@ -613,6 +673,9 @@ if (EMBED) document.documentElement.classList.add('embed');
 const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
+  expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  shrink:'<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
+  status:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   link:'<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
   coins:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
@@ -694,7 +757,7 @@ const LICENSE_OPTS = [
 ];
 const UPLOAD = T('files','Please upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance',{type:'file',req:true,full:true,hint:'PDF, JPG or PNG. Up to 10 files, 30 MB each. Phone photos work too.'});
 const APPLICANT = [
-  T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true,hint:'Receives updates about this application.'}),
+  T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true,hint:'Used with your reference # to check your permit status online.'}),
   T('phone','Applicant Phone #',{type:'tel',hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true})
 ];
 const PROPERTY = [
@@ -965,7 +1028,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.11.0';   // shown at the bottom of every page
+const APP_VERSION = '2.12.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -992,6 +1055,7 @@ function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
+   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt (or your permit #) and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
@@ -1123,7 +1187,8 @@ async function submitForm(e){
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
-      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+APPS_URL+'" target="_top">Back to Applications &amp; Fees</a></div></div>';
+      '<p class="pg-sub" style="font-size:14px">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # '+refNo(subId)+' and '+esc(vals.email||'your email')+'.</p>'+
+      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" href="'+APPS_URL+'" target="_top">Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -1313,8 +1378,13 @@ function panelHtml(){
       '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
       '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>'+
       (hasInsp?'<div class="sect">Inspections</div><div class="fld full"><div class="insp"><span></span><span class="ihead">Date of inspection</span><span class="ihead">Completed by</span><span class="ihead">Date recorded</span>'+
-        INSPECT.map(n=>{ const r = ins[n]||{}; return '<b>'+n+'</b><input type="date" id="i_'+n+'_d" aria-label="'+n+' date of inspection" value="'+esc(r.date||'')+'"><input type="text" id="i_'+n+'_b" aria-label="'+n+' completed by" placeholder="Completed by" value="'+esc(r.by||'')+'"><input type="date" id="i_'+n+'_r" aria-label="'+n+' date recorded" value="'+esc(r.recorded||'')+'">'; }).join('')+'</div></div>':'')+
-      ((isBldg(s.form)||s.form==='subtrade')?'<div class="sect">Certificate of Occupancy</div><div class="fld"><label class="l" for="o_co">Certificate of Occupancy given?</label><select id="o_co">'+['','Given','Not Given'].map(o=>'<option'+((st.co||'')===o?' selected':'')+' value="'+o+'">'+(o||'—')+'</option>').join('')+'</select></div>'+
+        INSPECT.map(n=>{ const r = ins[n]||{}; return '<b>'+n+'</b><input type="date" id="i_'+n+'_d" aria-label="'+n+' date of inspection" value="'+esc(r.date||'')+'"><input type="text" id="i_'+n+'_b" aria-label="'+n+' completed by" placeholder="Completed by" value="'+esc(r.by||'')+'"><input type="date" id="i_'+n+'_r" aria-label="'+n+' date recorded" value="'+esc(r.recorded||'')+'">'+
+          '<textarea class="icomm" id="i_'+n+'_c" rows="2" aria-label="'+n+' inspection comments" placeholder="'+n+' comments (what was checked, corrections needed, re-inspection notes)">'+esc(r.comment||'')+'</textarea>'; }).join('')+'</div></div>':'')+
+      ((isBldg(s.form)||s.form==='subtrade')?'<div class="sect">Certificate of Occupancy</div><div class="fld"><label class="l" for="o_co">Certificate of Occupancy given?</label><select id="o_co" onchange="coChange()">'+['','Given','Not Given'].map(o=>'<option'+((st.co||'')===o?' selected':'')+' value="'+o+'">'+(o||'—')+'</option>').join('')+'</select>'+
+          (st.co!=='Given' && coNeedsOverride(s) ? '<span class="hint">Can be given once the permit is paid in full ('+esc(payText(s))+').</span>' : '')+'</div>'+
+        '<div class="fld full" id="coOv" hidden><div class="callout pay" style="margin:0"><b>Not paid in full</b>This permit is '+esc(payText(s).toLowerCase())+'. The Certificate of Occupancy can only be given once it is paid. To give it anyway, enter your initials to override. The override is recorded with your name and the date.'+
+          '<label class="l" for="o_coOverride" style="display:block;margin-top:10px">Your initials (override)</label><input type="text" id="o_coOverride" maxlength="8" autocomplete="off" style="max-width:160px;border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--surface)"></div></div>'+
+        (st.co==='Given' && st.coOverrideInit ? '<div class="fld full"><p class="hint" style="margin:0;color:var(--amber)"><b>Given before payment, by override:</b> initials '+esc(st.coOverrideInit)+(st.coOverrideBy?' ('+esc(st.coOverrideBy)+')':'')+(st.coOverrideAt?' on '+esc(fmtDT(st.coOverrideAt)):'')+(st.coOverrideBalance!=null?' · '+money(st.coOverrideBalance)+' was due at the time':'')+'</p></div>' : '')+
         '<div class="fld"><label class="l" for="o_coInit">Initials sign off</label><input type="text" id="o_coInit" value="'+esc(st.coInit||'')+'"></div>'+
         '<div class="fld full"><label class="l" for="o_coComments">C of O comments</label><textarea id="o_coComments">'+esc(st.coComments||'')+'</textarea></div>':'')+
       '<div class="fld full"><label class="l" for="o_comments">Staff comments</label><textarea id="o_comments">'+esc(st.comments||'')+'</textarea></div></form>';
@@ -1336,14 +1406,20 @@ function panelHtml(){
       : S.tab==='office'
         ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span><button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
-  return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
+  if (S.panelFull === undefined){ try{ S.panelFull = localStorage.getItem('bdPanelFull') === '1'; }catch(e){ S.panelFull = false; } }
+  return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
    '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
    '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src">'+ic('link')+'Linked</span>':'')+'</small></div>'+
+   '<button class="btn sm" id="fullBtn" onclick="togglePanelFull()" title="'+(S.panelFull?'Exit full screen':'Full screen')+'">'+ic(S.panelFull?'shrink':'expand')+'<span class="hide-sm">'+(S.panelFull?'Exit full screen':'Full screen')+'</span></button>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
    '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
 }
 const curSub = () => S.subs.find(x=>x.id===S.sel);
+function togglePanelFull(){ S.panelFull = !S.panelFull; try{ localStorage.setItem('bdPanelFull', S.panelFull ? '1' : '0'); }catch(e){} render(); }
+const coNeedsOverride = s => !['paid','none'].includes(payStatus(s));
+function coChange(){ const s = curSub(), sel = document.getElementById('o_co'), box = document.getElementById('coOv'); if (!s || !sel || !box) return;
+  box.hidden = !(sel.value==='Given' && ((s.staff||{}).co!=='Given') && coNeedsOverride(s)); }
 async function saveEdit(){
   const s = curSub(); if (!s||!DB) return;
   const f = Object.assign({}, s.fields);
@@ -1357,11 +1433,20 @@ async function saveEdit(){
 async function saveOffice(){
   const s = curSub(); if (!s||!DB) return;
   const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
-  const st = { permitNo:g('o_permitNo')||'', payment:(s.staff&&s.staff.payment)||'', checkNo:(s.staff&&s.staff.checkNo)||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' };
-  if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'' }; }); }
-  if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||''; }
+  const prev = s.staff||{};
+  const st = Object.assign({}, prev, { permitNo:g('o_permitNo')||'', payment:prev.payment||'', checkNo:prev.checkNo||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' });
+  if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'', comment:(g('i_'+n+'_c')||'').trim() }; }); }
+  if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||'';
+    if (st.co!=='Given'){ delete st.coOverrideInit; delete st.coOverrideBy; delete st.coOverrideAt; delete st.coOverrideBalance; }
+    else if (prev.co!=='Given'){
+      delete st.coOverrideBy; delete st.coOverrideAt; delete st.coOverrideBalance; delete st.coOverrideInit;
+      if (coNeedsOverride(s)){ const init = (g('o_coOverride')||'').trim();
+        if (!init){ coChange(); const el = document.getElementById('o_coOverride'); if (el) el.focus(); toast('Not paid in full. Enter your initials to override, or wait until it is paid.'); return; }
+        st.coOverrideInit = init; } } }
   const doubled = document.getElementById('o_double').checked;
-  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled) }); toast('Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
+  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled) });
+    if (st.coOverrideInit && prev.co!=='Given'){ try{ const fresh = await sbRpc('bf_get', {p_token:TOKEN, p_collection:'submissions', p_id:s.id}); if (fresh && fresh.staff){ s.staff = fresh.staff; render(); } }catch(e){} }
+    toast(st.coOverrideInit && prev.co!=='Given' ? 'Saved. Certificate of Occupancy given by override ('+st.coOverrideInit+').' : 'Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
 }
 async function deleteSub(){
   const s = curSub(); if (!s||!DB) return;
@@ -1426,8 +1511,8 @@ async function buildPdf(s){
   head('Office use');
   row('Payment', payText(s)+(s.pay&&s.pay.lastReceipt?'  ·  receipt '+s.pay.lastReceipt:''));
   row('Approval', [st.approvedBy, st.approvedDate].filter(Boolean).join('  ·  ')||'-');
-  if (st.inspections) INSPECT.forEach(n=>{ const r=st.inspections[n]||{}; if (r.date||r.by||r.recorded) row(n+' inspection', [r.date&&'Inspected '+r.date, r.by&&'by '+r.by, r.recorded&&'recorded '+r.recorded].filter(Boolean).join(', ')); });
-  if (st.co) row('Certificate of Occupancy', st.co+(st.coInit?'  ·  '+st.coInit:'')+(st.coComments?'\n'+st.coComments:''));
+  if (st.inspections) INSPECT.forEach(n=>{ const r=st.inspections[n]||{}; if (r.date||r.by||r.recorded||r.comment) row(n+' inspection', [r.date&&'Inspected '+r.date, r.by&&'by '+r.by, r.recorded&&'recorded '+r.recorded].filter(Boolean).join(', ')+(r.comment?'\nComments: '+r.comment:'')); });
+  if (st.co) row('Certificate of Occupancy', st.co+(st.coInit?'  ·  '+st.coInit:'')+(st.coComments?'\n'+st.coComments:'')+(st.co==='Given'&&st.coOverrideInit?'\nGiven before payment by override: initials '+st.coOverrideInit+(st.coOverrideBy?' ('+st.coOverrideBy+')':'')+(st.coOverrideAt?', '+fmtDT(st.coOverrideAt):'')+(st.coOverrideBalance!=null?', '+money(st.coOverrideBalance)+' due at the time':''):''));
   if (st.comments) row('Staff comments', st.comments);
   const fl = await loadAtt(s.id), ext = (s.files||[]).filter(f=>f.url);
   head('Documents attached ('+(fl.length+ext.length)+')');
@@ -2232,7 +2317,7 @@ async function cictPdf(){
     const pdf = await PDFDocument.create(), W = 792, H = 612, M = 40;              // landscape letter
     const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
     const ink = rgb(0.06,0.09,0.25), grey = rgb(0.4,0.43,0.55), line = rgb(0.85,0.87,0.92), navy = rgb(0.12,0.16,0.27);
-    const cols = [['Date', 62], ['Permit #', 58], ['Ref #', 62], ['Application', 132], ['Applicant', 120], ['Property address', 150], ['Value', 70, 1], ['CICT fee', 58, 1]];
+    const cols = [['Date', 58], ['Permit #', 48], ['Ref #', 56], ['Application', 122], ['Applicant', 112], ['Property address', 150], ['Value', 70, 1], ['CICT fee', 54, 1]];   // 670 + 7 gaps of 6 = 712 = W - 2M
     let page, y, pn = 0;
     const fit = (t, f, s, w) => { t = pdfSafe(String(t||'')); while (t && f.widthOfTextAtSize(t, s) > w) t = t.slice(0, -2) + '…'; return t; };
     const head = () => { page = pdf.addPage([W, H]); pn++;
@@ -2305,12 +2390,64 @@ async function printPayReceipt(pid){
   }catch(e){ toast('Could not build the receipt: '+((e&&e.message)||'try again')); }
 }
 
+
+/* ================= PUBLIC: permit status lookup (no sign-in) =================
+   bf_permit_status returns only applications whose reference # (or permit #) AND
+   application email both match, and only status details (no staff notes). */
+function viewStatus(){
+  const R = S.st || (S.st = { ref:'', email:'' });
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
+   '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" href="'+(EMBED?APPS_URL:'#apps')+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'apps\')"')+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
+     '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt (or your permit #) and the email address you used on the application.</span></div>'+
+   '<form id="stf" class="fgrid" novalidate>'+
+     '<div class="fld"><label class="l" for="stRef">Reference # or permit #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
+     '<div class="fld"><label class="l" for="stEmail">Email on the application</label><input type="email" id="stEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" value="'+esc(R.email||'')+'"></div>'+
+     '<div class="fld full"><button class="btn primary" id="stBtn" type="submit" style="justify-content:center;padding:12px 18px;font-size:15px"'+(R.busy?' disabled':'')+'>'+ic('search')+(R.busy?'Checking…':'Check status')+'</button></div></form>'+
+   (R.err ? '<p class="formerr" role="alert" style="margin-top:14px">'+esc(R.err)+'</p>' : '')+
+   '<div id="stOut" aria-live="polite">'+(R.res ? (R.res.length ? R.res.map(statusCard).join('') :
+     '<div class="callout warn"><b>No match found</b>We could not find an application with that reference # (or permit #) and email. Check both and try again, or contact the Building Department at buildingdept@arabcity.org.</div>') : '')+'</div>'+
+   '</div></main></div>';
+}
+function statusCard(r){
+  const F = FORMS[r.form] || { short:r.form, title:r.form };
+  const s = { pay:(r.pay && r.pay.status) ? r.pay : null, staff:{ payment:r.payment||'' }, fees:r.fees||{} };
+  const ps = payStatus(s), p = r.pay || {}, total = p.total!=null ? p.total : (r.fees||{}).total, bal = p.balance!=null ? p.balance : (ps==='paid' ? 0 : total);
+  const hasInsp = ['building','homeowner','subtrade','pool'].includes(r.form), hasCo = isBldg(r.form) || r.form==='subtrade';
+  const ins = r.inspections || {}, doneN = INSPECT.filter(n => ins[n]).length;
+  const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
+    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }];
+  if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
+  steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
+  if (hasInsp) steps.push({ t:'Inspections', d:doneN+' of '+INSPECT.length+' complete', st:doneN===INSPECT.length ? 'ok' : doneN ? 'part' : '',
+    list:'<ul class="st-insp">'+INSPECT.map(n => '<li class="'+(ins[n]?'ok':'')+'"><span>'+n+'</span><span>'+(ins[n] ? esc(fmtDay(ins[n])) : 'Not yet')+'</span></li>').join('')+'</ul>' });
+  if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
+  const complete = steps.every(x => x.st==='ok');
+  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</span></div>'+
+    '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
+    '<ol class="steps">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
+    '<div class="st-fees num"><div><span>Amount due</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>'+
+    ((ps==='unpaid'||ps==='partial') ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
+    '</section>';
+}
+function bindStatus(){
+  const f = document.getElementById('stf'); if (!f) return;
+  f.onsubmit = async e => { e.preventDefault();
+    const R = S.st; R.ref = document.getElementById('stRef').value.trim(); R.email = document.getElementById('stEmail').value.trim(); R.err = ''; R.res = null;
+    if (!R.ref || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(R.email)){ R.err = 'Enter your reference # (or permit #) and the email address on your application.'; render(); return; }
+    R.busy = true; render();
+    try{ R.res = await sbRpc('bf_permit_status', { p_ref:R.ref, p_email:R.email }) || []; }
+    catch(x){ R.err = x.message || 'Could not check right now. Please try again.'; }
+    R.busy = false; render();
+    const o = document.getElementById(R.err ? 'stf' : 'stOut'); if (o && o.scrollIntoView) o.scrollIntoView({ behavior:'smooth', block:'start' }); };
+}
+
 /* ================= render & boot ================= */
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
   if (S.view==='apps') root.innerHTML = viewApps();
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
+  else if (S.view==='status'){ root.innerHTML = viewStatus(); bindStatus(); }
   else if (isPhone()) root.innerHTML = viewPhoneBlock();
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
@@ -2327,15 +2464,19 @@ function render(){
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('mef').onsubmit = changeMyPassword; }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
   else if (S.view==='cict') root.innerHTML = viewCict();
-  else if (S.view==='table' && S.form){ root.innerHTML = viewTable(); bindLinkPick(); }
+  else if (S.view==='table' && S.form){
+    const off = document.getElementById('offf'), keep = (off && S.tab==='office') ? { sel:S.sel, v:[...off.querySelectorAll('input,select,textarea')].filter(e => e.id).map(e => [e.id, e.type==='checkbox' ? e.checked : e.value]) } : null;
+    root.innerHTML = viewTable(); bindLinkPick();
+    if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
-  if (S.staff && S.view!=='apps' && S.view!=='form' && S.view!=='pdf') root.insertAdjacentHTML('beforeend', staffFooter());
-  else if (S.view==='apps' || S.view==='form' || S.view==='pdf') root.insertAdjacentHTML('beforeend', pubFooter());
+  const isPub = ['apps','form','pdf','status'].includes(S.view);
+  if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
+  else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = (S.view==='apps'||S.view==='form'||S.view==='pdf') ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
+  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
 function startForm(){ const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
@@ -2347,6 +2488,7 @@ function initRoute(){
   const pm = h.match(/^pdf-(\w+)$/);
   if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
+  else if (h==='status') S.view = 'status';
   else if (['staff','purge','users','me','import','bugs','clerk','cict'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
@@ -2885,6 +3027,7 @@ async function buildReceipt(r){
   page.drawText('Pay in person at City of Arab, 740 N Main St, Arab, AL 35016, by cash or check', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
   page.drawText('made payable to "City of Arab." Show this receipt (printed or on your phone) when you pay', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
   page.drawText('so your payment is matched to reference # '+ref+'. The Building Department will contact you.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
+  page.drawText(pdfSafe('Check your permit status anytime at arabcityapplications.jadecruz.dev/apply/#status with reference # '+ref+' and your email.'), {x:M, y:56, size:9, font:bold, color:ink});
   page.drawText(pdfSafe('This receipt confirms your application was received. It is not proof of payment or an issued permit.  ·  Reference '+ref), {x:M, y:40, size:8.5, font:reg, color:grey});
   return pdf.save();
 }
