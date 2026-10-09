@@ -575,6 +575,30 @@ tr.rev td{color:var(--muted)}
 .agtext{max-height:58vh;overflow:auto;display:grid;gap:10px;font-size:15px;line-height:1.55;color:var(--ink);padding-right:4px}
 .agtext p{margin:0}.agtext p.li{padding-left:14px}
 .agtext h3{margin:6px 0 0;font:700 15px var(--f-body)}
+
+/* linked applications + CICT report */
+.lk-box{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 16px;display:grid;gap:10px;background:var(--surface)}
+.lk-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lk-head .i{width:18px;height:18px}
+.lk-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
+.lk-row.match{border-color:var(--ok)}
+.lk-ico{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:var(--sel);color:var(--city);flex:none}
+.lk-ico .i{width:18px;height:18px}
+.lk-txt{flex:1;min-width:0;display:grid}
+.lk-txt small{color:var(--ink2);font-size:12.5px;overflow:hidden;text-overflow:ellipsis}
+.lk-pick{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.lk-pick .search{width:100%}
+.lk-tag{display:inline-flex;align-items:center;gap:3px;margin-left:6px;border-radius:99px;padding:1px 8px;font-size:11.5px;font-weight:700;background:var(--sel);color:var(--city);vertical-align:middle}
+.lk-tag .i,.pill .i{width:12px;height:12px;vertical-align:-2px;margin-right:2px}
+.purge.cict{max-width:1240px}
+.cict .grid-wrap{min-height:0}
+.cict .grid td,.cict .grid th{white-space:nowrap}
+.cict-ctl{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));align-items:end}
+.cict-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.cict-tiles>div{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 16px;display:grid;gap:4px}
+.cict-tiles span{color:var(--ink2);font-size:13px}
+.cict-tiles b{font:800 24px var(--f-disp)}
+.cict .grid tfoot td{border-top:2px solid var(--line);padding:10px 12px;background:var(--surface)}
 </style>
 
 
@@ -589,6 +613,8 @@ if (EMBED) document.documentElement.classList.add('embed');
 const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
+  link:'<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+  coins:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
   house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
@@ -939,7 +965,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.10.0';   // shown at the bottom of every page
+const APP_VERSION = '2.11.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -1120,7 +1146,7 @@ const COLS = [
   {k:'payment', l:'Payment', t:'S', get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
   {k:'buildType', l:'Build Type', t:'T', only:['building','homeowner','subtrade'], get:s=>s.fields.buildType||''},
   {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
-  {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||''},
+  {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||'', fmt:s=>esc(s.fields.applicant||'')+(isLinked(s)?' <span class="lk-tag" title="Linked to '+(s.form==='subtrade'?'a building permit':linkedSubs(s).length+' sub trade application'+(linkedSubs(s).length===1?'':'s'))+'">'+ic('link')+'Linked</span>':'')},
   {k:'email', l:'Applicant Email', t:'@', get:s=>s.fields.email||''},
   {k:'phone', l:'Applicant Phone', t:'T', hide:true, get:s=>s.fields.phone||''},
   {k:'description', l:'Description of Work', t:'T', hide:true, get:s=>s.fields.description||''}
@@ -1165,6 +1191,7 @@ function viewWorkspace(){
   return topBar()+'<div class="ws"><aside class="ws-side">'+
    meterHtml()+
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
+   '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    (isAdmin()?'<a class="navi" href="#purge" onclick="event.preventDefault();go(\'purge\')">'+ic('trash')+'Free up space</a><a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a><a class="navi" href="#import" onclick="event.preventDefault();S.imp=null;go(\'import\')">'+ic('upload')+'Import from Jotform</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
@@ -1269,7 +1296,7 @@ function panelHtml(){
       if (Array.isArray(s.agreements) && s.agreements.length){ clean.push('<div class="h">Terms &amp; agreements</div><div class="h" style="display:none"></div>');
         s.agreements.forEach(a => clean.push('<div>'+esc(a.title||a.id)+'</div><div>Agreed '+esc(fmtDT(a.at))+'</div>')); }
       const fe = s.fees||{};
-      body = '<div class="qa">'+clean.join('')+'<div class="h">Fees</div><div class="h" style="display:none"></div>'+
+      body = linkBoxHtml(s)+'<div class="qa">'+clean.join('')+'<div class="h">Fees</div><div class="h" style="display:none"></div>'+
         ((isBldg(s.form)||s.form==='subtrade')?'<div>Construction value</div><div class="num">'+money(fe.value)+'</div>':'')+
         '<div>Permit fee</div><div class="num">'+money(fe.permit)+(fe.doubled?' (doubled)':'')+'</div>'+
         ((isBldg(s.form)||s.form==='subtrade')?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
@@ -1311,7 +1338,7 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
    '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+'</small></div>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src">'+ic('link')+'Linked</span>':'')+'</small></div>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
    '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
@@ -1387,6 +1414,10 @@ async function buildPdf(s){
     const v = s.fields[x.id]; if (v==null||v==='') return; if (sec){ head(sec); sec=null; }
     row(x.label, x.type==='money'?money(num(v)):v); });
   if (Array.isArray(s.agreements) && s.agreements.length){ head('Terms & agreements'); s.agreements.forEach(a => row(a.title||a.id, 'Agreed '+fmtDT(a.at))); }
+  { const lm = linkedMain(s), ls = linkedSubs(s);
+    if (lm || ls.length){ head(s.form==='subtrade' ? 'Linked building permit' : 'Linked sub trade applications');
+      (lm ? [lm] : ls).forEach(x => x.missing ? row('Building permit', 'Linked application is no longer on file') :
+        row((FORMS[x.form]||{}).short||x.form, [x.fields.applicant||'Applicant', x.fields.address, (x.staff&&x.staff.permitNo)?'Permit # '+x.staff.permitNo:'', 'Ref '+refNo(x.id)].filter(Boolean).join('  ·  '))); } }
   const fe = s.fees||{}; head('Fees');
   if (isBldg(s.form)||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
   row('Permit fee', money(fe.permit)+(fe.doubled?'  (doubled - work started without permit)':''));
@@ -1555,7 +1586,7 @@ function routeAllowed(v){
   if (v==='me') return true;
   if (v==='clerk') return canPay();
   if (['users','purge','import','bugs'].includes(v)) return isAdmin();
-  if (v==='staff' || v==='table') return canBuilding();
+  if (v==='staff' || v==='table' || v==='cict') return canBuilding();
   return false;
 }
 const ROLE_LABEL = { staff:'Building Department', clerk:'Municipal Support Clerk', admin:'Administrator', citizen:'No access' };
@@ -2088,6 +2119,156 @@ function autoCropCheck(src){
   return { canvas: out, found: true, angle: Math.atan2(ly, lx) * 180 / Math.PI };
 }
 
+/* ================= linked applications (sub trade ⇄ contractor / homeowner building permit) =================
+   One field holds the link: a Sub Trade application's linkedTo = id of its building permit application.
+   A building permit lists every sub trade whose linkedTo points at it. Only Building Department staff can change it. */
+const subById = id => S.subs.find(x => x.id === id);
+const linkedMain = s => s && s.form === 'subtrade' && s.linkedTo ? (subById(s.linkedTo) || { missing:true, id:s.linkedTo }) : null;
+const linkedSubs = s => s && isBldg(s.form) ? S.subs.filter(x => x.form === 'subtrade' && x.linkedTo === s.id) : [];
+const isLinked = s => !!(linkedMain(s) || linkedSubs(s).length);
+const normAddr = a => String(a||'').toLowerCase().replace(/[.,#]/g,' ').replace(/\b(road|rd|street|st|avenue|ave|drive|dr|lane|ln|trail|trl|circle|cir|court|ct|parkway|pkwy|highway|hwy|boulevard|blvd|northeast|northwest|southeast|southwest|ne|nw|se|sw|n|s|e|w)\b/g,' ').replace(/\s+/g,' ').trim();
+const appLine = x => esc(x.fields.applicant || 'Applicant')+' · '+esc(x.fields.address || 'no address')+((x.staff&&x.staff.permitNo) ? ' · Permit # '+esc(x.staff.permitNo) : '')+' · Ref '+refNo(x.id);
+function openLinked(id){ const x = subById(id); if (!x) { toast('That application is no longer on file.'); return; } S.linkPick = null; go('table', x.form); openSub(id); }
+function linkCandidates(s){
+  const want = s.form === 'subtrade' ? x => isBldg(x.form) : x => x.form === 'subtrade' && x.linkedTo !== s.id;
+  const q = String((S.linkPick && S.linkPick.q) || '').trim().toLowerCase(), a = normAddr(s.fields.address), num = (a.match(/^\d+/)||[''])[0];
+  return S.subs.filter(want).map(x => { const xa = normAddr(x.fields.address);
+      const score = (a && xa === a ? 3 : 0) + (num && xa.startsWith(num+' ') ? 1 : 0) + (x.fields.owner && s.fields.owner && x.fields.owner.toLowerCase() === s.fields.owner.toLowerCase() ? 1 : 0);
+      return { x, score }; })
+    .filter(o => !q || (JSON.stringify(o.x.fields)+' '+((o.x.staff&&o.x.staff.permitNo)||'')+' '+refNo(o.x.id)).toLowerCase().includes(q))
+    .sort((p, r) => r.score - p.score || String(r.x.createdAt).localeCompare(String(p.x.createdAt))).slice(0, 8);
+}
+async function setLink(subtradeId, mainId){
+  try{ await DB.doc('submissions/'+subtradeId).update(mainId ? { linkedTo:mainId, linkedAt:new Date().toISOString(), linkedBy:(S.me&&S.me.name)||'' } : { linkedTo:null, linkedAt:null, linkedBy:null });
+    S.linkPick = null; toast(mainId ? 'Applications linked' : 'Link removed'); render(); }
+  catch(e){ toast('Could not update the link: '+e.message); }
+}
+function linkBoxHtml(s){
+  if (s.form !== 'subtrade' && !isBldg(s.form)) return '';
+  const P = S.linkPick && S.linkPick.id === s.id;
+  const row = (x, unlinkSub) => '<div class="lk-row"><span class="lk-ico">'+ic(x.form==='subtrade'?'wrench':'house')+'</span><span class="lk-txt"><b>'+esc((FORMS[x.form]||{}).short||'')+'</b><small>'+appLine(x)+'</small></span>'+
+    '<button class="btn sm" onclick="openLinked(\''+x.id+'\')">Open</button><button class="btn sm ghost" onclick="setLink(\''+unlinkSub+'\', null)">Unlink</button></div>';
+  let body = '';
+  if (s.form === 'subtrade'){
+    const m = linkedMain(s);
+    body = m ? (m.missing ? '<p class="hint" style="margin:0">Linked to a building permit that is no longer on file. <button class="linkbtn" onclick="setLink(\''+s.id+'\', null)">Remove link</button></p>' : row(m, s.id))
+             : '<p class="hint" style="margin:0">This sub trade is not linked to a building permit yet.</p>';
+  } else {
+    const subs = linkedSubs(s);
+    body = subs.length ? subs.map(x => row(x, x.id)).join('') : '<p class="hint" style="margin:0">No sub trade applications are linked to this permit yet.</p>';
+  }
+  const canAdd = s.form !== 'subtrade' || !linkedMain(s);
+  let pick = '';
+  if (P){
+    const c = linkCandidates(s);
+    pick = '<div class="lk-pick"><label class="search">'+ic('search')+'<input id="lkq" placeholder="Search name, address, permit # or reference #" value="'+esc(S.linkPick.q||'')+'" aria-label="Search applications to link"></label>'+
+      (c.length ? c.map(o => '<div class="lk-row'+(o.score>=3?' match':'')+'"><span class="lk-ico">'+ic(o.x.form==='subtrade'?'wrench':'house')+'</span><span class="lk-txt"><b>'+esc(FORMS[o.x.form].short)+(o.score>=3?' <span class="pill paid">Same address</span>':'')+(o.x.form==='subtrade'&&o.x.linkedTo?' <span class="pill src">Linked elsewhere, will move</span>':'')+'</b><small>'+appLine(o.x)+' · '+fmtDate(o.x.createdAt)+'</small></span>'+
+        '<button class="btn sm primary" onclick="setLink(\''+(s.form==='subtrade'?s.id:o.x.id)+'\', \''+(s.form==='subtrade'?o.x.id:s.id)+'\')">Link</button></div>').join('')
+        : '<p class="hint" style="margin:0">No matching applications.</p>')+
+      '<div class="row"><button class="btn sm ghost" onclick="S.linkPick=null;render()">Cancel</button></div></div>';
+  }
+  return '<div class="lk-box"><div class="lk-head">'+ic('link')+'<b>'+(s.form==='subtrade'?'Linked building permit':'Linked sub trade applications')+'</b>'+
+    (canAdd && !P ? '<button class="btn sm" style="margin-left:auto" onclick="S.linkPick={id:\''+s.id+'\',q:\'\'};render()">'+ic('link')+(s.form==='subtrade'?'Link to a building permit':'Link a sub trade')+'</button>' : '')+'</div>'+body+pick+'</div>';
+}
+function bindLinkPick(){ const q = document.getElementById('lkq'); if (q && !q.dataset.b){ q.dataset.b = '1'; q.oninput = () => { S.linkPick.q = q.value; const pos = q.selectionStart; render(); const n = document.getElementById('lkq'); if (n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }; } }
+
+/* ================= monthly CICT fee report (Building Department) ================= */
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const monthLabel = ym => { const [y, m] = String(ym).split('-'); return MONTH_NAMES[(+m||1)-1]+' '+y; };
+const cictAmt = s => Math.round((Number(s.fees && s.fees.cict) || 0) * 100) / 100;
+function cictDate(s, basis){
+  if (basis === 'submitted') return { ym:(s.createdAt||'').slice(0,7), day:(s.createdAt||'').slice(0,10), est:false };
+  if (payStatus(s) !== 'paid') return null;
+  const d = s.pay && s.pay.lastPaidOn;
+  return d ? { ym:String(d).slice(0,7), day:String(d).slice(0,10), est:false } : { ym:(s.createdAt||'').slice(0,7), day:(s.createdAt||'').slice(0,10), est:true };
+}
+function cictData(basis){
+  const rows = [];
+  S.subs.forEach(s => { const c = cictAmt(s); if (!(c > 0)) return; const d = cictDate(s, basis); if (!d || !d.ym) return; rows.push({ s, c, d }); });
+  const months = {}; rows.forEach(r => { const m = months[r.d.ym] || (months[r.d.ym] = { ym:r.d.ym, n:0, total:0, value:0 }); m.n++; m.total += r.c; m.value += Number(r.s.fees.value)||0; });
+  return { rows, months: Object.values(months).sort((a,b) => b.ym.localeCompare(a.ym)) };
+}
+function cictState(){
+  const C = S.cict || (S.cict = { basis:'paid', ym:'' });
+  const D = cictData(C.basis), now = new Date(), cur = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const opts = [...new Set([cur].concat(D.months.map(m => m.ym)))].sort().reverse();
+  if (!C.ym || !opts.includes(C.ym)) C.ym = D.months.length ? D.months[0].ym : cur;
+  const list = D.rows.filter(r => r.d.ym === C.ym).sort((a,b) => a.d.day.localeCompare(b.d.day));
+  return { C, D, opts, list, total: Math.round(list.reduce((a,r) => a + r.c, 0)*100)/100, value: list.reduce((a,r) => a + (Number(r.s.fees.value)||0), 0) };
+}
+function viewCict(){
+  const { C, D, opts, list, total, value } = cictState();
+  const unpaid = C.basis === 'submitted' ? list.filter(r => payStatus(r.s) !== 'paid').length : 0;
+  const est = list.filter(r => r.d.est).length;
+  return topBar()+'<div class="purge cict"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div>'+
+    '<h1>CICT fee report</h1><p style="margin:0;color:var(--ink2);max-width:72ch">CICT fees from every application that charges one (Contractor and Homeowner building permits and Sub Trade permits, commercial work only). Pick a month to see the total and the permits that make it up, then download it for the county and state report.</p>'+
+    '<div class="card cict-ctl"><div class="fld"><label class="l" for="ciM">Month</label><select id="ciM" onchange="S.cict.ym=this.value;render()">'+opts.map(m => '<option value="'+m+'"'+(m===C.ym?' selected':'')+'>'+monthLabel(m)+'</option>').join('')+'</select></div>'+
+      '<div class="fld"><label class="l" for="ciB">Count fees by</label><select id="ciB" onchange="S.cict.basis=this.value;render()"><option value="paid"'+(C.basis==='paid'?' selected':'')+'>Date paid (fees collected)</option><option value="submitted"'+(C.basis==='submitted'?' selected':'')+'>Date submitted (fees charged)</option></select></div>'+
+      '<div class="row" style="gap:8px;align-self:end;flex-wrap:wrap"><button class="btn primary" onclick="cictPdf()" '+(list.length?'':'disabled')+'>'+ic('down')+'Download PDF report</button><button class="btn" onclick="cictCsv()" '+(list.length?'':'disabled')+'>'+ic('down')+'Download CSV</button></div></div>'+
+    '<div class="cict-tiles"><div><span>CICT total · '+esc(monthLabel(C.ym))+'</span><b class="num">'+money(total)+'</b></div><div><span>Permits with CICT</span><b class="num">'+list.length+'</b></div><div><span>Commercial construction value</span><b class="num">'+money(value)+'</b></div></div>'+
+    (unpaid ? '<p class="callout pay" style="margin:0"><b>'+unpaid+' of these '+(unpaid===1?'has':'have')+' not been paid in full yet.</b> Switch "Count fees by" to Date paid to see only fees collected.</p>' : '')+
+    (est ? '<p class="hint" style="margin:0">'+est+' marked paid before payment tracking began; the submission date is used for '+(est===1?'it':'them')+'.</p>' : '')+
+    '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px">'+(list.length ? '<table class="grid"><thead><tr><th>'+(C.basis==='paid'?'Date paid':'Submitted')+'</th><th>Permit #</th><th>Reference #</th><th>Application</th><th>Applicant</th><th>Property address</th><th style="text-align:right">Construction value</th><th style="text-align:right">CICT fee</th><th>Payment</th></tr></thead><tbody>'+
+      list.map(r => '<tr onclick="openLinked(\''+r.s.id+'\')" style="cursor:pointer"><td>'+esc(fmtDay(r.d.day))+(r.d.est?' *':'')+'</td><td>'+esc((r.s.staff&&r.s.staff.permitNo)||'—')+'</td><td class="num">'+refNo(r.s.id)+'</td><td>'+esc((FORMS[r.s.form]||{}).short||r.s.form)+'</td><td>'+esc(r.s.fields.applicant||'')+'</td><td>'+esc(r.s.fields.address||'')+'</td><td class="num" style="text-align:right">'+money(r.s.fees.value)+'</td><td class="num" style="text-align:right"><b>'+money(r.c)+'</b></td><td>'+payPill(r.s)+'</td></tr>').join('')+
+      '</tbody><tfoot><tr><td colspan="7"><b>Total for '+esc(monthLabel(C.ym))+'</b></td><td class="num" style="text-align:right"><b>'+money(total)+'</b></td><td></td></tr></tfoot></table>'
+      : '<div class="empty">No CICT fees '+(C.basis==='paid'?'were paid':'were charged')+' in '+esc(monthLabel(C.ym))+'.</div>')+'</div>'+
+    (D.months.length ? '<details class="sched"><summary>All months</summary><div class="sched-body"><table class="fees"><thead><tr><th>Month</th><th>Permits</th><th style="text-align:right">CICT total</th></tr></thead><tbody>'+
+      D.months.map(m => '<tr><td><button class="linkbtn" onclick="S.cict.ym=\''+m.ym+'\';render();window.scrollTo(0,0)">'+monthLabel(m.ym)+'</button></td><td class="num">'+m.n+'</td><td class="num" style="text-align:right">'+money(m.total)+'</td></tr>').join('')+'</tbody></table></div></details>' : '')+
+  '</div>';
+}
+function cictCsv(){
+  const { C, list, total, value } = cictState(), q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const lines = [['City of Arab Building Department - CICT fee report'].map(q).join(','), [monthLabel(C.ym), C.basis==='paid'?'Counted by date paid':'Counted by date submitted'].map(q).join(','), '',
+    [C.basis==='paid'?'Date paid':'Date submitted','Permit #','Reference #','Application','Applicant','Property owner','Property address','Build type','Construction value','CICT fee','Payment status','Receipt #'].map(q).join(',')]
+    .concat(list.map(r => [r.d.day+(r.d.est?' (submission date)':''), (r.s.staff&&r.s.staff.permitNo)||'', refNo(r.s.id), (FORMS[r.s.form]||{}).title||r.s.form, r.s.fields.applicant||'', r.s.fields.owner||'', r.s.fields.address||'', r.s.fields.buildType||'', (Number(r.s.fees.value)||0).toFixed(2), r.c.toFixed(2), PAY_LABEL[payStatus(r.s)]||'', (r.s.pay&&r.s.pay.lastReceipt)||''].map(q).join(',')))
+    .concat(['', ['TOTAL','','','','','','','', value.toFixed(2), total.toFixed(2), list.length+' permits',''].map(q).join(',')]);
+  DL.save({ filename:'CICT-'+C.ym+'.csv', data: lines.join('\r\n') });
+}
+async function cictPdf(){
+  if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
+  const { C, list, total, value } = cictState();
+  try{
+    const { PDFDocument, StandardFonts, rgb } = PDFLib;
+    const pdf = await PDFDocument.create(), W = 792, H = 612, M = 40;              // landscape letter
+    const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+    const ink = rgb(0.06,0.09,0.25), grey = rgb(0.4,0.43,0.55), line = rgb(0.85,0.87,0.92), navy = rgb(0.12,0.16,0.27);
+    const cols = [['Date', 62], ['Permit #', 58], ['Ref #', 62], ['Application', 132], ['Applicant', 120], ['Property address', 150], ['Value', 70, 1], ['CICT fee', 58, 1]];
+    let page, y, pn = 0;
+    const fit = (t, f, s, w) => { t = pdfSafe(String(t||'')); while (t && f.widthOfTextAtSize(t, s) > w) t = t.slice(0, -2) + '…'; return t; };
+    const head = () => { page = pdf.addPage([W, H]); pn++;
+      page.drawRectangle({ x:0, y:H-58, width:W, height:58, color:navy });
+      page.drawText('City of Arab Building Department', { x:M, y:H-26, size:14, font:bold, color:rgb(1,1,1) });
+      page.drawText(pdfSafe('CICT fee report · '+monthLabel(C.ym)+' · '+(C.basis==='paid'?'counted by date paid':'counted by date submitted')), { x:M, y:H-45, size:10.5, font:reg, color:rgb(0.95,0.8,0.45) });
+      y = H - 86; };
+    const colHead = () => { let x = M;
+      cols.forEach(([t, w, r]) => { page.drawText(t, { x: r ? x + w - bold.widthOfTextAtSize(t, 8.5) - 4 : x, y, size:8.5, font:bold, color:grey }); x += w + 6; });
+      y -= 6; page.drawLine({ start:{x:M,y}, end:{x:W-M,y}, thickness:.8, color:line }); y -= 14; };
+    head();
+    // summary
+    const sum = [['CICT total', money(total)], ['Permits', String(list.length)], ['Construction value', money(value)]];
+    let sx = M; sum.forEach(([l, v]) => { page.drawText(l.toUpperCase(), { x:sx, y:y, size:8, font:bold, color:grey }); page.drawText(v, { x:sx, y:y-17, size:15, font:bold, color:ink }); sx += 180; });
+    y -= 46; colHead();
+    list.forEach(r => {
+      if (y < 70){ head(); colHead(); }
+      const vals = [fmtDay(r.d.day)+(r.d.est?' *':''), (r.s.staff&&r.s.staff.permitNo)||'-', refNo(r.s.id), (FORMS[r.s.form]||{}).short||r.s.form, r.s.fields.applicant||'', r.s.fields.address||'', money(r.s.fees.value), money(r.c)];
+      let x = M; vals.forEach((v, i) => { const [ , w, rt] = cols[i], t = fit(v, i===7?bold:reg, 9, w-2), f = i===7?bold:reg;
+        page.drawText(t, { x: rt ? x + w - f.widthOfTextAtSize(t, 9) - 4 : x, y, size:9, font:f, color:ink }); x += w + 6; });
+      y -= 15;
+    });
+    if (y < 110) head();
+    y -= 4; page.drawLine({ start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.8, color:line });
+    const tw = cols.reduce((a,c)=>a+c[1]+6,0) - 6, tt = money(total);
+    page.drawText('Total CICT fees for '+monthLabel(C.ym), { x:M, y:y-6, size:11, font:bold, color:ink });
+    page.drawText(tt, { x:M + tw - bold.widthOfTextAtSize(tt, 12) - 4, y:y-6, size:12, font:bold, color:ink });
+    y -= 50;
+    page.drawText(pdfSafe('Prepared by '+((S.me&&S.me.name)||'')+' on '+fmtDT(new Date().toISOString())), { x:M, y, size:9.5, font:reg, color:grey });
+    page.drawLine({ start:{x:W-M-220,y:y-2}, end:{x:W-M,y:y-2}, thickness:.7, color:ink }); page.drawText('Signature', { x:W-M-220, y:y-14, size:8, font:reg, color:grey });
+    if (list.some(r => r.d.est)) page.drawText('* Paid before payment tracking began; the submission date is shown.', { x:M, y:y-28, size:8, font:reg, color:grey });
+    pdf.getPages().forEach((p, i) => p.drawText('Page '+(i+1)+' of '+pn, { x:W-M-50, y:22, size:8, font:reg, color:grey }));
+    await DL.save({ filename:'CICT-report-'+C.ym+'.pdf', data: await pdf.save() });
+  }catch(e){ toast('Could not build the report: '+((e&&e.message)||'try again')); }
+}
+
 /* ================= payment receipt (PDF) ================= */
 async function printPayReceipt(pid){
   const r = S.ck.rec || {}, x = (r.payments||[]).find(p=>p.id===pid) || (S.ck.done && S.ck.done.id===pid ? S.ck.done : null);
@@ -2145,7 +2326,8 @@ function render(){
   else if (S.view==='import' && isAdmin()) root.innerHTML = viewImport();
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('mef').onsubmit = changeMyPassword; }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
-  else if (S.view==='table' && S.form) root.innerHTML = viewTable();
+  else if (S.view==='cict') root.innerHTML = viewCict();
+  else if (S.view==='table' && S.form){ root.innerHTML = viewTable(); bindLinkPick(); }
   else root.innerHTML = viewWorkspace();
   if (S.staff && S.view!=='apps' && S.view!=='form' && S.view!=='pdf') root.insertAdjacentHTML('beforeend', staffFooter());
   else if (S.view==='apps' || S.view==='form' || S.view==='pdf') root.insertAdjacentHTML('beforeend', pubFooter());
@@ -2165,7 +2347,7 @@ function initRoute(){
   const pm = h.match(/^pdf-(\w+)$/);
   if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
-  else if (['staff','purge','users','me','import','bugs','clerk'].includes(h)) S.view = h;
+  else if (['staff','purge','users','me','import','bugs','clerk','cict'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
