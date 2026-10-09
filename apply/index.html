@@ -575,8 +575,7 @@ tr.rev td{color:var(--muted)}
 "use strict";
 const EMBED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 if (EMBED) document.documentElement.classList.add('embed');
-const CITY_LOGO = 'city-logo.jpg';   // official City of Arab seal (cropped from arabcity.org), stored next to this page
-const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" onerror="this.style.visibility=\'hidden\'"><span class="bdiv" aria-hidden="true"></span><span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
+const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
@@ -878,16 +877,16 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.9.1';   // shown at the bottom of every page
+const APP_VERSION = '2.9.2';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
-  return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
+  return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>';
 }
 function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
-    '<div class="pf-brand"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
+    '<div class="pf-brand"><div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
     '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="'+APPS_URL+'" target="_top">Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
     '<div class="pf-ver">Version '+APP_VERSION+'</div></div></footer>';
 }
@@ -2243,7 +2242,6 @@ function helloStart(acc){
   const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   const d = document.createElement('div'); d.id = 'hello'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
   d.innerHTML = '<div class="hl-glow" aria-hidden="true"></div><div class="hl-in">'+
-    '<div class="hl-seal"><img src="'+CITY_LOGO+'" alt=""></div>'+
     '<p class="hl-part">'+esc(part)+'</p>'+
     '<h1 class="hl-name"><span class="hl-hi">Hello,</span> '+name.split(/\s+/).map((w,i)=>'<span class="hl-w" style="animation-delay:'+(0.42+i*0.12).toFixed(2)+'s">'+esc(w)+'</span>').join(' ')+'</h1>'+
     '<p class="hl-title">'+esc(title)+'</p>'+
