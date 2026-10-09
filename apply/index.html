@@ -564,6 +564,17 @@ tr.rev td{color:var(--muted)}
 .scan-th .cap{font-size:12.5px;color:var(--ink2);line-height:1.35}
 
 .phone-block{display:grid;gap:12px;padding-top:28px;padding-bottom:40px}
+
+/* v2.10: terms & agreements */
+.agrees{display:grid;gap:10px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.4;cursor:pointer}
+.agree input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--city)}
+.agl{font-size:15px;text-decoration:underline;text-align:left}
+#agbox .veil{z-index:49}
+.agdlg{width:min(680px,calc(100% - 24px))}
+.agtext{max-height:58vh;overflow:auto;display:grid;gap:10px;font-size:15px;line-height:1.55;color:var(--ink);padding-right:4px}
+.agtext p{margin:0}.agtext p.li{padding-left:14px}
+.agtext h3{margin:6px 0 0;font:700 15px var(--f-body)}
 </style>
 
 
@@ -581,6 +592,7 @@ const IC = {
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
   doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
   house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  home2:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><circle cx="12" cy="13" r="2.2"/><path d="M8.5 20c.4-2.2 1.8-3.4 3.5-3.4s3.1 1.2 3.5 3.4"/>',
   wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
   sign:'<rect x="3" y="4" width="18" height="10" rx="1.5"/><path d="M8 14v7M16 14v7M7 9h10"/>',
   pool:'<path d="M3 17c2 0 2-1.5 4.5-1.5S9.5 17 12 17s2-1.5 4.5-1.5S19 17 21 17"/><path d="M3 21c2 0 2-1.5 4.5-1.5S9.5 21 12 21s2-1.5 4.5-1.5S19 21 21 21"/><path d="M8 14V5a2 2 0 0 1 4 0M14 14V5a2 2 0 0 1 4 0M8 9h6"/>',
@@ -628,7 +640,7 @@ const SIGN_FEE = { 'Illuminated':75, 'Electronic Message Display (Changing Messa
 /* compute fees for any submission's field values; `doubled` = staff-applied penalty */
 function computeFees(form, f, doubled){
   let value = 0, permit = 0, cict = 0, basis = '';
-  if (form === 'building'){
+  if (isBldg(form)){
     const com = f.buildType === 'Commercial';
     if (com){ value = num(f.comValue); basis = 'Commercial construction value'; }
     else if (f.projectType === 'New Build' || f.projectType === 'Addition'){
@@ -665,7 +677,7 @@ const PROPERTY = [
   T('owner','Property Owner'), T('ownerPhone','Property Owner Phone #',{type:'tel'}), T('ownerEmail','Property Owner Email',{type:'email',full:true})
 ];
 const FORMS = {
-  building:{ key:'building', title:'Contractor or Homeowner Application for Building Permit', short:'Building Permit (Contractor or Homeowner)', icon:'house', group:'Building Permits', feeLabel:'Fee based on construction value', created:'Jun 7, 2026',
+  building:{ key:'building', title:'Contractor Application for Building Permit', short:'Building Permit (Contractor)', icon:'house', agreements:[{id:'appAgree'},{id:'exemption',show:f=>f.exempt==='Yes'},{id:'inspection'},{id:'occupancy'}], group:'Building Permits', feeLabel:'Fee based on construction value', created:'Jun 7, 2026',
     fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY,
       {type:'section',label:'Contractor'},
       T('gcLicense','Contractor/GC License #'), T('contractor','Contractor Name'), T('business','Business Name',{hint:'Include DBA or LLC'}),
@@ -682,7 +694,7 @@ const FORMS = {
       T('exempt','Are you an authorized employee of a Federal, State, or Local Government, General Contractor (licensed prior to January 1, 1992), or Property Owner acting as your own contractor?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
       T('exemptReason','I do hereby solemnly swear that I, or the entity of which I am a qualifying representative, am exempt from the licensing requirements of the State of Alabama Home Builders Licensure law for the following reason:',{type:'radio',stack:true,req:true,opts:LICENSE_OPTS,full:true,show:f=>f.exempt==='Yes'}),
       UPLOAD ] },
-  subtrade:{ key:'subtrade', title:'Sub Trade Application for Building Permit', short:'Sub Trade Permit', icon:'wrench', group:'Building Permits', feeLabel:'Fee based on estimated project cost', created:'Jun 7, 2026',
+  subtrade:{ key:'subtrade', title:'Sub Trade Application for Building Permit', short:'Sub Trade Permit', icon:'wrench', agreements:[{id:'appAgree'}], group:'Building Permits', feeLabel:'Fee based on estimated project cost', created:'Jun 7, 2026',
     fields:[ T('applicant','Applicant Name or Business Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone #',{type:'tel'}), T('date','Date',{type:'date',req:true}),
       {type:'section',label:'Property'}, ...PROPERTY,
       {type:'section',label:'Sub-contractor'},
@@ -694,7 +706,7 @@ const FORMS = {
       T('estCost','Estimated project cost',{type:'money',req:true}),
       T('description','Brief description of work',{type:'textarea',req:true,full:true}),
       UPLOAD ] },
-  sign:{ key:'sign', title:'Sign Permit Application', short:'Sign Permit', icon:'sign', group:'Sign Permit', feeLabel:'$50 non-illuminated · $75 illuminated', created:'Jul 11, 2026',
+  sign:{ key:'sign', title:'Sign Permit Application', short:'Sign Permit', icon:'sign', agreements:[{id:'signAgree'}], group:'Sign Permit', feeLabel:'$50 non-illuminated · $75 illuminated', created:'Jul 11, 2026',
     fields:[ T('date','Date',{type:'date',req:true}), T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone Number',{type:'tel'}),
       T('address','Address of Sign',{req:true,full:true}), T('estCost','Estimated Cost of Work',{type:'money',req:true}), T('zoning','Zone'),
       {type:'section',label:'Owner, tenant & contractor'},
@@ -731,7 +743,57 @@ const FORMS = {
       T('contractor','Mover / Contractor Name'), T('gcLicense','Contractor License #'),
       T('description','Brief description of work',{type:'textarea',req:true,full:true}), UPLOAD ] }
 };
-const FORM_ORDER = ['building','subtrade','sign','pool','demo','moving'];
+// Homeowner application: same fields as the contractor application (split from the old combined form, Oct 2026)
+FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Homeowner Application for Building Permit', short:'Building Permit (Homeowner)', icon:'home2', created:'Oct 9, 2026',
+  agreements:[{id:'appAgree'},{id:'exemption'},{id:'inspection'},{id:'occupancy'}] });
+const isBldg = k => k==='building' || k==='homeowner';
+const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving'];
+
+/* ================= terms & agreements (required on the forms that list them) ================= */
+const AGREEMENTS = {
+  appAgree: { title:'Terms & Agreement', label:'I agree to the', link:'Terms & Agreement', text:[
+    'Application is hereby made for a certificate of compliance to erect/alter a structure as described herein or shown in accompanying plans and specifications, which structure is to be located as shown on the accompanying plot/plan. The information, which follows and the accompanying plans and specifications with the representation therein contained, is made as part of this application.',
+    'It is agreed and understood by this applicant that any error, misstatement or misrepresentation of material fact or expression of material fact, either with or without intention on the part of this applicant, such as might, or would, operate to cause a refusal of this application, or any material alteration or change in the accompanying plans, specifications or structure made subsequent to the issuance of a certificate, of compliance in accordance with this application, without approval of the City Building Inspector, shall constitute sufficient ground for the revocation of such certificate of compliance.',
+    '#Take Notice',
+    'No change of plans or proposed use may be made in any building or on any premises, which is inconsistent with this certificate.' ] },
+  exemption: { title:'Home Builder License Exemption Statement', label:'I acknowledge the', link:'Home Builder License Exemption Statement', text:[
+    '#Sworn Statement of party claiming exemption from the requirements of the Home Builders Licensure law, Ala. Code 34-14A-1, et seq. (1975).',
+    'I understand that by claiming exempt status, I waive my rights for protection under the provisions of the Home Builders Licensure law and that in the event of litigation involving activities resulting from the grant of this permit, I may not make demand of any money from the Homeowner\'s Recovery Fund, established by the Home Builders Licensure law. I understand that my claim of exempt status does not exempt anyone who contracts with me to perform construction work on my residence from holding the required license when the total cost of the undertaking exceeds $10,000.00.',
+    '*Violation of the Alabama Home Builders Licensure Law is a Class A misdemeanor (Ala. Code 34-14A-14) punishable by up to 12 months in jail and fines up to $6,000.00.' ] },
+  inspection: { title:'Contractor Inspection Requirements & Permit Conditions', label:'I agree to the', link:'Contractor Inspection Requirements & Permit Conditions', text:[
+    'The purpose of this document is to emphasize the importance of calling the Building Inspector for required inspections during the construction of your Building. Increasingly, lending institutions are requiring issuance of a Certificate of Occupancy by the City of Arab as a part of a requirement for mortgage qualifying.',
+    'It is the firm policy of the Building Inspector not to issue a Certificate of Occupancy if all required inspections have not been completed. Moreover, it is the responsibility of the contractor, or the homeowner serving as the contractor, to call the Building Inspector for required inspections.',
+    'Such calls should be placed at least 24 hours before the day of the inspection. However, occasionally the Building Inspector is willing to make an exception to this requirement.',
+    'For single-family residential construction, unless deficiencies are found, at least three inspections are required:',
+    '-Footing inspection (prior to concrete pouring)', '-Rough-in (framing, electrical and plumbing prior to sheetrock and insulation)', '-Final inspection',
+    'If deficiencies are found during any of these inspections, the contractor or homeowner is responsible for calling the Building Inspector for a return inspection to inspect corrections. To avoid difficulties with financing and future owners you should take all inspection requirements seriously. Regardless of the size and type of construction, the City will not complete a final inspection once electrical and plumbing systems have been covered. A Certificate of Occupancy will not be issued without a satisfactory final inspection.',
+    'Call the Building Department at 256-586-5968 for all inspections.' ] },
+  occupancy: { title:'Occupancy & Final Inspection Responsibilities', label:'I agree to the', link:'Occupancy & Final Inspection Responsibilities', text:[
+    'I understand that it is my responsibility to notify the building inspector when an inspection is needed. I also understand that under any circumstances no one shall occupy any building or portion of any building until a final inspection has been made and the building inspector has issued a certificate of occupancy.',
+    'Upon issuance of a building permit, the building inspector may visit the building site, or call the owner, or contractor if he feels that a significant amount of time has passed and no inspections have been called for.' ] },
+  signAgree: { title:'Sign Permit Agreement', label:'I agree to the', link:'Sign Permit Agreement', text:[
+    'I certify and acknowledge that I have read this application and that all information provided is true and correct; that all work performed in association with the issued permit shall conform to the plans and specifications submitted and will comply with all City Codes and Ordinances. By signing this application as a contractor, I certify that I will meet all applicable laws of the State of Alabama, including any exemptions as the law provides. I certify and agree to protect all public improvements and public utilities adjacent to or serving the property on which the proposed structure(s) are located, whether or not the said improvements, or utilities, are the property of the City of Arab. I further agree to make, or cause to have made, all necessary repairs resulting from my actions, misuse or lack of care, or on the part of any of my employees, agents, subcontractors, or suppliers of materials. I further attest that I am authorized by the property owner to execute this document as his or her agent.' ] }
+};
+const formAgreements = (F, f) => (F.agreements || []).filter(a => !a.show || a.show(f));
+const visSig = (F, f) => F.fields.filter(x=>x.show).map(x=>x.show(f)).concat((F.agreements||[]).filter(a=>a.show).map(a=>a.show(f))).join();
+function agreementsHtml(){
+  const list = formAgreements(FORMS[S.form], FVALS); if (!list.length) return '';
+  return '<div class="sect">Terms &amp; agreements</div><div class="fld full agrees">'+list.map(a => { const A = AGREEMENTS[a.id], on = FVALS['ag_'+a.id]==='1';
+    return '<label class="agree"><input type="checkbox" id="ag_'+a.id+'" required'+(on?' checked':'')+' onchange="FVALS[\'ag_'+a.id+'\']=this.checked?\'1\':\'\'"> <span>'+esc(A.label)+' <button type="button" class="linkbtn agl" onclick="openAgreement(\''+a.id+'\')">'+esc(A.link)+'</button> <span class="req">*</span></span></label>'; }).join('')+
+    '<span class="hint">Open each one to read it. All are required to submit this application.</span></div>';
+}
+function closeAgreement(){ const b = document.getElementById('agbox'); if (b) b.remove(); document.removeEventListener('keydown', agKey); }
+function agKey(e){ if (e.key==='Escape') closeAgreement(); }
+function openAgreement(id){
+  const A = AGREEMENTS[id]; if (!A) return; closeAgreement();
+  const box = document.createElement('div'); box.id = 'agbox';
+  box.innerHTML = '<div class="veil" onclick="closeAgreement()"></div><div class="scandlg agdlg" role="dialog" aria-modal="true" aria-labelledby="agT">'+
+    '<h2 id="agT" style="margin:0;font:700 18px var(--f-body)">'+esc(A.title)+'</h2><div class="agtext">'+
+    A.text.map(p => p[0]==='#' ? '<h3>'+esc(p.slice(1))+'</h3>' : p[0]==='-' ? '<p class="li">• '+esc(p.slice(1))+'</p>' : '<p>'+esc(p)+'</p>').join('')+'</div>'+
+    '<div class="row" style="gap:8px;justify-content:flex-end;flex-wrap:wrap"><button type="button" class="btn ghost" onclick="closeAgreement()">Close</button><button type="button" class="btn primary" onclick="acceptAgreement(\''+id+'\')">'+ic('check')+'I agree</button></div></div>';
+  document.body.appendChild(box); document.addEventListener('keydown', agKey); box.querySelector('.btn.primary').focus();
+}
+function acceptAgreement(id){ FVALS['ag_'+id] = '1'; const c = document.getElementById('ag_'+id); if (c) c.checked = true; closeAgreement(); }
 const valueFields = f => f.fields.filter(x => x.id && x.type!=='file');
 
 /* ================= state & capabilities ================= */
@@ -877,7 +939,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.9.2';   // shown at the bottom of every page
+const APP_VERSION = '2.10.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -904,7 +966,7 @@ function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
-   '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('subtrade')+'</div></section>'+
+   '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
@@ -948,7 +1010,7 @@ function fieldHtml(x, f){
 }
 function feeBoxHtml(key){
   const fe = computeFees(key, FVALS, false);
-  const showVal = key==='building'||key==='subtrade';
+  const showVal = isBldg(key)||key==='subtrade';
   return (showVal?'<div class="r"><span>Construction value <small>('+esc(fe.basis||'enter project details')+')</small></span><b class="num">'+money(fe.value)+'</b></div>':'')+
     '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
     (showVal?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
@@ -964,7 +1026,7 @@ function viewForm(){
 }
 function formFieldsHtml(){
   const F = FORMS[S.form];
-  return F.fields.map(x=>fieldHtml(x,FVALS)).join('')+
+  return F.fields.map(x=>fieldHtml(x,FVALS)).join('')+agreementsHtml()+
     '<div class="sect">Fees</div><div class="feebox" id="feebox" aria-live="polite">'+feeBoxHtml(S.form)+'</div>'+
     '<div class="submitrow"><button class="btn primary" type="submit" id="subBtn">Submit application</button><span class="formerr" id="ferr"></span></div>';
 }
@@ -975,11 +1037,11 @@ function bindForm(){
     FVALS[k] = e.target.value;
     const F = FORMS[S.form];
     // re-render only when a conditional field's visibility changes
-    const vis = F.fields.filter(x=>x.show).map(x=>x.show(FVALS)).join();
+    const vis = visSig(F, FVALS);
     if (vis !== form.dataset.vis){ form.dataset.vis = vis; const a = document.activeElement && document.activeElement.id; form.innerHTML = formFieldsHtml(); bindFiles(); paintFiles(); if (a){ const el = document.getElementById(a); if (el) el.focus(); } }
     else document.getElementById('feebox').innerHTML = feeBoxHtml(S.form);
   };
-  form.dataset.vis = FORMS[S.form].fields.filter(x=>x.show).map(x=>x.show(FVALS)).join();
+  form.dataset.vis = visSig(FORMS[S.form], FVALS);
   form.onsubmit = submitForm; bindFiles(); paintFiles();
 }
 function bindFiles(){
@@ -1007,8 +1069,11 @@ function paintFiles(){
 async function submitForm(e){
   e.preventDefault();
   const form = e.target, err = document.getElementById('ferr'), btn = document.getElementById('subBtn');
-  if (!form.checkValidity()){ form.reportValidity(); err.textContent = 'Please complete the required fields.'; return; }
+  const agMissing = formAgreements(FORMS[S.form], FVALS).filter(a => FVALS['ag_'+a.id]!=='1');
+  const otherBad = [...form.querySelectorAll(':invalid')].filter(el => !/^ag_/.test(el.id));
+  if (otherBad.length){ form.reportValidity(); err.textContent = 'Please complete the required fields.'; return; }
   if (FORMS[S.form].fields.some(x => x.type==='file' && (!x.show || x.show(FVALS))) && !FILES.length){ err.textContent = 'Please upload at least one document. This application requires documents.'; const d = document.getElementById('drop'); if (d){ d.scrollIntoView({block:'center'}); d.focus(); } return; }
+  if (agMissing.length){ err.textContent = 'Please read and agree to: '+agMissing.map(a=>AGREEMENTS[a.id].title).join(', ')+'.'; const c = document.getElementById('ag_'+agMissing[0].id); if (c){ c.scrollIntoView({block:'center'}); c.focus(); } return; }
   if (S.pubFull){ err.textContent = 'Online storage is full, so applications cannot be submitted right now. Please contact the Building Department.'; return; }
   btn.disabled = true; err.textContent='';
   const F = FORMS[S.form], vals = {};
@@ -1021,13 +1086,14 @@ async function submitForm(e){
     btn.textContent = 'Submitting…';
     const fees = computeFees(S.form, vals, false);
     const createdAt = new Date().toISOString();
-    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, staff:{ permitNo:'', payment:'' } } });
+    const agreements = formAgreements(F, FVALS).map(a => ({ id:a.id, title:AGREEMENTS[a.id].title, at:createdAt }));
+    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' } } });
     for (let i=0;i<opt.length;i++){
       btn.textContent = 'Uploading document '+(i+1)+' of '+opt.length+'…';
       const data = await readDataUrl(opt[i].blob);
       await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:Object.assign({ app:APP_TAG, submissionId:subId, index:i, data }, files[i]) });
     }
-    LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, files };
+    LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, agreements, files };
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
@@ -1050,9 +1116,9 @@ const COLS = [
   {k:'files', l:'Uploads', t:'F', get:s=>(s.files||[]).length, fmt:s=>'<span class="pdfs">'+(s.files||[]).slice(0,5).map(f=>'<span class="pdfi'+(/^image/.test(f.type)?' img':'')+'">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span>').join('')+((s.files||[]).length>5?'<small>+'+((s.files.length)-5)+'</small>':'')+'</span>'},
   {k:'total', l:'Grand Total Fee', t:'$', get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
   {k:'permitFee', l:'Permit Fee', t:'$', hide:true, get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
-  {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
+  {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','homeowner','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
   {k:'payment', l:'Payment', t:'S', get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
-  {k:'buildType', l:'Build Type', t:'T', only:['building','subtrade'], get:s=>s.fields.buildType||''},
+  {k:'buildType', l:'Build Type', t:'T', only:['building','homeowner','subtrade'], get:s=>s.fields.buildType||''},
   {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
   {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||''},
   {k:'email', l:'Applicant Email', t:'@', get:s=>s.fields.email||''},
@@ -1164,7 +1230,7 @@ function viewTable(){
    (isAdmin()?'<button class="btn sm" onclick="S.imp={form:S.form};go(\'import\')">'+ic('upload')+'Import from Jotform</button>':'')+'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
    (selN?rowBulkHtml(rows):'')+
    '<div class="grid-wrap">'+(rows.length?'<table class="grid"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
-   '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((k==='building'||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
+   '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((isBldg(k)||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
    (S.sel?panelHtml():'');
 }
 function sortBy(k){ S.sort = { k, d: S.sort.k===k ? -S.sort.d : (k==='createdAt'?-1:1) }; render(); }
@@ -1200,17 +1266,19 @@ function panelHtml(){
         qa.push('<div>'+esc(x.label.length>80?x.label.slice(0,80)+'…':x.label)+'</div><div>'+esc(x.type==='money'?money(num(v)):v)+'</div>'); });
       // drop empty section headers
       const clean = qa.filter((h,i)=>!(h.startsWith('<div class="h">') && (i===qa.length-1 || qa[i+1].startsWith('<div class="h">'))));
+      if (Array.isArray(s.agreements) && s.agreements.length){ clean.push('<div class="h">Terms &amp; agreements</div><div class="h" style="display:none"></div>');
+        s.agreements.forEach(a => clean.push('<div>'+esc(a.title||a.id)+'</div><div>Agreed '+esc(fmtDT(a.at))+'</div>')); }
       const fe = s.fees||{};
       body = '<div class="qa">'+clean.join('')+'<div class="h">Fees</div><div class="h" style="display:none"></div>'+
-        ((s.form==='building'||s.form==='subtrade')?'<div>Construction value</div><div class="num">'+money(fe.value)+'</div>':'')+
+        ((isBldg(s.form)||s.form==='subtrade')?'<div>Construction value</div><div class="num">'+money(fe.value)+'</div>':'')+
         '<div>Permit fee</div><div class="num">'+money(fe.permit)+(fe.doubled?' (doubled)':'')+'</div>'+
-        ((s.form==='building'||s.form==='subtrade')?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
+        ((isBldg(s.form)||s.form==='subtrade')?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
         '<div>Grand total</div><div class="num"><b>'+money(fe.total)+'</b></div></div>'+
         (s.editedAt?'<p class="hint" style="color:var(--muted);font-size:13px">Edited by staff '+fmtDT(s.editedAt)+'</p>':'');
     }
   } else if (S.tab==='office'){
     const ins = st.inspections||{};
-    const hasInsp = ['building','subtrade','pool'].includes(s.form);
+    const hasInsp = ['building','homeowner','subtrade','pool'].includes(s.form);
     body = '<form id="offf" class="fgrid">'+
       '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
@@ -1219,7 +1287,7 @@ function panelHtml(){
       '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>'+
       (hasInsp?'<div class="sect">Inspections</div><div class="fld full"><div class="insp"><span></span><span class="ihead">Date of inspection</span><span class="ihead">Completed by</span><span class="ihead">Date recorded</span>'+
         INSPECT.map(n=>{ const r = ins[n]||{}; return '<b>'+n+'</b><input type="date" id="i_'+n+'_d" aria-label="'+n+' date of inspection" value="'+esc(r.date||'')+'"><input type="text" id="i_'+n+'_b" aria-label="'+n+' completed by" placeholder="Completed by" value="'+esc(r.by||'')+'"><input type="date" id="i_'+n+'_r" aria-label="'+n+' date recorded" value="'+esc(r.recorded||'')+'">'; }).join('')+'</div></div>':'')+
-      ((s.form==='building'||s.form==='subtrade')?'<div class="sect">Certificate of Occupancy</div><div class="fld"><label class="l" for="o_co">Certificate of Occupancy given?</label><select id="o_co">'+['','Given','Not Given'].map(o=>'<option'+((st.co||'')===o?' selected':'')+' value="'+o+'">'+(o||'—')+'</option>').join('')+'</select></div>'+
+      ((isBldg(s.form)||s.form==='subtrade')?'<div class="sect">Certificate of Occupancy</div><div class="fld"><label class="l" for="o_co">Certificate of Occupancy given?</label><select id="o_co">'+['','Given','Not Given'].map(o=>'<option'+((st.co||'')===o?' selected':'')+' value="'+o+'">'+(o||'—')+'</option>').join('')+'</select></div>'+
         '<div class="fld"><label class="l" for="o_coInit">Initials sign off</label><input type="text" id="o_coInit" value="'+esc(st.coInit||'')+'"></div>'+
         '<div class="fld full"><label class="l" for="o_coComments">C of O comments</label><textarea id="o_coComments">'+esc(st.coComments||'')+'</textarea></div>':'')+
       '<div class="fld full"><label class="l" for="o_comments">Staff comments</label><textarea id="o_comments">'+esc(st.comments||'')+'</textarea></div></form>';
@@ -1318,10 +1386,11 @@ async function buildPdf(s){
   F.fields.forEach(x=>{ if (x.type==='section'){ sec = x.label; return; } if (!x.id||x.type==='file'||x.type==='note') return;
     const v = s.fields[x.id]; if (v==null||v==='') return; if (sec){ head(sec); sec=null; }
     row(x.label, x.type==='money'?money(num(v)):v); });
+  if (Array.isArray(s.agreements) && s.agreements.length){ head('Terms & agreements'); s.agreements.forEach(a => row(a.title||a.id, 'Agreed '+fmtDT(a.at))); }
   const fe = s.fees||{}; head('Fees');
-  if (s.form==='building'||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
+  if (isBldg(s.form)||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
   row('Permit fee', money(fe.permit)+(fe.doubled?'  (doubled - work started without permit)':''));
-  if (s.form==='building'||s.form==='subtrade') row('CICT fee', money(fe.cict));
+  if (isBldg(s.form)||s.form==='subtrade') row('CICT fee', money(fe.cict));
   row('Grand total', money(fe.total));
   head('Office use');
   row('Payment', payText(s)+(s.pay&&s.pay.lastReceipt?'  ·  receipt '+s.pay.lastReceipt:''));
@@ -1378,7 +1447,7 @@ const PDF_INFO = {
 const PDF_CACHE = {};
 async function buildFillable(key){
   if (PDF_CACHE[key]) return PDF_CACHE[key];
-  const D = PDF_FORMS[key], { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const D = PDF_FORMS[key], { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFDict, PDFCheckBox } = PDFLib;
   const r = await fetch(D.src); if (!r.ok) throw new Error('The form could not be loaded ('+r.status+').');
   const pdf = await PDFDocument.load(await r.arrayBuffer(), { ignoreEncryption:true });
   const font = await pdf.embedFont(StandardFonts.Helvetica), form = pdf.getForm(), pages = pdf.getPages();
@@ -1390,6 +1459,18 @@ async function buildFillable(key){
       tf.addToPage(page, { x, y, width:w, height:h, font, backgroundColor:bg, borderWidth:0 }); tf.setFontSize(k === 2 ? 10 : (h < 12 ? 8 : 9)); }
   });
   form.updateFieldAppearances(font);
+  // Checkboxes: give them what Acrobat and Mac Preview expect (check-mark font, an "Off" value
+  // and a check caption), not only Chrome.
+  const zadb = await pdf.embedFont(StandardFonts.ZapfDingbats);
+  const af = form.acroForm.dict; let dr = af.lookup(PDFName.of('DR'));
+  if (!(dr instanceof PDFDict)){ dr = pdf.context.obj({}); af.set(PDFName.of('DR'), dr); }
+  let dfont = dr.lookup(PDFName.of('Font')); if (!(dfont instanceof PDFDict)){ dfont = pdf.context.obj({}); dr.set(PDFName.of('Font'), dfont); }
+  dfont.set(PDFName.of('ZaDb'), zadb.ref);
+  form.getFields().forEach(fl => { if (!(fl instanceof PDFCheckBox)) return;
+    fl.acroField.dict.set(PDFName.of('DA'), PDFString.of('/ZaDb 0 Tf 0 g'));
+    fl.acroField.dict.set(PDFName.of('V'), PDFName.of('Off'));
+    fl.acroField.getWidgets().forEach(w => { w.getOrCreateAppearanceCharacteristics().setCaptions({ normal:'4' }); w.dict.set(PDFName.of('AS'), PDFName.of('Off')); });
+  });
   pdf.setTitle(D.title+' - City of Arab');
   return PDF_CACHE[key] = await pdf.save();
 }
@@ -2291,7 +2372,7 @@ function periodRange(p){
   return null;
 }
 function inPeriod(rows){ const r = periodRange(S.period||'all'); if (!r) return rows; return rows.filter(s=>{ const d = new Date(s.createdAt); return d>=r[0] && d<r[1]; }); }
-const HAS_CICT = k => k==='building' || k==='subtrade';
+const HAS_CICT = k => isBldg(k) || k==='subtrade';
 function dashHtml(k){
   const all = inPeriod(subsFor(k)), paid = all.filter(isPaid), unpaid = all.filter(s=>!isPaid(s));
   const sum = (rows,f) => rows.reduce((a,s)=>a+((s.fees&&s.fees[f])||0),0);
@@ -2606,13 +2687,14 @@ async function buildReceipt(r){
   row('License #', f.tradeLicense || f.gcLicense);
   row('Type of work', [f.buildType, f.projectType, f.signType, f.signFeature, f.poolType].filter(Boolean).join(' · '));
   row('Description', f.description);
+  if (Array.isArray(r.agreements) && r.agreements.length) row('Agreed to', r.agreements.map(a=>a.title||a.id).join('; '));
   row('Documents uploaded', (r.files||[]).length ? (r.files.length+' file'+(r.files.length===1?'':'s')) : 'None');
   y -= 6; page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1, color:line}); y -= 22;
   page.drawText('FEES', {x:M, y, size:10, font:bold, color:grey}); y -= 20;
   const fee = (l, v, b) => { page.drawText(l, {x:M, y, size:11.5, font:b?bold:reg, color:ink}); const t = money(v); page.drawText(t, {x:W-M-(b?bold:reg).widthOfTextAtSize(t, b?14:11.5), y, size:b?14:11.5, font:b?bold:reg, color:ink}); y -= b ? 26 : 18; };
   if (fe.value) fee('Construction value', fe.value);
   fee('Permit fee'+(fe.doubled?' (doubled)':''), fe.permit||0);
-  if (r.form==='building' || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
+  if (isBldg(r.form) || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
   page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
   fee('Amount due', fe.total||0, true);
   y -= 8;
