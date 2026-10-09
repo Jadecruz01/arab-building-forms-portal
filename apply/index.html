@@ -437,6 +437,116 @@ html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
   .pfoot-in{flex-direction:column;align-items:flex-start;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
   .pf-links{flex-direction:column;gap:8px}
 }
+/* ---------- v2.7: payments, Municipal Support Clerk workspace, access controls ---------- */
+.pill.partial{background:var(--sel);color:var(--city)}
+.paybox{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface2)}
+.paylist{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px;font-size:13.5px}
+.paylist li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline}
+.paylist li.rev{color:var(--muted);text-decoration:line-through}
+.wsw{display:inline-flex;margin-left:14px;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.wsw button{border:0;background:transparent;color:inherit;font:600 13px var(--f-body);padding:6px 12px;border-radius:999px;cursor:pointer;opacity:.8}
+.wsw button.on{background:#fff;color:var(--navy);opacity:1}
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.roles div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);display:grid;gap:3px;font-size:13.5px;color:var(--ink2)}
+.roles b{color:var(--ink);font-size:14px}
+.acc{display:grid;gap:4px}
+.addon{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink2);white-space:nowrap}
+tr.off td{color:var(--muted)}
+.ck-wrap{max-width:1040px;margin:0 auto;padding:22px 20px 40px;display:grid;gap:16px;align-content:start}
+.ck-title h1{font:800 28px/1.15 var(--f-disp);margin:0}
+.ck-title p{margin:4px 0 0;color:var(--ink2)}
+.ck-tabs{display:flex;gap:6px;border-bottom:1px solid var(--line)}
+.ck-tabs button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:10px 12px;font:600 14px var(--f-body);color:var(--ink2);border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}
+.ck-tabs button.on{color:var(--city);border-bottom-color:var(--city)}
+.ck-tabs svg{width:16px;height:16px}
+.ck-search{display:grid;gap:6px}
+.ck-sbox{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:6px 6px 6px 14px;background:var(--surface)}
+.ck-sbox:focus-within{border-color:var(--city);box-shadow:0 0 0 3px var(--sel)}
+.ck-sbox svg{width:20px;height:20px;color:var(--muted);flex:none}
+.ck-sbox input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-size:17px;padding:8px 0}
+.ck-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font:600 13.5px var(--f-body);color:var(--ink2);cursor:pointer}
+.chip.on{background:var(--city);border-color:var(--city);color:#fff}
+.ck-list{display:grid;gap:8px}
+.ck-row{display:flex;gap:14px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;cursor:pointer}
+.ck-row:hover{border-color:var(--city);box-shadow:var(--shadow)}
+.ck-row .ico{width:40px;height:40px;border-radius:9px;background:var(--sel);color:var(--city);display:grid;place-items:center;flex:none}
+.ck-row .ico svg{width:20px;height:20px}
+.ck-main{flex:1;min-width:0;display:grid;gap:2px}
+.ck-main b{font-size:15.5px;color:var(--ink)}
+.ck-main small{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ck-amt{display:grid;justify-items:end;gap:3px;flex:none}
+.ck-amt b{font-size:16px;color:var(--ink)}
+.ck-amt small{color:var(--muted);font-size:12px}
+.ck-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ck-head h1{font:800 26px/1.15 var(--f-disp);margin:0}
+.ck-head p{margin:2px 0 0;color:var(--ink2)}
+.ck-meta{margin:-6px 0 0;color:var(--ink2);font-size:14px}
+.ck-two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px}
+.ck-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 18px;display:grid;gap:10px;align-content:start}
+.ck-card h2{font:700 15px var(--f-body);margin:0;color:var(--ink)}
+.ck-dl{margin:0;display:grid;gap:6px}
+.ck-dl div{display:grid;grid-template-columns:150px 1fr;gap:10px;font-size:14.5px}
+.ck-dl dt{color:var(--muted)}
+.ck-dl dd{margin:0;color:var(--ink);overflow-wrap:anywhere}
+.ck-fees div{grid-template-columns:1fr auto}
+.ck-fees dd{text-align:right}
+.ck-fees .t{border-top:1px solid var(--line);padding-top:6px;font-weight:700}
+.ck-fees .due{font-size:18px;font-weight:800}
+.ck-fees .due dt{color:var(--ink)}
+.ck-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.ck-grid .full{grid-column:1/-1}
+.ck-money{display:flex;align-items:center;border:1px solid var(--line);border-radius:7px;background:var(--surface);padding-left:12px}
+.ck-money span{color:var(--muted);font-weight:700}
+.ck-money input{border:0!important;outline:0;flex:1;min-width:0;font-size:20px!important;font-weight:700;padding:9px 10px!important;background:transparent}
+.ck-methods{display:flex;gap:8px;flex-wrap:wrap}
+.ck-methods .opt{padding:10px 16px;font-weight:600}
+.ck-methods .opt.on{border-color:var(--city);background:var(--sel);color:var(--city)}
+.ck-confirm{border-color:var(--city);box-shadow:0 0 0 3px var(--sel)}
+.ck-confirm p{margin:0;color:var(--ink2)}
+.ck-big{font-size:18px}
+.ck-big b{font-size:30px;color:var(--ink)}
+.ck-paid{border-color:var(--ok);background:var(--okbg);grid-template-columns:auto 1fr;align-items:center;gap:12px}
+.ck-paid b{color:var(--ok);font-size:16px}
+.ck-ok{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-radius:12px;padding:14px 16px;background:var(--okbg);color:var(--ink);border:1px solid var(--ok)}
+.ck-ok > div{display:grid;gap:2px}
+.ck-ok b{color:var(--ok);font-size:16px}
+.ck-hist{display:grid;gap:8px}
+.ck-h{border:1px solid var(--line2);border-radius:10px;padding:10px 12px;display:grid;gap:4px}
+.ck-h.rev .ck-h1{color:var(--muted);text-decoration:line-through}
+.ck-h.isrev{background:var(--redbg)}
+.ck-h1{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline}
+.ck-h2{font-size:13px;color:var(--muted)}
+.ck-rev{display:grid;gap:6px}
+.ck-rev input{border:1px solid var(--line);border-radius:7px;padding:9px 10px;background:var(--surface)}
+.ck-tot{display:flex;gap:10px;flex-wrap:wrap}
+.ck-tot div{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface);display:grid;gap:2px;min-width:120px}
+.ck-tot span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.ck-tot b{font-size:18px}
+.ck-tot .t{border-color:var(--city)}
+tr.rev td{color:var(--muted)}
+@media (max-width:760px){
+  .roles{grid-template-columns:1fr}
+  .ck-wrap{padding:16px 14px 32px}
+  .ck-two,.ck-grid{grid-template-columns:1fr}
+  .ck-dl div{grid-template-columns:120px 1fr}
+  .ck-sbox .btn{display:none}
+  .ck-row{flex-wrap:wrap}
+  .ck-row .ico{display:none}
+  .ck-amt{justify-items:start;grid-auto-flow:column;align-items:center;gap:8px}
+  .ck-ok .btn,.ck-card .row .btn{width:100%;justify-content:center}
+  .wsw{margin-left:8px}
+  .wsw button{padding:5px 9px;font-size:12px}
+}
+
+@media (max-width:640px){
+  .jt-top{gap:10px;padding:0 12px}
+  .jt-top .bdiv{display:none}
+  .jt-top .bname{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .jt-top .bname small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .jt-top .tl{white-space:nowrap}
+  .jt-top .clogo{width:34px;height:34px}
+}
 </style>
 
 
@@ -449,7 +559,7 @@ html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
 const EMBED = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 if (EMBED) document.documentElement.classList.add('embed');
 const CITY_LOGO = 'city-logo.jpg';   // official City of Arab seal (cropped from arabcity.org), stored next to this page
-const brandHtml = sub => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" onerror="this.style.visibility=\'hidden\'"><span class="bdiv" aria-hidden="true"></span><span class="bname">Building Department<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
+const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img class="clogo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal" onerror="this.style.visibility=\'hidden\'"><span class="bdiv" aria-hidden="true"></span><span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
@@ -633,7 +743,7 @@ const DB = {
   }; }
 };
 async function loadSubs(){
-  if (!TOKEN) return;
+  if (!TOKEN || !canBuilding()) return;
   try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'submissions', p_where_field:'app', p_where_value:APP_TAG, p_order_field:'createdAt', p_order_dir:'desc', p_limit:500});
     S.subs = (r||[]).map(x => Object.assign({fields:{}, staff:{}, files:[]}, x.data, {id:x.id})); S.loaded = true; S.loadErr = '';
   }catch(e){ S.loaded = true; S.loadErr = e.message; }
@@ -751,7 +861,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.6.0';   // shown at the bottom of every page
+const APP_VERSION = '2.7.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -913,7 +1023,7 @@ async function submitForm(e){
 /* ================= STAFF: shared bits ================= */
 const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
 const fmtDT = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); };
-const isPaid = s => !!(s.staff && s.staff.payment && s.staff.payment!=='Please Select');
+const isPaid = s => { const st = payStatus(s); return st==='paid' || st==='none'; };   // 'none' = no fee due
 const subsFor = k => S.subs.filter(s => s.form===k);
 const INSPECT = ['Footing','Framing','Electrical','Plumbing','Final'];
 const COLS = [
@@ -925,7 +1035,7 @@ const COLS = [
   {k:'total', l:'Grand Total Fee', t:'$', get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
   {k:'permitFee', l:'Permit Fee', t:'$', hide:true, get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
   {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
-  {k:'payment', l:'Payment', t:'S', get:s=>isPaid(s)?1:0, fmt:s=>isPaid(s)?'<span class="pill paid">'+esc(s.staff.payment)+'</span>':'<span class="pill unpaid">Unpaid</span>'},
+  {k:'payment', l:'Payment', t:'S', get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
   {k:'buildType', l:'Build Type', t:'T', only:['building','subtrade'], get:s=>s.fields.buildType||''},
   {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
   {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||''},
@@ -940,11 +1050,11 @@ function visibleCols(k){
   return colsFor(k).filter(c => S.cols.on.includes(c.k));
 }
 function topBar(){
-  return '<header class="jt-top">'+brandHtml('Staff dashboard')+'<span class="sp"></span>'+
+  return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'Municipal Support Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'Municipal Support Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
    '<button class="tl hide-sm" title="My account" onclick="go(\'me\')">'+esc((S.me&&(S.me.name||S.me.email))||'')+'</button><button class="tl" onclick="lockStaff()">Sign out</button><span class="avatar" title="'+esc((S.me&&S.me.name)||'')+'">'+esc(((S.me&&(S.me.name||S.me.email))||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())+'</span></header>'+storageBanner();
 }
 async function lockStaff(){ const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
-const isAdmin = () => !!(S.me && S.me.role==='admin');
+const isAdmin = () => myAccess().admin;
 function storageBanner(){
   const st = S.storage; if (!st || st.pct < 80) return '';
   const full = st.pct >= 100;
@@ -955,7 +1065,7 @@ function storageBanner(){
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero"><img class="clogo lb-logo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal"><span class="lb-kicker">City of Arab, Alabama</span><h2>Building Department<br><em>staff portal</em></h2><p>Permits, inspections and certificates of occupancy for <span style="white-space:nowrap">A City on the Rise.</span></p></div>'+
+   '<div class="lb-wrap"><div class="lb-hero"><img class="clogo lb-logo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal"><span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the Municipal Support Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
@@ -1015,6 +1125,7 @@ function filteredRows(){
   if (S.filter==='starred') rows = rows.filter(s=>s.starred);
   if (S.filter==='unpaid') rows = rows.filter(s=>!isPaid(s));
   if (S.filter==='paid') rows = rows.filter(isPaid);
+  if (S.filter==='partial') rows = rows.filter(s=>payStatus(s)==='partial');
   if (q) rows = rows.filter(s => (JSON.stringify(s.fields)+' '+((s.staff&&s.staff.permitNo)||'')+' '+refNo(s.id)).toLowerCase().includes(q));
   const c = cols.find(c=>c.k===S.sort.k) || cols[0];
   return rows.slice().sort((a,b)=>{ const x=c.get(a), y=c.get(b); return (x<y?-1:x>y?1:0)*S.sort.d; });
@@ -1032,7 +1143,7 @@ function viewTable(){
    '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
    dashHtml(k)+
    '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
-   '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+   '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid (incl. partly paid)'],['partial','Partially paid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
    '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
    (isAdmin()?'<button class="btn sm" onclick="S.imp={form:S.form};go(\'import\')">'+ic('upload')+'Import from Jotform</button>':'')+'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
    (selN?rowBulkHtml(rows):'')+
@@ -1086,8 +1197,7 @@ function panelHtml(){
     const hasInsp = ['building','subtrade','pool'].includes(s.form);
     body = '<form id="offf" class="fgrid">'+
       '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
-      '<div class="fld"><label class="l" for="o_payment">Type of payment received</label><select id="o_payment">'+['Please Select','Check','Cash'].map(o=>'<option'+((st.payment||'Please Select')===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
-      '<div class="fld"><label class="l" for="o_checkNo">Check # / receipt #</label><input type="text" id="o_checkNo" value="'+esc(st.checkNo||'')+'"></div>'+
+      '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
       '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> Work started without a permit (double the permit fee)</label></div>'+
       '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
       '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>'+
@@ -1117,7 +1227,7 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel" role="dialog" aria-label="Submission">'+
    '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+(isPaid(s)?'<span class="pill paid">Paid</span>':'<span class="pill unpaid">Unpaid</span>')+'</small></div>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">From Jotform</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+'</small></div>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
    '<div class="p-body">'+body+'</div><div class="p-actions">'+actions+'</div></aside>';
@@ -1136,7 +1246,7 @@ async function saveEdit(){
 async function saveOffice(){
   const s = curSub(); if (!s||!DB) return;
   const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
-  const st = { permitNo:g('o_permitNo')||'', payment:g('o_payment')||'', checkNo:g('o_checkNo')||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' };
+  const st = { permitNo:g('o_permitNo')||'', payment:(s.staff&&s.staff.payment)||'', checkNo:(s.staff&&s.staff.checkNo)||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' };
   if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'' }; }); }
   if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||''; }
   const doubled = document.getElementById('o_double').checked;
@@ -1160,7 +1270,7 @@ function exportCsv(){
   const k=S.form, cols=colsFor(k), rows=filteredRows();
   const all = [...cols.filter(c=>c.k!=='files').map(c=>c.l), 'Documents'];
   const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const lines = [all.map(q).join(',')].concat(rows.map(s=>[...cols.filter(c=>c.k!=='files').map(c=>{ const v=c.get(s); return c.k==='createdAt'?fmtDate(v):c.k==='payment'?(isPaid(s)?s.staff.payment:'Unpaid'):v; }), (s.files||[]).map(f=>f.name).join('; ')].map(q).join(',')));
+  const lines = [all.map(q).join(',')].concat(rows.map(s=>[...cols.filter(c=>c.k!=='files').map(c=>{ const v=c.get(s); return c.k==='createdAt'?fmtDate(v):c.k==='payment'?payText(s):v; }), (s.files||[]).map(f=>f.name).join('; ')].map(q).join(',')));
   DL.save({ filename: FORMS[k].short.replace(/[^A-Za-z0-9]+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.csv', data: lines.join('\r\n') }).catch(e=>{ if(e&&e.code!=='declined') toast('Download failed.'); });
 }
 
@@ -1198,7 +1308,7 @@ async function buildPdf(s){
   if (s.form==='building'||s.form==='subtrade') row('CICT fee', money(fe.cict));
   row('Grand total', money(fe.total));
   head('Office use');
-  row('Payment received', isPaid(s)?st.payment+(st.checkNo?'  #'+st.checkNo:''):'Unpaid');
+  row('Payment', payText(s)+(s.pay&&s.pay.lastReceipt?'  ·  receipt '+s.pay.lastReceipt:''));
   row('Approval', [st.approvedBy, st.approvedDate].filter(Boolean).join('  ·  ')||'-');
   if (st.inspections) INSPECT.forEach(n=>{ const r=st.inspections[n]||{}; if (r.date||r.by||r.recorded) row(n+' inspection', [r.date&&'Inspected '+r.date, r.by&&'by '+r.by, r.recorded&&'recorded '+r.recorded].filter(Boolean).join(', ')); });
   if (st.co) row('Certificate of Occupancy', st.co+(st.coInit?'  ·  '+st.coInit:'')+(st.coComments?'\n'+st.coComments:''));
@@ -1332,6 +1442,285 @@ function viewPdfForm(){
    '</div></main></div>';
 }
 
+/* ================= roles & workspace access =================
+   Server-side rules live in bf_payments.sql; these only decide what to show.
+   building = Building Department workspace, payments = Municipal Support Clerk tools. */
+const myAccess = () => {
+  const m = S.me || {}, a = m.access;
+  if (a) return { building: !!a.building, payments: !!a.payments, admin: !!a.admin };
+  return { building: ['staff','admin'].includes(m.role), payments: ['clerk','admin'].includes(m.role), admin: m.role==='admin' };
+};
+const canBuilding = () => myAccess().building;
+const canPay = () => myAccess().payments;
+const homeView = () => canBuilding() ? 'staff' : canPay() ? 'clerk' : 'me';
+const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building || a.payments) : !!acc && ['staff','clerk','admin'].includes(acc.role); };
+function routeAllowed(v){
+  if (v==='me') return true;
+  if (v==='clerk') return canPay();
+  if (['users','purge','import','bugs'].includes(v)) return isAdmin();
+  if (v==='staff' || v==='table') return canBuilding();
+  return false;
+}
+const ROLE_LABEL = { staff:'Building Department', clerk:'Municipal Support Clerk', admin:'Administrator', citizen:'No access' };
+function goHome(){ go(homeView()); }
+
+/* ================= payment status (one definition used everywhere) ================= */
+const payStatus = s => {
+  const p = s && s.pay; if (p && p.status) return p.status;
+  if (s && s.staff && s.staff.payment && s.staff.payment!=='Please Select') return 'paid';
+  return (s && s.fees && Number(s.fees.total) > 0) ? 'unpaid' : 'none';
+};
+const PAY_LABEL = { paid:'Paid', partial:'Partially paid', unpaid:'Unpaid', none:'No fee' };
+const payPill = s => { const st = payStatus(s), p = (s && s.pay) || {};
+  const extra = st==='paid' ? (p.lastMethod || (s.staff && s.staff.payment) || '') : st==='partial' ? money(p.balance)+' due' : '';
+  return '<span class="pill '+({paid:'paid', partial:'partial', unpaid:'unpaid', none:'src'})[st]+'">'+PAY_LABEL[st]+(extra?' · '+esc(extra):'')+'</span>'; };
+const payText = s => { const st = payStatus(s), p = (s && s.pay) || {};
+  if (st==='paid') return 'Paid'+(p.lastMethod ? ' ('+p.lastMethod+(p.lastCheckNo?' #'+p.lastCheckNo:'')+')' : (s.staff && s.staff.payment ? ' ('+s.staff.payment+')' : ''));
+  if (st==='partial') return 'Partially paid: '+money(p.paid)+' of '+money(p.total)+', '+money(p.balance)+' due';
+  return PAY_LABEL[st]; };
+const PAY_METHODS = ['Cash','Check','Money order','Other'];
+const needsNo = m => m==='Check' || m==='Money order';
+const todayISO = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const fmtDay = d => { if (!d) return ''; const x = new Date(String(d).slice(0,10)+'T12:00:00'); return isNaN(x) ? d : x.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const pmtLabel = p => p.kind==='reversal' ? 'Reversal' : p.kind==='legacy' ? 'Before payment tracking' : 'Payment';
+
+/* Building Department "Office use" tab: payment is shown, never edited there. */
+const PH = {};   // submission id -> payment history
+async function loadPayHistory(id){ try{ PH[id] = await sbRpc('bf_payment_history', {p_token:TOKEN, p_sid:id}); }catch(e){ PH[id] = {err:e.message}; } if (S.sel===id) render(); }
+function payBoxHtml(s){
+  const st = payStatus(s), p = s.pay || {}, h = PH[s.id];
+  if (h === undefined) setTimeout(() => { if (PH[s.id]===undefined){ PH[s.id] = null; loadPayHistory(s.id); } }, 0);
+  const rows = Array.isArray(h) ? h : [];
+  return '<div class="paybox"><div class="row" style="justify-content:space-between;gap:8px">'+payPill(s)+
+    '<span class="num" style="color:var(--ink2)">'+(st==='none' ? 'No fee due' : 'Paid '+money(p.paid||((st==='paid')?(s.fees&&s.fees.total):0))+' of '+money(p.total!=null?p.total:(s.fees&&s.fees.total))+(st==='partial'?' · <b>'+money(p.balance)+' due</b>':''))+'</span></div>'+
+    (rows.length ? '<ul class="paylist">'+rows.map(r => '<li class="'+(r.reversedBy?'rev':'')+'"><span class="num">'+esc(r.receiptNo)+'</span><span>'+pmtLabel(r)+(r.method?' · '+esc(r.method)+(r.checkNo?' #'+esc(r.checkNo):''):'')+(r.receivedOn?' · '+fmtDay(r.receivedOn):'')+(r.reversedBy?' · reversed':'')+'</span><b class="num">'+money(r.amount)+'</b></li>').join('')+'</ul>' : (h===null ? '<p class="hint">Loading payment history…</p>' : ''))+
+    '<p class="hint" style="margin:6px 0 0;color:var(--muted);font-size:13px">Payments are recorded by the Municipal Support Clerk.'+(canPay()?'':' You can see the status here but cannot change it.')+'</p>'+
+    (canPay() && st!=='none' ? '<button type="button" class="btn sm" style="margin-top:8px" onclick="clerkOpen(\''+s.id+'\')">'+ic('ext')+'Open in Payments</button>' : '')+
+  '</div>';
+}
+
+/* ================= Municipal Support Clerk workspace ================= */
+S.ck = { q:'', status:'due', results:null, sel:null, rec:null, f:null, step:'form', err:'', dupOk:false, done:null, tab:'find', day:todayISO(), dayRows:null, revFor:null };
+let ckTimer = null;
+function ckFreshForm(rec){ const bal = rec && rec.pay ? Number(rec.pay.balance) : 0;
+  return { amount: bal > 0 ? bal.toFixed(2) : '', method:'', checkNo:'', on: todayISO(), note:'', req: null }; }
+async function clerkSearch(){
+  const my = (S.ck.seq = (S.ck.seq||0) + 1);
+  try{ const r = await sbRpc('bf_clerk_search', {p_token:TOKEN, p_q:S.ck.q, p_status:S.ck.status, p_limit:50}); if (my!==S.ck.seq) return; S.ck.results = r || []; S.ck.err = ''; }
+  catch(e){ if (my!==S.ck.seq) return; S.ck.results = []; S.ck.err = e.message; }
+  if (S.view==='clerk' && !S.ck.sel) render();
+}
+async function clerkLoad(){ if (S.ck.sel && !S.ck.rec) return clerkLoadRec(S.ck.sel); if (!S.ck.results) return clerkSearch(); }
+async function clerkLoadRec(id){
+  try{ const r = await sbRpc('bf_clerk_get', {p_token:TOKEN, p_sid:id}); if (S.ck.sel!==id) return; S.ck.rec = r; if (!S.ck.f) S.ck.f = ckFreshForm(r); }
+  catch(e){ S.ck.rec = {err:e.message}; }
+  if (S.view==='clerk') render();
+}
+function clerkOpen(id){ S.ck.sel = id; S.ck.rec = null; S.ck.f = null; S.ck.step = 'form'; S.ck.err = ''; S.ck.done = null; S.ck.revFor = null; S.ck.tab = 'find'; go('clerk'); clerkLoadRec(id); }
+function clerkBack(){ S.ck.sel = null; S.ck.rec = null; S.ck.f = null; S.ck.done = null; S.ck.revFor = null; render(); clerkSearch(); }
+function ckSet(k, v){ S.ck.f[k] = v; if (k==='method'){ S.ck.err=''; render(); } }
+
+function ckFindHtml(){
+  const C = S.ck, rows = C.results;
+  const chip = (v,l) => '<button type="button" class="chip'+(C.status===v?' on':'')+'" aria-pressed="'+(C.status===v)+'" onclick="S.ck.status=\''+v+'\';S.ck.results=null;render();clerkSearch()">'+l+'</button>';
+  return '<form class="ck-search" onsubmit="event.preventDefault();clearTimeout(ckTimer);clerkSearch()" role="search">'+
+      '<label for="ckq" class="l">Find an application</label>'+
+      '<div class="ck-sbox">'+ic('search')+'<input id="ckq" type="search" autocomplete="off" enterkeyhint="search" value="'+esc(C.q)+'" placeholder="Reference #, permit #, name, owner, address or phone"><button class="btn primary">Search</button></div>'+
+      '<span class="hint">The reference # is printed on the applicant\'s receipt. No receipt? Search by name, address or phone.</span>'+
+    '</form>'+
+    '<div class="ck-chips" role="group" aria-label="Show">'+chip('due','Needs payment')+chip('paid','Paid')+chip('all','All')+'</div>'+
+    (C.err ? '<p class="formerr">'+esc(C.err)+'</p>' : '')+
+    (!rows ? '<p class="empty">Searching…</p>' : !rows.length ? '<p class="empty">'+(C.q ? 'No applications match “'+esc(C.q)+'”. Try fewer words, the street name, or the phone number.' : C.status==='due' ? 'Nothing is waiting for payment.' : 'No applications found.')+'</p>' :
+    '<div class="ck-list">'+rows.map(r => { const f = r.fields || {}, F = FORMS[r.form] || {short:r.form, icon:'doc'};
+      return '<button type="button" class="ck-row" onclick="clerkOpen(\''+r.id+'\')"><span class="ico">'+ic(F.icon||'doc')+'</span>'+
+        '<span class="ck-main"><b>'+esc(f.applicant || 'Applicant')+'</b><small>'+esc(F.short||'')+' · Ref <span class="num">'+esc(r.ref)+'</span>'+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</small>'+
+        '<small>'+esc([f.address, f.owner && f.owner!==f.applicant ? 'Owner: '+f.owner : ''].filter(Boolean).join(' · '))+'</small></span>'+
+        '<span class="ck-amt">'+payPill(r)+'<b class="num">'+money(r.pay && r.pay.status ? (r.pay.status==='paid'||r.pay.status==='none' ? r.pay.total : r.pay.balance) : (r.fees||{}).total)+'</b><small>'+(r.pay && r.pay.status==='paid' ? 'paid' : r.pay && r.pay.status==='none' ? '' : 'due')+'</small></span></button>'; }).join('')+'</div>'+
+    (rows.length >= 50 ? '<p class="hint" style="text-align:center">Showing the 50 newest matches. Add more detail to narrow the search.</p>' : ''));
+}
+
+function ckRecordHtml(){
+  const C = S.ck, r = C.rec;
+  const back = '<button type="button" class="btn sm" onclick="clerkBack()">'+ic('left')+'Back to search</button>';
+  if (!r) return back+'<p class="empty">Loading application…</p>';
+  if (r.err) return back+'<p class="formerr">Could not open this application: '+esc(r.err)+'</p>';
+  const f = r.fields || {}, fe = r.fees || {}, p = r.pay || {}, F = FORMS[r.form] || {title:r.form, short:r.form};
+  const st = payStatus(r), bal = Number(p.balance)||0, f2 = C.f || (C.f = ckFreshForm(r));
+  const dl = (l, v) => v ? '<div><dt>'+l+'</dt><dd>'+esc(v)+'</dd></div>' : '';
+  const owner = f.owner || f.ownerName || '';
+  const work = [f.buildType, f.projectType, f.trade, f.signType, f.poolType].filter(Boolean).join(' · ');
+  let pay = '';
+  if (C.done){
+    const d = C.done;
+    pay = '<div class="ck-ok" role="status"><div><b>'+(d.kind==='reversal' ? 'Reversal recorded' : 'Payment recorded')+'</b>'+
+      '<span>'+(d.kind==='reversal' ? 'Receipt '+esc(d.receiptNo)+' cancels '+money(-d.amount)+'.' : money(d.amount)+' '+esc(d.method.toLowerCase())+(d.checkNo?' #'+esc(d.checkNo):'')+' · Receipt <b class="num">'+esc(d.receiptNo)+'</b>')+'</span></div>'+
+      (d.kind!=='reversal' ? '<button type="button" class="btn primary" onclick="printPayReceipt('+d.id+')">'+ic('down')+'Print payment receipt</button>' : '')+'</div>';
+  }
+  if (st==='none') pay += '<div class="ck-card"><p style="margin:0">This application has no fee, so there is nothing to collect.</p></div>';
+  else if (st==='paid') pay += '<div class="ck-card ck-paid"><b>Paid in full</b><span>'+money(p.paid)+(p.lastReceipt?' · last receipt '+esc(p.lastReceipt):'')+'</span></div>';
+  else if (C.step==='confirm'){
+    pay += '<div class="ck-card ck-confirm"><h2>Check before recording</h2>'+
+      '<p class="ck-big"><b class="num">'+money(f2.amount)+'</b> '+esc(f2.method.toLowerCase())+(f2.checkNo?' #'+esc(f2.checkNo):'')+'</p>'+
+      '<p>For <b>'+esc(f.applicant||'Applicant')+'</b> · Ref <span class="num">'+esc(r.ref)+'</span> · '+esc(F.short||'')+'<br>Received '+fmtDay(f2.on)+'. Balance after this payment: <b class="num">'+money(Math.max(bal - Number(f2.amount), 0))+'</b>'+(f2.note?'<br>Note: '+esc(f2.note):'')+'</p>'+
+      (C.err ? '<p class="formerr" role="alert">'+esc(C.err.replace(/^DUPLICATE:\s*/,''))+'</p>' : '')+
+      '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+        (C.err && /^DUPLICATE/.test(C.err) ? '<button type="button" class="btn danger" id="ckGo" onclick="ckRecord(true)">This is a separate payment, record it</button>' : '<button type="button" class="btn primary" id="ckGo" onclick="ckRecord(false)">'+ic('check')+'Record payment</button>')+
+        '<button type="button" class="btn" onclick="S.ck.step=\'form\';S.ck.err=\'\';render()">Go back</button></div></div>';
+  } else {
+    pay += '<form class="ck-card" id="ckf" onsubmit="event.preventDefault();ckReview()"><h2>Record a payment</h2>'+
+      '<div class="ck-grid">'+
+        '<div class="fld"><label class="l" for="ckAmt">Amount received</label><div class="ck-money"><span>$</span><input id="ckAmt" inputmode="decimal" autocomplete="off" value="'+esc(f2.amount)+'" oninput="S.ck.f.amount=this.value"></div><span class="hint">Balance due: '+money(bal)+'</span></div>'+
+        '<div class="fld"><label class="l" for="ckOn">Date received</label><input id="ckOn" type="date" max="'+todayISO()+'" value="'+esc(f2.on)+'" oninput="S.ck.f.on=this.value"></div>'+
+        '<div class="fld full"><span class="l" id="ckMl">Payment method</span><div class="ck-methods" role="radiogroup" aria-labelledby="ckMl">'+PAY_METHODS.map(m => '<label class="opt'+(f2.method===m?' on':'')+'"><input type="radio" name="ckM" value="'+m+'"'+(f2.method===m?' checked':'')+' onchange="ckSet(\'method\',this.value)"> '+m+'</label>').join('')+'</div></div>'+
+        (needsNo(f2.method) ? '<div class="fld"><label class="l" for="ckNo">'+(f2.method==='Check'?'Check':'Money order')+' number</label><input id="ckNo" autocomplete="off" value="'+esc(f2.checkNo)+'" oninput="S.ck.f.checkNo=this.value"></div>' : '')+
+        '<div class="fld'+(needsNo(f2.method)?'':' full')+'"><label class="l" for="ckNote">Note <span class="hint">(optional)</span></label><input id="ckNote" type="text" autocomplete="off" maxlength="500" value="'+esc(f2.note)+'" placeholder="'+(f2.method==='Other'?'Describe how it was paid':'Anything staff should know')+'" oninput="S.ck.f.note=this.value"></div>'+
+      '</div>'+(C.err ? '<p class="formerr" role="alert">'+esc(C.err)+'</p>' : '')+
+      '<div class="row"><button class="btn primary">Review payment</button></div></form>';
+  }
+  const hist = r.payments || [];
+  const histHtml = !hist.length ? '<p class="hint" style="margin:0">No payments recorded yet.</p>' :
+    '<div class="ck-hist">'+hist.slice().reverse().map(x => {
+      const canRev = x.kind!=='reversal' && !x.reversedBy;
+      return '<div class="ck-h'+(x.reversedBy?' rev':'')+(x.kind==='reversal'?' isrev':'')+'"><div class="ck-h1"><b class="num">'+esc(x.receiptNo)+'</b><span>'+pmtLabel(x)+(x.method?' · '+esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):''):'')+'</span><b class="num">'+money(x.amount)+'</b></div>'+
+        '<div class="ck-h2">'+(x.receivedOn?'Received '+fmtDay(x.receivedOn)+' · ':'')+'Recorded '+fmtDT(x.recordedAt)+(x.recordedBy?' by '+esc(x.recordedBy):'')+
+          (x.reversedBy?' · <b>Reversed</b>':'')+(x.kind==='reversal'?' · cancels '+esc((hist.find(y=>y.id===x.reverses)||{}).receiptNo||''):'')+(x.note?'<br>'+esc(x.note):'')+'</div>'+
+        (C.revFor===x.id ? '<div class="ck-rev"><label class="l" for="ckWhy">Why is this payment being reversed?</label><input id="ckWhy" autocomplete="off" maxlength="500" placeholder="e.g. Check returned by bank, entered on the wrong application"><div class="row" style="gap:8px"><button type="button" class="btn sm danger" onclick="ckReverse('+x.id+')">Reverse '+money(x.amount)+'</button><button type="button" class="btn sm ghost" onclick="S.ck.revFor=null;render()">Keep it</button></div></div>' :
+          '<div class="row" style="gap:6px">'+(x.kind!=='reversal'?'<button type="button" class="btn sm ghost" onclick="printPayReceipt('+x.id+')">'+ic('down')+'Receipt</button>':'')+(canRev?'<button type="button" class="btn sm ghost" onclick="S.ck.revFor='+x.id+';render()">Reverse…</button>':'')+'</div>')+
+      '</div>'; }).join('')+'</div>';
+  return back+
+   '<div class="ck-head"><div><h1>'+esc(f.applicant||'Applicant')+'</h1><p>'+esc(F.title||'')+'</p></div>'+payPill(r)+'</div>'+
+   '<p class="ck-meta">Ref <b class="num">'+esc(r.ref)+'</b> · '+(r.permitNo?'Permit # <b>'+esc(r.permitNo)+'</b>':'No permit # yet')+' · Submitted '+fmtDate(r.createdAt)+(r.imported?' · from Jotform':'')+'</p>'+
+   '<div class="ck-two">'+
+     '<section class="ck-card"><h2>Check the record</h2><dl class="ck-dl">'+
+       dl('Applicant', f.applicant)+dl('Phone', f.phone)+dl('Email', f.email)+dl('Property owner', owner)+
+       dl('Property address', [f.address, f.lot ? 'Lot '+f.lot : ''].filter(Boolean).join(', '))+(r.form==='moving'?dl('Moving to', f.toAddress):'')+
+       dl('Contractor / business', [f.contractor || f.subName, f.business].filter(Boolean).join(' · '))+dl('Type of work', work)+
+     '</dl></section>'+
+     '<section class="ck-card"><h2>Amount</h2><dl class="ck-dl ck-fees">'+
+       (fe.value ? '<div><dt>Construction value</dt><dd class="num">'+money(fe.value)+'</dd></div>' : '')+
+       '<div><dt>Permit fee'+(fe.doubled?' (doubled, work started without a permit)':'')+'</dt><dd class="num">'+money(fe.permit)+'</dd></div>'+
+       (fe.cict ? '<div><dt>CICT fee</dt><dd class="num">'+money(fe.cict)+'</dd></div>' : '')+
+       '<div class="t"><dt>Total fee</dt><dd class="num">'+money(p.total!=null?p.total:fe.total)+'</dd></div>'+
+       '<div><dt>Paid so far</dt><dd class="num">'+money(p.paid)+'</dd></div>'+
+       '<div class="due"><dt>Balance due</dt><dd class="num">'+money(bal)+'</dd></div>'+
+     '</dl></section>'+
+   '</div>'+pay+
+   '<section class="ck-card"><h2>Payment history</h2>'+histHtml+'</section>';
+}
+
+function ckReview(){
+  const f = S.ck.f, bal = Number((S.ck.rec.pay||{}).balance)||0, amt = Number(String(f.amount).replace(/[$,\s]/g,''));
+  S.ck.err = '';
+  if (!(amt > 0)) S.ck.err = 'Enter the amount received.';
+  else if (amt > bal + 0.004) S.ck.err = 'That is more than the balance due ('+money(bal)+').';
+  else if (!f.method) S.ck.err = 'Choose how the payment was made.';
+  else if (needsNo(f.method) && !String(f.checkNo).trim()) S.ck.err = 'Enter the '+f.method.toLowerCase()+' number.';
+  else if (!f.on || f.on > todayISO()) S.ck.err = 'Enter the date the payment was received (not a future date).';
+  if (S.ck.err){ render(); return; }
+  f.amount = amt.toFixed(2); f.checkNo = String(f.checkNo).trim();
+  if (!f.req) f.req = (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random()*16|0).toString(16)));
+  S.ck.step = 'confirm'; render();
+}
+async function ckRecord(allowDup){
+  const C = S.ck, f = C.f, b = document.getElementById('ckGo'); if (b){ b.disabled = true; b.textContent = 'Recording…'; }
+  try{
+    const r = await sbRpc('bf_record_payment', { p_token:TOKEN, p_sid:C.sel, p_amount:Number(f.amount), p_method:f.method, p_check_no:needsNo(f.method)?f.checkNo:'',
+      p_received_on:f.on, p_note:f.note||'', p_request_id:f.req, p_allow_duplicate:!!allowDup });
+    C.rec = r.record; C.done = r.payment; C.step = 'form'; C.err = ''; C.f = ckFreshForm(r.record);
+    syncSubPay(r.record); toast('Payment recorded');
+  }catch(e){ C.err = e.message || 'Could not record the payment. Try again.'; if (!/^DUPLICATE/.test(C.err)) f.req = null; }
+  render(); window.scrollTo(0,0);
+}
+async function ckReverse(id){
+  const why = (document.getElementById('ckWhy')||{}).value || '';
+  if (why.trim().length < 3){ toast('Explain why the payment is being reversed.'); return; }
+  try{ const r = await sbRpc('bf_reverse_payment', {p_token:TOKEN, p_payment_id:id, p_reason:why});
+    S.ck.rec = r.record; S.ck.done = r.payment; S.ck.revFor = null; S.ck.f = ckFreshForm(r.record); syncSubPay(r.record); toast('Payment reversed'); }
+  catch(e){ toast('Could not reverse: '+e.message); }
+  render(); window.scrollTo(0,0);
+}
+// keep the Building Department list (if loaded) in step with the server's new summary
+function syncSubPay(rec){ const s = S.subs.find(x=>x.id===rec.id); if (s){ s.pay = rec.pay; s.staff = Object.assign({}, s.staff, {payment: rec.pay.status==='paid' ? (rec.pay.lastMethod||'Paid') : '', checkNo: rec.pay.status==='paid' ? (rec.pay.lastCheckNo||'') : ''}); } delete PH[rec.id]; }
+
+/* today's payments, for balancing the drawer */
+async function ckLoadDay(){ S.ck.dayRows = null; render();
+  try{ S.ck.dayRows = await sbRpc('bf_clerk_day', {p_token:TOKEN, p_day:S.ck.day}); }catch(e){ S.ck.dayRows = {err:e.message}; }
+  render(); }
+function ckDayHtml(){
+  const rows = S.ck.dayRows;
+  const head = '<div class="row" style="gap:10px;align-items:flex-end;flex-wrap:wrap"><div class="fld"><label class="l" for="ckDay">Day</label><input id="ckDay" type="date" max="'+todayISO()+'" value="'+esc(S.ck.day)+'" onchange="S.ck.day=this.value;ckLoadDay()"></div>'+
+    (Array.isArray(rows) && rows.length ? '<button type="button" class="btn" onclick="ckDayCsv()">'+ic('down')+'Download CSV</button>' : '')+'</div>';
+  if (!rows) return head+'<p class="empty">Loading…</p>';
+  if (rows.err) return head+'<p class="formerr">'+esc(rows.err)+'</p>';
+  if (!rows.length) return head+'<p class="empty">No payments were recorded on '+fmtDay(S.ck.day)+'.</p>';
+  const by = {}; rows.forEach(x => { by[x.method] = (by[x.method]||0) + Number(x.amount); });
+  const total = rows.reduce((a,x)=>a+Number(x.amount),0);
+  return head+'<div class="ck-tot">'+Object.keys(by).map(m=>'<div><span>'+esc(m)+'</span><b class="num">'+money(by[m])+'</b></div>').join('')+'<div class="t"><span>Total</span><b class="num">'+money(total)+'</b></div></div>'+
+    '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Time</th><th>Receipt</th><th>Application</th><th>Method</th><th style="text-align:right">Amount</th><th>Recorded by</th></tr></thead><tbody>'+
+    rows.map(x=>'<tr'+(x.reversedBy?' class="rev"':'')+'><td>'+new Date(x.recordedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</td><td class="num">'+esc(x.receiptNo)+(x.reversedBy?' <span class="pill unpaid">reversed</span>':'')+(x.kind==='reversal'?' <span class="pill src">reversal</span>':'')+'</td>'+
+      '<td><button type="button" class="linkbtn" onclick="clerkOpen(\''+x.submissionId+'\')">'+esc(x.applicant||'Applicant')+'</button><br><small class="num" style="color:var(--muted)">Ref '+esc(x.ref)+'</small></td>'+
+      '<td>'+esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+'</td><td class="num" style="text-align:right">'+money(x.amount)+'</td><td>'+esc(x.recordedBy||'')+'</td></tr>').join('')+
+    '</tbody></table></div><p class="hint" style="color:var(--muted)">Reversals appear as negative amounts, so the total matches the money actually kept.</p>';
+}
+function ckDayCsv(){
+  const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const lines = [['Recorded at','Receipt #','Type','Reference #','Applicant','Address','Method','Check / money order #','Date received','Amount','Recorded by','Note'].map(q).join(',')]
+    .concat(S.ck.dayRows.map(x=>[fmtDT(x.recordedAt), x.receiptNo, pmtLabel(x)+(x.reversedBy?' (reversed)':''), x.ref, x.applicant, x.address, x.method, x.checkNo, x.receivedOn, Number(x.amount).toFixed(2), x.recordedBy, x.note].map(q).join(',')));
+  DL.save({ filename:'Payments-'+S.ck.day+'.csv', data:lines.join('\r\n') });
+}
+
+function viewClerk(){
+  const C = S.ck;
+  const tabs = '<div class="ck-tabs" role="tablist"><button role="tab" aria-selected="'+(C.tab==='find')+'" class="'+(C.tab==='find'?'on':'')+'" onclick="S.ck.tab=\'find\';S.ck.sel=null;render();if(!S.ck.results)clerkSearch()">'+ic('search')+'Find an application</button>'+
+    '<button role="tab" aria-selected="'+(C.tab==='day')+'" class="'+(C.tab==='day'?'on':'')+'" onclick="S.ck.tab=\'day\';S.ck.sel=null;ckLoadDay()">'+ic('grid')+'Payments by day</button></div>';
+  return topBar()+'<main class="ck-wrap">'+
+    (C.sel ? ckRecordHtml() : '<div class="ck-title"><h1>Payments</h1><p>Find an application, check the amount due, and record what the applicant paid.</p></div>'+tabs+(C.tab==='day' ? ckDayHtml() : ckFindHtml()))+
+  '</main>';
+}
+function bindClerk(){
+  const q = document.getElementById('ckq');
+  if (q) q.oninput = () => { S.ck.q = q.value; clearTimeout(ckTimer); ckTimer = setTimeout(clerkSearch, 300); };
+}
+
+/* ================= payment receipt (PDF) ================= */
+async function printPayReceipt(pid){
+  const r = S.ck.rec || {}, x = (r.payments||[]).find(p=>p.id===pid) || (S.ck.done && S.ck.done.id===pid ? S.ck.done : null);
+  if (!x){ toast('Open the application first.'); return; }
+  if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
+  try{
+    const { PDFDocument, StandardFonts, rgb } = PDFLib;
+    const pdf = await PDFDocument.create(), W = 612, H = 792, M = 54, page = pdf.addPage([W,H]);
+    const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+    const navy = rgb(0.06,0.2,0.45), gold = rgb(0.95,0.76,0.19), ink = rgb(0.04,0.08,0.3), grey = rgb(0.42,0.45,0.6), line = rgb(0.86,0.88,0.92);
+    const f = r.fields||{}, p = r.pay||{}, F = FORMS[r.form] || {title:r.form||''};
+    page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
+    let tx = M;
+    try{ const lb = new Uint8Array(await (await fetch(CITY_LOGO)).arrayBuffer());
+      const img = lb[0]===0x89 ? await pdf.embedPng(lb) : await pdf.embedJpg(lb);
+      page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
+    page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
+    page.drawText('Payment Receipt', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
+    page.drawText('740 N Main St, Arab, AL 35016', {x:tx, y:H-86, size:9.5, font:reg, color:rgb(0.85,0.88,1)});
+    page.drawRectangle({x:W-M-170, y:H-196, width:170, height:58, borderColor:navy, borderWidth:1.5, color:rgb(0.96,0.97,1)});
+    page.drawText('RECEIPT #', {x:W-M-158, y:H-158, size:8.5, font:bold, color:grey});
+    page.drawText(pdfSafe(x.receiptNo), {x:W-M-158, y:H-184, size:20, font:bold, color:navy});
+    let y = H-150;
+    page.drawText(x.kind==='legacy' ? 'PAYMENT ON FILE (RECORDED BEFORE PAYMENT TRACKING)' : 'PAYMENT RECEIVED', {x:M, y, size:11, font:bold, color:grey});
+    y -= 30; page.drawText(money(x.amount), {x:M, y, size:26, font:bold, color:ink});
+    y -= 20; page.drawText(pdfSafe(x.method+(x.checkNo?'  #'+x.checkNo:'')+(x.receivedOn?'  ·  received '+fmtDay(x.receivedOn):'')), {x:M, y, size:11.5, font:reg, color:ink});
+    y -= 34;
+    const row = (l, v, b) => { if (!v) return; page.drawText(l, {x:M, y, size:10, font:bold, color:grey}); page.drawText(pdfSafe(String(v)).slice(0,80), {x:M+170, y, size:11, font:b?bold:reg, color:ink}); y -= 20; };
+    row('Applied to', F.title||'', true); row('Reference #', r.ref); row('Permit #', r.permitNo);
+    row('Applicant', f.applicant, true); row('Property address', f.address); row('Property owner', f.owner);
+    y -= 6; page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1, color:line}); y -= 22;
+    row('Total fee', money(p.total)); row('Paid to date', money(p.paid)); row('Balance remaining', money(p.balance), true);
+    y -= 6; page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1, color:line}); y -= 22;
+    row('Recorded by', x.recordedBy); row('Recorded on', fmtDT(x.recordedAt)); if (x.reversedBy) row('Status', 'REVERSED. This payment was cancelled.', true); if (x.note) row('Note', x.note);
+    page.drawText(pdfSafe('Official record of a payment received by the City of Arab.  ·  '+x.receiptNo+'  ·  Ref '+r.ref), {x:M, y:40, size:8.5, font:reg, color:grey});
+    await DL.save({ filename:('Payment-'+x.receiptNo+'-'+(f.applicant||'')).replace(/[^A-Za-z0-9]+/g,'-').replace(/-+$/,'')+'.pdf', data: await pdf.save() });
+  }catch(e){ toast('Could not build the receipt: '+((e&&e.message)||'try again')); }
+}
+
 /* ================= render & boot ================= */
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
@@ -1340,8 +1729,15 @@ function render(){
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
+  else if (!routeAllowed(S.view)){
+    const from = S.view; S.view = homeView(); S.form = null; S.sel = null;
+    try{ history.replaceState(null, '', '#'+S.view); }catch(e){}
+    if (from!=='staff' && from!=='apps') setTimeout(() => toast('That page is not part of your workspace.'), 0);
+    if (S.view==='clerk') clerkLoad(); else if (S.view==='staff' && !S.loaded) loadSubs();
+    return render(); }
+  else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='purge' && isAdmin()) root.innerHTML = viewPurge();
-  else if (S.view==='users' && isAdmin()){ root.innerHTML = viewUsers(); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
+  else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
   else if (S.view==='import' && isAdmin()) root.innerHTML = viewImport();
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('mef').onsubmit = changeMyPassword; }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
@@ -1353,7 +1749,8 @@ function render(){
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  if (aid && (aid==='wsq'||aid==='tq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
+  document.title = (S.view==='apps'||S.view==='form'||S.view==='pdf') ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
+  if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
 function startForm(){ const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
 const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); };
@@ -1364,7 +1761,8 @@ function initRoute(){
   const pm = h.match(/^pdf-(\w+)$/);
   if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
-  else if (h==='staff'||h==='purge'||h==='users'||h==='me'||h==='import'||h==='bugs') S.view = h==='staff' ? 'staff' : h;
+  else if (['staff','purge','users','me','import','bugs','clerk'].includes(h)) S.view = h;
+  if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
 /* ================= storage meter, purge, staff accounts ================= */
@@ -1419,39 +1817,76 @@ async function loadUsers(){
 function genTempPw(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = new Uint32Array(10); crypto.getRandomValues(r); return [...r].map(x=>a[x%a.length]).join('').replace(/(.{5})/,'$1-'); }
 function viewUsers(){
   const u = S.users, showAll = !!S.showResidents;
-  const list = Array.isArray(u) ? u.filter(a => showAll || a.role==='staff' || a.role==='admin') : [];
-  const hidden = Array.isArray(u) ? u.length - u.filter(a=>a.role==='staff'||a.role==='admin').length : 0;
+  const portal = a => a.role!=='citizen';
+  const list = Array.isArray(u) ? u.filter(a => showAll || portal(a)) : [];
+  const hidden = Array.isArray(u) ? u.filter(a => !portal(a)).length : 0;
   const nc = S.newCreds;
-  return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div><h1>Staff accounts</h1>'+
-   '<p style="margin:0;color:var(--ink2);max-width:70ch"><b>Staff</b> can view, edit and download applications. <b>Administrator</b> can also delete, purge and manage staff logins.</p>'+
+  const roleSel = (id, v, lbl) => '<label for="r_'+id+'" class="vh">'+lbl+'</label><select class="mini" id="r_'+id+'" onchange="setAccess(\''+id+'\',{role:this.value})">'+
+    [['staff','Building Department'],['clerk','Municipal Support Clerk'],['admin','Administrator'],['citizen','No access']].map(o=>'<option value="'+o[0]+'"'+(v===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
+  const addon = a => { const id = esc(a.id), pr = a.perms || [];
+    if (a.role==='staff') return '<label class="addon"><input type="checkbox" '+(pr.includes('payments')?'checked':'')+' onchange="setAccess(\''+id+'\',{perms:this.checked?[\'payments\']:[]})"> Can also record payments</label>';
+    if (a.role==='clerk') return '<label class="addon"><input type="checkbox" '+(pr.includes('building')?'checked':'')+' onchange="setAccess(\''+id+'\',{perms:this.checked?[\'building\']:[]})"> Can also use Building Department</label>';
+    return ''; };
+  return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>Staff accounts</h1>'+
+   '<div class="roles"><div><b>Building Department</b><span>Applications, permits, inspections and certificates of occupancy. Sees whether a fee is paid but cannot record payments.</span></div>'+
+     '<div><b>Municipal Support Clerk</b><span>Looks up applications and records payments received. Does not see Building Department tools.</span></div>'+
+     '<div><b>Administrator</b><span>Both workspaces, plus staff accounts, Jotform import and freeing up space.</span></div></div>'+
    '<form class="card" id="addf"><h2>Add a staff member</h2><div class="fgrid">'+
     '<div class="fld"><label class="l" for="nuName">Name</label><input id="nuName" type="text" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuTitle">Title <span class="hint">(optional, shown when they sign in)</span></label><input id="nuTitle" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Building Inspector"></div>'+
     '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="8" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
-    '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Staff</option><option value="admin">Administrator</option></select></div>'+
+    '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Building Department</option><option value="clerk">Municipal Support Clerk</option><option value="admin">Administrator</option></select></div>'+
    '</div><span class="formerr" id="nuErr"></span><div class="row"><button class="btn primary" id="nuBtn">'+ic('user')+'Add staff member</button></div>'+
    (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
    '</form>'+
    (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
-   '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' resident account'+(hidden===1?'':'s')+' from the old forms site</label>':'')+'</div>'+
-   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Title</th><th>Email</th><th>Added</th><th>Access</th><th>Password</th><th></th></tr></thead><tbody>'+
-    list.map(a=>{ const me = S.me && a.id===S.me.id, id = esc(a.id);
-      return '<tr><td>'+esc(a.name||'')+'</td><td><label for="t_'+id+'" class="vh">Title for '+esc(a.name||a.email)+'</label><input class="mini ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></td><td>'+esc(a.email)+'</td><td>'+fmtDate(a.createdAt)+'</td><td>'+(me?'<span class="pill src">Administrator (you)</span>':
-      '<label for="r_'+id+'" style="position:absolute;left:-9999px">Access for '+esc(a.email)+'</label><select class="mini" id="r_'+id+'" onchange="setRole(\''+id+'\',this.value)">'+[['citizen','No access'],['staff','Staff'],['admin','Administrator']].map(o=>'<option value="'+o[0]+'"'+(a.role===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+'</td>'+
+   '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' account'+(hidden===1?'':'s')+' with no access</label>':'')+'</div>'+
+   '<div class="grid-wrap" style="max-height:none;border:1px solid var(--line);border-radius:8px"><table class="grid"><thead><tr><th>Name</th><th>Title</th><th>Email</th><th>Access</th><th>Status</th><th>Password</th><th></th></tr></thead><tbody>'+
+    list.map(a=>{ const me = S.me && a.id===S.me.id, id = esc(a.id), on = a.active!==false;
+      return '<tr'+(on?'':' class="off"')+'><td>'+esc(a.name||'')+'</td><td><label for="t_'+id+'" class="vh">Title for '+esc(a.name||a.email)+'</label><input class="mini ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></td><td>'+esc(a.email)+'</td>'+
+      '<td>'+(me?'<span class="pill src">Administrator (you)</span>':'<div class="acc">'+roleSel(id, a.role, 'Access for '+esc(a.email))+addon(a)+'</div>')+'</td>'+
+      '<td>'+(me?'<span class="pill paid">Active</span>':(on?'<span class="pill paid">Active</span> <button class="btn sm ghost" onclick="setAccess(\''+id+'\',{active:false})">Turn off</button>':'<span class="pill unpaid">Turned off</span> <button class="btn sm ghost" onclick="setAccess(\''+id+'\',{active:true})">Turn on</button>'))+'</td>'+
       '<td>'+(me?'<button class="btn sm" onclick="go(\'me\')">Change mine</button>':(S.resetFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="rp_'+id+'" class="mini" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:130px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></span>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</td>'+
-      '<td>'+(me?'':(S.removeFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><span>Remove?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Remove</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button></span>':'<button class="btn sm ghost" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Remove</button>'))+'</td></tr>'; }).join('')+
-   '</tbody></table></div>')+'</div>';
+      '<td>'+(me?'':(S.removeFor===a.id?'<span class="row" style="flex-wrap:nowrap;gap:6px"><span>Delete this login for good?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Delete</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button></span>':'<button class="btn sm ghost" title="Turning a login off keeps it on record; deleting removes it" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Delete</button>'))+'</td></tr>'; }).join('')+
+   '</tbody></table></div><p class="hint" style="color:var(--muted);font-size:13px;margin:0">To stop someone from signing in, use <b>Turn off</b>. Their name stays on the payments and records they made, and you can turn them back on later.</p>')+
+   '<details class="sched" id="auditBox" '+(S.auditOpen?'open':'')+' ontoggle="S.auditOpen=this.open;if(this.open&&!S.audit)loadAudit()"><summary>Recent activity (payments and access changes)</summary><div class="sched-body">'+auditHtml()+'</div></details>'+
+  '</div>';
+}
+async function setAccess(id, patch){
+  const a = S.users.find(x=>x.id===id); if (!a) return;
+  const role = patch.role || a.role, active = patch.active!=null ? patch.active : a.active!==false;
+  let perms = patch.perms || a.perms || [];
+  if (patch.role) perms = perms.filter(p => (role==='staff' && p==='payments') || (role==='clerk' && p==='building'));
+  try{ const acc = await sbRpc('bf_admin_set_access', {p_token:TOKEN, p_id:id, p_role:role, p_perms:perms, p_active:active});
+    Object.assign(a, acc); S.audit = null; toast(patch.active===false ? 'Login turned off' : patch.active===true ? 'Login turned on' : 'Access updated'); }
+  catch(e){ toast('Could not update: '+e.message); }
+  render();
+}
+async function loadAudit(){ try{ S.audit = await sbRpc('bf_admin_audit', {p_token:TOKEN, p_limit:100}); }catch(e){ S.audit = {err:e.message}; } if (S.view==='users') render(); }
+function auditHtml(){
+  const L = S.audit; if (!S.auditOpen) return ''; if (!L) return '<p class="empty">Loading…</p>'; if (L.err) return '<p class="formerr">'+esc(L.err)+'</p>';
+  if (!L.length) return '<p class="empty">No activity yet.</p>';
+  const ref = t => String(t||'').replace(/-/g,'').slice(0,8).toUpperCase();
+  const what = x => { const d = x.details || {};
+    if (x.action==='payment.recorded') return 'Recorded '+money(d.amount)+' '+(d.method||'').toLowerCase()+(d.checkNo?' #'+d.checkNo:'')+' ('+d.receiptNo+') for Ref '+ref(x.target);
+    if (x.action==='payment.reversed') return 'Reversed '+(d.original||'')+' for Ref '+ref(x.target)+(d.reason?': '+d.reason:'');
+    if (x.action==='payment.status') return 'Ref '+ref(x.target)+' payment status: '+(PAY_LABEL[d.from]||d.from)+' → '+(PAY_LABEL[d.to]||d.to);
+    if (x.action==='payment.migrated') return 'Carried over an existing “paid” mark ('+(d.method||'')+', '+money(d.amount)+') for Ref '+ref(x.target);
+    if (x.action==='access.created') return 'Added login '+(d.email||'')+' as '+(ROLE_LABEL[d.role]||d.role);
+    if (x.action==='access.changed'){ const b = d.before||{}, a = d.after||{};
+      if (!d.after) return 'Changed access to '+(ROLE_LABEL[d.role]||d.role);
+      const parts = []; if (b.role!==a.role) parts.push((ROLE_LABEL[b.role]||b.role)+' → '+(ROLE_LABEL[a.role]||a.role));
+      if (String(b.perms)!==String(a.perms)) parts.push('add-ons: '+((a.perms||[]).join(', ')||'none'));
+      if (b.active!==a.active) parts.push(a.active ? 'turned on' : 'turned off');
+      return 'Changed '+(d.email||'a login')+(parts.length?': '+parts.join('; '):''); }
+    return x.action; };
+  return '<table class="fees"><thead><tr><th>When</th><th>Who</th><th>What</th></tr></thead><tbody>'+L.map(x=>'<tr><td style="white-space:nowrap">'+fmtDT(x.at)+'</td><td>'+esc(x.by||'')+'</td><td>'+esc(what(x))+'</td></tr>').join('')+'</tbody></table>';
 }
 async function setTitle(id, title){
   try{ const acc = await sbRpc('bf_admin_set_title', {p_token:TOKEN, p_id:id, p_title:title}); const a = S.users.find(x=>x.id===id); if (a) a.title = acc.title;
     if (S.me && S.me.id===id) S.me.title = acc.title; toast(acc.title ? 'Title saved' : 'Title cleared'); }
   catch(e){ toast('Could not save title: '+e.message); }
-}
-async function setRole(id, role){
-  try{ await sbRpc('bf_update', {p_token:TOKEN, p_collection:'citizens', p_id:id, p_patch:{role}}); const a = S.users.find(x=>x.id===id); if (a) a.role = role; toast('Access updated'); }
-  catch(e){ toast('Could not update: '+e.message); }
-  render();
 }
 async function addStaff(e){
   e.preventDefault(); const err = document.getElementById('nuErr'), b = document.getElementById('nuBtn');
@@ -1461,7 +1896,7 @@ async function addStaff(e){
   const title = (document.getElementById('nuTitle')||{}).value || '';
   try{ const acc = await sbRpc('bf_admin_create_account', {p_token:TOKEN, p_email:email, p_name:name, p_pass:await sha256hex(pass), p_role:role});
     if (title.trim()) { try{ await sbRpc('bf_admin_set_title', {p_token:TOKEN, p_id:acc.id, p_title:title}); }catch(x){ toast('Login added, but the title did not save: '+x.message); } }
-    S.newCreds = {name, email:acc.email, pass}; S.users = null; await loadUsers(); toast('Staff member added'); }
+    S.newCreds = {name, email:acc.email, pass}; S.users = null; document.getElementById('addf').reset(); document.getElementById('nuPass').value = genTempPw(); await loadUsers(); toast('Staff member added'); }
   catch(x){ err.textContent = x.message; b.disabled = false; }
 }
 async function resetPw(id){
@@ -1477,7 +1912,7 @@ async function removeAcct(id){
 /* ================= "Hello" screen while the dashboard loads after sign-in ================= */
 function helloStart(acc){
   helloEnd(true);
-  const name = (acc.name || acc.email || '').trim(), title = (acc.title || '').trim() || (acc.role==='admin' ? 'Administrator' : 'Building Department staff');
+  const name = (acc.name || acc.email || '').trim(), title = (acc.title || '').trim() || ({admin:'Administrator', clerk:'Municipal Support Clerk', staff:'Building Department'})[acc.role] || 'City of Arab staff';
   const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   const d = document.createElement('div'); d.id = 'hello'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
   d.innerHTML = '<div class="hl-glow" aria-hidden="true"></div><div class="hl-in">'+
@@ -1509,10 +1944,13 @@ async function staffSignIn(e){
       return;
     }
     const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:document.getElementById('lgRem').checked });
-    if (!r || !r.account || !['staff','admin'].includes(r.account.role)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
+    if (!r || !r.account || !hasPortal(r.account)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
     TOKEN = r.token; S.me = r.account; S.staff = true; try{ localStorage.setItem('bdStaffToken', TOKEN); }catch(x){}
-    S.loaded = false; const hello = helloStart(r.account); render();
-    await Promise.all([loadSubs().catch(()=>{}), hello]); helloEnd();
+    S.loaded = false; const hello = helloStart(r.account);
+    if (!routeAllowed(S.view) || S.view==='staff') S.view = homeView();
+    try{ history.replaceState(null, '', '#'+S.view); }catch(e){}
+    render();
+    await Promise.all([(canBuilding() ? loadSubs() : clerkLoad()).catch(()=>{}), hello]); helloEnd();
   }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; }
 }
 initRoute();
@@ -1610,14 +2048,14 @@ function csvGeneric(rows, filename){
   const q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const lines = [head.map(q).join(',')].concat(rows.map(s=>{ const f=s.fields||{}, st=s.staff||{}, fe=s.fees||{};
     return [FORMS[s.form]?FORMS[s.form].short:s.form, fmtDate(s.createdAt), st.permitNo||'', f.applicant||'', f.email||'', f.phone||'', f.address||'', f.lot||'',
-      fe.value||'', fe.permit||0, fe.cict||0, fe.total||0, isPaid(s)?st.payment:'Unpaid', st.checkNo||'', st.co||'', (s.files||[]).map(x=>x.name).join('; ')].map(q).join(','); }));
+      fe.value||'', fe.permit||0, fe.cict||0, fe.total||0, payText(s), (s.pay&&s.pay.lastCheckNo)||st.checkNo||'', st.co||'', (s.files||[]).map(x=>x.name).join('; ')].map(q).join(','); }));
   DL.save({ filename, data: lines.join('\r\n') });
 }
 
 /* ================= my account: change password ================= */
 function viewMe(){
-  return topBar()+'<div class="purge" style="max-width:560px"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div><h1>My account</h1>'+
-   '<p style="margin:0;color:var(--ink2)">'+esc((S.me&&S.me.name)||'')+' · '+esc((S.me&&S.me.email)||'')+' · '+(isAdmin()?'Administrator':'Staff')+'</p>'+
+  return topBar()+'<div class="purge" style="max-width:560px"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>My account</h1>'+
+   '<p style="margin:0;color:var(--ink2)">'+esc((S.me&&S.me.name)||'')+' · '+esc((S.me&&S.me.email)||'')+' · '+esc(ROLE_LABEL[S.me&&S.me.role]||'Staff')+'</p>'+
    '<form class="card" id="mef"><h2>Change password</h2>'+
    '<div class="fld"><label class="l" for="meOld">Current password</label><input id="meOld" type="password" autocomplete="current-password" required></div>'+
    '<div class="fld"><label class="l" for="meNew">New password</label><input id="meNew" type="password" autocomplete="new-password" minlength="8" required><span class="hint">At least 8 characters.</span></div>'+
@@ -1931,7 +2369,7 @@ async function runZipAttach(){
 }
 /* ================= staff footer + bug reports ================= */
 const BUG_EMAIL = 'jade.cruz@collinsalexander.com';
-const AREAS = [['staff','Workspace (list of forms)'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['import','Import from Jotform'],['users','Staff accounts or passwords'],['other','Something else']];
+const AREAS = [['clerk','Payments (Municipal Support Clerk)'],['staff','Building Department workspace'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['import','Import from Jotform'],['users','Staff accounts or passwords'],['other','Something else']];
 function staffFooter(){
   return '<footer class="sfoot"><span>Designed and managed by Jade Cruz</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
@@ -1997,7 +2435,7 @@ async function delBug(id){
   sbRpc('bf_storage_status', {}).then(st => { S.storage = st; if (st && st.full){ S.pubFull = true; if (S.view==='form'){ const k = S.form; render(); } } }).catch(()=>{});
   if (TOKEN){
     try{ const me = await sbRpc('bf_me', {p_token:TOKEN});
-      if (me && ['staff','admin'].includes(me.role)){ S.me = me; S.staff = true; render(); await loadSubs(); }
+      if (me && hasPortal(me)){ S.me = me; S.staff = true; render(); if (canBuilding()) await loadSubs(); if (S.view==='clerk') clerkLoad(); }
       else { signOutLocal(); render(); }
     }catch(e){}
   }
