@@ -1028,8 +1028,10 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.12.0';   // shown at the bottom of every page
-const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
+const APP_VERSION = '2.12.1';   // shown at the bottom of every page
+const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app (not used for back links right now)
+// "Applications & Fees" back links open this site's own Applications page. To send them to the Jotform page instead: const HOME_LINK = 'href="'+APPS_URL+'" target="_top"';
+const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>';
@@ -1038,7 +1040,7 @@ function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand"><div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="'+APPS_URL+'" target="_top">Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
     '<div class="pf-ver">Version '+APP_VERSION+'</div></div></footer>';
 }
 function sideNav(){ return '';
@@ -1110,7 +1112,7 @@ function feeBoxHtml(key){
 function viewForm(){
   const F = FORMS[S.form];
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
    '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
 }
@@ -1188,7 +1190,7 @@ async function submitForm(e){
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
       '<p class="pg-sub" style="font-size:14px">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # '+refNo(subId)+' and '+esc(vals.email||'your email')+'.</p>'+
-      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" href="'+APPS_URL+'" target="_top">Back to Applications &amp; Fees</a></div></div>';
+      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -1246,7 +1248,7 @@ function viewPin(){
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
    '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
    '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
-   '<a class="btn ghost" href="'+APPS_URL+'" target="_top" style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
+   '<a class="btn ghost" '+HOME_LINK+' style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
    '<div class="lb-cap"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.pin+'</svg>Downtown Arab · Main Street from above</div><div class="lb-ver">Version '+APP_VERSION+'</div></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
@@ -1641,7 +1643,7 @@ function viewPdfForm(){
   const key = S.form, D = PDF_FORMS[key], I = PDF_INFO[key];
   const step = (n, t, body) => '<li class="pstep"><span class="pn">'+n+'</span><div><b>'+t+'</b>'+body+'</div></li>';
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" href="'+APPS_URL+'" target="_top">← Applications &amp; Fees</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
+   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(D.title)+'</h1><span class="hint" style="color:var(--muted)">'+esc(I.blurb)+'</span></div>'+
    '<ol class="psteps">'+
      step(1, 'Open the fillable form', '<p>Every blank on every page can be typed in, and every box can be checked. Sign where shown (type your name or sign after printing).</p>'+
        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="pdfGo_open" onclick="pdfFormAction(\''+key+'\',\'open\')">'+ic('ext')+'Open fillable form</button><button class="btn" id="pdfGo_save" onclick="pdfFormAction(\''+key+'\',\'save\')">'+ic('down')+'Download PDF</button></div><span class="formerr" id="pdfErr"></span>')+
@@ -1916,7 +1918,7 @@ function viewPhoneBlock(){
     '<div class="sheet phone-block"><h1 class="pg-h">Staff Portal: use a computer or iPad</h1>'+
     '<p class="pg-sub">The staff dashboard needs a bigger screen than a phone, so staff sign-in is turned off on phones. Please sign in from a computer or an iPad.</p>'+
     '<p class="pg-sub">Applicants can still fill out every application on a phone.</p>'+
-    '<div class="row" style="gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn primary" href="'+APPS_URL+'" target="_top">Applications &amp; Fees</a>'+
+    '<div class="row" style="gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn primary" '+HOME_LINK+'>Applications &amp; Fees</a>'+
     (TOKEN ? '<button type="button" class="btn" onclick="lockStaff()">Sign out on this phone</button>' : '')+'</div></div>'+
     pubFooter()+'</main></div>';
 }
@@ -2397,7 +2399,7 @@ async function printPayReceipt(pid){
 function viewStatus(){
   const R = S.st || (S.st = { ref:'', email:'' });
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" href="'+(EMBED?APPS_URL:'#apps')+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'apps\')"')+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
+   '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
      '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt (or your permit #) and the email address you used on the application.</span></div>'+
    '<form id="stf" class="fgrid" novalidate>'+
      '<div class="fld"><label class="l" for="stRef">Reference # or permit #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
