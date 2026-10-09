@@ -220,7 +220,7 @@ input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer
 .creds{background:var(--okbg);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:14px}
 .creds code{font-size:15px;user-select:all}
 a.brandbar{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
-.clogo{width:44px;height:44px;border-radius:50%;display:block;flex:none;object-fit:cover;object-position:center;background:#1e2a4a;box-shadow:0 0 0 2px rgba(242,194,48,.55)}
+.clogo{width:44px;height:44px;display:block;flex:none;object-fit:contain}
 .bdiv{width:1px;align-self:stretch;margin:4px 0;background:currentColor;opacity:.35}
 .bname{display:flex;flex-direction:column;font:700 17px/1.15 var(--f-disp);letter-spacing:.01em;min-width:0}
 .bname small{font:500 12px/1.3 var(--f-body);letter-spacing:.04em;opacity:.8;text-transform:uppercase}
@@ -355,7 +355,7 @@ html.embed .verfoot{color:var(--muted);padding:8px 0 4px}
 #hello .hl-glow{position:absolute;width:70vmax;height:70vmax;left:50%;top:38%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(242,194,48,.16) 0%,rgba(242,194,48,0) 60%);animation:hlGlow 3.2s ease-in-out infinite alternate}
 #hello .hl-in{position:relative;display:grid;justify-items:center;gap:6px;max-width:640px}
 #hello .hl-seal{position:relative;width:96px;height:96px;margin-bottom:26px;animation:hlPop .7s cubic-bezier(.2,1.4,.4,1) both}
-#hello .hl-seal img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+#hello .hl-seal img{width:100%;height:100%;object-fit:contain;display:block}
 #hello .hl-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(242,194,48,.7);animation:hlRing 1.8s ease-out .5s infinite}
 #hello .hl-part{margin:0;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f2c230;animation:hlUp .6s ease .25s both}
 #hello .hl-name{margin:4px 0 0;font:800 clamp(30px,6vw,52px)/1.1 var(--f-disp);letter-spacing:-.01em}
@@ -379,7 +379,7 @@ html.embed .verfoot{color:var(--muted);padding:8px 0 4px}
 .phead-wrap{background:var(--surface);border-bottom:1px solid var(--line)}
 .phead{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px}
 .pbrand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;min-width:0}
-.pbrand img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none}
+.pbrand img{width:44px;height:44px;object-fit:contain;flex:none}
 .pbrand span{display:flex;flex-direction:column;line-height:1.15;min-width:0}
 .pbrand small{font:800 10.5px/1.3 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .pbrand b{font:800 18px/1.15 var(--f-disp);color:var(--ink)}
@@ -402,7 +402,7 @@ html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
 .pfoot{background:var(--surface);border-top:1px solid var(--line);color:var(--ink2);font-size:13.5px}
 .pfoot-in{max-width:1120px;margin:0 auto;padding:22px 24px calc(22px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:14px 28px;flex-wrap:wrap}
 .pf-brand{display:flex;align-items:center;gap:12px}
-.pf-brand img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.pf-brand img{width:36px;height:36px;object-fit:contain}
 .pf-brand b{display:block;color:var(--ink);font-size:14px}
 .pf-brand span{color:var(--muted)}
 .pf-links{display:flex;gap:6px 18px;flex-wrap:wrap}
@@ -562,6 +562,8 @@ tr.rev td{color:var(--muted)}
 .scan-th img{height:58px;width:auto;max-width:140px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid var(--line2)}
 .scan-th .ph{display:grid;place-items:center;width:120px;height:58px;font-size:12px;color:var(--muted);background:var(--surface2);border-radius:4px}
 .scan-th .cap{font-size:12.5px;color:var(--ink2);line-height:1.35}
+
+.phone-block{display:grid;gap:12px;padding-top:28px;padding-bottom:40px}
 </style>
 
 
@@ -876,7 +878,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.9.0';   // shown at the bottom of every page
+const APP_VERSION = '2.9.1';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -1080,7 +1082,7 @@ function storageBanner(){
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero"><img class="clogo lb-logo" src="'+CITY_LOGO+'" alt="City of Arab, Alabama seal"><span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the Municipal Support Clerk. You go straight to your own workspace.</p></div>'+
+   '<div class="lb-wrap"><div class="lb-hero"><span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the Municipal Support Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
@@ -1706,25 +1708,22 @@ function bindClerk(){
   if (q) q.oninput = () => { S.ck.q = q.value; clearTimeout(ckTimer); ckTimer = setTimeout(clerkSearch, 300); };
 }
 
-/* ================= City seal for PDFs and printed receipts =================
-   city-logo.jpg is a square with its own dark background; on a receipt header it showed
-   as a box. Cut it to a round seal with a transparent outside. */
-let sealP = null;
-function sealCanvas_(){
-  return new Promise((ok, no) => { const im = new Image();
-    im.onload = () => { const S = 480, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
-      g.save(); g.beginPath(); g.arc(S/2, S/2, S/2 - 3, 0, Math.PI*2); g.clip(); g.drawImage(im, 0, 0, S, S); g.restore();
-      g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.arc(S/2, S/2, S/2 - 2, 0, Math.PI*2); g.stroke();
-      ok(c); };
-    im.onerror = () => no(new Error('The City seal did not load.')); im.src = CITY_LOGO; });
+/* ================= phones: the staff portal is for computers and iPads ================= */
+function isPhone(){
+  const ua = navigator.userAgent || '';
+  if (/iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return false;      // iPad (incl. iPadOS desktop mode)
+  if (/iPhone|iPod|Windows Phone|Android.+Mobile|Mobile.+Firefox/i.test(ua)) return true;
+  return Math.min(screen.width, screen.height) < 600 && !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 }
-function sealPngBytes(){
-  if (!sealP) sealP = sealCanvas_().then(c => new Promise((ok, no) => c.toBlob(b => b ? b.arrayBuffer().then(a => ok(new Uint8Array(a))) : no(new Error('seal')), 'image/png'))).catch(e => { sealP = null; throw e; });
-  return sealP;
+function viewPhoneBlock(){
+  return '<div class="app pub"><main class="stage">'+pubHeader()+
+    '<div class="sheet phone-block"><h1 class="pg-h">Staff Portal: use a computer or iPad</h1>'+
+    '<p class="pg-sub">The staff dashboard needs a bigger screen than a phone, so staff sign-in is turned off on phones. Please sign in from a computer or an iPad.</p>'+
+    '<p class="pg-sub">Applicants can still fill out every application on a phone.</p>'+
+    '<div class="row" style="gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn primary" href="'+APPS_URL+'" target="_top">Applications &amp; Fees</a>'+
+    (TOKEN ? '<button type="button" class="btn" onclick="lockStaff()">Sign out on this phone</button>' : '')+'</div></div>'+
+    pubFooter()+'</main></div>';
 }
-let sealUrlP = null;
-function sealDataUrl(){ if (!sealUrlP) sealUrlP = sealCanvas_().then(c => c.toDataURL('image/png')).catch(() => { sealUrlP = null; return ''; }); return sealUrlP; }
-
 /* ================= paper receipt: opens the computer's print dialog (any installed printer) ================= */
 function printHtml(html){
   const old = document.getElementById('printFrame'); if (old) old.remove();
@@ -1746,11 +1745,11 @@ function findPayment(pid){
 async function printPaperReceipt(pid){
   const r = S.ck.rec || {}, x = findPayment(pid);
   if (!x || !r.id){ toast('Open the application first.'); return; }
-  const f = r.fields || {}, p = r.pay || {}, F = FORMS[r.form] || {title:r.form||''}, seal = await sealDataUrl();
+  const f = r.fields || {}, p = r.pay || {}, F = FORMS[r.form] || {title:r.form||''};
   const row = (l, v, b) => v ? '<tr><th>'+esc(l)+'</th><td>'+(b?'<b>':'')+esc(v)+(b?'</b>':'')+'</td></tr>' : '';
   const html = '<!doctype html><html><head><meta charset="utf-8"><title>Receipt '+esc(x.receiptNo)+'</title><style>'+
     '@page{size:letter;margin:0.6in}*{box-sizing:border-box}body{margin:0;font:13px/1.45 Helvetica,Arial,sans-serif;color:#111}'+
-    '.hd{display:flex;align-items:center;gap:16px;border-bottom:2px solid #111;padding-bottom:12px}.hd img{width:72px;height:72px}'+
+    '.hd{display:flex;align-items:center;gap:16px;border-bottom:2px solid #111;padding-bottom:12px}'+
     '.hd small{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#444}.hd b{display:block;font-size:22px}'+
     '.no{margin-left:auto;text-align:right;border:1.5px solid #111;border-radius:6px;padding:8px 12px}.no small{font-size:10px;letter-spacing:.08em;color:#444;display:block}.no b{font-size:20px}'+
     '.amt{margin:22px 0 4px;font-size:34px;font-weight:700}.how{font-size:15px;margin-bottom:18px}'+
@@ -1758,7 +1757,7 @@ async function printPaperReceipt(pid){
     'tr+tr th,tr+tr td{border-top:1px solid #ddd}.rev{border:2px solid #111;padding:8px 12px;font-weight:700;margin:10px 0}'+
     '.ft{margin-top:26px;border-top:1px solid #999;padding-top:10px;font-size:11.5px;color:#444}'+
     '</style></head><body>'+
-    '<div class="hd">'+(seal?'<img src="'+seal+'" alt="">':'')+'<div><small>City of Arab, Alabama</small><b>Payment Receipt</b><span>740 N Main St, Arab, AL 35016</span></div>'+
+    '<div class="hd"><div><small>City of Arab, Alabama</small><b>Payment Receipt</b><span>740 N Main St, Arab, AL 35016</span></div>'+
       '<div class="no"><small>RECEIPT #</small><b>'+esc(x.receiptNo)+'</b></div></div>'+
     (x.reversedBy ? '<div class="rev">REVERSED: this payment was cancelled and is not valid.</div>' : '')+
     '<div class="amt">'+money(x.amount)+'</div>'+
@@ -2022,8 +2021,6 @@ async function printPayReceipt(pid){
     const f = r.fields||{}, p = r.pay||{}, F = FORMS[r.form] || {title:r.form||''};
     page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
     let tx = M;
-    try{ const img = await pdf.embedPng(await sealPngBytes());
-      page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
     page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
     page.drawText('Payment Receipt', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
     page.drawText('740 N Main St, Arab, AL 35016', {x:tx, y:H-86, size:9.5, font:reg, color:rgb(0.85,0.88,1)});
@@ -2053,6 +2050,7 @@ function render(){
   if (S.view==='apps') root.innerHTML = viewApps();
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
+  else if (isPhone()) root.innerHTML = viewPhoneBlock();
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (!routeAllowed(S.view)){
@@ -2245,7 +2243,7 @@ function helloStart(acc){
   const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   const d = document.createElement('div'); d.id = 'hello'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
   d.innerHTML = '<div class="hl-glow" aria-hidden="true"></div><div class="hl-in">'+
-    '<div class="hl-seal"><img src="'+CITY_LOGO+'" alt=""><span class="hl-ring" aria-hidden="true"></span></div>'+
+    '<div class="hl-seal"><img src="'+CITY_LOGO+'" alt=""></div>'+
     '<p class="hl-part">'+esc(part)+'</p>'+
     '<h1 class="hl-name"><span class="hl-hi">Hello,</span> '+name.split(/\s+/).map((w,i)=>'<span class="hl-w" style="animation-delay:'+(0.42+i*0.12).toFixed(2)+'s">'+esc(w)+'</span>').join(' ')+'</h1>'+
     '<p class="hl-title">'+esc(title)+'</p>'+
@@ -2579,11 +2577,9 @@ async function buildReceipt(r){
   const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
   const navy = rgb(0.06,0.2,0.45), gold = rgb(0.95,0.76,0.19), ink = rgb(0.04,0.08,0.3), grey = rgb(0.42,0.45,0.6), line = rgb(0.86,0.88,0.92);
   const F = FORMS[r.form] || {title:r.form, short:r.form}, f = r.fields || {}, fe = r.fees || {};
-  // header band with the City seal
+  // header band
   page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
   let tx = M;
-  try{ const img = await pdf.embedPng(await sealPngBytes());
-    page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
   page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
   page.drawText('Building Department', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
   page.drawText('740 N Main St, Arab, AL 35016  ·  buildingdept@arabcity.org', {x:tx, y:H-86, size:9.5, font:reg, color:rgb(0.85,0.88,1)});
