@@ -547,6 +547,21 @@ tr.rev td{color:var(--muted)}
   .jt-top .tl{white-space:nowrap}
   .jt-top .clogo{width:34px;height:34px}
 }
+
+/* v2.9: check scans + printed receipts */
+.scandlg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:var(--surface);border-radius:12px;box-shadow:0 20px 60px rgba(6,10,40,.35);padding:18px;z-index:50;display:grid;gap:12px}
+.scandlg.wide{width:min(900px,calc(100% - 24px))}
+#scanbox .veil,#scanview .veil{z-index:49}
+.scan-choices{display:flex;gap:10px;flex-wrap:wrap}
+.scan-choices .btn{cursor:pointer}
+.scan-big{width:100%;max-height:62vh;object-fit:contain;background:#f1f3f8;border:1px solid var(--line);border-radius:8px}
+.scan-mini{height:72px;max-width:180px;object-fit:contain;border:1px solid var(--line);border-radius:6px;background:#fff}
+.scan-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.scan-th{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:6px 10px 6px 6px;cursor:pointer;font:inherit;color:inherit;max-width:100%}
+.scan-th:hover{border-color:var(--city)}
+.scan-th img{height:58px;width:auto;max-width:140px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid var(--line2)}
+.scan-th .ph{display:grid;place-items:center;width:120px;height:58px;font-size:12px;color:var(--muted);background:var(--surface2);border-radius:4px}
+.scan-th .cap{font-size:12.5px;color:var(--ink2);line-height:1.35}
 </style>
 
 
@@ -861,7 +876,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.8.0';   // shown at the bottom of every page
+const APP_VERSION = '2.9.0';   // shown at the bottom of every page
 const APPS_URL = 'https://app.jotform.com/261578162936164/page/18';   // official Applications & Fees page in the City's Jotform app
 function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)"><img src="'+CITY_LOGO+'" alt="" onerror="this.style.visibility=\'hidden\'"><span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
@@ -1493,7 +1508,7 @@ function payBoxHtml(s){
   const rows = Array.isArray(h) ? h : [];
   return '<div class="paybox"><div class="row" style="justify-content:space-between;gap:8px">'+payPill(s)+
     '<span class="num" style="color:var(--ink2)">'+(st==='none' ? 'No fee due' : 'Paid '+money(p.paid||((st==='paid')?(s.fees&&s.fees.total):0))+' of '+money(p.total!=null?p.total:(s.fees&&s.fees.total))+(st==='partial'?' · <b>'+money(p.balance)+' due</b>':''))+'</span></div>'+
-    (rows.length ? '<ul class="paylist">'+rows.map(r => '<li class="'+(r.reversedBy?'rev':'')+'"><span class="num">'+esc(r.receiptNo)+'</span><span>'+pmtLabel(r)+(r.method?' · '+esc(r.method)+(r.checkNo?' #'+esc(r.checkNo):''):'')+(r.receivedOn?' · '+fmtDay(r.receivedOn):'')+(r.reversedBy?' · reversed':'')+'</span><b class="num">'+money(r.amount)+'</b></li>').join('')+'</ul>' : (h===null ? '<p class="hint">Loading payment history…</p>' : ''))+
+    (rows.length ? '<ul class="paylist">'+rows.map(r => '<li class="'+(r.reversedBy?'rev':'')+'"><span class="num">'+esc(r.receiptNo)+'</span><span>'+pmtLabel(r)+(r.method?' · '+esc(r.method)+(r.checkNo?' #'+esc(r.checkNo):''):'')+(r.receivedOn?' · '+fmtDay(r.receivedOn):'')+(r.reversedBy?' · reversed':'')+'</span><b class="num">'+money(r.amount)+'</b></li>').join('')+'</ul>'+(rows.some(r=>r.scan)?'<div class="scan-row">'+rows.filter(r=>r.scan).map(scanThumbHtml).join('')+'</div>':'') : (h===null ? '<p class="hint">Loading payment history…</p>' : ''))+
     '<p class="hint" style="margin:6px 0 0;color:var(--muted);font-size:13px">Payments are recorded by the Municipal Support Clerk.'+(canPay()?'':' You can see the status here but cannot change it.')+'</p>'+
     (canPay() && st!=='none' ? '<button type="button" class="btn sm" style="margin-top:8px" onclick="clerkOpen(\''+s.id+'\')">'+ic('ext')+'Open in Payments</button>' : '')+
   '</div>';
@@ -1516,7 +1531,7 @@ async function clerkLoadRec(id){
   catch(e){ S.ck.rec = {err:e.message}; }
   if (S.view==='clerk') render();
 }
-function clerkOpen(id){ S.ck.sel = id; S.ck.rec = null; S.ck.f = null; S.ck.step = 'form'; S.ck.err = ''; S.ck.done = null; S.ck.revFor = null; S.ck.tab = 'find'; go('clerk'); clerkLoadRec(id); }
+function clerkOpen(id){ S.ck.scan = null; S.ck.sel = id; S.ck.rec = null; S.ck.f = null; S.ck.step = 'form'; S.ck.err = ''; S.ck.done = null; S.ck.revFor = null; S.ck.tab = 'find'; go('clerk'); clerkLoadRec(id); }
 function clerkBack(){ S.ck.sel = null; S.ck.rec = null; S.ck.f = null; S.ck.done = null; S.ck.revFor = null; render(); clerkSearch(); }
 function ckSet(k, v){ S.ck.f[k] = v; if (k==='method'){ S.ck.err=''; render(); } }
 
@@ -1554,14 +1569,14 @@ function ckRecordHtml(){
     const d = C.done;
     pay = '<div class="ck-ok" role="status"><div><b>'+(d.kind==='reversal' ? 'Reversal recorded' : 'Payment recorded')+'</b>'+
       '<span>'+(d.kind==='reversal' ? 'Receipt '+esc(d.receiptNo)+' cancels '+money(-d.amount)+'.' : money(d.amount)+' '+esc(d.method.toLowerCase())+(d.checkNo?' #'+esc(d.checkNo):'')+' · Receipt <b class="num">'+esc(d.receiptNo)+'</b>')+'</span></div>'+
-      (d.kind!=='reversal' ? '<button type="button" class="btn primary" onclick="printPayReceipt('+d.id+')">'+ic('down')+'Print payment receipt</button>' : '')+'</div>';
+      (d.kind!=='reversal' ? '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" onclick="printPaperReceipt('+d.id+')">'+ic('down')+'Print receipt</button><button type="button" class="btn" onclick="printPayReceipt('+d.id+')">Download PDF</button></div>' : '')+'</div>';
   }
   if (st==='none') pay += '<div class="ck-card"><p style="margin:0">This application has no fee, so there is nothing to collect.</p></div>';
   else if (st==='paid') pay += '<div class="ck-card ck-paid"><b>Paid in full</b><span>'+money(p.paid)+(p.lastReceipt?' · last receipt '+esc(p.lastReceipt):'')+'</span></div>';
   else if (C.step==='confirm'){
     pay += '<div class="ck-card ck-confirm"><h2>Check before recording</h2>'+
       '<p class="ck-big"><b class="num">'+money(f2.amount)+'</b> '+esc(f2.method.toLowerCase())+(f2.checkNo?' #'+esc(f2.checkNo):'')+'</p>'+
-      '<p>For <b>'+esc(f.applicant||'Applicant')+'</b> · Ref <span class="num">'+esc(r.ref)+'</span> · '+esc(F.short||'')+'<br>Received '+fmtDay(f2.on)+'. Balance after this payment: <b class="num">'+money(Math.max(bal - Number(f2.amount), 0))+'</b>'+(f2.note?'<br>Note: '+esc(f2.note):'')+'</p>'+
+      '<p>For <b>'+esc(f.applicant||'Applicant')+'</b> · Ref <span class="num">'+esc(r.ref)+'</span> · '+esc(F.short||'')+'<br>Received '+fmtDay(f2.on)+'. Balance after this payment: <b class="num">'+money(Math.max(bal - Number(f2.amount), 0))+'</b>'+(f2.note?'<br>Note: '+esc(f2.note):'')+'</p>'+(C.scan && needsNo(f2.method) ? '<img class="scan-mini" src="'+C.scan.url+'" alt="Scan of the '+esc(f2.method.toLowerCase())+'">' : '')+
       (C.err ? '<p class="formerr" role="alert">'+esc(C.err.replace(/^DUPLICATE:\s*/,''))+'</p>' : '')+
       '<div class="row" style="gap:8px;flex-wrap:wrap">'+
         (C.err && /^DUPLICATE/.test(C.err) ? '<button type="button" class="btn danger" id="ckGo" onclick="ckRecord(true)">This is a separate payment, record it</button>' : '<button type="button" class="btn primary" id="ckGo" onclick="ckRecord(false)">'+ic('check')+'Record payment</button>')+
@@ -1572,8 +1587,11 @@ function ckRecordHtml(){
         '<div class="fld"><label class="l" for="ckAmt">Amount received</label><div class="ck-money"><span>$</span><input id="ckAmt" inputmode="decimal" autocomplete="off" value="'+esc(f2.amount)+'" oninput="S.ck.f.amount=this.value"></div><span class="hint">Balance due: '+money(bal)+'</span></div>'+
         '<div class="fld"><label class="l" for="ckOn">Date received</label><input id="ckOn" type="date" max="'+todayISO()+'" value="'+esc(f2.on)+'" oninput="S.ck.f.on=this.value"></div>'+
         '<div class="fld full"><span class="l" id="ckMl">Payment method</span><div class="ck-methods" role="radiogroup" aria-labelledby="ckMl">'+PAY_METHODS.map(m => '<label class="opt'+(f2.method===m?' on':'')+'"><input type="radio" name="ckM" value="'+m+'"'+(f2.method===m?' checked':'')+' onchange="ckSet(\'method\',this.value)"> '+m+'</label>').join('')+'</div></div>'+
-        (needsNo(f2.method) ? '<div class="fld"><label class="l" for="ckNo">'+(f2.method==='Check'?'Check':'Money order')+' number</label><input id="ckNo" autocomplete="off" value="'+esc(f2.checkNo)+'" oninput="S.ck.f.checkNo=this.value"></div>' : '')+
+        (needsNo(f2.method) ? '<div class="fld"><label class="l" for="ckNo">'+(f2.method==='Check'?'Check':'Money order')+' number</label><input id="ckNo" type="text" autocomplete="off" value="'+esc(f2.checkNo)+'" oninput="S.ck.f.checkNo=this.value"></div>' : '')+
         '<div class="fld'+(needsNo(f2.method)?'':' full')+'"><label class="l" for="ckNote">Note <span class="hint">(optional)</span></label><input id="ckNote" type="text" autocomplete="off" maxlength="500" value="'+esc(f2.note)+'" placeholder="'+(f2.method==='Other'?'Describe how it was paid':'Anything staff should know')+'" oninput="S.ck.f.note=this.value"></div>'+
+        (needsNo(f2.method) ? '<div class="fld full"><span class="l">Scan of the '+esc(f2.method.toLowerCase())+' <span class="hint">(optional, saved with the payment)</span></span>'+
+          (C.scan ? '<div class="row" style="gap:10px;align-items:center;flex-wrap:wrap"><img class="scan-mini" src="'+C.scan.url+'" alt="Scan of the '+esc(f2.method.toLowerCase())+'"><button type="button" class="btn sm" onclick="openScanner({kind:\'form\',label:\''+esc(f2.method.toLowerCase())+'\'})">Scan again</button><button type="button" class="btn sm ghost" onclick="S.ck.scan=null;render()">Remove</button></div>'
+                  : '<div><button type="button" class="btn sm" onclick="openScanner({kind:\'form\',label:\''+esc(f2.method.toLowerCase())+'\'})">'+ic('upload')+'Scan or upload the '+esc(f2.method.toLowerCase())+'</button></div>')+'</div>' : '')+
       '</div>'+(C.err ? '<p class="formerr" role="alert">'+esc(C.err)+'</p>' : '')+
       '<div class="row"><button class="btn primary">Review payment</button></div></form>';
   }
@@ -1585,7 +1603,9 @@ function ckRecordHtml(){
         '<div class="ck-h2">'+(x.receivedOn?'Received '+fmtDay(x.receivedOn)+' · ':'')+'Recorded '+fmtDT(x.recordedAt)+(x.recordedBy?' by '+esc(x.recordedBy):'')+
           (x.reversedBy?' · <b>Reversed</b>':'')+(x.kind==='reversal'?' · cancels '+esc((hist.find(y=>y.id===x.reverses)||{}).receiptNo||''):'')+(x.note?'<br>'+esc(x.note):'')+'</div>'+
         (C.revFor===x.id ? '<div class="ck-rev"><label class="l" for="ckWhy">Why is this payment being reversed?</label><input id="ckWhy" autocomplete="off" maxlength="500" placeholder="e.g. Check returned by bank, entered on the wrong application"><div class="row" style="gap:8px"><button type="button" class="btn sm danger" onclick="ckReverse('+x.id+')">Reverse '+money(x.amount)+'</button><button type="button" class="btn sm ghost" onclick="S.ck.revFor=null;render()">Keep it</button></div></div>' :
-          '<div class="row" style="gap:6px">'+(x.kind!=='reversal'?'<button type="button" class="btn sm ghost" onclick="printPayReceipt('+x.id+')">'+ic('down')+'Receipt</button>':'')+(canRev?'<button type="button" class="btn sm ghost" onclick="S.ck.revFor='+x.id+';render()">Reverse…</button>':'')+'</div>')+
+          (x.scan ? '<div class="scan-row">'+scanThumbHtml(x)+'</div>' : '')+
+          '<div class="row" style="gap:6px;flex-wrap:wrap">'+(x.kind!=='reversal'?'<button type="button" class="btn sm ghost" onclick="printPaperReceipt('+x.id+')">'+ic('down')+'Print receipt</button><button type="button" class="btn sm ghost" onclick="printPayReceipt('+x.id+')">PDF</button>':'')+
+          (x.kind!=='reversal' && !x.reversedBy && (needsNo(x.method) || x.scan) ? '<button type="button" class="btn sm ghost" onclick="openScanner({kind:\'payment\',pid:'+x.id+',label:\''+esc((x.method||'check').toLowerCase())+'\'})">'+ic('upload')+(x.scan?'Replace scan':'Add '+esc((x.method||'check').toLowerCase())+' scan')+'</button>' : '')+(canRev?'<button type="button" class="btn sm ghost" onclick="S.ck.revFor='+x.id+';render()">Reverse…</button>':'')+'</div>')+
       '</div>'; }).join('')+'</div>';
   return back+
    '<div class="ck-head"><div><h1>'+esc(f.applicant||'Applicant')+'</h1><p>'+esc(F.title||'')+'</p></div>'+payPill(r)+'</div>'+
@@ -1628,6 +1648,10 @@ async function ckRecord(allowDup){
       p_received_on:f.on, p_note:f.note||'', p_request_id:f.req, p_allow_duplicate:!!allowDup });
     C.rec = r.record; C.done = r.payment; C.step = 'form'; C.err = ''; C.f = ckFreshForm(r.record);
     syncSubPay(r.record); toast('Payment recorded');
+    const scan = C.scan; C.scan = null; render(); window.scrollTo(0,0);
+    if (scan && needsNo(r.payment.method)) await uploadScan(r.payment.id, scan);
+    if (['Cash','Check','Money order'].includes(r.payment.method)) printPaperReceipt(r.payment.id);
+    return;
   }catch(e){ C.err = e.message || 'Could not record the payment. Try again.'; if (!/^DUPLICATE/.test(C.err)) f.req = null; }
   render(); window.scrollTo(0,0);
 }
@@ -1682,6 +1706,309 @@ function bindClerk(){
   if (q) q.oninput = () => { S.ck.q = q.value; clearTimeout(ckTimer); ckTimer = setTimeout(clerkSearch, 300); };
 }
 
+/* ================= City seal for PDFs and printed receipts =================
+   city-logo.jpg is a square with its own dark background; on a receipt header it showed
+   as a box. Cut it to a round seal with a transparent outside. */
+let sealP = null;
+function sealCanvas_(){
+  return new Promise((ok, no) => { const im = new Image();
+    im.onload = () => { const S = 480, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+      g.save(); g.beginPath(); g.arc(S/2, S/2, S/2 - 3, 0, Math.PI*2); g.clip(); g.drawImage(im, 0, 0, S, S); g.restore();
+      g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.arc(S/2, S/2, S/2 - 2, 0, Math.PI*2); g.stroke();
+      ok(c); };
+    im.onerror = () => no(new Error('The City seal did not load.')); im.src = CITY_LOGO; });
+}
+function sealPngBytes(){
+  if (!sealP) sealP = sealCanvas_().then(c => new Promise((ok, no) => c.toBlob(b => b ? b.arrayBuffer().then(a => ok(new Uint8Array(a))) : no(new Error('seal')), 'image/png'))).catch(e => { sealP = null; throw e; });
+  return sealP;
+}
+let sealUrlP = null;
+function sealDataUrl(){ if (!sealUrlP) sealUrlP = sealCanvas_().then(c => c.toDataURL('image/png')).catch(() => { sealUrlP = null; return ''; }); return sealUrlP; }
+
+/* ================= paper receipt: opens the computer's print dialog (any installed printer) ================= */
+function printHtml(html){
+  const old = document.getElementById('printFrame'); if (old) old.remove();
+  const f = document.createElement('iframe'); f.id = 'printFrame'; f.title = 'Receipt to print'; f.setAttribute('aria-hidden', 'true');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f);
+  const d = f.contentDocument; d.open(); d.write(html); d.close();
+  const waits = [...d.images].map(i => i.complete ? null : new Promise(r => { i.onload = i.onerror = r; }));
+  return Promise.race([Promise.all(waits), new Promise(r => setTimeout(r, 2500))]).then(() => {
+    try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ toast('Could not open the print window: '+e.message); }
+  });
+}
+function findPayment(pid){
+  const r = S.ck && S.ck.rec, list = (r && r.payments) || [];
+  let x = list.find(p => p.id === pid) || (S.ck && S.ck.done && S.ck.done.id === pid ? S.ck.done : null);
+  if (!x) Object.keys(PH).some(k => Array.isArray(PH[k]) && (x = PH[k].find(p => p.id === pid)));
+  return x || null;
+}
+async function printPaperReceipt(pid){
+  const r = S.ck.rec || {}, x = findPayment(pid);
+  if (!x || !r.id){ toast('Open the application first.'); return; }
+  const f = r.fields || {}, p = r.pay || {}, F = FORMS[r.form] || {title:r.form||''}, seal = await sealDataUrl();
+  const row = (l, v, b) => v ? '<tr><th>'+esc(l)+'</th><td>'+(b?'<b>':'')+esc(v)+(b?'</b>':'')+'</td></tr>' : '';
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>Receipt '+esc(x.receiptNo)+'</title><style>'+
+    '@page{size:letter;margin:0.6in}*{box-sizing:border-box}body{margin:0;font:13px/1.45 Helvetica,Arial,sans-serif;color:#111}'+
+    '.hd{display:flex;align-items:center;gap:16px;border-bottom:2px solid #111;padding-bottom:12px}.hd img{width:72px;height:72px}'+
+    '.hd small{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#444}.hd b{display:block;font-size:22px}'+
+    '.no{margin-left:auto;text-align:right;border:1.5px solid #111;border-radius:6px;padding:8px 12px}.no small{font-size:10px;letter-spacing:.08em;color:#444;display:block}.no b{font-size:20px}'+
+    '.amt{margin:22px 0 4px;font-size:34px;font-weight:700}.how{font-size:15px;margin-bottom:18px}'+
+    'table{border-collapse:collapse;width:100%;margin:6px 0 14px}th{text-align:left;font-weight:600;color:#444;width:38%;padding:5px 0;vertical-align:top}td{padding:5px 0}'+
+    'tr+tr th,tr+tr td{border-top:1px solid #ddd}.rev{border:2px solid #111;padding:8px 12px;font-weight:700;margin:10px 0}'+
+    '.ft{margin-top:26px;border-top:1px solid #999;padding-top:10px;font-size:11.5px;color:#444}'+
+    '</style></head><body>'+
+    '<div class="hd">'+(seal?'<img src="'+seal+'" alt="">':'')+'<div><small>City of Arab, Alabama</small><b>Payment Receipt</b><span>740 N Main St, Arab, AL 35016</span></div>'+
+      '<div class="no"><small>RECEIPT #</small><b>'+esc(x.receiptNo)+'</b></div></div>'+
+    (x.reversedBy ? '<div class="rev">REVERSED: this payment was cancelled and is not valid.</div>' : '')+
+    '<div class="amt">'+money(x.amount)+'</div>'+
+    '<div class="how">'+esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+(x.receivedOn?' · received '+esc(fmtDay(x.receivedOn)):'')+'</div>'+
+    '<table>'+row('Applied to', F.title, true)+row('Reference #', r.ref)+row('Permit #', r.permitNo)+row('Applicant', f.applicant, true)+row('Property address', f.address)+row('Property owner', f.owner)+'</table>'+
+    '<table>'+row('Total fee', money(p.total))+row('Paid to date', money(p.paid))+row('Balance remaining', money(p.balance), true)+'</table>'+
+    '<table>'+row('Recorded by', x.recordedBy)+row('Recorded on', fmtDT(x.recordedAt))+row('Note', x.note)+'</table>'+
+    '<div class="ft">Official receipt for a payment received by the City of Arab. Keep it for your records. Questions: buildingdept@arabcity.org</div>'+
+    '</body></html>';
+  return printHtml(html);
+}
+
+/* ================= check scans ================= */
+const SCANS = {};   // payment id -> {data, mime, ...} | null while loading | {err}
+async function loadScan(pid){ try{ SCANS[pid] = await sbRpc('bf_check_scan', {p_token:TOKEN, p_payment_id:pid}) || {err:'No scan on file.'}; }catch(e){ SCANS[pid] = {err:e.message}; } render(); }
+const scanSrc = s => s && s.data ? 'data:'+(s.mime||'image/jpeg')+';base64,'+s.data : '';
+function scanThumbHtml(x){
+  if (!x || !x.scan) return '';
+  const s = SCANS[x.id];
+  if (s === undefined) setTimeout(() => { if (SCANS[x.id] === undefined){ SCANS[x.id] = null; loadScan(x.id); } }, 0);
+  return '<button type="button" class="scan-th" onclick="viewScan('+x.id+')" aria-label="View the scanned check for receipt '+esc(x.receiptNo)+'">'+
+    (s && s.data ? '<img src="'+scanSrc(s)+'" alt="">' : '<span class="ph">'+(s && s.err ? 'Scan unavailable' : 'Loading scan…')+'</span>')+
+    '<span class="cap">'+esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+' · paid '+esc(fmtDay(x.receivedOn || x.recordedAt))+'<br>Marked paid by '+esc(x.recordedBy||'')+'</span></button>';
+}
+function closeScanView(){ const b = document.getElementById('scanview'); if (b) b.remove(); document.removeEventListener('keydown', scanViewKey); }
+function scanViewKey(e){ if (e.key === 'Escape') closeScanView(); }
+function viewScan(pid){
+  const x = findPayment(pid), s = SCANS[pid];
+  if (!x || !s || !s.data){ toast('The scan is still loading.'); return; }
+  closeScanView();
+  const box = document.createElement('div'); box.id = 'scanview';
+  const cap = esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+' · '+money(x.amount)+' · receipt '+esc(x.receiptNo);
+  box.innerHTML = '<div class="veil" onclick="closeScanView()"></div><div class="scandlg wide" role="dialog" aria-modal="true" aria-labelledby="svT">'+
+    '<div style="display:flex;gap:12px;align-items:flex-start"><h2 id="svT" style="margin:0;flex:1;font:700 17px var(--f-body)">'+cap+'</h2><button class="btn sm ghost" onclick="closeScanView()" aria-label="Close">Close</button></div>'+
+    '<img class="scan-big" src="'+scanSrc(s)+'" alt="Scanned check">'+
+    '<dl class="ck-dl"><div><dt>Date paid</dt><dd>'+esc(fmtDay(x.receivedOn || x.recordedAt))+'</dd></div>'+
+      '<div><dt>Marked paid by</dt><dd>'+esc(x.recordedBy||'')+' · '+esc(fmtDT(x.recordedAt))+'</dd></div>'+
+      '<div><dt>Scan added by</dt><dd>'+esc(s.addedBy||'')+' · '+esc(fmtDT(s.addedAt))+(s.earlier?' (replaces '+s.earlier+' earlier scan'+(s.earlier===1?'':'s')+', kept on record)':'')+'</dd></div></dl>'+
+    '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="printScan('+pid+')">'+ic('down')+'Print</button><button class="btn sm" onclick="DL.save({filename:\'Check-'+esc(x.receiptNo)+'.jpg\', data: scanBlob('+pid+')})">Download</button></div></div>';
+  document.body.appendChild(box); document.addEventListener('keydown', scanViewKey);
+  box.querySelector('button').focus();
+}
+function scanBlob(pid){ const s = SCANS[pid]; const bin = atob(s.data), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], {type: s.mime||'image/jpeg'}); }
+function printScan(pid){
+  const x = findPayment(pid), s = SCANS[pid]; if (!x || !s) return;
+  printHtml('<!doctype html><html><head><meta charset="utf-8"><style>@page{size:letter;margin:0.6in}body{margin:0;font:13px Helvetica,Arial,sans-serif}img{max-width:100%;border:1px solid #999}</style></head><body>'+
+    '<p><b>Check '+esc(x.checkNo||'')+' · '+money(x.amount)+' · receipt '+esc(x.receiptNo)+'</b><br>Paid '+esc(fmtDay(x.receivedOn || x.recordedAt))+' · marked paid by '+esc(x.recordedBy||'')+'</p><img src="'+scanSrc(s)+'"></body></html>');
+}
+
+/* ---- scanner: camera or a file from the scanner; auto crop, straighten and fit ---- */
+const SC = { stream:null, src:null, out:null, rot:0, auto:true, target:null, busy:false, found:true };
+function openScanner(target){
+  closeScanner(); SC.target = target; SC.src = SC.out = null; SC.rot = 0; SC.auto = true;
+  const box = document.createElement('div'); box.id = 'scanbox';
+  box.innerHTML = '<div class="veil"></div><div class="scandlg" role="dialog" aria-modal="true" aria-labelledby="scT"><h2 id="scT" style="margin:0;font:700 17px var(--f-body)">Scan the '+(target.label||'check')+'</h2><div id="scBody"></div></div>';
+  document.body.appendChild(box); document.addEventListener('keydown', scannerKey); scanStep('choose');
+}
+function scannerKey(e){ if (e.key === 'Escape') closeScanner(); }
+function closeScanner(){ if (SC.stream){ SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; } const b = document.getElementById('scanbox'); if (b) b.remove(); document.removeEventListener('keydown', scannerKey); }
+function scanStep(step, msg){
+  const el = document.getElementById('scBody'); if (!el) return;
+  if (SC.stream && step !== 'camera'){ SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; }
+  if (step === 'choose'){
+    el.innerHTML = (msg ? '<p class="formerr" role="alert">'+esc(msg)+'</p>' : '')+
+      '<p style="margin:0;color:var(--ink2)">Lay the check face up. The portal finds the check, straightens it, trims the background and shrinks it before saving.</p>'+
+      '<div class="scan-choices"><button type="button" class="btn primary" onclick="scanCamera()">'+ic('upload')+'Use camera</button>'+
+      '<label class="btn"><input id="scFile" type="file" accept="image/*,application/pdf" style="position:absolute;left:-9999px" onchange="scanFile(this.files[0])">'+ic('doc')+'Choose a scanned file</label></div>'+
+      '<p class="hint" style="margin:0">Desk scanner: scan the check to a file (JPG, PNG or PDF) with the scanner\'s own app, then choose that file. Webcam or phone: hold the check flat on a dark, plain surface.</p>'+
+      '<div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" onclick="closeScanner()">Cancel</button></div>';
+    el.querySelector('button').focus();
+  } else if (step === 'camera'){
+    el.innerHTML = '<video id="scVid" autoplay playsinline muted style="width:100%;border-radius:8px;background:#000;max-height:60vh"></video>'+
+      '<div class="row" style="gap:8px;justify-content:space-between"><button type="button" class="btn ghost" onclick="scanStep(\'choose\')">Back</button><button type="button" class="btn primary" id="scSnap" onclick="scanSnap()">Take picture</button></div>';
+    const v = document.getElementById('scVid'); v.srcObject = SC.stream; document.getElementById('scSnap').focus();
+  } else if (step === 'working'){
+    el.innerHTML = '<p class="empty">Straightening and cropping…</p>';
+  } else if (step === 'preview'){
+    const url = SC.out.toDataURL('image/jpeg', 0.8);
+    el.innerHTML = '<img class="scan-big" src="'+url+'" alt="Preview of the scanned check">'+
+      (!SC.found && SC.auto ? '<p class="hint" style="margin:0">The check\'s edges were not clear, so the whole picture is kept. Rotate it if needed.</p>' : '')+
+      '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn sm" onclick="scanRotate(-90)" aria-label="Rotate left">↺ Rotate left</button><button type="button" class="btn sm" onclick="scanRotate(90)" aria-label="Rotate right">↻ Rotate right</button>'+
+      '<button type="button" class="btn sm ghost" onclick="SC.auto=!SC.auto;scanRender()">'+(SC.auto ? 'Undo auto-crop' : 'Auto-crop again')+'</button></div>'+
+      '<div class="row" style="gap:8px;justify-content:space-between;flex-wrap:wrap"><button type="button" class="btn ghost" onclick="scanStep(\'choose\')">Scan again</button><button type="button" class="btn primary" id="scUse" onclick="scanUse()">'+ic('check')+'Use this scan</button></div>';
+    document.getElementById('scUse').focus();
+  }
+}
+async function scanCamera(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ scanStep('choose', 'This browser cannot use a camera here. Choose a scanned file instead.'); return; }
+  try{ SC.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false }); scanStep('camera'); }
+  catch(e){ scanStep('choose', 'The camera could not be opened ('+(e.name==='NotAllowedError'?'permission was not given':e.name==='NotFoundError'?'no camera found':e.message)+'). Choose a scanned file instead.'); }
+}
+function scanSnap(){
+  const v = document.getElementById('scVid'); if (!v || !v.videoWidth) return;
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v, 0, 0);
+  scanProcess(c);
+}
+async function scanFile(file){
+  if (!file) return;
+  scanStep('working');
+  try{
+    let c;
+    if (/pdf/i.test(file.type) || /\.pdf$/i.test(file.name)){
+      const lib = await loadPdfJs(), doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise, pg = await doc.getPage(1);
+      const vp0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: Math.min(3, 2400 / Math.max(vp0.width, vp0.height)) });
+      c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+      await pg.render({ canvasContext: g, viewport: vp }).promise;
+    } else {
+      let bmp; try{ bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+      catch(e){ bmp = await new Promise((ok, no) => { const im = new Image(), u = URL.createObjectURL(file); im.onload = () => { URL.revokeObjectURL(u); ok(im); }; im.onerror = () => no(new Error('That file is not a picture the browser can open.')); im.src = u; }); }
+      const w = bmp.width, h = bmp.height, k = Math.min(1, 3200 / Math.max(w, h));
+      c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    }
+    scanProcess(c);
+  }catch(e){ scanStep('choose', 'Could not read that file: '+e.message); }
+}
+function scanProcess(c){
+  scanStep('working');
+  setTimeout(() => { SC.src = c; SC.rot = 0; SC.auto = true; const r = autoCropCheck(c); SC.crop = r.canvas; SC.found = r.found; scanRender(); }, 20);
+}
+function scanRender(){
+  const base = SC.auto ? SC.crop : landscape_(SC.src);
+  SC.out = fitScan_(rotateCanvas_(base, SC.rot));
+  scanStep('preview');
+}
+function scanRotate(d){ SC.rot = (SC.rot + d + 360) % 360; scanRender(); }
+async function scanUse(){
+  let q = 0.72, url = SC.out.toDataURL('image/jpeg', q);
+  while (url.length > 1300000 && q > 0.35){ q -= 0.1; url = SC.out.toDataURL('image/jpeg', q); }
+  const scan = { url, mime:'image/jpeg', data: url.split(',')[1], width: SC.out.width, height: SC.out.height };
+  const t = SC.target; closeScanner();
+  if (t && t.kind === 'form'){ S.ck.scan = scan; render(); return; }
+  if (t && t.kind === 'payment') await uploadScan(t.pid, scan);
+}
+async function uploadScan(pid, scan){
+  try{
+    const pj = await sbRpc('bf_add_check_scan', {p_token:TOKEN, p_payment_id:pid, p_mime:scan.mime, p_data:scan.data, p_width:scan.width, p_height:scan.height});
+    SCANS[pid] = { data: scan.data, mime: scan.mime, addedBy: (S.me && S.me.name) || '', addedAt: new Date().toISOString(), width: scan.width, height: scan.height, earlier: 0 };
+    const r = S.ck.rec; if (r && r.payments) r.payments = r.payments.map(p => p.id === pid ? Object.assign({}, p, pj) : p);
+    if (S.ck.done && S.ck.done.id === pid) S.ck.done = Object.assign({}, S.ck.done, pj);
+    if (r) delete PH[r.id];
+    toast('Check scan saved'); render(); return true;
+  }catch(e){ toast('The scan was not saved: '+e.message); render(); return false; }
+}
+
+/* image helpers */
+function landscape_(c){ return c.height > c.width * 1.05 ? rotateCanvas_(c, 90) : c; }
+function rotateCanvas_(c, deg){
+  if (!deg) return c;
+  const o = document.createElement('canvas'), q = deg % 180 !== 0;
+  o.width = q ? c.height : c.width; o.height = q ? c.width : c.height;
+  const g = o.getContext('2d'); g.translate(o.width / 2, o.height / 2); g.rotate(deg * Math.PI / 180); g.drawImage(c, -c.width / 2, -c.height / 2);
+  return o;
+}
+function fitScan_(c){   // long side at most 1600px, gentle auto-contrast
+  const k = Math.min(1, 1600 / Math.max(c.width, c.height));
+  const o = document.createElement('canvas'); o.width = Math.max(1, Math.round(c.width * k)); o.height = Math.max(1, Math.round(c.height * k));
+  const g = o.getContext('2d'); g.imageSmoothingQuality = 'high'; g.fillStyle = '#fff'; g.fillRect(0, 0, o.width, o.height); g.drawImage(c, 0, 0, o.width, o.height);
+  try{
+    const im = g.getImageData(0, 0, o.width, o.height), d = im.data, hist = new Uint32Array(256), n = d.length / 4;
+    for (let i = 0; i < d.length; i += 16) hist[(d[i]*77 + d[i+1]*150 + d[i+2]*29) >> 8]++;
+    const tot = Math.ceil(n / 4); let lo = 0, hi = 255, acc = 0;
+    for (let v = 0; v < 256; v++){ acc += hist[v]; if (acc > tot * 0.01){ lo = v; break; } }
+    acc = 0; for (let v = 255; v >= 0; v--){ acc += hist[v]; if (acc > tot * 0.01){ hi = v; break; } }
+    if (hi - lo > 40 && (lo > 8 || hi < 247)){
+      const s = 255 / (hi - lo);
+      for (let i = 0; i < d.length; i += 4){ d[i] = Math.max(0, Math.min(255, (d[i]-lo)*s)); d[i+1] = Math.max(0, Math.min(255, (d[i+1]-lo)*s)); d[i+2] = Math.max(0, Math.min(255, (d[i+2]-lo)*s)); }
+      g.putImageData(im, 0, 0);
+    }
+  }catch(e){}
+  return o;
+}
+/* Find the check against the background (scanner lid, desk), then cut it out straight.
+   Returns {canvas, found}. */
+function autoCropCheck(src){
+  const W0 = src.width, H0 = src.height, k = Math.min(1, 640 / Math.max(W0, H0));
+  const w = Math.max(8, Math.round(W0 * k)), h = Math.max(8, Math.round(H0 * k));
+  const sm = document.createElement('canvas'); sm.width = w; sm.height = h; const sg = sm.getContext('2d'); sg.drawImage(src, 0, 0, w, h);
+  const d = sg.getImageData(0, 0, w, h).data;
+  // background = median colour of a 3px frame
+  const fr = [[], [], []];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){ if (x > 2 && x < w-3 && y > 2 && y < h-3) continue; const i = (y*w + x)*4; fr[0].push(d[i]); fr[1].push(d[i+1]); fr[2].push(d[i+2]); }
+  const med = a => { a.sort((p, q) => p - q); return a[a.length >> 1]; };
+  const bg = fr.map(med);
+  let noise = 0, nn = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){ if (x > 2 && x < w-3 && y > 2 && y < h-3) continue; const i = (y*w + x)*4; noise += Math.abs(d[i]-bg[0]) + Math.abs(d[i+1]-bg[1]) + Math.abs(d[i+2]-bg[2]); nn++; }
+  noise /= Math.max(1, nn);
+  const T = Math.max(30, noise * 3 + 14);
+  const lum = new Float32Array(w*h);
+  for (let p = 0; p < w*h; p++) lum[p] = d[p*4]*0.299 + d[p*4+1]*0.587 + d[p*4+2]*0.114;
+  let m = new Uint8Array(w*h);
+  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++){
+    const p = y*w + x, i = p*4;
+    const diff = Math.abs(d[i]-bg[0]) + Math.abs(d[i+1]-bg[1]) + Math.abs(d[i+2]-bg[2]);
+    const gx = lum[p+1] - lum[p-1], gy = lum[p+w] - lum[p-w];
+    if (diff > T || gx*gx + gy*gy > 900) m[p] = 1;
+  }
+  // close small gaps: dilate then erode (3x3, twice)
+  const morph = (a, grow) => { const o = new Uint8Array(w*h); for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++){ const p = y*w + x; let s = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) s += a[p + dy*w + dx]; o[p] = grow ? (s > 0 ? 1 : 0) : (s === 9 ? 1 : 0); } return o; };
+  m = morph(morph(m, true), true); m = morph(morph(m, false), false);
+  // largest connected region
+  const lab = new Int32Array(w*h); let best = 0, bestN = 0, cur = 0; const st = [];
+  for (let p0 = 0; p0 < w*h; p0++){
+    if (!m[p0] || lab[p0]) continue; cur++; let n = 0; st.push(p0); lab[p0] = cur;
+    while (st.length){ const p = st.pop(); n++; const x = p % w, y = (p / w) | 0;
+      if (x > 0 && m[p-1] && !lab[p-1]){ lab[p-1] = cur; st.push(p-1); } if (x < w-1 && m[p+1] && !lab[p+1]){ lab[p+1] = cur; st.push(p+1); }
+      if (y > 0 && m[p-w] && !lab[p-w]){ lab[p-w] = cur; st.push(p-w); } if (y < h-1 && m[p+w] && !lab[p+w]){ lab[p+w] = cur; st.push(p+w); } }
+    if (n > bestN){ bestN = n; best = cur; }
+  }
+  const fallback = () => ({ canvas: landscape_(src), found: false });
+  if (!best || bestN < w*h*0.06) return fallback();
+  // outline points (row extremes + column extremes) -> convex hull
+  const pts = [];
+  for (let y = 0; y < h; y++){ let a = -1, b = -1; for (let x = 0; x < w; x++) if (lab[y*w + x] === best){ if (a < 0) a = x; b = x; } if (a >= 0){ pts.push([a, y], [b + 1, y], [a, y + 1], [b + 1, y + 1]); } }
+  pts.sort((p, q) => p[0] - q[0] || p[1] - q[1]);
+  const cross = (o, a, b) => (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
+  const lower = [], upper = [];
+  for (const p of pts){ while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop(); lower.push(p); }
+  for (let i = pts.length - 1; i >= 0; i--){ const p = pts[i]; while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop(); upper.push(p); }
+  const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+  if (hull.length < 3) return fallback();
+  // minimum-area rectangle around the hull (rotating calipers)
+  let bestA = Infinity, R = null;
+  for (let i = 0; i < hull.length; i++){
+    const a = hull[i], b = hull[(i + 1) % hull.length], L = Math.hypot(b[0]-a[0], b[1]-a[1]); if (L < 1e-6) continue;
+    const ux = (b[0]-a[0]) / L, uy = (b[1]-a[1]) / L, vx = -uy, vy = ux;
+    let u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;
+    for (const p of hull){ const pu = p[0]*ux + p[1]*uy, pv = p[0]*vx + p[1]*vy; if (pu < u0) u0 = pu; if (pu > u1) u1 = pu; if (pv < v0) v0 = pv; if (pv > v1) v1 = pv; }
+    const A = (u1 - u0) * (v1 - v0); if (A < bestA){ bestA = A; R = { ux, uy, u0, u1, v0, v1 }; }
+  }
+  const rw = R.u1 - R.u0, rh = R.v1 - R.v0;
+  if (rw * rh > w*h*0.97) return fallback();
+  // long side horizontal, smallest turn
+  let lx = rw >= rh ? R.ux : -R.uy, ly = rw >= rh ? R.uy : R.ux;
+  if (lx < 0 || (lx === 0 && ly < 0)){ lx = -lx; ly = -ly; }
+  const px = -ly, py = lx;
+  let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+  for (const p of hull){ const pu = p[0]*lx + p[1]*ly, pv = p[0]*px + p[1]*py; if (pu < a0) a0 = pu; if (pu > a1) a1 = pu; if (pv < b0) b0 = pv; if (pv > b1) b1 = pv; }
+  const pad = 0.003 * Math.max(a1 - a0, b1 - b0); a0 -= pad; a1 += pad; b0 -= pad; b1 += pad;
+  const s = 1 / k, OW = Math.round((a1 - a0) * s), OH = Math.round((b1 - b0) * s);
+  const out = document.createElement('canvas'); out.width = Math.max(1, OW); out.height = Math.max(1, OH);
+  const g = out.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, out.width, out.height);
+  const ox = (a0*lx + b0*px) * s, oy = (a0*ly + b0*py) * s;          // rectangle corner in source pixels
+  g.setTransform(lx, px, ly, py, -(lx*ox + ly*oy), -(px*ox + py*oy));
+  g.drawImage(src, 0, 0);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  return { canvas: out, found: true, angle: Math.atan2(ly, lx) * 180 / Math.PI };
+}
+
 /* ================= payment receipt (PDF) ================= */
 async function printPayReceipt(pid){
   const r = S.ck.rec || {}, x = (r.payments||[]).find(p=>p.id===pid) || (S.ck.done && S.ck.done.id===pid ? S.ck.done : null);
@@ -1695,8 +2022,7 @@ async function printPayReceipt(pid){
     const f = r.fields||{}, p = r.pay||{}, F = FORMS[r.form] || {title:r.form||''};
     page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
     let tx = M;
-    try{ const lb = new Uint8Array(await (await fetch(CITY_LOGO)).arrayBuffer());
-      const img = lb[0]===0x89 ? await pdf.embedPng(lb) : await pdf.embedJpg(lb);
+    try{ const img = await pdf.embedPng(await sealPngBytes());
       page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
     page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
     page.drawText('Payment Receipt', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
@@ -1872,6 +2198,7 @@ function auditHtml(){
     if (x.action==='payment.recorded') return 'Recorded '+money(d.amount)+' '+(d.method||'').toLowerCase()+(d.checkNo?' #'+d.checkNo:'')+' ('+d.receiptNo+') for Ref '+ref(x.target);
     if (x.action==='payment.reversed') return 'Reversed '+(d.original||'')+' for Ref '+ref(x.target)+(d.reason?': '+d.reason:'');
     if (x.action==='payment.status') return 'Ref '+ref(x.target)+' payment status: '+(PAY_LABEL[d.from]||d.from)+' → '+(PAY_LABEL[d.to]||d.to);
+    if (x.action==='payment.scan') return (d.replaced?'Replaced':'Added')+' the '+(d.method||'check').toLowerCase()+' scan'+(d.checkNo?' (#'+d.checkNo+')':'')+' on '+(d.receiptNo||'')+' for Ref '+ref(x.target);
     if (x.action==='payment.migrated') return 'Carried over an existing “paid” mark ('+(d.method||'')+', '+money(d.amount)+') for Ref '+ref(x.target);
     if (x.action==='sync.run') return 'Google Sheet sync: '+(d.added||0)+' added, '+(d.updated||0)+' updated'+(d.paymentsCarried?', '+d.paymentsCarried+' “paid” mark'+(d.paymentsCarried===1?'':'s')+' carried over':'')+((d.errors||[]).length?', '+d.errors.length+' problem'+(d.errors.length===1?'':'s'):'')+((d.refs||[]).length?' (Ref '+d.refs.slice(0,6).join(', ')+(d.refs.length>6?'…':'')+')':'');
     if (x.action==='sync.key') return 'Created a new Google Sheet sync key';
@@ -2255,8 +2582,7 @@ async function buildReceipt(r){
   // header band with the City seal
   page.drawRectangle({x:0, y:H-112, width:W, height:112, color:navy});
   let tx = M;
-  try{ const lb = new Uint8Array(await (await fetch(CITY_LOGO)).arrayBuffer());
-    const img = lb[0]===0x89 ? await pdf.embedPng(lb) : await pdf.embedJpg(lb);
+  try{ const img = await pdf.embedPng(await sealPngBytes());
     page.drawImage(img, {x:M, y:H-100, width:88, height:88}); tx = M + 104; }catch(e){}
   page.drawText('City of Arab', {x:tx, y:H-44, size:12, font:reg, color:gold});
   page.drawText('Building Department', {x:tx, y:H-66, size:20, font:bold, color:rgb(1,1,1)});
