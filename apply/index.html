@@ -888,6 +888,14 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .codes{list-style:none;margin:0;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:var(--surface2);border:1px dashed var(--gold);border-radius:8px}
 .codes code{font:600 16px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--ink)}
 .sec-on{display:flex;gap:10px;align-items:flex-start;margin:0;color:var(--ink2)}.sec-on svg{width:20px;height:20px;color:var(--ok);flex:none;margin-top:2px}
+/* v2.17 privacy statement */
+.pv-body h2{font:600 18px var(--f-disp);color:var(--ink);margin:22px 0 8px}.pv-body h3{font:600 16px var(--f-disp);color:var(--ink);margin:16px 0 6px}
+.pv-body p,.pv-body li{color:var(--ink2);font-size:15px;line-height:1.6}.pv-body p{margin:0 0 10px}.pv-body ul{margin:0 0 10px;padding-left:20px;display:grid;gap:6px}
+.pv-none{color:var(--ink2);font-size:15px;margin:8px 0 0}
+.pvedit textarea#pvBody{width:100%;min-height:420px;font:14px/1.55 var(--f-body)}
+.pv-preview{border:1px solid var(--line);border-radius:8px;padding:18px 22px;background:var(--surface)}.pv-preview h1{font:700 24px var(--f-disp);margin:0 0 6px}
+.pv-switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}.pv-switch input{width:20px;height:20px;accent-color:var(--navy)}
+.pv-status{gap:10px}
 </style>
 
 
@@ -1262,7 +1270,7 @@ function queueOptimize(f){
 // size note used on the Documents tab and in the PDF
 const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
+function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
 /* ================= saved settings (per staff login, stored in the database) =================
    Layout and report choices are saved to the signed-in account (bf_set_my_prefs), so they come
    back after signing out, on another computer, or after the browser is cleared. A small copy is
@@ -1318,7 +1326,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.16.0';   // shown at the bottom of every page
+const APP_VERSION = '2.17.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1329,51 +1337,82 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button> · <a href="https://arabcityapplications.jadecruz.dev/apply/#privacy" target="_top">Privacy</a> · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+' · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#privacy" onclick="event.preventDefault();go(\'privacy\')">Privacy &amp; your information</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
 }
 function sideNav(){ return ''; }
 
-/* ================= privacy: short note on every application + the full page (#privacy) ================= */
+/* ================= privacy: short note on every application + the City's own statement (#privacy) =================
+   The statement is written and published by City staff (Staff Portal → Privacy statement; bf_privacy_save).
+   Until one is published and switched on, every privacy link on the public site stays hidden. */
 let FORM_T0 = Date.now();                     // when the form was opened (simple bot check, sent as fillMs)
-const PRIV_LINK = (txt) => '<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#privacy"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'privacy\')"')+'>'+txt+'</a>';
+const PRIV_LINK = (txt, sep) => '<span class="priv-link"'+(S.priv?'':' hidden')+'>'+(sep||'')+'<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#privacy"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'privacy\')"')+'>'+txt+'</a></span>';
 function privacyNote(){
   return '<div class="privnote">'+ic('lock')+'<p>Your application is sent over an encrypted connection and is used by the City of Arab Building Department to review your permit, figure your fee, schedule inspections and contact you. It is not sold or used for advertising. '+PRIV_LINK('How we handle your information')+'</p></div>';
 }
-function viewPrivacy(){
-  const sec = (h, body) => '<section class="pv-sec"><h2>'+h+'</h2>'+body+'</section>';
-  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Privacy &amp; your information</h1>'+
-     '<span class="hint" style="color:var(--muted)">How the City of Arab Building Department handles what you enter on this website. Last updated October 10, 2026.</span></div>'+
-   sec('What we collect',
-     '<ul><li>What you type into an application: names, phone numbers, email addresses, property and contractor details, and a description of the work.</li>'+
-     '<li>Documents you choose to upload, such as construction plans.</li>'+
-     '<li>The agreements you accept and the date you accepted them.</li>'+
-     '<li>For the permit status check: the reference # and email you enter, used only to find your application.</li>'+
-     '<li>The network (IP) address a request comes from, kept for up to 2 days, only to block spam and repeated guessing.</li></ul>')+
-   sec('Why we use it',
-     '<p>To review and issue your permit, figure your fee, schedule inspections, record payments made at City Hall and contact you about your application. We do not sell your information or use it for advertising, and this site has no advertising or tracking cookies.</p>')+
-   sec('Who can see it',
-     '<ul><li>Building Department staff, and the City staff who record payments. Each has their own password-protected login, and every payment, access change and record deletion is logged.</li>'+
-     '<li>The website administrator, to keep the site running.</li>'+
-     '<li>Permit applications are City records. Under Alabama’s open records law, members of the public may ask to inspect public records, and the City handles those requests as state law requires.</li></ul>')+
-   sec('How it is protected',
-     '<ul><li>Everything you send travels over an encrypted (HTTPS) connection.</li>'+
-     '<li>Applications and documents are stored in a secured database hosted in the United States (Ohio). The public cannot read it, and staff can only reach it by signing in.</li>'+
-     '<li>Staff logins are locked after repeated wrong passwords, and administrators must use 2-step verification.</li>'+
-     '<li>There are limits on how many applications can be sent from one place in a short time, to stop automated spam.</li>'+
-     '<li>The page loads its fonts from Google Fonts and its PDF tools from Cloudflare’s cdnjs. Like any website, those services see your network address when your browser downloads those files.</li></ul>')+
-   sec('How long we keep it',
-     '<p>Applications are kept for as long as the Alabama records retention schedule for City building records requires, and are only destroyed as that schedule allows.</p>')+
-   sec('Please do not send',
-     '<p>Driver’s licenses, Social Security numbers, or bank or card details. They are not needed for a permit. Fees are paid in person at 740 N Main St by cash or check. The City will never ask you to pay, or to enter a password, through this website or a link in an email.</p>')+
-   sec('Questions or corrections',
-     '<p>City of Arab Building Department · 740 N Main St, Arab, AL 35016 · 256-586-5968 · <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a>. To fix something on an application you sent, contact the Building Department with your reference #. Problems with the website itself: <button class="linkbtn" onclick="openBug()">Report a problem</button>.</p>')+
-   '</div></main></div>';
+async function loadPublicPrivacy(){
+  try{ S.priv = await sbRpc('bf_public_privacy', {}) || null; }catch(e){ S.priv = null; }
+  S.privLoaded = true;
+  document.querySelectorAll('.priv-link').forEach(el => { el.hidden = !S.priv; });
+  if (S.view==='privacy') render();
 }
+// Plain text → safe HTML: blank line = new paragraph, "## " heading, "- " bullet, web and email addresses become links.
+function mdLite(text){
+  const link = s => s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+                     .replace(/\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})\b/g, '<a href="mailto:$1">$1</a>');
+  const inline = s => link(esc(s)).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  return String(text||'').replace(/\r/g,'').split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).map(b => {
+    const lines = b.split('\n');
+    if (lines.every(l => /^\s*[-*•]\s+/.test(l))) return '<ul>'+lines.map(l => '<li>'+inline(l.replace(/^\s*[-*•]\s+/,''))+'</li>').join('')+'</ul>';
+    if (/^###\s+/.test(b) && lines.length===1) return '<h3>'+inline(b.replace(/^###\s+/,''))+'</h3>';
+    if (/^##?\s+/.test(lines[0])){ const h = '<h2>'+inline(lines[0].replace(/^##?\s+/,''))+'</h2>'; return lines.length>1 ? h+mdLite(lines.slice(1).join('\n')) : h; }
+    return '<p>'+lines.map(inline).join('<br>')+'</p>';
+  }).join('');
+}
+function viewPrivacy(){
+  const P = S.priv;
+  const body = !S.privLoaded ? '<p class="empty">Loading…</p>'
+    : !P ? '<h1>Privacy &amp; your information</h1><p class="pv-none">The City’s privacy statement is not available on this site right now. For questions about your information, contact the City of Arab Building Department at 256-586-5968 or <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a>.</p>'
+    : '<h1>'+esc(P.title)+'</h1>'+(P.updatedAt?'<span class="hint" style="color:var(--muted)">Last updated '+esc(new Date(P.updatedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}))+'</span>':'');
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
+   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a>'+body+'</div>'+
+   (P ? '<div class="pv-body">'+mdLite(P.body)+'</div>' : '')+'</div></main></div>';
+}
+// Suggested starting text for City staff (Staff Portal → Privacy statement → "Start from a suggested draft").
+const PRIV_DRAFT = `How the City of Arab Building Department handles what you enter on this website.
+
+## What we collect
+- What you type into an application: names, phone numbers, email addresses, property and contractor details, and a description of the work.
+- Documents you choose to upload, such as construction plans.
+- The agreements you accept and the date you accepted them.
+- For the permit status check: the reference # and email you enter, used only to find your application.
+- The network (IP) address a request comes from, kept for up to 2 days, only to block spam and repeated guessing.
+
+## Why we use it
+To review and issue your permit, figure your fee, schedule inspections, record payments made at City Hall and contact you about your application. We do not sell your information or use it for advertising, and this site has no advertising or tracking cookies.
+
+## Who can see it
+- Building Department staff, and the City staff who record payments. Each has their own password-protected login, and every payment, access change and record deletion is logged.
+- The website administrator, to keep the site running.
+- Permit applications are City records. Under Alabama's open records law, members of the public may ask to inspect public records, and the City handles those requests as state law requires.
+
+## How it is protected
+- Everything you send travels over an encrypted (HTTPS) connection.
+- Applications and documents are stored in a secured database hosted in the United States (Ohio). The public cannot read it, and staff can only reach it by signing in.
+- Staff logins are locked after repeated wrong passwords, and administrators must use 2-step verification.
+- There are limits on how many applications can be sent from one place in a short time, to stop automated spam.
+
+## How long we keep it
+Applications are kept for as long as the Alabama records retention schedule for City building records requires, and are only destroyed as that schedule allows.
+
+## Please do not send
+Driver's licenses, Social Security numbers, or bank or card details. They are not needed for a permit. Fees are paid in person at 740 N Main St by cash or check. The City will never ask you to pay, or to enter a password, through this website or a link in an email.
+
+## Questions or corrections
+City of Arab Building Department, 740 N Main St, Arab, AL 35016 · 256-586-5968 · buildingdept@arabcity.org. To fix something on an application you sent, contact the Building Department with your reference #.`;
 
 function uploadNote(f){ const u = f.fields.find(x => x.type==='file'); return !u ? 'Apply online' : u.req ? 'Apply online · upload documents' : f.key==='homeowner' ? 'Apply online · construction plans optional' : 'Apply online · documents optional'; }
 function tile(k){ const f = FORMS[k];
@@ -1578,6 +1617,7 @@ function profileMenuHtml(){
       '<button type="button" role="menuitem" onclick="openAccount(\'profile\')">'+ic('user')+'Profile and account settings</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'password\')">'+ic('lock')+'Change password</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'security\')">'+ic('check')+'Two-step verification</button>'+
+      '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'privacy-statement\')">'+ic('lock')+'Privacy statement (public site)</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -1623,6 +1663,7 @@ function viewWorkspace(){
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
    '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    (canRecords()?'<a class="navi" href="#records" onclick="event.preventDefault();go(\'records\')">'+ic('db')+'Records &amp; storage</a>':'')+
+   '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
@@ -2034,7 +2075,7 @@ const canPay = () => myAccess().payments;
 const homeView = () => canBuilding() ? 'staff' : canPay() ? 'clerk' : 'me';
 const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building || a.payments) : !!acc && ['staff','clerk','admin'].includes(acc.role); };
 function routeAllowed(v){
-  if (v==='me') return true;
+  if (v==='me' || v==='privacy-statement') return true;
   if (v==='clerk') return canPay();
   if (['users','bugs'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
@@ -3044,6 +3085,7 @@ function render(){
     return render(); }
   else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='records') root.innerHTML = viewRecords();
+  else if (S.view==='privacy-statement'){ root.innerHTML = viewPrivacyEdit(); if (!PV.st && !PV.loading) privLoad(); }
   else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; bindMfaSetup(); if (!S.sec) loadMySecurity(); }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
@@ -3083,7 +3125,7 @@ function initRoute(){
   else if (h==='status') S.view = 'status';
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -3193,6 +3235,10 @@ function auditHtml(){
     if (x.action==='mfa.recovery_used') return 'Signed in with a recovery code ('+(d.left||0)+' left)';
     if (x.action==='mfa.recovery_new') return 'Made new recovery codes';
     if (x.action==='records.purge') return 'Purged records';
+    if (x.action==='privacy.draft') return 'Saved a draft of the privacy statement';
+    if (x.action==='privacy.publish') return 'Published the privacy statement on the public site';
+    if (x.action==='privacy.show') return 'Turned the privacy statement on (public site)';
+    if (x.action==='privacy.hide') return 'Turned the privacy statement off (public site)';
     if (x.action==='profile.updated') return 'Updated their profile';
     return x.action; };
   return '<ul class="actlist">'+L.map(x=>'<li><span class="aw">'+fmtDT(x.at)+'<br><b>'+esc(x.by||'')+'</b></span><span>'+esc(what(x))+'</span></li>').join('')+'</ul>';
@@ -3632,6 +3678,58 @@ async function adminUnlock(id){
   catch(e){ toast('Could not unlock: '+e.message); }
   loadSecList();
 }
+/* ================= Privacy statement editor (any staff member) =================
+   The City writes its own statement here. "Save draft" keeps it private; "Publish" puts that text on the
+   public site and switches it on; the switch hides or shows the published copy (and every public privacy link). */
+const PV = { st:null, loading:false, err:'', msg:'', busy:'', preview:false, title:'', body:'', dirty:false };
+async function privLoad(){
+  PV.loading = true; PV.err = '';
+  try{ PV.st = await sbRpc('bf_privacy_get', {p_token:TOKEN}); PV.title = PV.st.draftTitle || 'Privacy & your information'; PV.body = PV.st.draftBody || ''; PV.dirty = false; }
+  catch(e){ PV.err = e.message; }
+  PV.loading = false; if (S.view==='privacy-statement') render();
+}
+const pvWhen = (by, at) => (by ? esc(by)+' on ' : '')+(at ? esc(new Date(at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})) : '');
+function viewPrivacyEdit(){
+  const st = PV.st;
+  let body;
+  if (!st) body = PV.err ? '<p class="formerr">'+esc(PV.err)+'</p>' : '<p class="empty">Loading…</p>';
+  else {
+    const hasPub = !!(st.pubBody||'').trim(), on = st.published && hasPub;
+    body = '<section class="card pv-status"><div class="row" style="gap:12px;flex-wrap:wrap;align-items:center">'+
+        (on ? '<span class="pill paid">On the public site</span>' : '<span class="pill partial">Not on the public site</span>')+
+        '<label class="pv-switch"><input type="checkbox" id="pvOn" '+(on?'checked':'')+' '+(hasPub&&!PV.busy?'':'disabled')+' onchange="privSave(this.checked?\'show\':\'hide\')"><span>Show on the public site</span></label>'+
+        (on ? '<a class="btn sm ghost" href="#privacy" target="_blank" rel="noopener">View it on the public site</a>' : '')+'</div>'+
+      '<p class="hint" style="margin:0;color:var(--ink2)">'+(hasPub ? 'Last published by '+pvWhen(st.pubBy, st.pubAt)+'.' : 'Nothing has been published yet. While it is off, the public site shows no privacy link.')+
+        (hasPub && (st.unpublishedChanges || PV.dirty) ? ' <b>The text below has changes that are not published yet.</b>' : '')+'</p></section>'+
+      '<section class="card"><h2>Statement</h2>'+
+        '<div class="fld"><label class="l" for="pvTitle">Page title</label><input id="pvTitle" type="text" maxlength="120" value="'+esc(PV.title)+'" oninput="PV.title=this.value;PV.dirty=true"></div>'+
+        (PV.preview ? '<div class="pv-preview"><h1>'+esc(PV.title||'Privacy & your information')+'</h1><div class="pv-body">'+(PV.body.trim()?mdLite(PV.body):'<p class="empty">Nothing written yet.</p>')+'</div></div>'
+          : '<div class="fld"><label class="l" for="pvBody">Statement text</label><textarea id="pvBody" rows="22" maxlength="60000" oninput="PV.body=this.value;PV.dirty=true" placeholder="Write the City of Arab’s privacy and information statement here.">'+esc(PV.body)+'</textarea>'+
+            '<span class="hint">Leave a blank line between paragraphs. Start a line with <code>## </code> for a heading or <code>- </code> for a bullet. Web and email addresses become links. Wrap words in <code>**</code> for bold.</span></div>')+
+        '<div class="row" style="gap:8px;flex-wrap:wrap">'+
+          '<button type="button" class="btn" '+(PV.busy?'disabled':'')+' onclick="privSave(\'draft\')">'+(PV.busy==='draft'?'Saving…':'Save draft')+'</button>'+
+          '<button type="button" class="btn primary" '+(PV.busy?'disabled':'')+' onclick="privSave(\'publish\')">'+(PV.busy==='publish'?'Publishing…':'Publish to the public site')+'</button>'+
+          '<button type="button" class="btn ghost" onclick="PV.preview=!PV.preview;render()">'+(PV.preview?'Back to editing':'Preview')+'</button>'+
+          (!PV.body.trim() && !PV.preview ? '<button type="button" class="btn ghost" onclick="PV.body=PRIV_DRAFT;PV.dirty=true;render()">Start from a suggested draft</button>' : '')+
+        '</div>'+
+        (PV.err ? '<p class="formerr" role="alert">'+esc(PV.err)+'</p>' : PV.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(PV.msg)+'</p>' : '')+
+        (st.draftAt ? '<p class="hint" style="margin:0;color:var(--muted)">Draft last saved by '+pvWhen(st.draftBy, st.draftAt)+'.</p>' : '')+
+      '</section>';
+  }
+  return topBar()+'<div class="purge acctpage pvedit"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>Privacy &amp; information statement</h1>'+
+    '<p style="margin:0;color:var(--ink2)">The City of Arab’s own statement for the public website, shown at “Privacy &amp; your information” in the site footer. Any staff member can edit and publish it, and every change is recorded in the activity log. Have the City Clerk or City Attorney review it before publishing.</p>'+
+    body+'</div>';
+}
+async function privSave(action){
+  if (action==='publish' && !PV.body.trim()){ PV.err = 'Write the statement before publishing it.'; PV.msg = ''; render(); return; }
+  PV.busy = action; PV.err = ''; PV.msg = ''; render();
+  try{ PV.st = await sbRpc('bf_privacy_save', {p_token:TOKEN, p_action:action, p_title:PV.title, p_body:PV.body});
+    if (action==='draft' || action==='publish') PV.dirty = false;
+    PV.msg = ({draft:'Draft saved. It is not on the public site until you publish it.', publish:'Published. It is now on the public site.', show:'The statement is back on the public site.', hide:'The statement and its links are now hidden from the public site.'})[action];
+    S.audit = null; loadPublicPrivacy(); }
+  catch(e){ PV.err = e.message; }
+  PV.busy = ''; render();
+}
 /* ================= applicant receipt (PDF) ================= */
 const refNo = id => String(id||'').replace(/-/g,'').slice(0,8).toUpperCase();
 async function buildReceipt(r){
@@ -3896,6 +3994,7 @@ async function delBug(id){
 }
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
+  loadPublicPrivacy();
   sbRpc('bf_storage_status', {}).then(st => { S.storage = st; if (st && st.full){ S.pubFull = true; if (S.view==='form'){ const k = S.form; render(); } } }).catch(()=>{});
   if (TOKEN){
     try{ const me = await sbRpc('bf_me', {p_token:TOKEN});
