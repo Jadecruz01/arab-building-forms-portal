@@ -866,6 +866,7 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 /* v2.15.1: band is decoration only (page title lives in the white sheet) */
 .pband-in{padding:0;height:120px}
 @media (max-width:640px){.pband-in{height:14px}}
+@media (max-width:640px){.pf-credit{flex-direction:column;align-items:flex-start;gap:6px}.pf-credit > span[aria-hidden]{display:none}}
 </style>
 
 
@@ -1293,7 +1294,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.15.1';   // shown at the bottom of every page
+const APP_VERSION = '2.15.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1304,11 +1305,11 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Designed and managed by Jade Cruz · <button class="linkbtn" onclick="openBug()">Report a problem</button> · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button> · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
     '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
-    '<div class="pf-credit"><span>Designed and managed by Jade Cruz</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
+    '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
 }
 function sideNav(){ return ''; }
 
@@ -3489,7 +3490,7 @@ async function runZipAttach(){
 const BUG_EMAIL = 'jade.cruz@collinsalexander.com';
 const AREAS = [['clerk','Payments (Municipal Support Clerk)'],['staff','Building Department workspace'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['users','Staff accounts or passwords'],['other','Something else']];
 function staffFooter(){
-  return '<footer class="sfoot"><span>Designed and managed by Jade Cruz</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
+  return '<footer class="sfoot"><span>Website designed by Jade Cruz, Managed by Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
 const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF forms (Annexation, Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
