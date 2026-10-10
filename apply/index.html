@@ -1270,7 +1270,7 @@ function queueOptimize(f){
 // size note used on the Documents tab and in the PDF
 const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
+function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mustPw=false; S.signinPw=null; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
 /* ================= saved settings (per staff login, stored in the database) =================
    Layout and report choices are saved to the signed-in account (bf_set_my_prefs), so they come
    back after signing out, on another computer, or after the browser is cleared. A small copy is
@@ -1326,7 +1326,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.17.1';   // shown at the bottom of every page
+const APP_VERSION = '2.18.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3073,6 +3073,7 @@ function render(){
   else if (EMBED) root.innerHTML = viewFramed();     // staff screens never load inside another site's frame
   else if (isPhone()) root.innerHTML = viewPhoneBlock();
   else if (!S.staff && S.booting) root.innerHTML = '<div class="booting" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span>Loading the Staff Portal…</div>';
+  else if (S.limited && S.mustPw){ root.innerHTML = viewMustPw(); document.getElementById('mpwf').onsubmit = submitMustPw; }
   else if (S.limited){ root.innerHTML = viewMfaRequired(); bindMfaSetup(); }
   else if (!S.staff && S.mfa){ root.innerHTML = viewCode(); document.getElementById('codef').onsubmit = submitCode; }
   else if (!S.staff){ root.innerHTML = viewPin();
@@ -3141,9 +3142,10 @@ function meterHtml(){
 }
 const estBytes = s => Math.round((s.files||[]).reduce((a,f)=>a+(f.size||0),0)*1.37 + 4000);
 async function loadUsers(){
-  loadSecList();
+  const sec = loadSecList(true);         // loaded together, so the page draws once
   try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'citizens', p_limit:500}); S.users = (r||[]).map(x=>x.data); }
   catch(e){ S.users = {err:e.message}; }
+  await sec;
   if (S.view==='users') render();
 }
 function genTempPw(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = new Uint32Array(15); crypto.getRandomValues(r); return [...r].map(x=>a[x%a.length]).join('').replace(/(.{5})(.{5})/,'$1-$2-'); }
@@ -3170,10 +3172,10 @@ function viewUsers(){
     '<div class="fld"><label class="l" for="nuName">Name</label><input id="nuName" type="text" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuTitle">Title <span class="hint">(optional, shown when they sign in)</span></label><input id="nuTitle" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Building Inspector"></div>'+
     '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
-    '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="12" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
+    '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="12" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">Temporary: they must choose their own password the first time they sign in.</span></div>'+
     '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Building Department</option><option value="clerk">Municipal Support Clerk</option><option value="admin">Administrator</option></select></div>'+
    '</div><span class="formerr" id="nuErr"></span><div class="row"><button class="btn primary" id="nuBtn">'+ic('user')+'Add staff member</button></div>'+
-   (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
+   (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again. The first time they sign in, they must choose their own password, so this temporary one stops working.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
    '</form>'+
    (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
    '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' account'+(hidden===1?'':'s')+' with no access</label>':'')+'</div>'+
@@ -3186,7 +3188,7 @@ function viewUsers(){
         '<div class="acct-f"><label class="l" for="t_'+id+'">Title</label><input class="ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title, e.g. Building Inspector" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></div>'+
         '<div class="acct-f"><span class="l">Workspace access</span>'+(me?'<span class="acct-v">Administrator (you cannot change your own access)</span>':'<div class="acc">'+roleSel(id, a.role, 'Access for '+esc(a.email))+addon(a)+'</div>')+'</div>'+
         '<div class="acct-f"><span class="l">Sign-in</span>'+(me?'<span class="acct-v">Active</span>':(on?'<div class="row" style="gap:8px"><span class="acct-v">Can sign in</span><button class="btn sm" onclick="setAccess(\''+id+'\',{active:false})">Turn off</button></div>':'<div class="row" style="gap:8px"><span class="acct-v">Cannot sign in</span><button class="btn sm primary" onclick="setAccess(\''+id+'\',{active:true})">Turn on</button></div>'))+'</div>'+
-        secCardHtml(a, me)+'<div class="acct-f"><span class="l">Password</span>'+(me?'<button class="btn sm" onclick="openAccount(\'password\')">Change my password</button>':(S.resetFor===a.id?'<div class="row" style="gap:6px"><input id="rp_'+id+'" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:190px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></div>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</div>'+
+        secCardHtml(a, me)+'<div class="acct-f"><span class="l">Password</span>'+(me?'<button class="btn sm" onclick="openAccount(\'password\')">Change my password</button>':(S.resetFor===a.id?'<div class="row" style="gap:6px"><input id="rp_'+id+'" type="text" value="'+esc(S.resetPw||(S.resetPw=genTempPw()))+'" oninput="S.resetPw=this.value" aria-label="New password for '+esc(a.email)+'" style="width:190px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></div>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.resetPw=genTempPw();S.removeFor=null;render()">Reset password</button>'))+'</div>'+
       '</div>'+
       (me?'':'<footer class="acct-ft">'+(S.removeFor===a.id?'<span>Delete this login for good?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Delete</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button>':'<button class="btn sm ghost" title="Turning a login off keeps it on record; deleting removes it" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Delete login</button>')+'</footer>')+
       '</article>'; }).join('')+'</div><p class="hint" style="color:var(--muted);font-size:13px;margin:0">To stop someone from signing in, use <b>Turn off</b>. Their name stays on the payments and records they made, and you can turn them back on later.</p>')+
@@ -3227,7 +3229,8 @@ function auditHtml(){
     const who = d.email || 'their own login';
     if (x.action==='signin.locked') return 'Sign-in locked for 15 minutes after 5 wrong passwords'+(d.ip?' (from '+d.ip+')':'');
     if (x.action==='signin.unlocked') return 'Unlocked sign-in for '+who;
-    if (x.action==='password.reset') return 'Reset a password';
+    if (x.action==='password.reset') return 'Reset a password (temporary; must be changed at next sign-in)';
+    if (x.action==='password.set_own') return 'Chose their own password at first sign-in';
     if (x.action==='mfa.enabled') return 'Turned on 2-step verification';
     if (x.action==='mfa.disabled') return 'Turned off 2-step verification';
     if (x.action==='mfa.reset') return 'Reset 2-step verification for '+who;
@@ -3304,6 +3307,7 @@ async function staffSignIn(e){
       return;
     }
     const remember = document.getElementById('lgRem').checked;
+    S.signinPw = pass;                      // kept in memory only, for a first-sign-in password change
     const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:remember });
     if (r && r.error) throw new Error(r.error);
     S.pinMsg = '';
@@ -3312,7 +3316,8 @@ async function staffSignIn(e){
   }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; }
 }
 async function finishSignIn(r, remember){
-  if (r && r.limited){ TOKEN = r.token; saveToken(TOKEN, remember); S.me = r.account; S.limited = true; S.mfa = null; S.mfaSet = null; render(); return; }
+  if (r && r.limited){ TOKEN = r.token; saveToken(TOKEN, remember); S.me = r.account; S.limited = true; S.mustPw = !!r.mustChangePw; S.mfa = null; S.mfaSet = null; render(); if (S.mustPw){ const f = document.getElementById('mpNew'); if (f) f.focus(); } return; }
+  S.signinPw = null;
   if (!r || !r.account || !hasPortal(r.account)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
   TOKEN = r.token; S.me = r.account; S.staff = true; S.limited = false; S.mfa = null; saveToken(TOKEN, remember); idleTouch();
   S.loaded = false; const hello = helloStart(r.account);
@@ -3538,6 +3543,36 @@ async function submitCode(e){
     if (r.usedRecovery) setTimeout(() => toast('You signed in with a recovery code. Make new ones under My account → Two-step verification.'), 2600);
   }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; const c = document.getElementById('mfaCode'); if (c){ c.value = ''; c.focus(); } }
 }
+// ---- first sign-in with a temporary password: choose your own (server keeps the session limited until then) ----
+function viewMustPw(){
+  const m = S.me || {};
+  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">Welcome</span><h2>Choose your<br><em>own password</em></h2>'+
+     '<p>You signed in with a temporary password. Choose a new one that only you know. The temporary password stops working once you do.</p></div>'+
+   '<form class="pin" id="mpwf"><h1 style="font:800 22px var(--f-disp)">Set your password</h1>'+
+   '<p style="margin:0;color:var(--muted)">For '+esc(m.email||'your login')+'.</p>'+
+   (S.signinPw ? '' : '<div class="fld" style="text-align:left"><label class="l" for="mpOld">Temporary password</label><input id="mpOld" type="password" autocomplete="current-password" required></div>')+
+   '<div class="fld" style="text-align:left"><label class="l" for="mpNew">New password</label><input id="mpNew" type="password" autocomplete="new-password" minlength="12" required><span class="hint">At least 12 characters. A short phrase of three or four words works well.</span></div>'+
+   '<div class="fld" style="text-align:left"><label class="l" for="mpNew2">Type it again</label><input id="mpNew2" type="password" autocomplete="new-password" required></div>'+
+   '<span class="formerr" id="mpwErr"></span><button class="btn primary" id="mpwBtn" style="justify-content:center">Save password and continue</button>'+
+   '<button type="button" class="btn ghost" style="justify-content:center" onclick="cancelLimited()">Sign out</button></form></div>'+
+   '<div class="lb-ver">Version '+APP_VERSION+'</div></div>';
+}
+async function submitMustPw(e){
+  e.preventDefault(); const err = document.getElementById('mpwErr'), btn = document.getElementById('mpwBtn');
+  const a = document.getElementById('mpNew').value, bad = pwProblem(a, S.me && S.me.email);
+  if (bad){ err.textContent = bad; return; }
+  if (a !== document.getElementById('mpNew2').value){ err.textContent = 'The two passwords do not match.'; return; }
+  const old = S.signinPw || await sha256hex((document.getElementById('mpOld')||{}).value||''), nw = await sha256hex(a);
+  if (old === nw){ err.textContent = 'Choose a new password that is different from the temporary one.'; return; }
+  btn.disabled = true; err.textContent = '';
+  try{ await sbRpc('bf_change_password', {p_token:TOKEN, p_old:old, p_new:nw}); S.signinPw = null; S.mustPw = false;
+    const sec = await sbRpc('bf_my_security', {p_token:TOKEN});
+    if (sec && sec.limited){ S.me = sec.account; S.limited = true; S.mfaSet = null; render(); return; }     // next: 2-step set-up
+    S.limited = false; const me = await sbRpc('bf_me', {p_token:TOKEN}); await finishSignIn({token:TOKEN, account:me}, tokenRemembered());
+    setTimeout(() => toast('Password saved'), 2600);
+  }catch(x){ err.textContent = x.message; btn.disabled = false; }
+}
 // ---- 2-step set-up (required screen after sign-in, or from My account) ----
 function viewMfaRequired(){
   const m = S.me || {};
@@ -3645,15 +3680,15 @@ async function turnOffMfa(){
   paintSec();
 }
 // ---- Staff accounts → 2-step and sign-in lock per person (administrators) ----
-async function loadSecList(){
+async function loadSecList(quiet){
   try{ S.secList = await sbRpc('bf_admin_security', {p_token:TOKEN}) || []; }catch(e){ S.secList = {err:e.message}; }
-  if (S.view==='users') render();
+  if (S.view==='users' && !quiet) render();
 }
 function secCardHtml(a, me){
   if (a.role==='citizen') return '';
   const L = Array.isArray(S.secList) ? S.secList.find(x => x.id===a.id) : null, id = esc(a.id);
   if (!L) return '<div class="acct-f"><span class="l">2-step verification</span><span class="acct-v">'+(S.secList && S.secList.err ? 'Could not load' : 'Checking…')+'</span></div>';
-  const st = L.mfaEnabled ? '<span class="pill paid">On</span>' : L.mfaRequired ? '<span class="pill unpaid">Required · not set up yet</span>' : '<span class="pill partial">Off</span>';
+  const st = (L.mustChangePw ? '<span class="pill partial" title="Has a temporary password; they choose their own at next sign-in">Temporary password</span> ' : '')+(L.mfaEnabled ? '<span class="pill paid">On</span>' : L.mfaRequired ? '<span class="pill unpaid">Required · not set up yet</span>' : '<span class="pill partial">Off</span>');
   let btns = '';
   if (!me && !L.mfaRoleRequired) btns += '<button class="btn sm" onclick="adminRequireMfa(\''+id+'\','+(!L.mfaRequired)+')">'+(L.mfaRequired?'Stop requiring':'Require it')+'</button>';
   if (!me && L.mfaEnabled) btns += S.mfaResetFor===a.id ? '<span>Reset their 2-step?</span><button class="btn sm danger" onclick="adminResetMfa(\''+id+'\')">Reset</button><button class="btn sm ghost" onclick="S.mfaResetFor=null;render()">Keep</button>'
@@ -4001,7 +4036,7 @@ async function delBug(id){
       if (me && hasPortal(me)){ S.me = me; S.staff = true; await prefLoad(); S.booting = false; render();
         await Promise.all([canBuilding() ? loadSubs() : null, S.view==='clerk' ? clerkLoad() : null]); }
       else { const sec = await sbRpc('bf_my_security', {p_token:TOKEN}).catch(()=>null);
-        S.booting = false; if (sec && sec.limited){ S.me = sec.account; S.limited = true; } else signOutLocal(); render(); }
+        S.booting = false; if (sec && sec.limited){ S.me = sec.account; S.limited = true; S.mustPw = !!sec.mustChangePw; } else signOutLocal(); render(); }
     }catch(e){ S.booting = false; render(); }
   }
   setInterval(()=>{ if (S.staff && document.visibilityState==='visible' && (S.view==='staff'||S.view==='table')) loadSubs(); }, 30000);
