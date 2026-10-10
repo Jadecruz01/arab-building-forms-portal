@@ -863,6 +863,9 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .ficon.tbl{background:var(--gold);color:var(--navy)}
 .ficon{background:var(--navy2)}
 #hello .hl-seal img{border-radius:50%;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+/* v2.15.1: band is decoration only (page title lives in the white sheet) */
+.pband-in{padding:0;height:120px}
+@media (max-width:640px){.pband-in{height:14px}}
 </style>
 
 
@@ -1290,7 +1293,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.15.0';   // shown at the bottom of every page
+const APP_VERSION = '2.15.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1298,7 +1301,7 @@ function pubHeader(){
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a></nav>'+
     '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>'+
-    '<div class="pband" aria-hidden="true"><div class="pband-in"><span>Building Department</span><b>Permits &amp; Applications</b></div></div>';
+    '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Designed and managed by Jade Cruz · <button class="linkbtn" onclick="openBug()">Report a problem</button> · Version '+APP_VERSION+'</div>';
