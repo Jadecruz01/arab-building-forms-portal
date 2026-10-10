@@ -1326,7 +1326,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.18.0';   // shown at the bottom of every page
+const APP_VERSION = '2.18.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1602,7 +1602,7 @@ function visibleCols(k){
   return colsFor(k).filter(c => S.cols.on.includes(c.k));
 }
 function topBar(){
-  return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'Municipal Support Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'Municipal Support Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
+  return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
    profileMenuHtml()+'</header>'+storageBanner();
 }
 
