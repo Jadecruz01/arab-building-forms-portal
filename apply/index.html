@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Poppins:wght@500;600;700&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" integrity="sha384-weMABwrltA6jWR8DDe9Jp5blk+tZQh7ugpCsF3JwSA53WZM9/14PjS5LAJNHNjAI" crossorigin="anonymous"></script>
 <style>
 /* Layout: public side = city portal (navy/gold) with app-style left nav; staff side = workspace + green table + right-hand submission panel. */
 :root{
@@ -867,6 +867,27 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .pband-in{padding:0;height:120px}
 @media (max-width:640px){.pband-in{height:14px}}
 @media (max-width:640px){.pf-credit{flex-direction:column;align-items:flex-start;gap:6px}.pf-credit > span[aria-hidden]{display:none}}
+/* v2.16 security & privacy */
+.hpf{position:absolute!important;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+.privnote{grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;background:var(--surface2);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;padding:12px 14px;font-size:13.5px;color:var(--ink2)}
+.privnote p{margin:0}.privnote svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--golddk)}
+.privnote a{color:var(--ink);font-weight:600}
+.upwarn{display:flex;gap:6px;align-items:flex-start;color:var(--ink2)!important}.upwarn svg{width:14px;height:14px;flex:none;margin-top:2px;color:var(--golddk)}
+.sheet.pv{max-width:860px;margin-left:auto;margin-right:auto}
+.pv-sec{margin-top:22px}.pv-sec h2{font:600 18px var(--f-disp);color:var(--ink);margin-bottom:8px}
+.pv-sec p,.pv-sec li{color:var(--ink2);font-size:15px;line-height:1.6}.pv-sec ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.pinmsg{margin:0;background:var(--amberbg);color:var(--ink);border-radius:6px;padding:8px 10px;font-size:13.5px}
+.mfa-pin{max-width:520px}
+.mfa-steps{margin:0;padding-left:22px;display:grid;gap:14px;text-align:left}
+.mfa-steps li{padding-left:4px}.mfa-steps li > b{display:block;color:var(--ink)}.mfa-steps li > span{display:block;color:var(--ink2);font-size:14px}
+.mfa-qr{margin:10px 0 6px;display:inline-grid;place-items:center;min-width:180px;min-height:180px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px}
+.mfa-qr svg{display:block;width:180px;height:180px}
+.mfa-key{font:600 14px/1.5 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:2px 6px;user-select:all;word-break:break-all}
+.mfa-in{font:600 20px ui-monospace,Menlo,Consolas,monospace!important;letter-spacing:.18em}
+.mfa-done{display:grid;gap:12px;text-align:left}
+.codes{list-style:none;margin:0;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:var(--surface2);border:1px dashed var(--gold);border-radius:8px}
+.codes code{font:600 16px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--ink)}
+.sec-on{display:flex;gap:10px;align-items:flex-start;margin:0;color:var(--ink2)}.sec-on svg{width:20px;height:20px;color:var(--ok);flex:none;margin-top:2px}
 </style>
 
 
@@ -1115,7 +1136,10 @@ async function sbRpc(fn, args){
   if (!r.ok) throw new Error(((j && (j.message || j.hint)) || ('Server error '+r.status)).replace(/^STORAGE_FULL:\s*/,''));
   return j;
 }
-let TOKEN = null; try{ TOKEN = localStorage.getItem('bdStaffToken'); }catch(e){}
+let TOKEN = null; try{ TOKEN = localStorage.getItem('bdStaffToken') || sessionStorage.getItem('bdStaffToken'); }catch(e){}
+// "Keep me signed in" keeps the token for 7 days (localStorage); otherwise it lives only until the browser is closed.
+function saveToken(t, remember){ try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); (remember ? localStorage : sessionStorage).setItem('bdStaffToken', t); }catch(e){} }
+const tokenRemembered = () => { try{ return !!localStorage.getItem('bdStaffToken'); }catch(e){ return false; } };
 S.booting = !!TOKEN;   // a remembered sign-in is being checked: show "Loading", not the sign-in form
 const DL = { save: async ({filename, data}) => { const b = data instanceof Blob ? data : new Blob([data], {type: /\.pdf$/.test(filename)?'application/pdf':/\.csv$/.test(filename)?'text/csv':'application/octet-stream'});
   const u = URL.createObjectURL(b), a = document.createElement('a'); a.href=u; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 5000); } };
@@ -1157,7 +1181,7 @@ const PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 let pdfjsP = null;
 function loadPdfJs(){
   if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
-  return pdfjsP = pdfjsP || new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFJS_CDN+'pdf.min.js';
+  return pdfjsP = pdfjsP || new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFJS_CDN+'pdf.min.js'; s.integrity = 'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e'; s.crossOrigin = 'anonymous';
     s.onload = () => { if (!window.pdfjsLib){ pdfjsP = null; return no(new Error('PDF tool did not load')); } pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_CDN+'pdf.worker.min.js'; ok(pdfjsLib); };
     s.onerror = () => { pdfjsP = null; no(new Error('PDF tool did not load')); }; document.head.appendChild(s); });
 }
@@ -1238,7 +1262,7 @@ function queueOptimize(f){
 // size note used on the Documents tab and in the PDF
 const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); try{ localStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
+function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
 /* ================= saved settings (per staff login, stored in the database) =================
    Layout and report choices are saved to the signed-in account (bf_set_my_prefs), so they come
    back after signing out, on another computer, or after the browser is cleared. A small copy is
@@ -1294,7 +1318,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.15.2';   // shown at the bottom of every page
+const APP_VERSION = '2.16.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1305,13 +1329,51 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button> · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button> · <a href="https://arabcityapplications.jadecruz.dev/apply/#privacy" target="_top">Privacy</a> · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#privacy" onclick="event.preventDefault();go(\'privacy\')">Privacy &amp; your information</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
 }
 function sideNav(){ return ''; }
+
+/* ================= privacy: short note on every application + the full page (#privacy) ================= */
+let FORM_T0 = Date.now();                     // when the form was opened (simple bot check, sent as fillMs)
+const PRIV_LINK = (txt) => '<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#privacy"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'privacy\')"')+'>'+txt+'</a>';
+function privacyNote(){
+  return '<div class="privnote">'+ic('lock')+'<p>Your application is sent over an encrypted connection and is used by the City of Arab Building Department to review your permit, figure your fee, schedule inspections and contact you. It is not sold or used for advertising. '+PRIV_LINK('How we handle your information')+'</p></div>';
+}
+function viewPrivacy(){
+  const sec = (h, body) => '<section class="pv-sec"><h2>'+h+'</h2>'+body+'</section>';
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
+   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Privacy &amp; your information</h1>'+
+     '<span class="hint" style="color:var(--muted)">How the City of Arab Building Department handles what you enter on this website. Last updated October 10, 2026.</span></div>'+
+   sec('What we collect',
+     '<ul><li>What you type into an application: names, phone numbers, email addresses, property and contractor details, and a description of the work.</li>'+
+     '<li>Documents you choose to upload, such as construction plans.</li>'+
+     '<li>The agreements you accept and the date you accepted them.</li>'+
+     '<li>For the permit status check: the reference # and email you enter, used only to find your application.</li>'+
+     '<li>The network (IP) address a request comes from, kept for up to 2 days, only to block spam and repeated guessing.</li></ul>')+
+   sec('Why we use it',
+     '<p>To review and issue your permit, figure your fee, schedule inspections, record payments made at City Hall and contact you about your application. We do not sell your information or use it for advertising, and this site has no advertising or tracking cookies.</p>')+
+   sec('Who can see it',
+     '<ul><li>Building Department staff, and the City staff who record payments. Each has their own password-protected login, and every payment, access change and record deletion is logged.</li>'+
+     '<li>The website administrator, to keep the site running.</li>'+
+     '<li>Permit applications are City records. Under Alabama’s open records law, members of the public may ask to inspect public records, and the City handles those requests as state law requires.</li></ul>')+
+   sec('How it is protected',
+     '<ul><li>Everything you send travels over an encrypted (HTTPS) connection.</li>'+
+     '<li>Applications and documents are stored in a secured database hosted in the United States (Ohio). The public cannot read it, and staff can only reach it by signing in.</li>'+
+     '<li>Staff logins are locked after repeated wrong passwords, and administrators must use 2-step verification.</li>'+
+     '<li>There are limits on how many applications can be sent from one place in a short time, to stop automated spam.</li>'+
+     '<li>The page loads its fonts from Google Fonts and its PDF tools from Cloudflare’s cdnjs. Like any website, those services see your network address when your browser downloads those files.</li></ul>')+
+   sec('How long we keep it',
+     '<p>Applications are kept for as long as the Alabama records retention schedule for City building records requires, and are only destroyed as that schedule allows.</p>')+
+   sec('Please do not send',
+     '<p>Driver’s licenses, Social Security numbers, or bank or card details. They are not needed for a permit. Fees are paid in person at 740 N Main St by cash or check. The City will never ask you to pay, or to enter a password, through this website or a link in an email.</p>')+
+   sec('Questions or corrections',
+     '<p>City of Arab Building Department · 740 N Main St, Arab, AL 35016 · 256-586-5968 · <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a>. To fix something on an application you sent, contact the Building Department with your reference #. Problems with the website itself: <button class="linkbtn" onclick="openBug()">Report a problem</button>.</p>')+
+   '</div></main></div>';
+}
 
 function uploadNote(f){ const u = f.fields.find(x => x.type==='file'); return !u ? 'Apply online' : u.req ? 'Apply online · upload documents' : f.key==='homeowner' ? 'Apply online · construction plans optional' : 'Apply online · documents optional'; }
 function tile(k){ const f = FORMS[k];
@@ -1371,7 +1433,8 @@ function fieldHtml(x, f){
   else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button">'+ic('upload')+'<div><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
     inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
-  return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+(x.type==='radio'?'_0':'')+'">'+esc(x.label)+star+'</label>'+inner+(x.hint?'<span class="hint">'+esc(x.hint)+'</span>':'')+'</div>';
+  return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+(x.type==='radio'?'_0':'')+'">'+esc(x.label)+star+'</label>'+inner+(x.hint?'<span class="hint">'+esc(x.hint)+'</span>':'')+
+    (x.type==='file'?'<span class="hint upwarn">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
   const fe = computeFees(key, FVALS, false);
@@ -1393,6 +1456,8 @@ function formFieldsHtml(){
   const F = FORMS[S.form];
   return F.fields.map(x=>fieldHtml(x,FVALS)).join('')+agreementsHtml()+
     '<div class="sect">Fees</div><div class="feebox" id="feebox" aria-live="polite">'+feeBoxHtml(S.form)+'</div>'+
+    '<div class="hpf" aria-hidden="true"><label for="hpWebsite">Leave this field empty</label><input type="text" id="hpWebsite" name="website" tabindex="-1" autocomplete="off"></div>'+
+    privacyNote()+
     '<div class="submitrow"><button class="btn primary" type="submit" id="subBtn">Submit application</button><span class="formerr" id="ferr"></span></div>';
 }
 function bindForm(){
@@ -1452,7 +1517,7 @@ async function submitForm(e){
     const fees = computeFees(S.form, vals, false);
     const createdAt = new Date().toISOString();
     const agreements = formAgreements(F, FVALS).map(a => ({ id:a.id, title:AGREEMENTS[a.id].title, at:createdAt }));
-    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' } } });
+    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ hp:(document.getElementById('hpWebsite')||{}).value||'', fillMs:Date.now()-FORM_T0, app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' } } });
     for (let i=0;i<opt.length;i++){
       btn.textContent = 'Uploading document '+(i+1)+' of '+opt.length+'…';
       const data = await readDataUrl(opt[i].blob);
@@ -1512,6 +1577,7 @@ function profileMenuHtml(){
       '<div class="pm-who"><span class="avatar" aria-hidden="true">'+myInitials()+'</span><div><b>'+esc(m.name||'')+'</b>'+(m.title?'<span>'+esc(m.title)+'</span>':'')+'<span>'+esc(m.email||'')+'</span><span class="pm-role">'+esc(accessLabel())+'</span></div></div>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'profile\')">'+ic('user')+'Profile and account settings</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'password\')">'+ic('lock')+'Change password</button>'+
+      '<button type="button" role="menuitem" onclick="openAccount(\'security\')">'+ic('check')+'Two-step verification</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -1540,7 +1606,8 @@ function viewPin(){
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
-   '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem" checked> Keep me signed in on this device</label>'+
+   '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="lgRem"> Keep me signed in for 7 days <span style="color:var(--muted)">(only on a computer that is yours)</span></label>'+
+   (S.pinMsg?'<p class="pinmsg" role="status">'+esc(S.pinMsg)+'</p>':'')+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
    '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
    '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
@@ -2705,7 +2772,7 @@ function viewStatus(){
   const R = S.st || (S.st = { ref:'', email:'' });
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
-     '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt (or your permit #) and the email address you used on the application.</span></div>'+
+     '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt (or your permit #) and the email address you used on the application. They are used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
    '<form id="stf" class="fgrid" novalidate>'+
      '<div class="fld"><label class="l" for="stRef">Reference # or permit #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
      '<div class="fld"><label class="l" for="stEmail">Email on the application</label><input type="email" id="stEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" value="'+esc(R.email||'')+'"></div>'+
@@ -2840,6 +2907,7 @@ function purgeConfirmHtml(sel, scope, docs, freed, lastExp){
     '<div><b>Will be kept</b><ul>'+(scope==='documents'?'<li>The application records, marked "documents purged"</li>':'')+
       '<li>All payments and receipt numbers</li><li>Check scans</li><li>The activity log and the purge log</li></ul></div></div>'+
     (fresh ? '' : '<p class="formerr" style="margin:0">You have not exported a copy in the last 7 days. Consider downloading a ZIP first (step 2).</p>')+
+    '<div class="callout pay" style="margin:0"><b>Records law: check before you purge</b>Alabama requires City records to be kept for the periods in the Local Government Records Commission’s retention schedule (RDA), and each destruction must be reported to the Alabama Department of Archives and History on a Local Government Records Destruction Notice. Confirm with the City Clerk that these records have passed their retention period before purging.</div>'+
     '<div class="fgrid"><div class="fld"><label class="l" for="pgInit">Your initials</label><input id="pgInit" type="text" maxlength="4" autocomplete="off" style="text-transform:uppercase" oninput="pgCheck()"><span class="hint">2 to 4 letters. Saved with the purge record.</span></div>'+
       '<div class="fld"><span class="l">Confirmation</span><label class="opt"><input type="checkbox" id="pgOk" onchange="pgCheck()"> I understand this permanently deletes the items listed and cannot be undone.</label></div></div>'+
     '<span class="formerr" id="pgErr"></span>'+
@@ -2960,8 +3028,12 @@ function render(){
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
   else if (S.view==='status'){ root.innerHTML = viewStatus(); bindStatus(); }
+  else if (S.view==='privacy') root.innerHTML = viewPrivacy();
+  else if (EMBED) root.innerHTML = viewFramed();     // staff screens never load inside another site's frame
   else if (isPhone()) root.innerHTML = viewPhoneBlock();
   else if (!S.staff && S.booting) root.innerHTML = '<div class="booting" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span>Loading the Staff Portal…</div>';
+  else if (S.limited){ root.innerHTML = viewMfaRequired(); bindMfaSetup(); }
+  else if (!S.staff && S.mfa){ root.innerHTML = viewCode(); document.getElementById('codef').onsubmit = submitCode; }
   else if (!S.staff){ root.innerHTML = viewPin();
     document.getElementById('pinf').onsubmit = staffSignIn; }
   else if (!routeAllowed(S.view)){
@@ -2973,7 +3045,7 @@ function render(){
   else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='records') root.innerHTML = viewRecords();
   else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
-  else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; }
+  else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; bindMfaSetup(); if (!S.sec) loadMySecurity(); }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
   else if (S.view==='cict') root.innerHTML = viewCict();
   else if (S.view==='table' && S.form){
@@ -2981,14 +3053,14 @@ function render(){
     root.innerHTML = viewTable(); bindLinkPick();
     if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
-  const isPub = ['apps','form','pdf','status'].includes(S.view);
+  const isPub = ['apps','form','pdf','status','privacy'].includes(S.view);
   if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
   else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
+  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
   ensureViewData();
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
@@ -2999,7 +3071,7 @@ function ensureViewData(){
   if (S.view==='clerk' && canPay() && !S.ck.sel && S.ck.tab!=='day' && !S.ck.results && !S.ck.busy) setTimeout(clerkLoad, 0);
   if (['staff','table','cict','records'].includes(S.view) && canBuilding() && !S.loaded && !S.loadingSubs) setTimeout(() => loadSubs(), 0);
 }
-function startForm(){ const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
+function startForm(){ FORM_T0 = Date.now(); const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
 const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); };
 window.addEventListener('hashchange', () => initRoute());
 function initRoute(){
@@ -3009,6 +3081,7 @@ function initRoute(){
   if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
+  else if (h==='privacy') S.view = 'privacy';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
   else if (['staff','records','users','me','bugs','clerk','cict'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
@@ -3026,11 +3099,12 @@ function meterHtml(){
 }
 const estBytes = s => Math.round((s.files||[]).reduce((a,f)=>a+(f.size||0),0)*1.37 + 4000);
 async function loadUsers(){
+  loadSecList();
   try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'citizens', p_limit:500}); S.users = (r||[]).map(x=>x.data); }
   catch(e){ S.users = {err:e.message}; }
   if (S.view==='users') render();
 }
-function genTempPw(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = new Uint32Array(10); crypto.getRandomValues(r); return [...r].map(x=>a[x%a.length]).join('').replace(/(.{5})/,'$1-'); }
+function genTempPw(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const r = new Uint32Array(15); crypto.getRandomValues(r); return [...r].map(x=>a[x%a.length]).join('').replace(/(.{5})(.{5})/,'$1-$2-'); }
 function viewUsers(){
   const u = S.users, showAll = !!S.showResidents;
   const portal = a => a.role!=='citizen';
@@ -3054,7 +3128,7 @@ function viewUsers(){
     '<div class="fld"><label class="l" for="nuName">Name</label><input id="nuName" type="text" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuTitle">Title <span class="hint">(optional, shown when they sign in)</span></label><input id="nuTitle" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Building Inspector"></div>'+
     '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
-    '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="8" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
+    '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="12" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">They can change it under My account after signing in.</span></div>'+
     '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Building Department</option><option value="clerk">Municipal Support Clerk</option><option value="admin">Administrator</option></select></div>'+
    '</div><span class="formerr" id="nuErr"></span><div class="row"><button class="btn primary" id="nuBtn">'+ic('user')+'Add staff member</button></div>'+
    (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
@@ -3070,7 +3144,7 @@ function viewUsers(){
         '<div class="acct-f"><label class="l" for="t_'+id+'">Title</label><input class="ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title, e.g. Building Inspector" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></div>'+
         '<div class="acct-f"><span class="l">Workspace access</span>'+(me?'<span class="acct-v">Administrator (you cannot change your own access)</span>':'<div class="acc">'+roleSel(id, a.role, 'Access for '+esc(a.email))+addon(a)+'</div>')+'</div>'+
         '<div class="acct-f"><span class="l">Sign-in</span>'+(me?'<span class="acct-v">Active</span>':(on?'<div class="row" style="gap:8px"><span class="acct-v">Can sign in</span><button class="btn sm" onclick="setAccess(\''+id+'\',{active:false})">Turn off</button></div>':'<div class="row" style="gap:8px"><span class="acct-v">Cannot sign in</span><button class="btn sm primary" onclick="setAccess(\''+id+'\',{active:true})">Turn on</button></div>'))+'</div>'+
-        '<div class="acct-f"><span class="l">Password</span>'+(me?'<button class="btn sm" onclick="openAccount(\'password\')">Change my password</button>':(S.resetFor===a.id?'<div class="row" style="gap:6px"><input id="rp_'+id+'" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:150px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></div>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</div>'+
+        secCardHtml(a, me)+'<div class="acct-f"><span class="l">Password</span>'+(me?'<button class="btn sm" onclick="openAccount(\'password\')">Change my password</button>':(S.resetFor===a.id?'<div class="row" style="gap:6px"><input id="rp_'+id+'" type="text" value="'+genTempPw()+'" aria-label="New password for '+esc(a.email)+'" style="width:190px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></div>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.removeFor=null;render()">Reset password</button>'))+'</div>'+
       '</div>'+
       (me?'':'<footer class="acct-ft">'+(S.removeFor===a.id?'<span>Delete this login for good?</span><button class="btn sm danger" onclick="removeAcct(\''+id+'\')">Delete</button><button class="btn sm ghost" onclick="S.removeFor=null;render()">Keep</button>':'<button class="btn sm ghost" title="Turning a login off keeps it on record; deleting removes it" onclick="S.removeFor=\''+id+'\';S.resetFor=null;render()">'+ic('trash')+'Delete login</button>')+'</footer>')+
       '</article>'; }).join('')+'</div><p class="hint" style="color:var(--muted);font-size:13px;margin:0">To stop someone from signing in, use <b>Turn off</b>. Their name stays on the payments and records they made, and you can turn them back on later.</p>')+
@@ -3108,6 +3182,18 @@ function auditHtml(){
       if (String(b.perms)!==String(a.perms)) parts.push('add-ons: '+((a.perms||[]).join(', ')||'none'));
       if (b.active!==a.active) parts.push(a.active ? 'turned on' : 'turned off');
       return 'Changed '+(d.email||'a login')+(parts.length?': '+parts.join('; '):''); }
+    const who = d.email || 'their own login';
+    if (x.action==='signin.locked') return 'Sign-in locked for 15 minutes after 5 wrong passwords'+(d.ip?' (from '+d.ip+')':'');
+    if (x.action==='signin.unlocked') return 'Unlocked sign-in for '+who;
+    if (x.action==='password.reset') return 'Reset a password';
+    if (x.action==='mfa.enabled') return 'Turned on 2-step verification';
+    if (x.action==='mfa.disabled') return 'Turned off 2-step verification';
+    if (x.action==='mfa.reset') return 'Reset 2-step verification for '+who;
+    if (x.action==='mfa.required') return (d.on?'Required':'Stopped requiring')+' 2-step verification for '+who;
+    if (x.action==='mfa.recovery_used') return 'Signed in with a recovery code ('+(d.left||0)+' left)';
+    if (x.action==='mfa.recovery_new') return 'Made new recovery codes';
+    if (x.action==='records.purge') return 'Purged records';
+    if (x.action==='profile.updated') return 'Updated their profile';
     return x.action; };
   return '<ul class="actlist">'+L.map(x=>'<li><span class="aw">'+fmtDT(x.at)+'<br><b>'+esc(x.by||'')+'</b></span><span>'+esc(what(x))+'</span></li>').join('')+'</ul>';
 }
@@ -3119,7 +3205,7 @@ async function setTitle(id, title){
 async function addStaff(e){
   e.preventDefault(); const err = document.getElementById('nuErr'), b = document.getElementById('nuBtn');
   const name = document.getElementById('nuName').value.trim(), email = document.getElementById('nuEmail').value.trim(), pass = document.getElementById('nuPass').value, role = document.getElementById('nuRole').value;
-  if (pass.length < 8){ err.textContent = 'Use a temporary password of at least 8 characters.'; return; }
+  const bad = pwProblem(pass, email); if (bad){ err.textContent = bad; return; }
   b.disabled = true; err.textContent = '';
   const title = (document.getElementById('nuTitle')||{}).value || '';
   try{ const acc = await sbRpc('bf_admin_create_account', {p_token:TOKEN, p_email:email, p_name:name, p_pass:await sha256hex(pass), p_role:role});
@@ -3128,7 +3214,7 @@ async function addStaff(e){
   catch(x){ err.textContent = x.message; b.disabled = false; }
 }
 async function resetPw(id){
-  const v = (document.getElementById('rp_'+id)||{}).value||''; if (v.length < 8){ toast('Use at least 8 characters.'); return; }
+  const v = (document.getElementById('rp_'+id)||{}).value||''; const bad = pwProblem(v); if (bad){ toast(bad); return; }
   try{ await sbRpc('bf_admin_set_password', {p_token:TOKEN, p_id:id, p_pass:await sha256hex(v)}); const a = S.users.find(x=>x.id===id);
     S.resetFor = null; S.newCreds = {name:a&&a.name, email:a&&a.email, pass:v}; render(); toast('Password reset. Share the new password with them.'); window.scrollTo(0,0); }
   catch(e){ toast('Could not reset: '+e.message); }
@@ -3171,16 +3257,24 @@ async function staffSignIn(e){
       S.authTab = 'in'; render(); document.getElementById('pinErr').textContent = ''; toast('Account created. An administrator needs to turn on staff access before you can sign in.');
       return;
     }
-    const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:document.getElementById('lgRem').checked });
-    if (!r || !r.account || !hasPortal(r.account)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
-    TOKEN = r.token; S.me = r.account; S.staff = true; try{ localStorage.setItem('bdStaffToken', TOKEN); }catch(x){}
-    S.loaded = false; const hello = helloStart(r.account);
-    await prefLoad();
-    if (!routeAllowed(S.view) || S.view==='staff') S.view = homeView();
-    try{ history.replaceState(null, '', '#'+S.view); }catch(e){}
-    render();
-    await Promise.all([canBuilding() ? loadSubs().catch(()=>{}) : null, S.view==='clerk' ? clerkLoad().catch(()=>{}) : null, hello]); helloEnd();
+    const remember = document.getElementById('lgRem').checked;
+    const r = await sbRpc('bf_sign_in', { p_email:email, p_pass:pass, p_remember:remember });
+    if (r && r.error) throw new Error(r.error);
+    S.pinMsg = '';
+    if (r && r.mfa){ S.mfa = { challenge:r.challenge, remember, email }; render(); const c = document.getElementById('mfaCode'); if (c) c.focus(); return; }
+    await finishSignIn(r, remember);
   }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; }
+}
+async function finishSignIn(r, remember){
+  if (r && r.limited){ TOKEN = r.token; saveToken(TOKEN, remember); S.me = r.account; S.limited = true; S.mfa = null; S.mfaSet = null; render(); return; }
+  if (!r || !r.account || !hasPortal(r.account)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
+  TOKEN = r.token; S.me = r.account; S.staff = true; S.limited = false; S.mfa = null; saveToken(TOKEN, remember); idleTouch();
+  S.loaded = false; const hello = helloStart(r.account);
+  await prefLoad();
+  if (!routeAllowed(S.view) || S.view==='staff') S.view = homeView();
+  try{ history.replaceState(null, '', '#'+S.view); }catch(e){}
+  render();
+  await Promise.all([canBuilding() ? loadSubs().catch(()=>{}) : null, S.view==='clerk' ? clerkLoad().catch(()=>{}) : null, hello]); helloEnd();
 }
 initRoute();
 /* ================= periods + per-type dashboard ================= */
@@ -3296,10 +3390,11 @@ function viewMe(){
    '<form class="card" id="me-password"><h2>Change password</h2>'+
      '<div class="fgrid">'+
      '<div class="fld full"><label class="l" for="meOld">Current password</label><input id="meOld" type="password" autocomplete="current-password" required></div>'+
-     '<div class="fld"><label class="l" for="meNew">New password</label><input id="meNew" type="password" autocomplete="new-password" minlength="8" required><span class="hint">At least 8 characters.</span></div>'+
+     '<div class="fld"><label class="l" for="meNew">New password</label><input id="meNew" type="password" autocomplete="new-password" minlength="12" required><span class="hint">At least 12 characters. A short phrase of three or four words works well.</span></div>'+
      '<div class="fld"><label class="l" for="meNew2">Type the new password again</label><input id="meNew2" type="password" autocomplete="new-password" required></div></div>'+
      '<span class="formerr" id="meErr"></span><div class="row"><button class="btn primary" id="meBtn">Change password</button></div>'+
      '<p class="hint" style="margin:0;color:var(--muted);font-size:13px">Changing your password signs you out on your other devices. Forgot it? Ask an administrator to reset it.</p></form>'+
+   mySecurityHtml()+
    '<section class="card" id="me-settings"><h2>Saved settings and devices</h2>'+
      '<p style="margin:0;color:var(--ink2)">Your layout and report choices are saved to your login, so they come back on any computer: the workspace sort order, table columns, sort and filter, the time period, full screen, the CICT report month and count, and the Payments filter.</p>'+
      '<div class="row" style="gap:10px;flex-wrap:wrap"><button type="button" class="btn" onclick="resetMyPrefs()">Reset my saved settings</button>'+
@@ -3328,10 +3423,214 @@ async function signOutOthers(){
 }
 async function changeMyPassword(e){
   e.preventDefault(); const err = document.getElementById('meErr'), a = document.getElementById('meNew').value;
-  if (a.length < 8){ err.textContent = 'Use at least 8 characters.'; return; }
+  const bad = pwProblem(a, S.me && S.me.email); if (bad){ err.textContent = bad; return; }
   if (a !== document.getElementById('meNew2').value){ err.textContent = 'The two new passwords do not match.'; return; }
   try{ await sbRpc('bf_change_password', {p_token:TOKEN, p_old:await sha256hex(document.getElementById('meOld').value), p_new:await sha256hex(a)}); toast('Password changed'); ['meOld','meNew','meNew2'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); err.textContent = ''; }
   catch(x){ err.textContent = x.message; }
+}
+/* ================= staff security: passwords, 2-step verification, idle sign-out, framing =================
+   Server side (bf_security.sql) does the real enforcement: sign-in lockout, 2-step codes, and
+   "limited" sessions that reach nothing but the 2-step set-up until it is turned on.
+   This part is the screens for those steps. */
+// (EMBED, defined at the top, is true whenever this page is inside another page's frame)
+function viewFramed(){
+  return '<div class="booting" role="alert" style="flex-direction:column;gap:12px;text-align:center;padding:24px">'+
+    '<b>For your security, the Staff Portal only opens in its own browser tab.</b>'+
+    '<a class="btn primary" href="https://arabcityapplications.jadecruz.dev/apply/#staff" target="_blank" rel="noopener">Open the Staff Portal</a></div>';
+}
+// ---- passwords: 12+ characters, not a common one, not the email name ----
+const COMMON_PW = ['password','passw0rd','123456','12345678','123456789','1234567890','qwerty','qwertyuiop','iloveyou','welcome','letmein','changeme',
+  'admin','administrator','abc123','111111','monkey','dragon','football','baseball','sunshine','princess','trustno1','1q2w3e4r','arabcity','cityofarab','building','buildingdept','alabama'];
+function pwProblem(p, email){
+  p = String(p||'');
+  if (p.length < 12) return 'Use at least 12 characters. A short phrase of three or four words is easy to remember.';
+  const l = p.toLowerCase().replace(/[^a-z0-9]/g,'');
+  const rest = w => l.split(w).join('');
+  if (/^(.)\1+$/.test(p) || COMMON_PW.some(w => l.includes(w) && (rest(w).length < 6 || /^\d+$/.test(rest(w))))) return 'That password is too easy to guess. Choose something less common.';
+  const u = String(email||'').split('@')[0].toLowerCase().replace(/[^a-z0-9]/g,'');
+  if (u.length >= 4 && l.includes(u)) return 'Do not use your email name in your password.';
+  return '';
+}
+// ---- idle sign-out (sessions that are not "kept signed in") ----
+const IDLE_MIN = 30; let IDLE_AT = Date.now();
+function idleTouch(){ IDLE_AT = Date.now(); }
+['mousedown','mousemove','keydown','wheel','touchstart'].forEach(ev => document.addEventListener(ev, idleTouch, {passive:true, capture:true}));
+setInterval(() => {
+  if ((S.staff || S.limited) && TOKEN && !tokenRemembered() && Date.now() - IDLE_AT > IDLE_MIN*60000){
+    S.pinMsg = 'For your security, you were signed out after '+IDLE_MIN+' minutes without activity.'; lockStaff(); }
+}, 30000);
+// ---- QR code (loaded only on the set-up screen, checked with a subresource integrity hash) ----
+let qrP = null;
+function loadQr(){
+  if (window.qrcode) return Promise.resolve(window.qrcode);
+  return qrP = qrP || new Promise((ok, no) => { const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+    s.integrity = 'sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1'; s.crossOrigin = 'anonymous';
+    s.onload = () => window.qrcode ? ok(window.qrcode) : (qrP = null, no(new Error('QR'))); s.onerror = () => { qrP = null; no(new Error('QR')); };
+    document.head.appendChild(s); });
+}
+// ---- sign-in step 2 ----
+function viewCode(){
+  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2></div>'+
+   '<form class="pin" id="codef"><h1 style="font:800 22px var(--f-disp)">2-step verification</h1>'+
+   '<p style="margin:0;color:var(--muted)">Open the authenticator app on your phone and enter the 6-digit code for <b style="color:var(--ink)">Arab City Staff Portal</b>.</p>'+
+   '<div class="fld" style="text-align:left"><label class="l" for="mfaCode">Code</label><input id="mfaCode" class="mfa-in" type="text" autocomplete="one-time-code" maxlength="11" required spellcheck="false"></div>'+
+   '<span class="formerr" id="codeErr"></span><button class="btn primary" id="codeBtn" style="justify-content:center">Verify</button>'+
+   '<p style="margin:0;font-size:13px;color:var(--muted)">Lost your phone? Type one of your recovery codes in the box instead, or ask an administrator to reset your 2-step verification.</p>'+
+   '<button type="button" class="btn ghost" style="justify-content:center" onclick="S.mfa=null;render()">Back to sign in</button></form></div>'+
+   '<div class="lb-ver">Version '+APP_VERSION+'</div></div>';
+}
+async function submitCode(e){
+  e.preventDefault(); const err = document.getElementById('codeErr'), btn = document.getElementById('codeBtn'), code = document.getElementById('mfaCode').value;
+  if (!code.trim()){ err.textContent = 'Enter the code from your app.'; return; }
+  btn.disabled = true; err.textContent = '';
+  try{ const r = await sbRpc('bf_sign_in_code', {p_challenge:S.mfa.challenge, p_code:code});
+    if (r && r.error){ if (r.restart){ S.mfa = null; S.pinMsg = r.error; render(); return; } throw new Error(r.error); }
+    const remember = S.mfa.remember; S.mfa = null;
+    await finishSignIn(r, remember);
+    if (r.usedRecovery) setTimeout(() => toast('You signed in with a recovery code. Make new ones under My account → Two-step verification.'), 2600);
+  }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; const c = document.getElementById('mfaCode'); if (c){ c.value = ''; c.focus(); } }
+}
+// ---- 2-step set-up (required screen after sign-in, or from My account) ----
+function viewMfaRequired(){
+  const m = S.me || {};
+  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">One more step</span><h2>Protect your<br><em>staff login</em></h2>'+
+     '<p>Your login needs a code from your phone each time you sign in. Even if someone learns your password, they cannot get in without your phone.</p></div>'+
+   '<div class="pin mfa-pin"><h1 style="font:800 22px var(--f-disp)">Set up 2-step verification</h1>'+
+   '<p style="margin:0;color:var(--muted)">Required for '+esc(m.email||'your login')+'. It takes about 2 minutes.</p>'+
+   mfaSetupHtml()+
+   '<button type="button" class="btn ghost" style="justify-content:center" onclick="cancelLimited()">Sign out</button></div></div>'+
+   '<div class="lb-ver">Version '+APP_VERSION+'</div></div>';
+}
+// redraw just the 2-step part (so half-typed profile or password fields on My account are kept)
+function paintSec(){
+  const el = document.getElementById('me-security');
+  if (!S.limited && S.view==='me' && el){ el.outerHTML = mySecurityHtml(); bindMfaSetup(); } else render();
+}
+async function cancelLimited(){ const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out', {p_token:t}); }catch(e){} render(); }
+function mfaSetupHtml(){
+  const M = S.mfaSet || {};
+  if (M.codes) return mfaCodesHtml();
+  if (!M.secret) return '<div class="row"><button class="btn primary" type="button" '+(M.busy?'disabled':'')+' onclick="startMfa()">'+(M.busy?'Starting…':'Set up 2-step verification')+'</button></div>'+(M.err?'<p class="formerr" role="alert">'+esc(M.err)+'</p>':'');
+  const key = M.secret.replace(/(.{4})/g, '$1 ').trim();
+  return '<ol class="mfa-steps">'+
+    '<li><b>Install an authenticator app on your phone.</b><span>Google Authenticator, Microsoft Authenticator and Authy are free. Your phone’s built-in password manager may also work.</span></li>'+
+    '<li><b>Add this login to the app.</b><span>In the app, tap <b>+</b> and scan this code.</span><div class="mfa-qr" id="mfaQr">'+(M.qr||'<span class="hint">Loading the code…</span>')+'</div>'+
+      '<span class="hint">Can’t scan? Choose <b>Enter a setup key</b>, pick <b>Time based</b>, and type: <code class="mfa-key">'+esc(key)+'</code></span></li>'+
+    '<li><b>Enter the 6-digit code the app now shows.</b><div class="row" style="gap:8px;flex-wrap:nowrap;margin-top:6px"><label class="vh" for="mfaOn">6-digit code</label>'+
+      '<input id="mfaOn" class="mfa-in" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123456" style="max-width:160px">'+
+      '<button class="btn primary" type="button" id="mfaOnBtn" '+(M.busy?'disabled':'')+' onclick="enableMfa()">'+(M.busy?'Checking…':'Turn on')+'</button></div></li></ol>'+
+    (M.err?'<p class="formerr" role="alert">'+esc(M.err)+'</p>':'');
+}
+function bindMfaSetup(){
+  const M = S.mfaSet;
+  if (S.limited && !M) { S.mfaSet = {}; startMfa(); return; }
+  const on = document.getElementById('mfaOn'); if (on) on.onkeydown = e => { if (e.key==='Enter'){ e.preventDefault(); enableMfa(); } };
+  if (M && M.secret && !M.qr && !M.qrTried){ M.qrTried = true;
+    loadQr().then(q => { const g = q(0, 'M'); g.addData(M.uri); g.make(); M.qr = g.createSvgTag(5, 3);
+      const el = document.getElementById('mfaQr'); if (el) el.innerHTML = M.qr; })
+    .catch(() => { M.qr = '<span class="hint">The code picture could not load. Use the setup key below instead.</span>'; const el = document.getElementById('mfaQr'); if (el) el.innerHTML = M.qr; }); }
+}
+async function startMfa(){
+  S.mfaSet = Object.assign(S.mfaSet || {}, {busy:true, err:''}); paintSec();
+  try{ const r = await sbRpc('bf_mfa_setup', {p_token:TOKEN}); S.mfaSet = {secret:r.secret, uri:r.uri}; }
+  catch(x){ S.mfaSet = {err:x.message}; }
+  paintSec(); const on = document.getElementById('mfaOn'); if (on) on.focus();
+}
+async function enableMfa(){
+  const M = S.mfaSet, code = (document.getElementById('mfaOn')||{}).value || '';
+  if (!/^\d{6}$/.test(code.replace(/\s/g,''))){ M.err = 'Enter the 6-digit code from your app.'; paintSec(); return; }
+  M.busy = true; M.err = ''; paintSec();
+  try{ const r = await sbRpc('bf_mfa_enable', {p_token:TOKEN, p_code:code}); S.mfaSet = {codes:r.recovery}; S.sec = null; }
+  catch(x){ M.busy = false; M.err = x.message; }
+  if (S.view==='me' && !S.limited && S.mfaSet && S.mfaSet.codes) S.sec = Object.assign({}, S.sec||{}, {mfaEnabled:true});
+  paintSec();
+}
+function mfaCodesHtml(){
+  const M = S.mfaSet;
+  return '<div class="mfa-done"><p style="margin:0"><b>Save your recovery codes.</b> If you lose your phone, each code lets you sign in once. Keep them somewhere safe, away from this computer, such as printed in a locked drawer.</p>'+
+    '<ol class="codes">'+M.codes.map(c => '<li><code>'+esc(c)+'</code></li>').join('')+'</ol>'+
+    '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn" onclick="saveCodes()">'+ic('down')+'Download (.txt)</button><button type="button" class="btn" onclick="printCodes()">Print</button></div>'+
+    '<label class="opt" style="border:0;padding:0"><input type="checkbox" id="codesOk" '+(M.saved?'checked':'')+' onchange="S.mfaSet.saved=this.checked;document.getElementById(\'codesGo\').disabled=!this.checked"> I saved these codes somewhere safe.</label>'+
+    '<div class="row"><button type="button" class="btn primary" id="codesGo" '+(M.saved?'':'disabled')+' onclick="mfaDone()">'+(S.limited?'Continue to the Staff Portal':'Done')+'</button></div></div>';
+}
+const codesText = () => 'Arab City Staff Portal: 2-step verification recovery codes\nLogin: '+((S.me&&S.me.email)||'')+'\nMade: '+new Date().toLocaleString()+'\n\nEach code works once.\n\n'+S.mfaSet.codes.join('\n')+'\n';
+function saveCodes(){ DL.save({ filename:'arab-staff-portal-recovery-codes.txt', data:new Blob([codesText()], {type:'text/plain'}) }); }
+function printCodes(){ printHtml('<!doctype html><html><head><meta charset="utf-8"><title>Recovery codes</title><style>@page{size:8.5in 11in;margin:0.75in}body{margin:0}</style></head><body><pre style="font:13pt/1.6 monospace;white-space:pre-wrap">'+esc(codesText())+'</pre></body></html>'); }
+async function mfaDone(){
+  S.mfaSet = null;
+  if (S.limited){ S.limited = false;
+    try{ const me = await sbRpc('bf_me', {p_token:TOKEN}); await finishSignIn({token:TOKEN, account:me}, tokenRemembered()); }
+    catch(x){ signOutLocal(); S.pinMsg = 'Sign in again.'; render(); }
+    return; }
+  S.sec = null; toast('2-step verification is on'); loadMySecurity();
+}
+// ---- My account → Two-step verification ----
+async function loadMySecurity(){
+  if (S.secLoading) return; S.secLoading = true;
+  try{ S.sec = await sbRpc('bf_my_security', {p_token:TOKEN}) || {err:'Sign in again.'}; }catch(e){ S.sec = {err:e.message}; }
+  S.secLoading = false; if (S.view==='me') paintSec();
+}
+function mySecurityHtml(){
+  const s = S.sec; let body;
+  if (!s) body = '<p class="empty">Loading…</p>';
+  else if (s.err) body = '<p class="formerr">'+esc(s.err)+'</p>';
+  else if (!s.mfaEnabled) body = '<p style="margin:0;color:var(--ink2)">2-step verification is <b>off</b>. '+(s.mfaRequired?'It is required for your login.':'Turn it on so a stolen password alone cannot open your login.')+'</p>'+mfaSetupHtml();
+  else body = '<p class="sec-on">'+ic('check')+'<span>2-step verification is <b>on</b>'+(s.mfaOnAt?' since '+esc(fmtDay(s.mfaOnAt)):'')+'. You have <b>'+s.recoveryLeft+'</b> unused recovery code'+(s.recoveryLeft===1?'':'s')+'.</span></p>'+
+    (S.mfaSet && S.mfaSet.codes ? mfaCodesHtml() :
+     '<div class="row" style="gap:8px;flex-wrap:wrap;align-items:flex-end"><div class="fld" style="max-width:220px"><label class="l" for="secCode">Current 6-digit code</label><input id="secCode" class="mfa-in" type="text" autocomplete="one-time-code" maxlength="7"></div>'+
+     '<button class="btn" type="button" onclick="newRecovery()">Make new recovery codes</button>'+(s.mfaRequired?'':'<button class="btn" type="button" onclick="turnOffMfa()">Turn off</button>')+'</div>'+
+     (s.mfaRequired?'<p class="hint" style="margin:0;color:var(--muted)">Required for your login, so it cannot be turned off. Lost your phone? Use a recovery code, or ask another administrator to reset it.</p>':'')+
+     (S.secErr?'<p class="formerr" role="alert">'+esc(S.secErr)+'</p>':''));
+  return '<section class="card" id="me-security"><h2>Two-step verification</h2>'+body+'</section>';
+}
+async function newRecovery(){
+  const code = (document.getElementById('secCode')||{}).value || ''; S.secErr = '';
+  try{ const r = await sbRpc('bf_mfa_recovery_new', {p_token:TOKEN, p_code:code}); S.mfaSet = {codes:r.recovery}; }
+  catch(x){ S.secErr = x.message; }
+  paintSec();
+}
+async function turnOffMfa(){
+  const code = (document.getElementById('secCode')||{}).value || ''; S.secErr = '';
+  try{ await sbRpc('bf_mfa_disable', {p_token:TOKEN, p_code:code}); S.sec = null; toast('2-step verification is off'); return loadMySecurity(); }
+  catch(x){ S.secErr = x.message; }
+  paintSec();
+}
+// ---- Staff accounts → 2-step and sign-in lock per person (administrators) ----
+async function loadSecList(){
+  try{ S.secList = await sbRpc('bf_admin_security', {p_token:TOKEN}) || []; }catch(e){ S.secList = {err:e.message}; }
+  if (S.view==='users') render();
+}
+function secCardHtml(a, me){
+  if (a.role==='citizen') return '';
+  const L = Array.isArray(S.secList) ? S.secList.find(x => x.id===a.id) : null, id = esc(a.id);
+  if (!L) return '<div class="acct-f"><span class="l">2-step verification</span><span class="acct-v">'+(S.secList && S.secList.err ? 'Could not load' : 'Checking…')+'</span></div>';
+  const st = L.mfaEnabled ? '<span class="pill paid">On</span>' : L.mfaRequired ? '<span class="pill unpaid">Required · not set up yet</span>' : '<span class="pill partial">Off</span>';
+  let btns = '';
+  if (!me && !L.mfaRoleRequired) btns += '<button class="btn sm" onclick="adminRequireMfa(\''+id+'\','+(!L.mfaRequired)+')">'+(L.mfaRequired?'Stop requiring':'Require it')+'</button>';
+  if (!me && L.mfaEnabled) btns += S.mfaResetFor===a.id ? '<span>Reset their 2-step?</span><button class="btn sm danger" onclick="adminResetMfa(\''+id+'\')">Reset</button><button class="btn sm ghost" onclick="S.mfaResetFor=null;render()">Keep</button>'
+      : '<button class="btn sm ghost" title="Use when they lose their phone. They set it up again on their next sign-in." onclick="S.mfaResetFor=\''+id+'\';render()">Reset (lost phone)</button>';
+  return '<div class="acct-f"><span class="l">2-step verification</span><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">'+st+
+      (L.mfaRoleRequired?'<span class="acct-v" style="font-size:13px">Always required for administrators</span>':'')+btns+'</div>'+
+    (L.locked?'<div class="row" style="gap:8px;margin-top:6px;align-items:center"><span class="pill unpaid">Sign-in locked</span><span class="acct-v" style="font-size:13px">5 wrong passwords</span><button class="btn sm" onclick="adminUnlock(\''+id+'\')">Unlock</button></div>'
+      : L.failedToday ? '<span class="hint" style="display:block;margin-top:4px">'+L.failedToday+' wrong password'+(L.failedToday===1?'':'s')+' in the last day</span>' : '')+'</div>';
+}
+async function adminRequireMfa(id, on){
+  try{ await sbRpc('bf_admin_set_mfa_required', {p_token:TOKEN, p_id:id, p_on:on}); S.audit = null; toast(on ? '2-step verification is now required for them' : 'No longer required'); }
+  catch(e){ toast('Could not update: '+e.message); }
+  loadSecList();
+}
+async function adminResetMfa(id){
+  try{ await sbRpc('bf_admin_reset_mfa', {p_token:TOKEN, p_id:id}); S.mfaResetFor = null; S.audit = null; toast('2-step verification reset. They are signed out and set it up again on their next sign-in.'); }
+  catch(e){ toast('Could not reset: '+e.message); }
+  loadSecList();
+}
+async function adminUnlock(id){
+  try{ await sbRpc('bf_admin_unlock', {p_token:TOKEN, p_id:id}); S.audit = null; toast('Sign-in unlocked'); }
+  catch(e){ toast('Could not unlock: '+e.message); }
+  loadSecList();
 }
 /* ================= applicant receipt (PDF) ================= */
 const refNo = id => String(id||'').replace(/-/g,'').slice(0,8).toUpperCase();
@@ -3602,7 +3901,8 @@ async function delBug(id){
     try{ const me = await sbRpc('bf_me', {p_token:TOKEN});
       if (me && hasPortal(me)){ S.me = me; S.staff = true; await prefLoad(); S.booting = false; render();
         await Promise.all([canBuilding() ? loadSubs() : null, S.view==='clerk' ? clerkLoad() : null]); }
-      else { S.booting = false; signOutLocal(); render(); }
+      else { const sec = await sbRpc('bf_my_security', {p_token:TOKEN}).catch(()=>null);
+        S.booting = false; if (sec && sec.limited){ S.me = sec.account; S.limited = true; } else signOutLocal(); render(); }
     }catch(e){ S.booting = false; render(); }
   }
   setInterval(()=>{ if (S.staff && document.visibilityState==='visible' && (S.view==='staff'||S.view==='table')) loadSubs(); }, 30000);
