@@ -582,6 +582,28 @@ tr.rev td{color:var(--muted)}
 .scan-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
 .scan-th{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:6px 10px 6px 6px;cursor:pointer;font:inherit;color:inherit;max-width:100%}
 .scan-th:hover{border-color:var(--city)}
+/* v2.20: payment history + scan viewer alignment */
+.ck-h1 > b.num:last-child{text-align:right;white-space:nowrap}
+.ck-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding-top:10px;border-top:1px solid var(--line2)}
+.ck-acts .btn{height:32px;padding:0 12px;gap:6px;line-height:1}
+.ck-acts .btn svg{width:15px;height:15px;flex:none}
+.ck-acts .ck-revbtn{margin-left:auto;color:var(--red)}
+.scandlg.wide{padding:0;gap:14px;display:flex;flex-direction:column}
+.sv-head{display:flex;align-items:flex-start;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.sv-head > div{flex:1;min-width:0}
+.sv-k{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.sv-head h2{margin:0;font:700 17px/1.3 var(--f-body);color:var(--ink)}
+.sv-x{flex:none;width:34px;height:34px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer;padding:0}
+.sv-x:hover{border-color:var(--city)}
+.sv-x svg{width:16px;height:16px}
+.sv-img{padding:0 18px}
+.sv-img .scan-big{display:block;width:auto;max-width:100%;max-height:52vh;margin:0 auto}
+.scandlg.wide .ck-dl{padding:0 18px;margin:0}
+.sv-foot{display:flex;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--line)}
+.sv-foot .sp{flex:1}
+.sv-foot .btn{height:38px;padding:0 16px}
+.sv-foot .btn svg{width:16px;height:16px}
+@media (max-width:760px){ .ck-acts .btn{flex:1 1 auto;justify-content:center} .ck-acts .ck-revbtn{margin-left:0} .sv-foot{flex-wrap:wrap} .sv-foot .sp{display:none} .sv-foot .btn{flex:1 1 auto;justify-content:center} }
 .scan-th img{height:58px;width:auto;max-width:140px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid var(--line2)}
 .scan-th .ph{display:grid;place-items:center;width:120px;height:58px;font-size:12px;color:var(--muted);background:var(--surface2);border-radius:4px}
 .scan-th .cap{font-size:12.5px;color:var(--ink2);line-height:1.35}
@@ -911,6 +933,62 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .pv-preview{border:1px solid var(--line);border-radius:8px;padding:18px 22px;background:var(--surface)}.pv-preview h1{font:700 24px var(--f-disp);margin:0 0 6px}
 .pv-switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}.pv-switch input{width:20px;height:20px;accent-color:var(--navy)}
 .pv-status{gap:10px}
+/* ---- application table (v2.19.2): formal header, pinned columns, column manager ---- */
+.grid-wrap.apptbl-wrap{overflow:auto;max-height:calc(100vh - 210px);min-height:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:0 16px}
+table.grid.apptbl{table-layout:fixed;border-collapse:separate;border-spacing:0;min-width:100%;font-size:14px}
+table.grid.apptbl th{position:sticky;top:0;z-index:3;height:48px;padding:0;background:#212c46;color:#fff;border:0;border-bottom:3px solid #c0a869;border-right:1px solid rgba(255,255,255,.08);white-space:nowrap;vertical-align:middle;cursor:default;user-select:none;text-align:left}
+table.grid.apptbl th.rn{z-index:5;padding:0 12px}
+table.grid.apptbl th.pcol{z-index:4}
+table.grid.apptbl .hd{display:flex;align-items:stretch;height:100%;min-width:0}
+table.grid.apptbl .hd-sort{flex:1;min-width:0;display:flex;align-items:center;gap:6px;background:none;border:0;color:inherit;padding:0 10px 0 14px;font:700 11.5px/1.2 var(--f-body);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-align:left}
+table.grid.apptbl th.num-r .hd-sort{justify-content:flex-end}
+table.grid.apptbl .hd-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.grid.apptbl .srt{width:13px;height:13px;flex:none;stroke:rgba(255,255,255,.45)}
+table.grid.apptbl .srt.on{stroke:#c0a869;stroke-width:3}
+table.grid.apptbl .pinmark{width:12px;height:12px;flex:none;stroke:#c0a869}
+table.grid.apptbl .hd{position:relative}
+table.grid.apptbl .hd-menu{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:26px;height:30px;background:#2c3a5e;border:0;color:#fff;cursor:pointer;display:grid;place-items:center;border-radius:6px;opacity:0;transition:opacity .12s}
+table.grid.apptbl th:hover .hd-menu,table.grid.apptbl .hd:focus-within .hd-menu,table.grid.apptbl .hd-menu[aria-expanded="true"]{opacity:1}
+table.grid.apptbl .hd-menu svg{width:16px;height:16px;fill:currentColor}
+table.grid.apptbl .hd-menu:hover{background:#3a4a74}
+table.grid.apptbl .hd-sort:hover .hd-l{text-decoration:underline;text-underline-offset:3px}
+table.grid.apptbl .hd-sort:focus-visible,table.grid.apptbl .hd-menu:focus-visible{outline:2px solid #c0a869;outline-offset:-2px}
+table.grid.apptbl th.dragging{opacity:.5}
+table.grid.apptbl th.dropto{box-shadow:inset 3px 0 0 #c0a869}
+table.grid.apptbl td{height:auto;padding:11px 14px;vertical-align:top;white-space:normal;max-width:none;overflow:visible;border:0;border-bottom:1px solid var(--line2);background:var(--surface);line-height:1.4}
+table.grid.apptbl td.rn{padding:11px 12px}
+table.grid.apptbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface) 96%,var(--ink) 4%)}
+table.grid.apptbl tbody tr:hover td{background:var(--rowhover)}
+table.grid.apptbl tbody tr.sel td{background:var(--sel)}
+table.grid.apptbl .pcol{position:sticky}
+table.grid.apptbl td.pcol{z-index:1}
+table.grid.apptbl .pcol-last{box-shadow:6px 0 8px -6px rgba(16,24,48,.35);border-right:1px solid var(--line)}
+table.grid.apptbl td.rn{position:sticky;left:0;z-index:2}
+table.grid.apptbl .num-r{text-align:right;font-variant-numeric:tabular-nums}
+table.grid.apptbl .cl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+table.grid.apptbl tr.unread td{font-weight:700}
+.col-pop{position:fixed;z-index:60;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(10,16,40,.22);padding:6px;display:grid;gap:1px}
+.col-pop button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;background:none;border-radius:6px;font:500 14px var(--f-body);color:var(--ink);text-align:left;cursor:pointer}
+.col-pop button svg{width:16px;height:16px;stroke:var(--ink2)}
+.col-pop button:hover:not([disabled]),.col-pop button:focus-visible{background:var(--rowhover)}
+.col-pop button[disabled]{color:var(--muted);cursor:default;opacity:.55}
+.colmenu .pop.colpanel{width:340px;padding:0;display:block}
+.cp-h{padding:12px 14px 8px;border-bottom:1px solid var(--line2)}.cp-h b{display:block;font-size:15px}.cp-h small{color:var(--muted);font-size:12.5px;line-height:1.35;display:block;margin-top:3px}
+.cp-list{list-style:none;margin:0;padding:6px;max-height:min(60vh,440px);overflow:auto}
+.cp-list li{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:6px}
+.cp-list li:hover{background:var(--rowhover)}
+.cp-list li.off label{color:var(--muted)}
+.cp-list li.pinned{background:var(--sel)}
+.cp-list .grip{width:16px;color:var(--muted);cursor:grab;display:grid;place-items:center}.cp-list .grip svg{width:14px;height:14px;fill:currentColor;stroke:none}
+.colmenu .cp-list label{flex:1;display:flex;gap:8px;align-items:center;padding:6px 4px;font-size:14px;cursor:pointer}
+.cp-ic{width:28px;height:28px;border:0;background:none;border-radius:6px;display:grid;place-items:center;cursor:pointer;color:var(--ink2)}
+.cp-ic svg{width:15px;height:15px}
+.cp-ic:hover:not([disabled]){background:var(--line2)}
+.cp-ic[disabled]{opacity:.3;cursor:default}
+.cp-ic.on{color:var(--city)}.cp-ic.on svg{fill:currentColor}
+.cp-f{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-top:1px solid var(--line2)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) table.grid.apptbl th{background:#283454}}
+:root[data-theme="dark"] table.grid.apptbl th{background:#283454}
 /* ---- site notice (v2.19.1) ---- */
 .sitenotice{display:flex;gap:12px;align-items:flex-start;border-radius:10px;padding:13px 16px;margin:0 0 18px;font-size:15px;line-height:1.5;border:1px solid}
 .sitenotice svg{flex:none;width:22px;height:22px;margin-top:1px}
@@ -981,6 +1059,12 @@ const IC = {
   gavel:'<path d="M14 4l6 6M11 7l6 6M13 5l-5 5 3 3 5-5M9.5 11.5L3 18l3 3 6.5-6.5"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   alert:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17v.01"/>',
+  thumbtack:'<path d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/>',
+  grip:'<circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/>',
+  more:'<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
+  sortud:'<path d="M8 9l4-4 4 4M8 15l4 4 4-4"/>',
+  up:'<path d="M6 15l6-6 6 6"/>',
+  down2:'<path d="M6 9l6 6 6-6"/>',
   access:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="6.6" r="1.4"/><path d="M7 9.4l5 1.1 5-1.1M12 10.5v4m0 0l-2.4 4.2m2.4-4.2l2.4 4.2"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
@@ -988,6 +1072,9 @@ const IC = {
   upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   down:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  printer:'<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+  pdf:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6m-3-3l3 3 3-3"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
   check:'<path d="M5 12l5 5L20 7"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
@@ -999,7 +1086,7 @@ const IC = {
 };
 const ic = (n, cls) => '<svg class="i '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money = n => '$' + (Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money = n => { const v = Number(n)||0; return (v < 0 ? '\u2212$' : '$') + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
 const num = v => { const n = parseFloat(String(v==null?'':v).replace(/[$,\s]/g,'')); return isFinite(n) ? n : 0; };
 
 /* ================= fee schedule (City of Arab building permit fees) ================= */
@@ -1374,7 +1461,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.19.2';   // shown at the bottom of every page
+const APP_VERSION = '2.20.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1753,11 +1840,25 @@ const COLS = [
   {k:'description', l:'Description of Work', t:'T', hide:true, get:s=>s.fields.description||''}
 ];
 const colsFor = k => COLS.filter(c => (!c.only || c.only.includes(k)) && (!c.not || !c.not.includes(k)));
-function visibleCols(k){
-  if (!S.cols || S.cols.form!==k){ const saved = prefGet('cols.'+k, null);
-    S.cols = { form:k, on: saved || colsFor(k).filter(c=>!c.hide).map(c=>c.k) }; }
-  return colsFor(k).filter(c => S.cols.on.includes(c.k));
+// Column widths (px) — the table keeps these so pinned columns line up and headers stay on one line.
+const COL_W = { createdAt:176, permitNo:132, address:260, lot:100, files:142, total:178, permitFee:152, cict:134, payment:142, buildType:150, signFeature:170, applicant:220, email:260, phone:180, description:320 };
+const RN_W = 104;
+const colDefaultOn = k => colsFor(k).filter(c=>!c.hide).map(c=>c.k);
+function colState(k){
+  if (!S.cols || S.cols.form!==k){
+    const all = colsFor(k).map(c=>c.k), saved = prefGet('cols.'+k, null), pins = prefGet('pins.'+k, null);
+    const on = Array.isArray(saved) ? saved.filter(x => all.includes(x)) : colDefaultOn(k);
+    S.cols = { form:k, on, pin: Array.isArray(pins) ? pins.filter(x => on.includes(x)) : [] };
+  }
+  return S.cols;
 }
+// Shown columns in display order: pinned ones first (in their own order), then the rest.
+function visibleCols(k){
+  const st = colState(k), by = Object.fromEntries(colsFor(k).map(c=>[c.k,c]));
+  const shown = st.on.map(x=>by[x]).filter(Boolean);
+  return shown.filter(c=>st.pin.includes(c.k)).concat(shown.filter(c=>!st.pin.includes(c.k)));
+}
+function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); }
 function topBar(){
   return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
    profileMenuHtml()+'</header>'+storageBanner();
@@ -1903,9 +2004,18 @@ function viewTable(){
   const k = S.form, F = FORMS[k], cols = visibleCols(k), rows = filteredRows();
   const last = subsFor(k)[0];
   const selN = rows.filter(s=>S.rowSel[s.id]).length;
-  const head = '<tr><th class="rn"><div class="rn-in"><input type="checkbox" class="ck" id="ckAll" aria-label="Select all shown applications" '+(rows.length&&selN===rows.length?'checked':'')+' onchange="rowPickAll(this.checked)"></div></th>'+cols.map(c=>'<th onclick="sortBy(\''+c.k+'\')" aria-sort="'+(S.sort.k===c.k?(S.sort.d>0?'ascending':'descending'):'none')+'"><div class="hd"><span class="ty">'+c.t+'</span>'+esc(c.l)+(S.sort.k===c.k?(S.sort.d>0?' ▲':' ▼'):'')+'</div></th>').join('')+'</tr>';
-  const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id||S.rowSel[s.id]?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn"><div class="rn-in"><input type="checkbox" class="ck" aria-label="Select '+esc(s.fields.applicant||'application')+'" '+(S.rowSel[s.id]?'checked':'')+' onclick="event.stopPropagation()" onchange="rowPick(\''+s.id+'\',this.checked)"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
-    cols.map(c=>'<td>'+(c.fmt?c.fmt(s):esc(c.get(s)))+'</td>').join('')+'</tr>').join('');
+  const st = colState(k), off = {}; let acc = RN_W; cols.forEach(c => { if (st.pin.includes(c.k)){ off[c.k] = acc; acc += COL_W[c.k]||160; } });
+  const lastPin = cols.filter(c=>st.pin.includes(c.k)).slice(-1)[0], tw = RN_W + cols.reduce((a,c)=>a+(COL_W[c.k]||160), 0);
+  const cellCls = c => (c.t==='$'?'num-r':'')+(off[c.k]!=null?' pcol':'')+(lastPin&&lastPin.k===c.k?' pcol-last':'');
+  const cellSty = c => off[c.k]!=null ? ' style="left:'+off[c.k]+'px"' : '';
+  const sortIc = c => S.sort.k===c.k ? '<svg viewBox="0 0 24 24" class="i srt on" aria-hidden="true"><path d="'+(S.sort.d>0?'M6 15l6-6 6 6':'M6 9l6 6 6-6')+'"/></svg>' : '<svg viewBox="0 0 24 24" class="i srt" aria-hidden="true">'+IC.sortud+'</svg>';
+  const colg = '<colgroup><col style="width:'+RN_W+'px">'+cols.map(c=>'<col style="width:'+(COL_W[c.k]||160)+'px">').join('')+'</colgroup>';
+  const head = '<tr><th class="rn pcol" scope="col" style="left:0"><div class="rn-in"><input type="checkbox" class="ck" id="ckAll" aria-label="Select all shown applications" '+(rows.length&&selN===rows.length?'checked':'')+' onchange="rowPickAll(this.checked)"><span class="vh">Row</span></div></th>'+
+    cols.map(c=>'<th scope="col" class="'+cellCls(c)+'"'+cellSty(c)+' aria-sort="'+(S.sort.k===c.k?(S.sort.d>0?'ascending':'descending'):'none')+'" draggable="true" ondragstart="DRAG_COL=\''+c.k+'\';this.classList.add(\'dragging\')" ondragend="this.classList.remove(\'dragging\')" ondragover="event.preventDefault();this.classList.add(\'dropto\')" ondragleave="this.classList.remove(\'dropto\')" ondrop="event.preventDefault();colDrop(DRAG_COL,\''+c.k+'\')">'+
+      '<div class="hd"><button type="button" class="hd-sort" onclick="sortBy(\''+c.k+'\')" title="Sort by '+esc(c.l)+'">'+(st.pin.includes(c.k)?'<svg viewBox="0 0 24 24" class="i pinmark" aria-label="Pinned">'+IC.thumbtack+'</svg>':'')+'<span class="hd-l">'+esc(c.l)+'</span>'+sortIc(c)+'</button>'+
+      '<button type="button" class="hd-menu" id="hdm_'+c.k+'" aria-label="'+esc(c.l)+' column options" aria-haspopup="menu" aria-expanded="'+(!!(S.colMenu&&S.colMenu.k===c.k))+'" onclick="colMenu(event,\''+c.k+'\')"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.more+'</svg></button></div></th>').join('')+'</tr>';
+  const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id||S.rowSel[s.id]?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn pcol" style="left:0"><div class="rn-in"><input type="checkbox" class="ck" aria-label="Select '+esc(s.fields.applicant||'application')+'" '+(S.rowSel[s.id]?'checked':'')+' onclick="event.stopPropagation()" onchange="rowPick(\''+s.id+'\',this.checked)"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
+    cols.map(c=>'<td class="'+cellCls(c)+'"'+cellSty(c)+'><div class="cl">'+(c.fmt?c.fmt(s):esc(c.get(s)))+'</div></td>').join('')+'</tr>').join('');
   const sumT = rows.reduce((a,s)=>a+(s.fees?s.fees.total:0),0), sumC = rows.reduce((a,s)=>a+(s.fees?s.fees.cict:0),0);
   return topBar()+'<div class="ws-main" style="min-height:calc(100% - 60px)"><div class="tb-head"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button>'+
    '<div class="ttl"><b>'+esc(F.title)+'</b><small>'+(last?'Last submission '+fmtDT(last.createdAt):'No submissions yet')+'</small></div><span style="width:96px"></span></div>'+
@@ -1913,15 +2023,72 @@ function viewTable(){
    dashHtml(k)+
    '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
    '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;prefSet(\'filter\',this.value);render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid (incl. partly paid)'],['partial','Partially paid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
-   '<span class="sp"></span><div class="colmenu"><button class="btn sm" onclick="S.colsOpen=!S.colsOpen;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?'<div class="pop">'+colsFor(k).map(c=>'<label><input type="checkbox" '+(S.cols.on.includes(c.k)?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>').join('')+'</div>':'')+'</div>'+
+   '<span class="sp"></span><div class="colmenu"><button class="btn sm" id="colsBtn" aria-expanded="'+!!S.colsOpen+'" onclick="event.stopPropagation();S.colsOpen=!S.colsOpen;S.colMenu=null;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?colPanelHtml(k):'')+'</div>'+
 '<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
    (selN?rowBulkHtml(rows):'')+
-   '<div class="grid-wrap">'+(rows.length?'<table class="grid"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
+   '<div class="grid-wrap apptbl-wrap">'+(rows.length?'<table class="grid apptbl" style="width:'+tw+'px">'+colg+'<thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
    '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((isBldg(k)||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
-   (S.sel?panelHtml():'');
+   (S.sel?panelHtml():'')+colPopHtml();
 }
 function sortBy(k){ S.sort = { k, d: S.sort.k===k ? -S.sort.d : (k==='createdAt'?-1:1) }; prefSet('sort', S.sort); render(); }
-function toggleCol(k){ const on = S.cols.on; const i = on.indexOf(k); if (i>=0) on.splice(i,1); else on.push(k); prefSet('cols.'+S.form, on.slice()); render(); }
+function toggleCol(k){ const st = colState(S.form), on = st.on, i = on.indexOf(k);
+  if (i>=0){ if (on.length<=1){ toast('At least one column has to stay visible.'); render(); return; } on.splice(i,1); st.pin = st.pin.filter(x=>x!==k); } else on.push(k);
+  colSave(); render(); }
+function colPin(k){ const st = colState(S.form); if (!st.on.includes(k)) st.on.push(k);
+  st.pin = st.pin.includes(k) ? st.pin.filter(x=>x!==k) : st.pin.concat(k); colSave(); S.colMenu = null; render();
+  toast(st.pin.includes(k) ? 'Column pinned. It stays on the left while you scroll.' : 'Column unpinned.'); }
+function colMove(k, d){ const st = colState(S.form), order = visibleCols(S.form).map(c=>c.k), i = order.indexOf(k), j = i + d;
+  if (i<0 || j<0 || j>=order.length) return;
+  const pinned = st.pin.includes(k); if (pinned !== st.pin.includes(order[j])) return;   // pinned and unpinned columns move within their own group
+  [order[i], order[j]] = [order[j], order[i]]; st.on = order.concat(st.on.filter(x=>!order.includes(x))); st.pin = order.filter(x=>st.pin.includes(x));
+  colSave(); render(); const b = document.getElementById('cpm_'+k+'_'+(d<0?'up':'dn')) || document.getElementById('cpm_'+k+'_'+(d<0?'dn':'up')); if (b) b.focus(); }
+function colDrop(from, to){ if (!from || from===to) return; const st = colState(S.form), order = visibleCols(S.form).map(c=>c.k);
+  const i = order.indexOf(from), j = order.indexOf(to); if (i<0 || j<0) return;
+  order.splice(j, 0, order.splice(i, 1)[0]);
+  if (st.pin.includes(to) !== st.pin.includes(from)){ st.pin = st.pin.includes(to) ? st.pin.concat(from) : st.pin.filter(x=>x!==from); }
+  st.on = order.concat(st.on.filter(x=>!order.includes(x))); st.pin = order.filter(x=>st.pin.includes(x)); colSave(); render(); }
+function resetTable(){ const k = S.form; prefSet('cols.'+k, null); prefSet('pins.'+k, null);
+  S.sort = Object.assign({}, PREF_DEFAULTS.sort); prefSet('sort', S.sort); S.filter = 'all'; prefSet('filter', 'all'); S.q = '';
+  S.cols = null; S.colsOpen = false; S.colMenu = null; render(); toast('The table is back to its original settings.'); }
+function colMenu(e, k){ e.stopPropagation(); if (S.colMenu && S.colMenu.k===k){ S.colMenu = null; render(); return; }
+  const r = e.currentTarget.getBoundingClientRect(); S.colMenu = { k, x:Math.min(r.right, innerWidth-12), y:r.bottom+4 }; S.colsOpen = false; render();
+  const f = document.querySelector('#colPop button'); if (f) f.focus(); }
+let DRAG_COL = null;
+document.addEventListener('keydown', e => { if (e.key==='Escape' && (S.colMenu || S.colsOpen)){ const k = S.colMenu && S.colMenu.k; S.colMenu = null; S.colsOpen = false; render(); const b = document.getElementById(k ? 'hdm_'+k : 'colsBtn'); if (b) b.focus(); } });
+document.addEventListener('click', e => { if ((S.colMenu && !e.target.closest('#colPop, .hd-menu')) || (S.colsOpen && !e.target.closest('.colmenu'))){ S.colMenu = null; S.colsOpen = false; render(); } });
+function colPopHtml(){
+  const m = S.colMenu; if (!m || S.view!=='table') return '';
+  const c = colsFor(S.form).find(x=>x.k===m.k); if (!c) return '';
+  const st = colState(S.form), order = visibleCols(S.form).map(x=>x.k), i = order.indexOf(c.k), pinned = st.pin.includes(c.k);
+  const can = d => { const j = i+d; return j>=0 && j<order.length && st.pin.includes(order[j])===pinned; };
+  const item = (icon, label, fn, ok=true) => '<button type="button" role="menuitem"'+(ok?'':' disabled')+' onclick="'+fn+'">'+ic(icon)+label+'</button>';
+  return '<div id="colPop" class="col-pop" role="menu" aria-label="'+esc(c.l)+' column" style="top:'+m.y+'px;left:'+Math.max(12, m.x-230)+'px">'+
+    item('sortud', 'Sort ascending', "S.sort={k:'"+c.k+"',d:1};prefSet('sort',S.sort);S.colMenu=null;render()")+
+    item('sortud', 'Sort descending', "S.sort={k:'"+c.k+"',d:-1};prefSet('sort',S.sort);S.colMenu=null;render()")+
+    '<div class="pm-sep" role="separator"></div>'+
+    item('thumbtack', pinned ? 'Unpin column' : 'Pin (freeze) column', "colPin('"+c.k+"')")+
+    item('left', 'Move left', "colMove('"+c.k+"',-1);S.colMenu=null;render()", can(-1))+
+    item('right', 'Move right', "colMove('"+c.k+"',1);S.colMenu=null;render()", can(1))+
+    item('x', 'Hide column', "S.colMenu=null;toggleCol('"+c.k+"')", order.length>1)+
+    '<div class="pm-sep" role="separator"></div>'+
+    item('cols', 'Reset table to default', "resetTable()")+'</div>';
+}
+function colPanelHtml(k){
+  const st = colState(k), shown = visibleCols(k).map(c=>c.k), hidden = colsFor(k).filter(c=>!st.on.includes(c.k));
+  const by = Object.fromEntries(colsFor(k).map(c=>[c.k,c]));
+  const li = (c, vis, idx) => { const pinned = st.pin.includes(c.k);
+    const can = d => { const j = idx+d; return vis && j>=0 && j<shown.length && st.pin.includes(shown[j])===pinned; };
+    return '<li'+(vis?' draggable="true" ondragstart="DRAG_COL=\''+c.k+'\'" ondragover="event.preventDefault()" ondrop="event.preventDefault();colDrop(DRAG_COL,\''+c.k+'\')"':'')+' class="'+(vis?'':'off')+(pinned?' pinned':'')+'">'+
+      '<span class="grip" aria-hidden="true">'+(vis?ic('grip'):'')+'</span>'+
+      '<label><input type="checkbox" '+(vis?'checked':'')+' onchange="toggleCol(\''+c.k+'\')">'+esc(c.l)+'</label>'+
+      '<button type="button" class="cp-ic'+(pinned?' on':'')+'" aria-pressed="'+pinned+'" aria-label="'+(pinned?'Unpin ':'Pin ')+esc(c.l)+'" title="'+(pinned?'Unpin':'Pin (freeze) on the left')+'" onclick="colPin(\''+c.k+'\');S.colsOpen=true;render()">'+ic('thumbtack')+'</button>'+
+      '<button type="button" class="cp-ic" id="cpm_'+c.k+'_up" aria-label="Move '+esc(c.l)+' up"'+(can(-1)?'':' disabled')+' onclick="colMove(\''+c.k+'\',-1)">'+ic('up')+'</button>'+
+      '<button type="button" class="cp-ic" id="cpm_'+c.k+'_dn" aria-label="Move '+esc(c.l)+' down"'+(can(1)?'':' disabled')+' onclick="colMove(\''+c.k+'\',1)">'+ic('down2')+'</button></li>'; };
+  return '<div class="pop colpanel" role="dialog" aria-label="Table columns">'+
+    '<div class="cp-h"><b>Columns</b><small>Check to show. Pin to freeze a column on the left. Drag or use the arrows to change the order.</small></div>'+
+    '<ul class="cp-list">'+shown.map((x,i)=>li(by[x], true, i)).join('')+hidden.map(c=>li(c, false, -1)).join('')+'</ul>'+
+    '<div class="cp-f"><button type="button" class="btn sm ghost" onclick="resetTable()">Reset to default</button><button type="button" class="btn sm primary" onclick="S.colsOpen=false;render()">Done</button></div></div>';
+}
 async function toggleStar(id){ const s = S.subs.find(x=>x.id===id); if (!s||!DB) return; try{ await DB.doc('submissions/'+id).update({starred:!s.starred}); }catch(e){ toast('Could not update star.'); } }
 async function openSub(id){ S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
   loadAtt(id).then(()=>{ if (S.sel===id) render(); }).catch(e=>{ ATT[id] = {err:e.message}; if (S.sel===id) render(); });
@@ -2372,7 +2539,7 @@ function ckRecordHtml(){
     const d = C.done;
     pay = '<div class="ck-ok" role="status"><div><b>'+(d.kind==='reversal' ? 'Reversal recorded' : 'Payment recorded')+'</b>'+
       '<span>'+(d.kind==='reversal' ? 'Receipt '+esc(d.receiptNo)+' cancels '+money(-d.amount)+'.' : money(d.amount)+' '+esc(d.method.toLowerCase())+(d.checkNo?' #'+esc(d.checkNo):'')+' · Receipt <b class="num">'+esc(d.receiptNo)+'</b>')+'</span></div>'+
-      (d.kind!=='reversal' ? '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" onclick="printPaperReceipt('+d.id+')">'+ic('down')+'Print receipt</button><button type="button" class="btn" onclick="printPayReceipt('+d.id+')">Download PDF</button></div>' : '')+'</div>';
+      (d.kind!=='reversal' ? '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" onclick="printPaperReceipt('+d.id+')">'+ic('printer')+'Print receipt</button><button type="button" class="btn" onclick="printPayReceipt('+d.id+')">'+ic('pdf')+'Save as PDF</button></div>' : '')+'</div>';
   }
   if (st==='none') pay += '<div class="ck-card"><p style="margin:0">This application has no fee, so there is nothing to collect.</p></div>';
   else if (st==='paid') pay += '<div class="ck-card ck-paid"><b>Paid in full</b><span>'+money(p.paid)+(p.lastReceipt?' · last receipt '+esc(p.lastReceipt):'')+'</span></div>';
@@ -2407,8 +2574,8 @@ function ckRecordHtml(){
           (x.reversedBy?' · <b>Reversed</b>':'')+(x.kind==='reversal'?' · cancels '+esc((hist.find(y=>y.id===x.reverses)||{}).receiptNo||''):'')+(x.note?'<br>'+esc(x.note):'')+'</div>'+
         (C.revFor===x.id ? '<div class="ck-rev"><label class="l" for="ckWhy">Why is this payment being reversed?</label><input id="ckWhy" autocomplete="off" maxlength="500" placeholder="e.g. Check returned by bank, entered on the wrong application"><div class="row" style="gap:8px"><button type="button" class="btn sm danger" onclick="ckReverse('+x.id+')">Reverse '+money(x.amount)+'</button><button type="button" class="btn sm ghost" onclick="S.ck.revFor=null;render()">Keep it</button></div></div>' :
           (x.scan ? '<div class="scan-row">'+scanThumbHtml(x)+'</div>' : '')+
-          '<div class="row" style="gap:6px;flex-wrap:wrap">'+(x.kind!=='reversal'?'<button type="button" class="btn sm ghost" onclick="printPaperReceipt('+x.id+')">'+ic('down')+'Print receipt</button><button type="button" class="btn sm ghost" onclick="printPayReceipt('+x.id+')">PDF</button>':'')+
-          (x.kind!=='reversal' && !x.reversedBy && (needsNo(x.method) || x.scan) ? '<button type="button" class="btn sm ghost" onclick="openScanner({kind:\'payment\',pid:'+x.id+',label:\''+esc((x.method||'check').toLowerCase())+'\'})">'+ic('upload')+(x.scan?'Replace scan':'Add '+esc((x.method||'check').toLowerCase())+' scan')+'</button>' : '')+(canRev?'<button type="button" class="btn sm ghost" onclick="S.ck.revFor='+x.id+';render()">Reverse…</button>':'')+'</div>')+
+          ((x.kind!=='reversal') ? '<div class="ck-acts"><button type="button" class="btn sm" onclick="printPaperReceipt('+x.id+')">'+ic('printer')+'Print receipt</button><button type="button" class="btn sm" onclick="printPayReceipt('+x.id+')">'+ic('pdf')+'Save as PDF</button>'+
+          (!x.reversedBy && (needsNo(x.method) || x.scan) ? '<button type="button" class="btn sm" onclick="openScanner({kind:\'payment\',pid:'+x.id+',label:\''+esc((x.method||'check').toLowerCase())+'\'})">'+ic('upload')+(x.scan?'Replace scan':'Add '+esc((x.method||'check').toLowerCase())+' scan')+'</button>' : '')+(canRev?'<button type="button" class="btn sm ck-revbtn" onclick="S.ck.revFor='+x.id+';render()">'+ic('undo')+'Reverse…</button>':'')+'</div>' : ''))+
       '</div>'; }).join('')+'</div>';
   return back+
    '<div class="ck-head"><div><h1>'+esc(f.applicant||'Applicant')+'</h1><p>'+esc(F.title||'')+'</p></div>'+payPill(r)+'</div>'+
@@ -2598,12 +2765,12 @@ function viewScan(pid){
   const box = document.createElement('div'); box.id = 'scanview';
   const cap = esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+' · '+money(x.amount)+' · receipt '+esc(x.receiptNo);
   box.innerHTML = '<div class="veil" onclick="closeScanView()"></div><div class="scandlg wide" role="dialog" aria-modal="true" aria-labelledby="svT">'+
-    '<div style="display:flex;gap:12px;align-items:flex-start"><h2 id="svT" style="margin:0;flex:1;font:700 17px var(--f-body)">'+cap+'</h2><button class="btn sm ghost" onclick="closeScanView()" aria-label="Close">Close</button></div>'+
-    '<img class="scan-big" src="'+scanSrc(s)+'" alt="Scanned check">'+
+    '<div class="sv-head"><div><span class="sv-k">Scanned '+esc((x.method||'check').toLowerCase())+'</span><h2 id="svT">'+cap+'</h2></div><button type="button" class="sv-x" onclick="closeScanView()" aria-label="Close">'+ic('x')+'</button></div>'+
+    '<div class="sv-img"><img class="scan-big" src="'+scanSrc(s)+'" alt="Scanned check"></div>'+
     '<dl class="ck-dl"><div><dt>Date paid</dt><dd>'+esc(fmtDay(x.receivedOn || x.recordedAt))+'</dd></div>'+
       '<div><dt>Marked paid by</dt><dd>'+esc(x.recordedBy||'')+' · '+esc(fmtDT(x.recordedAt))+'</dd></div>'+
       '<div><dt>Scan added by</dt><dd>'+esc(s.addedBy||'')+' · '+esc(fmtDT(s.addedAt))+(s.earlier?' (replaces '+s.earlier+' earlier scan'+(s.earlier===1?'':'s')+', kept on record)':'')+'</dd></div></dl>'+
-    '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="printScan('+pid+')">'+ic('down')+'Print</button><button class="btn sm" onclick="DL.save({filename:\'Check-'+esc(x.receiptNo)+'.jpg\', data: scanBlob('+pid+')})">Download</button></div></div>';
+    '<div class="sv-foot"><button type="button" class="btn" onclick="closeScanView()">Close</button><span class="sp"></span><button type="button" class="btn" onclick="DL.save({filename:\'Check-'+esc(x.receiptNo)+'.jpg\', data: scanBlob('+pid+')})">'+ic('down')+'Download</button><button type="button" class="btn primary" onclick="printScan('+pid+')">'+ic('printer')+'Print</button></div></div>';
   document.body.appendChild(box); document.addEventListener('keydown', scanViewKey);
   box.querySelector('button').focus();
 }
