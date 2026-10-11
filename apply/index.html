@@ -240,6 +240,10 @@ footer.sfoot{display:flex;justify-content:center;align-items:center;gap:10px;fle
 #bugbox .veil{z-index:39}
 /* submission panel */
 .veil{position:fixed;inset:0;background:rgba(6,10,40,.35);z-index:30}
+html.scroll-locked{overflow:hidden}
+html.scroll-locked body{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+.veil{touch-action:none;overscroll-behavior:contain}
+.scandlg,.bugdlg,.panel,.p-body,.agtext{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--surface);z-index:31;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(6,10,40,.2);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .p-head{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .p-head .who{flex:1;min-width:0}
@@ -616,7 +620,9 @@ tr.rev td{color:var(--muted)}
 .agrees{display:grid;gap:10px}
 .agree{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.4;cursor:pointer}
 .agree input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--city)}
-.agl{font-size:15px;text-decoration:underline;text-align:left}
+.agl{display:inline;font:inherit;font-weight:600;color:var(--blue);text-decoration:underline;text-underline-offset:2px;cursor:pointer;overflow-wrap:anywhere}
+.agree > span{flex:1;min-width:0}
+.agree .req{color:var(--red);white-space:nowrap}
 #agbox .veil{z-index:49}
 .agdlg{width:min(680px,calc(100% - 24px))}
 .agtext{max-height:58vh;overflow:auto;display:grid;gap:10px;font-size:15px;line-height:1.55;color:var(--ink);padding-right:4px}
@@ -1147,8 +1153,8 @@ const FORMS = {
   building:{ key:'building', title:'Contractor Application for Building Permit', short:'Building Permit (Contractor)', icon:'house', agreements:[{id:'appAgree'},{id:'exemption',show:f=>f.exempt==='Yes'},{id:'inspection'},{id:'occupancy'}], group:'Building Permits', feeLabel:'Fee based on construction value', created:'Jun 7, 2026',
     fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY,
       {type:'section',label:'Contractor'},
-      T('gcLicense','Contractor/GC License #'), T('contractor','Contractor Name'), T('business','Business Name',{hint:'Include DBA or LLC'}),
-      T('cPhone','Contractor Phone #',{type:'tel'}), T('cEmail','Contractor Email',{type:'email',full:true}),
+      T('gcLicense','Contractor/GC License #',{req:true}), T('contractor','Contractor Name',{req:true}), T('business','Business Name',{req:true,hint:'Include DBA or LLC'}),
+      T('cPhone','Contractor Phone #',{type:'tel',req:true}), T('cEmail','Contractor Email',{type:'email',req:true,full:true}),
       {type:'section',label:'Project & construction value'},
       T('buildType','What type of build?',{type:'radio',req:true,opts:['Residential','Commercial'],full:true}),
       T('projectType','What type of project is this?',{type:'radio',req:true,opts:['New Build','Addition','Remodel or Single Trade','Other'],full:true,show:f=>f.buildType==='Residential'}),
@@ -1215,7 +1221,12 @@ const FORMS = {
 // Homeowners only upload their construction plans, and the upload is optional (Oct 10, 2026).
 const PLANS_UPLOAD = T('files','Construction plans (optional)',{type:'file',req:false,full:true,hint:'Upload only your construction plans, such as the floor plan or site plan. This is optional; you can submit without a file. PDF, JPG or PNG, up to 10 files, 30 MB each.'});
 FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Homeowner Application for Building Permit', short:'Building Permit (Homeowner)', icon:'home2', created:'Oct 9, 2026',
-  fields: FORMS.building.fields.map(x => x === UPLOAD ? PLANS_UPLOAD : x),
+  // No contractor section: the homeowner is the one doing the work (Oct 11, 2026). The contractor fields stay on the
+  // form definition as hidden "legacy" fields so details on earlier homeowner applications still show to staff.
+  fields: (() => { let inC = false; return FORMS.building.fields.map(x => {
+    if (x.type==='section'){ inC = x.label==='Contractor'; return inC ? Object.assign({}, x, {label:'Contractor (earlier applications)', legacy:true}) : x; }
+    if (inC) return Object.assign({}, x, {req:false, legacy:true, show:()=>false});
+    return x === UPLOAD ? PLANS_UPLOAD : x; }); })(),
   agreements:[{id:'appAgree'},{id:'occupancy'}] });
 const isBldg = k => k==='building' || k==='homeowner';
 const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving'];
@@ -1250,7 +1261,7 @@ const visSig = (F, f) => F.fields.filter(x=>x.show).map(x=>x.show(f)).concat((F.
 function agreementsHtml(){
   const list = formAgreements(FORMS[S.form], FVALS); if (!list.length) return '';
   return '<div class="sect">Terms &amp; agreements</div><div class="fld full agrees">'+list.map(a => { const A = AGREEMENTS[a.id], on = FVALS['ag_'+a.id]==='1';
-    return '<label class="agree"><input type="checkbox" id="ag_'+a.id+'" required'+(on?' checked':'')+' onchange="FVALS[\'ag_'+a.id+'\']=this.checked?\'1\':\'\'"> <span>'+esc(A.label)+' <button type="button" class="linkbtn agl" onclick="openAgreement(\''+a.id+'\')">'+esc(A.link)+'</button> <span class="req">*</span></span></label>'; }).join('')+
+    return '<label class="agree"><input type="checkbox" id="ag_'+a.id+'" required'+(on?' checked':'')+' onchange="FVALS[\'ag_'+a.id+'\']=this.checked?\'1\':\'\'"> <span>'+esc(A.label)+' <a href="#" role="button" class="agl" onclick="openAgreement(\''+a.id+'\');return false">'+esc(A.link)+'</a>&nbsp;<span class="req" aria-hidden="true">*</span></span></label>'; }).join('')+
     '<span class="hint">Open each one to read it. All are required to submit this application.</span></div>';
 }
 function closeAgreement(){ const b = document.getElementById('agbox'); if (b) b.remove(); document.removeEventListener('keydown', agKey); }
@@ -1463,7 +1474,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.20.1';   // shown at the bottom of every page
+const APP_VERSION = '2.20.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1673,6 +1684,7 @@ let LAST_RECEIPT = null;   // shown on the confirmation page        // live fiel
 // WCAG 1.3.5: fields asking for the applicant's own details say what they are, so browsers can fill them in.
 const AUTOCOMP = { applicant:'name', email:'email', phone:'tel' };
 function fieldHtml(x, f){
+  if (x.legacy) return '';
   if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
   if (x.type==='note') return '<div class="fld full hint" style="color:var(--ink2);font-size:14px">'+esc(x.text)+'</div>';
   if (x.show && !x.show(f)) return '';
@@ -1817,6 +1829,30 @@ async function submitForm(e){
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
+
+/* v2.20.2: while any pop-up, lightbox or side panel is open (anything with a .veil behind it), the page behind it
+   cannot scroll; only the box itself scrolls. The page returns to the same spot when the box closes. */
+const SCROLL_LOCK = { on:false, y:0 };
+function syncScrollLock(){
+  const open = !!document.querySelector('.veil');
+  if (open === SCROLL_LOCK.on) return;
+  SCROLL_LOCK.on = open;
+  const h = document.documentElement, b = document.body;
+  if (open){
+    SCROLL_LOCK.y = window.scrollY || 0;
+    const sw = window.innerWidth - h.clientWidth;
+    b.style.top = (-SCROLL_LOCK.y) + 'px'; if (sw > 0) b.style.paddingRight = sw + 'px';
+    h.classList.add('scroll-locked');
+  } else {
+    h.classList.remove('scroll-locked'); b.style.top = ''; b.style.paddingRight = '';
+    window.scrollTo({ top: SCROLL_LOCK.y, left: 0, behavior: 'instant' });
+  }
+}
+(function startScrollLock(){
+  if (!document.body){ document.addEventListener('DOMContentLoaded', startScrollLock); return; }
+  new MutationObserver(syncScrollLock).observe(document.body, { childList:true, subtree:true });
+  syncScrollLock();
+})();
 
 /* ================= STAFF: shared bits ================= */
 const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
@@ -2105,7 +2141,8 @@ function panelHtml(){
   let body='';
   if (S.tab==='app'){
     if (S.editing){
-      body = '<form id="editf" class="fgrid">'+F.fields.filter(x=>x.type!=='file').map(x=>{
+      const hasLegacy = F.fields.some(x => x.legacy && x.id && s.fields[x.id]);
+      body = '<form id="editf" class="fgrid">'+F.fields.filter(x=>x.type!=='file' && (!x.legacy || hasLegacy)).map(x=>{
         if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
         if (x.type==='note') return '';
         const v = s.fields[x.id]||'', id='e_'+x.id;
