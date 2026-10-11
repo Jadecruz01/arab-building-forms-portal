@@ -3158,7 +3158,8 @@ function a11yLandmarks(){
     const c = [...root.children].find(e => !e.matches('header, nav, footer, .jt-top, .sfoot, .pfoot, .verfoot, .toast, .veil, .skip, script'));
     if (c) c.setAttribute('role', 'main');
   }
-  if (!root.querySelector('.skip')) root.insertAdjacentHTML('afterbegin', '<a class="skip" href="#" onclick="event.preventDefault();focusMain()">Skip to main content</a>');
+  const mn = root.querySelector('main, [role=main]'); if (mn && !mn.id) mn.id = 'main-content';
+  if (!root.querySelector('.skip')) root.insertAdjacentHTML('afterbegin', '<a class="skip" href="#'+(mn ? mn.id : 'root')+'" onclick="event.preventDefault();focusMain()">Skip to main content</a>');
 }
 function focusMain(){
   const m = mainTarget(); if (!m) return;
