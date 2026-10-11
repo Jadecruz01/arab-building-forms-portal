@@ -896,7 +896,19 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .pv-preview{border:1px solid var(--line);border-radius:8px;padding:18px 22px;background:var(--surface)}.pv-preview h1{font:700 24px var(--f-disp);margin:0 0 6px}
 .pv-switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}.pv-switch input{width:20px;height:20px;accent-color:var(--navy)}
 .pv-status{gap:10px}
+/* ---- site notice (v2.19.1) ---- */
+.sitenotice{display:flex;gap:12px;align-items:flex-start;border-radius:10px;padding:13px 16px;margin:0 0 18px;font-size:15px;line-height:1.5;border:1px solid}
+.sitenotice svg{flex:none;width:22px;height:22px;margin-top:1px}
+.sitenotice.info{background:#eef2f9;border-color:#c5d0e6;color:#1d2840}.sitenotice.info svg{stroke:#2a4a80}
+.sitenotice.warn{background:#fff5df;border-color:#e5c77a;color:#3d2f08}.sitenotice.warn svg{stroke:#8a5a00}
+.sitenotice a{color:inherit;text-decoration:underline;font-weight:600}
+.sn-body p{margin:0 0 6px}.sn-body p:last-child{margin:0}
+.noticedlg{max-width:520px;z-index:1200}#noticeBox .veil{z-index:1199}
+.noticedlg.warn{border-top:5px solid #c9971f}.noticedlg.info{border-top:5px solid var(--city)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sitenotice.info{background:#1e2a44;border-color:#3a4c72;color:#e8ecf5} :root:not([data-theme="light"]) .sitenotice.info svg{stroke:#a9c0ea} :root:not([data-theme="light"]) .sitenotice.warn{background:#3a3018;border-color:#6d5a26;color:#f5ead0} :root:not([data-theme="light"]) .sitenotice.warn svg{stroke:#e3c97f}}
+:root[data-theme="dark"] .sitenotice.info{background:#1e2a44;border-color:#3a4c72;color:#e8ecf5} :root[data-theme="dark"] .sitenotice.warn{background:#3a3018;border-color:#6d5a26;color:#f5ead0}
 /* ---- accessibility (v2.19) ---- */
+.pv-tabs{display:flex;gap:6px;flex-wrap:wrap}.pv-tabs a{padding:7px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink2);text-decoration:none;font-weight:600;font-size:14px}.pv-tabs a[aria-current=page]{background:var(--sel);color:var(--ink);border-color:var(--city)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .callout.pay{background:var(--amberbg);border-color:#5a4a22;color:var(--ink)} :root:not([data-theme="light"]) .pn{color:#141a29}}
 :root[data-theme="dark"] .callout.pay{background:var(--amberbg);border-color:#5a4a22;color:var(--ink)} :root[data-theme="dark"] .pn{color:#141a29}
 
@@ -953,6 +965,8 @@ const IC = {
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
   gavel:'<path d="M14 4l6 6M11 7l6 6M13 5l-5 5 3 3 5-5M9.5 11.5L3 18l3 3 6.5-6.5"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  alert:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17v.01"/>',
+  access:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="6.6" r="1.4"/><path d="M7 9.4l5 1.1 5-1.1M12 10.5v4m0 0l-2.4 4.2m2.4-4.2l2.4 4.2"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   star:'<path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/>',
@@ -1345,7 +1359,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.19.0';   // shown at the bottom of every page
+const APP_VERSION = '2.19.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1356,7 +1370,7 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+' · '+A11Y_LINK('Accessibility')+' · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
     '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a></nav>'+
@@ -1372,11 +1386,51 @@ const PRIV_LINK = (txt, sep) => '<span class="priv-link"'+(S.priv?'':' hidden')+
 function privacyNote(){
   return '<div class="privnote">'+ic('lock')+'<p>Your application is sent over an encrypted connection and is used by the City of Arab Building Department to review your permit, figure your fee, schedule inspections and contact you. It is not sold or used for advertising. '+PRIV_LINK('How we handle your information')+'</p></div>';
 }
+// ---- site notice (banner across the top of the page, or a pop-up), set by an administrator ----
+const NOTICE_LEGACY = 'Applications submitted before **October 10, 2026** are legacy applications and may not work properly with the Permit Status checker. For questions about the status of a legacy application, email buildingdept@arabcity.org, call 256-586-5968, or visit the Building Department at City Hall, 740 N Main St, Arab, AL 35016.';
+const noticeKey = n => 'bfNotice:'+[...String(n.body)].reduce((h, c) => (h*31 + c.charCodeAt(0))|0, 7)+':'+(n.updatedAt||'');
+function noticeHere(n){ return n && ['apps','form','pdf','status','privacy','accessibility'].includes(S.view) && (n.pages==='all' || S.view==='status'); }
+function noticeBannerHtml(n){
+  return '<div class="sitenotice '+(n.tone==='warning'?'warn':'info')+'" role="region" aria-label="Notice from the Building Department">'+ic(n.tone==='warning'?'alert':'info')+'<div class="sn-body">'+mdLite(n.body)+'</div></div>';
+}
+let NOTICE_RET = null;
+function openNoticeBox(n){
+  if (document.getElementById('noticeBox')) return;
+  NOTICE_RET = document.activeElement;
+  const d = document.createElement('div'); d.id = 'noticeBox';
+  d.innerHTML = '<div class="veil" onclick="closeNoticeBox()"></div><div class="scandlg noticedlg '+(n.tone==='warning'?'warn':'info')+'" role="dialog" aria-modal="true" aria-labelledby="nbT" aria-describedby="nbD">'+
+    '<h2 id="nbT" style="margin:0;font-size:19px;display:flex;gap:8px;align-items:center">'+ic(n.tone==='warning'?'alert':'info')+(n.tone==='warning'?'Important notice':'Notice')+'</h2>'+
+    '<div id="nbD" class="sn-body">'+mdLite(n.body)+'</div>'+
+    '<div style="display:flex;justify-content:flex-end"><button type="button" class="btn primary" id="nbClose" onclick="closeNoticeBox()">Close</button></div></div>';
+  document.body.appendChild(d); document.addEventListener('keydown', noticeKeys, true);
+  document.getElementById('nbClose').focus();
+}
+function noticeKeys(e){
+  if (e.key==='Escape'){ e.preventDefault(); closeNoticeBox(); return; }
+  if (e.key==='Tab'){ const f = [...document.querySelectorAll('#noticeBox a[href], #noticeBox button')]; if (!f.length) return;
+    const i = f.indexOf(document.activeElement); if (e.shiftKey && i<=0){ e.preventDefault(); f[f.length-1].focus(); } else if (!e.shiftKey && i===f.length-1){ e.preventDefault(); f[0].focus(); } }
+}
+function closeNoticeBox(){
+  const d = document.getElementById('noticeBox'); if (d) d.remove(); document.removeEventListener('keydown', noticeKeys, true);
+  try{ if (S.notice) sessionStorage.setItem(noticeKey(S.notice), '1'); }catch(e){}
+  if (NOTICE_RET && NOTICE_RET.focus) NOTICE_RET.focus(); NOTICE_RET = null;
+}
+// called after every public render
+function paintNotice(){
+  const n = S.notice, sheet = document.getElementById('sheet');
+  document.querySelectorAll('#root .sitenotice').forEach(e => e.remove());
+  if (!noticeHere(n) || !sheet) return;
+  if (n.kind==='banner') sheet.insertAdjacentHTML('afterbegin', noticeBannerHtml(n));
+  else { let seen = false; try{ seen = sessionStorage.getItem(noticeKey(n))==='1'; }catch(e){} if (!seen) setTimeout(() => openNoticeBox(n), 300); }
+}
 async function loadPublicPrivacy(){
-  try{ S.priv = await sbRpc('bf_public_privacy', {}) || null; }catch(e){ S.priv = null; }
+  const [p, a, n] = await Promise.all([sbRpc('bf_public_privacy', {}).catch(() => null), sbRpc('bf_public_a11y', {}).catch(() => null), sbRpc('bf_public_notice', {}).catch(() => null)]);
+  S.priv = p || null; S.a11y = a || null; S.notice = n || null;
+  paintNotice();
   S.privLoaded = true;
   document.querySelectorAll('.priv-link').forEach(el => { el.hidden = !S.priv; });
-  if (S.view==='privacy') render();
+  document.querySelectorAll('.a11y-wrap').forEach(el => { el.hidden = !S.a11y; });
+  if (S.view==='privacy' || S.view==='accessibility') render();
 }
 // Plain text → safe HTML: blank line = new paragraph, "## " heading, "- " bullet, web and email addresses become links.
 function mdLite(text){
@@ -1393,30 +1447,38 @@ function mdLite(text){
 }
 // ---- Accessibility statement (#accessibility) ----
 const A11Y_ICON = '<svg class="a11y-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="6.4" r="1.7" fill="currentColor"/><path d="M6.5 9.2l5.5 1.2 5.5-1.2M12 10.4v4.2m0 0l-2.6 4.6m2.6-4.6l2.6 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const A11Y_LINK = txt => '<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#accessibility"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'accessibility\')"')+' class="a11y-link">'+A11Y_ICON+txt+'</a>';
-const A11Y_REVIEWED = 'October 11, 2026';
+const A11Y_LINK = (txt, sep) => '<span class="a11y-wrap"'+(S.a11y?'':' hidden')+'>'+(sep||'')+'<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#accessibility"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'accessibility\')"')+' class="a11y-link">'+A11Y_ICON+txt+'</a></span>';
 function viewAccessibility(){
+  const P = S.a11y;
+  const body = !S.privLoaded ? '<p class="empty">Loading…</p>'
+    : !P ? '<h1>Accessibility</h1><p class="pv-none">The City’s accessibility statement is not available on this site right now. If any part of this site is hard to use, or you need information in another format, contact the City of Arab Building Department at <a href="tel:+12565865968">256-586-5968</a>, <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a>, or 740 N Main St, Arab, AL 35016.</p>'
+    : '<h1>'+esc(P.title)+'</h1>'+(P.updatedAt?'<span class="hint" style="color:var(--muted)">Last updated '+esc(new Date(P.updatedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}))+'</span>':'');
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Accessibility</h1>'+
-   '<span class="hint" style="color:var(--muted)">Last reviewed '+A11Y_REVIEWED+'</span></div><div class="pv-body">'+
-   '<p>The City of Arab Building Department wants everyone to be able to apply for permits and check on them, including people with disabilities. This site is built to meet the <b>Web Content Accessibility Guidelines (WCAG) 2.1, Level AA</b>, the standard the U.S. Department of Justice set for state and local government websites under Title II of the Americans with Disabilities Act.</p>'+
-   '<h2>What we have done</h2><ul>'+
-   '<li>Every page works with a keyboard alone, shows where you are with a visible focus outline, and has a “Skip to main content” link.</li>'+
-   '<li>Every form field has a written label. If something is missing or entered wrong, the form says which field and what to fix.</li>'+
-   '<li>Text and buttons meet WCAG color-contrast levels, and pages still work when zoomed to 200% or viewed on a phone.</li>'+
-   '<li>Images have text descriptions, and decorative images are hidden from screen readers.</li>'+
-   '<li>Pages are checked with automated accessibility tests (axe-core) and by hand with a keyboard before each update.</li></ul>'+
-   '<h2>Known limitations</h2><ul>'+
-   '<li>The <b>Annexation</b> and <b>Subdivision</b> applications are fillable PDF forms. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.</li>'+
-   '<li>Documents you upload are kept as you send them.</li></ul>'+
-   '<h2>Need help or a different format?</h2>'+
-   '<p>If any part of this site is hard to use, or you need information in another format, please contact the Building Department. We will help you apply, give you the information another way, and work to fix the problem.</p><ul>'+
-   '<li>Phone: <a href="tel:+12565865968">256-586-5968</a></li>'+
-   '<li>Email: <a href="mailto:buildingdept@arabcity.org?subject=Website%20accessibility">buildingdept@arabcity.org</a></li>'+
-   '<li>In person: 740 N Main St, Arab, AL 35016</li></ul>'+
-   '<p>When you contact us, please tell us the page and what you were trying to do. You can also use <button class="linkbtn" onclick="openBug()">Report a problem with this site</button>.</p>'+
-   '</div></div></main></div>';
+   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a>'+body+'</div>'+
+   (P ? '<div class="pv-body">'+mdLite(P.body)+'</div>' : '')+'</div></main></div>';
 }
+// Suggested starting text for City staff (Staff Portal → Accessibility statement → "Start from a suggested draft").
+const A11Y_DRAFT = `The City of Arab Building Department wants everyone to be able to apply for permits and check on them, including people with disabilities. This site is built to meet the **Web Content Accessibility Guidelines (WCAG) 2.1, Level AA**, the standard the U.S. Department of Justice set for state and local government websites under Title II of the Americans with Disabilities Act.
+
+## What we have done
+- Every page works with a keyboard alone, shows where you are with a visible focus outline, and has a "Skip to main content" link.
+- Every form field has a written label. If something is missing or entered wrong, the form says which field and what to fix.
+- Text and buttons meet WCAG color-contrast levels, and pages still work when zoomed to 200% or viewed on a phone.
+- Images have text descriptions, and decorative images are hidden from screen readers.
+- Pages are checked with automated accessibility tests and by hand with a keyboard before each update.
+
+## Known limitations
+- The **Annexation** and **Subdivision** applications are fillable PDF forms. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.
+- Documents you upload are kept as you send them.
+
+## Need help or a different format?
+If any part of this site is hard to use, or you need information in another format, please contact the Building Department. We will help you apply, give you the information another way, and work to fix the problem.
+
+- Phone: 256-586-5968
+- Email: buildingdept@arabcity.org
+- In person: 740 N Main St, Arab, AL 35016
+
+When you contact us, please tell us the page and what you were trying to do. You can also use "Report a problem with this site" at the bottom of every page.`;
 function viewPrivacy(){
   const P = S.priv;
   const body = !S.privLoaded ? '<p class="empty">Loading…</p>'
@@ -1465,7 +1527,7 @@ function tile(k){ const f = FORMS[k];
   return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
 function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-  '<div class="sheet apps">'+
+  '<div class="sheet apps" id="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
@@ -1698,6 +1760,8 @@ function profileMenuHtml(){
       '<button type="button" role="menuitem" onclick="openAccount(\'password\')">'+ic('lock')+'Change password</button>'+
       '<button type="button" role="menuitem" onclick="openAccount(\'security\')">'+ic('check')+'Two-step verification</button>'+
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'privacy-statement\')">'+ic('lock')+'Privacy statement (public site)</button>'+
+      '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement (public site)</button>'+
+      (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'site-notice\')">'+ic('info')+'Site notice (public site)</button>' : '')+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -1744,6 +1808,8 @@ function viewWorkspace(){
    '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    (canRecords()?'<a class="navi" href="#records" onclick="event.preventDefault();go(\'records\')">'+ic('db')+'Records &amp; storage</a>':'')+
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
+   '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
+   (isAdmin()?'<a class="navi" href="#site-notice" onclick="event.preventDefault();go(\'site-notice\')">'+ic('info')+'Site notice</a>':'')+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
@@ -2163,9 +2229,9 @@ const canPay = () => myAccess().payments;
 const homeView = () => canBuilding() ? 'staff' : canPay() ? 'clerk' : 'me';
 const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building || a.payments) : !!acc && ['staff','clerk','admin'].includes(acc.role); };
 function routeAllowed(v){
-  if (v==='me' || v==='privacy-statement') return true;
+  if (v==='me' || v==='privacy-statement' || v==='accessibility-statement') return true;
   if (v==='clerk') return canPay();
-  if (['users','bugs'].includes(v)) return isAdmin();
+  if (['users','bugs','site-notice'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
   if (v==='staff' || v==='table' || v==='cict') return canBuilding();
   return false;
@@ -3190,7 +3256,8 @@ function render(){
     return render(); }
   else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='records') root.innerHTML = viewRecords();
-  else if (S.view==='privacy-statement'){ root.innerHTML = viewPrivacyEdit(); if (!PV.st && !PV.loading) privLoad(); }
+  else if (S.view==='site-notice' && isAdmin()){ root.innerHTML = viewNoticeEdit(); if (!NT.st && !NT.loading) noticeLoad(); }
+  else if (S.view==='privacy-statement' || S.view==='accessibility-statement'){ pvOpen(S.view==='privacy-statement' ? 'privacy' : 'accessibility'); root.innerHTML = viewPrivacyEdit(); if (!PV.st && !PV.loading) privLoad(); }
   else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; bindMfaSetup(); if (!S.sec) loadMySecurity(); }
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
@@ -3201,6 +3268,7 @@ function render(){
     if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
   a11yLandmarks();
+  if (['apps','form','pdf','status','privacy','accessibility'].includes(S.view)) paintNotice();
   const isPub = ['apps','form','pdf','status','privacy','accessibility'].includes(S.view);
   if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
   else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
@@ -3232,7 +3300,7 @@ function initRoute(){
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement','accessibility-statement','site-notice'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -3838,16 +3906,25 @@ async function adminUnlock(id){
 /* ================= Privacy statement editor (any staff member) =================
    The City writes its own statement here. "Save draft" keeps it private; "Publish" puts that text on the
    public site and switches it on; the switch hides or shows the published copy (and every public privacy link). */
-const PV = { st:null, loading:false, err:'', msg:'', busy:'', preview:false, title:'', body:'', dirty:false };
+const PV = { key:'privacy', st:null, loading:false, err:'', msg:'', busy:'', preview:false, title:'', body:'', dirty:false };
+const PV_PAGES = {
+  privacy:{ view:'privacy-statement', get:'bf_privacy_get', save:'bf_privacy_save', title:'Privacy & your information', hash:'privacy',
+    h1:'Privacy &amp; information statement', where:'“Privacy &amp; your information” in the site footer', what:'privacy', review:'the City Clerk or City Attorney',
+    ph:'Write the City of Arab’s privacy and information statement here.', draft:() => PRIV_DRAFT },
+  accessibility:{ view:'accessibility-statement', get:'bf_a11y_get', save:'bf_a11y_save', title:'Accessibility', hash:'accessibility',
+    h1:'Accessibility statement', where:'“Accessibility” in the site footer', what:'accessibility', review:'the City’s ADA coordinator or City Attorney',
+    ph:'Write the City of Arab’s accessibility statement here: the standard the site follows, known limitations, and how people can get help or another format.', draft:() => A11Y_DRAFT } };
+function pvOpen(key){ if (PV.key !== key) Object.assign(PV, { key, st:null, loading:false, err:'', msg:'', busy:'', preview:false, title:'', body:'', dirty:false }); }
 async function privLoad(){
   PV.loading = true; PV.err = '';
-  try{ PV.st = await sbRpc('bf_privacy_get', {p_token:TOKEN}); PV.title = PV.st.draftTitle || 'Privacy & your information'; PV.body = PV.st.draftBody || ''; PV.dirty = false; }
-  catch(e){ PV.err = e.message; }
-  PV.loading = false; if (S.view==='privacy-statement') render();
+  const key = PV.key, pg = PV_PAGES[key];
+  try{ const st = await sbRpc(pg.get, {p_token:TOKEN}); if (PV.key !== key) return; PV.st = st; PV.title = st.draftTitle || pg.title; PV.body = st.draftBody || ''; PV.dirty = false; }
+  catch(e){ if (PV.key === key) PV.err = e.message; }
+  PV.loading = false; if (S.view===pg.view) render();
 }
 const pvWhen = (by, at) => (by ? esc(by)+' on ' : '')+(at ? esc(new Date(at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})) : '');
 function viewPrivacyEdit(){
-  const st = PV.st;
+  const st = PV.st, pg = PV_PAGES[PV.key];
   let body;
   if (!st) body = PV.err ? '<p class="formerr">'+esc(PV.err)+'</p>' : '<p class="empty">Loading…</p>';
   else {
@@ -3855,37 +3932,85 @@ function viewPrivacyEdit(){
     body = '<section class="card pv-status"><div class="row" style="gap:12px;flex-wrap:wrap;align-items:center">'+
         (on ? '<span class="pill paid">On the public site</span>' : '<span class="pill partial">Not on the public site</span>')+
         '<label class="pv-switch"><input type="checkbox" id="pvOn" '+(on?'checked':'')+' '+(hasPub&&!PV.busy?'':'disabled')+' onchange="privSave(this.checked?\'show\':\'hide\')"><span>Show on the public site</span></label>'+
-        (on ? '<a class="btn sm ghost" href="#privacy" target="_blank" rel="noopener">View it on the public site</a>' : '')+'</div>'+
-      '<p class="hint" style="margin:0;color:var(--ink2)">'+(hasPub ? 'Last published by '+pvWhen(st.pubBy, st.pubAt)+'.' : 'Nothing has been published yet. While it is off, the public site shows no privacy link.')+
+        (on ? '<a class="btn sm ghost" href="#'+pg.hash+'" target="_blank" rel="noopener">View it on the public site<span class="vh"> (opens in a new tab)</span></a>' : '')+'</div>'+
+      '<p class="hint" style="margin:0;color:var(--ink2)">'+(hasPub ? 'Last published by '+pvWhen(st.pubBy, st.pubAt)+'.' : 'Nothing has been published yet. While it is off, the public site shows no '+pg.what+' link.')+
         (hasPub && (st.unpublishedChanges || PV.dirty) ? ' <b>The text below has changes that are not published yet.</b>' : '')+'</p></section>'+
       '<section class="card"><h2>Statement</h2>'+
         '<div class="fld"><label class="l" for="pvTitle">Page title</label><input id="pvTitle" type="text" maxlength="120" value="'+esc(PV.title)+'" oninput="PV.title=this.value;PV.dirty=true"></div>'+
-        (PV.preview ? '<div class="pv-preview"><h1>'+esc(PV.title||'Privacy & your information')+'</h1><div class="pv-body">'+(PV.body.trim()?mdLite(PV.body):'<p class="empty">Nothing written yet.</p>')+'</div></div>'
-          : '<div class="fld"><label class="l" for="pvBody">Statement text</label><textarea id="pvBody" rows="22" maxlength="60000" oninput="PV.body=this.value;PV.dirty=true" placeholder="Write the City of Arab’s privacy and information statement here.">'+esc(PV.body)+'</textarea>'+
+        (PV.preview ? '<div class="pv-preview"><h1>'+esc(PV.title||pg.title)+'</h1><div class="pv-body">'+(PV.body.trim()?mdLite(PV.body):'<p class="empty">Nothing written yet.</p>')+'</div></div>'
+          : '<div class="fld"><label class="l" for="pvBody">Statement text</label><textarea id="pvBody" rows="22" maxlength="60000" oninput="PV.body=this.value;PV.dirty=true" placeholder="'+esc(pg.ph)+'">'+esc(PV.body)+'</textarea>'+
             '<span class="hint">Leave a blank line between paragraphs. Start a line with <code>## </code> for a heading or <code>- </code> for a bullet. Web and email addresses become links. Wrap words in <code>**</code> for bold.</span></div>')+
         '<div class="row" style="gap:8px;flex-wrap:wrap">'+
           '<button type="button" class="btn" '+(PV.busy?'disabled':'')+' onclick="privSave(\'draft\')">'+(PV.busy==='draft'?'Saving…':'Save draft')+'</button>'+
           '<button type="button" class="btn primary" '+(PV.busy?'disabled':'')+' onclick="privSave(\'publish\')">'+(PV.busy==='publish'?'Publishing…':'Publish to the public site')+'</button>'+
           '<button type="button" class="btn ghost" onclick="PV.preview=!PV.preview;render()">'+(PV.preview?'Back to editing':'Preview')+'</button>'+
-          (!PV.body.trim() && !PV.preview ? '<button type="button" class="btn ghost" onclick="PV.body=PRIV_DRAFT;PV.dirty=true;render()">Start from a suggested draft</button>' : '')+
+          (!PV.body.trim() && !PV.preview ? '<button type="button" class="btn ghost" onclick="PV.body=PV_PAGES[PV.key].draft();PV.dirty=true;render()">Start from a suggested draft</button>' : '')+
         '</div>'+
         (PV.err ? '<p class="formerr" role="alert">'+esc(PV.err)+'</p>' : PV.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(PV.msg)+'</p>' : '')+
         (st.draftAt ? '<p class="hint" style="margin:0;color:var(--muted)">Draft last saved by '+pvWhen(st.draftBy, st.draftAt)+'.</p>' : '')+
       '</section>';
   }
-  return topBar()+'<div class="purge acctpage pvedit"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>Privacy &amp; information statement</h1>'+
-    '<p style="margin:0;color:var(--ink2)">The City of Arab’s own statement for the public website, shown at “Privacy &amp; your information” in the site footer. Any staff member can edit and publish it, and every change is recorded in the activity log. Have the City Clerk or City Attorney review it before publishing.</p>'+
+  return topBar()+'<div class="purge acctpage pvedit"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>'+pg.h1+'</h1>'+
+    '<nav class="pv-tabs" aria-label="Public statements"><a href="#privacy-statement" '+(PV.key==='privacy'?'aria-current="page" ':'')+'onclick="event.preventDefault();go(\'privacy-statement\')">Privacy statement</a><a href="#accessibility-statement" '+(PV.key==='accessibility'?'aria-current="page" ':'')+'onclick="event.preventDefault();go(\'accessibility-statement\')">Accessibility statement</a></nav>'+
+    '<p style="margin:0;color:var(--ink2)">The City of Arab’s own statement for the public website, shown at '+pg.where+'. Any staff member can edit and publish it, and every change is recorded in the activity log. Have '+pg.review+' review it before publishing.</p>'+
     body+'</div>';
 }
 async function privSave(action){
   if (action==='publish' && !PV.body.trim()){ PV.err = 'Write the statement before publishing it.'; PV.msg = ''; render(); return; }
   PV.busy = action; PV.err = ''; PV.msg = ''; render();
-  try{ PV.st = await sbRpc('bf_privacy_save', {p_token:TOKEN, p_action:action, p_title:PV.title, p_body:PV.body});
+  try{ PV.st = await sbRpc(PV_PAGES[PV.key].save, {p_token:TOKEN, p_action:action, p_title:PV.title, p_body:PV.body});
     if (action==='draft' || action==='publish') PV.dirty = false;
     PV.msg = ({draft:'Draft saved. It is not on the public site until you publish it.', publish:'Published. It is now on the public site.', show:'The statement is back on the public site.', hide:'The statement and its links are now hidden from the public site.'})[action];
     S.audit = null; loadPublicPrivacy(); }
   catch(e){ PV.err = e.message; }
   PV.busy = ''; render();
+}
+/* ================= site notice editor (administrators) ================= */
+const NT = { st:null, loading:false, err:'', msg:'', busy:false, body:'', kind:'banner', tone:'info', pages:'all', active:false, dirty:false };
+async function noticeLoad(){
+  NT.loading = true; NT.err = '';
+  try{ const st = await sbRpc('bf_notice_get', {p_token:TOKEN}); NT.st = st; Object.assign(NT, { body:st.body||'', kind:st.kind||'banner', tone:st.tone||'info', pages:st.pages||'all', active:!!st.active, dirty:false }); }
+  catch(e){ NT.err = e.message; }
+  NT.loading = false; if (S.view==='site-notice') render();
+}
+function ntRadio(name, val, label, hint){
+  return '<label class="opt"><input type="radio" name="nt_'+name+'" value="'+val+'"'+(NT[name]===val?' checked':'')+' onchange="NT.'+name+'=this.value;NT.dirty=true;render()"> <span><b>'+label+'</b>'+(hint?'<br><small style="color:var(--muted)">'+hint+'</small>':'')+'</span></label>';
+}
+function viewNoticeEdit(){
+  const st = NT.st; let body;
+  if (!st) body = NT.err ? '<p class="formerr">'+esc(NT.err)+'</p>' : '<p class="empty">Loading…</p>';
+  else {
+    const live = st.active && (st.body||'').trim();
+    const n = { body:NT.body, kind:NT.kind, tone:NT.tone };
+    body = '<section class="card pv-status"><div class="row" style="gap:12px;flex-wrap:wrap;align-items:center">'+
+        (live ? '<span class="pill paid">On the public site</span>' : '<span class="pill partial">Not on the public site</span>')+
+        '<label class="pv-switch"><input type="checkbox" id="ntOn" '+(NT.active?'checked':'')+' '+(NT.busy?'disabled':'')+' onchange="NT.active=this.checked;NT.dirty=true;render()"><span>Show on the public site</span></label></div>'+
+        '<p class="hint" style="margin:0;color:var(--ink2)">'+(st.updatedAt ? 'Last saved by '+pvWhen(st.updatedBy, st.updatedAt)+'.' : 'No notice has been saved yet.')+(NT.dirty ? ' <b>You have changes that are not saved yet.</b>' : '')+'</p></section>'+
+      '<section class="card"><h2>Message</h2>'+
+        '<div class="fld"><label class="l" for="ntBody">Message text</label><textarea id="ntBody" rows="6" maxlength="4000" oninput="NT.body=this.value;NT.dirty=true;const p=document.getElementById(\'ntPrev\');if(p)p.innerHTML=mdLite(this.value)||\'\'" placeholder="Write the message the public should see.">'+esc(NT.body)+'</textarea>'+
+          '<span class="hint">Web and email addresses become links. Wrap words in <code>**</code> for bold. Leave a blank line between paragraphs.</span></div>'+
+        (!NT.body.trim() ? '<div><button type="button" class="btn ghost sm" onclick="NT.body=NOTICE_LEGACY;NT.dirty=true;render()">Use the legacy-applications message</button></div>' : '')+
+        '<div class="fgrid" style="margin-top:6px">'+
+          '<div class="fld"><span class="l" id="ntKindL">How it shows</span><div class="opts stack" role="radiogroup" aria-labelledby="ntKindL">'+ntRadio('kind','banner','Banner across the top','Stays at the top of the page.')+ntRadio('kind','lightbox','Pop-up message','Opens once per visit; the visitor closes it.')+'</div></div>'+
+          '<div class="fld"><span class="l" id="ntToneL">Style</span><div class="opts stack" role="radiogroup" aria-labelledby="ntToneL">'+ntRadio('tone','info','Information','Navy and gold.')+ntRadio('tone','warning','Important','Amber, with a warning icon.')+'</div></div>'+
+          '<div class="fld"><span class="l" id="ntPagesL">Where</span><div class="opts stack" role="radiogroup" aria-labelledby="ntPagesL">'+ntRadio('pages','all','All public pages','Applications, forms, Permit Status and more.')+ntRadio('pages','status','Permit Status page only','')+'</div></div>'+
+        '</div>'+
+        '<h3 style="margin:8px 0 0">Preview</h3><div class="sitenotice '+(NT.tone==='warning'?'warn':'info')+'">'+ic(NT.tone==='warning'?'alert':'info')+'<div class="sn-body" id="ntPrev">'+(NT.body.trim()?mdLite(NT.body):'<p class="empty" style="margin:0">Nothing written yet.</p>')+'</div></div>'+
+        '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" '+(NT.busy?'disabled':'')+' onclick="noticeSave()">'+(NT.busy?'Saving…':'Save')+'</button></div>'+
+        (NT.err ? '<p class="formerr" role="alert">'+esc(NT.err)+'</p>' : NT.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(NT.msg)+'</p>' : '')+
+      '</section>';
+  }
+  return topBar()+'<div class="purge acctpage pvedit"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>Site notice</h1>'+
+    '<p style="margin:0;color:var(--ink2)">A message for the public website, shown as a banner at the top of the page or as a pop-up. Only administrators can change it, and every change is recorded in the activity log.</p>'+body+'</div>';
+}
+async function noticeSave(){
+  if (NT.active && !NT.body.trim()){ NT.err = 'Write the message before turning it on.'; NT.msg = ''; render(); return; }
+  NT.busy = true; NT.err = ''; NT.msg = ''; render();
+  try{ NT.st = await sbRpc('bf_notice_save', {p_token:TOKEN, p_body:NT.body, p_kind:NT.kind, p_tone:NT.tone, p_pages:NT.pages, p_active:NT.active});
+    NT.dirty = false; NT.msg = NT.active ? 'Saved. The notice is on the public site.' : 'Saved. The notice is not shown on the public site.';
+    S.audit = null; loadPublicPrivacy(); }
+  catch(e){ NT.err = e.message; }
+  NT.busy = false; render();
 }
 /* ================= applicant receipt (PDF) ================= */
 const refNo = id => String(id||'').replace(/-/g,'').slice(0,8).toUpperCase();
