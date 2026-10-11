@@ -896,6 +896,25 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .pv-preview{border:1px solid var(--line);border-radius:8px;padding:18px 22px;background:var(--surface)}.pv-preview h1{font:700 24px var(--f-disp);margin:0 0 6px}
 .pv-switch{display:inline-flex;align-items:center;gap:8px;font-weight:600;cursor:pointer}.pv-switch input{width:20px;height:20px;accent-color:var(--navy)}
 .pv-status{gap:10px}
+/* ---- accessibility (v2.19) ---- */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .callout.pay{background:var(--amberbg);border-color:#5a4a22;color:var(--ink)} :root:not([data-theme="light"]) .pn{color:#141a29}}
+:root[data-theme="dark"] .callout.pay{background:var(--amberbg);border-color:#5a4a22;color:var(--ink)} :root[data-theme="dark"] .pn{color:#141a29}
+
+.skip{position:absolute;left:12px;top:-60px;z-index:1000;background:var(--navy,#212c46);color:#fff;padding:10px 16px;border-radius:8px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.skip:focus{top:12px;outline:3px solid var(--gold,#c0a869);outline-offset:2px}
+.ferr-f{display:block;color:var(--red);font-weight:600;font-size:13.5px;margin-top:5px}
+.ferr-f::before{content:"⚠ ";speak:never}
+[aria-invalid="true"]:not([role=radiogroup]){border-color:var(--red)!important;box-shadow:0 0 0 1px var(--red)}
+[role=radiogroup][aria-invalid="true"]{outline:2px solid var(--red);outline-offset:4px;border-radius:8px}
+.a11y-link{display:inline-flex;align-items:center;gap:6px}
+.a11y-ic{width:18px;height:18px;flex:none}
+.pv-body a,.callout a,.st-note a,p.pv-none a{text-decoration:underline}
+.idlewarn{z-index:2000;max-width:440px}
+#idleBox .veil{z-index:1999}
+h1[tabindex="-1"]:focus,[role=main][tabindex="-1"]:focus,#sheet[tabindex="-1"]:focus{outline:none}
+input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px rgba(192,168,105,.35)}
+.search:focus-within,.ck-money:focus-within{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 
 
@@ -1326,7 +1345,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.18.3';   // shown at the bottom of every page
+const APP_VERSION = '2.19.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1337,10 +1356,10 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+' · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+' · '+A11Y_LINK('Accessibility')+' · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org</a></nav>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a></nav>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
 }
 function sideNav(){ return ''; }
@@ -1371,6 +1390,32 @@ function mdLite(text){
     if (/^##?\s+/.test(lines[0])){ const h = '<h2>'+inline(lines[0].replace(/^##?\s+/,''))+'</h2>'; return lines.length>1 ? h+mdLite(lines.slice(1).join('\n')) : h; }
     return '<p>'+lines.map(inline).join('<br>')+'</p>';
   }).join('');
+}
+// ---- Accessibility statement (#accessibility) ----
+const A11Y_ICON = '<svg class="a11y-ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="6.4" r="1.7" fill="currentColor"/><path d="M6.5 9.2l5.5 1.2 5.5-1.2M12 10.4v4.2m0 0l-2.6 4.6m2.6-4.6l2.6 4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const A11Y_LINK = txt => '<a href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#accessibility"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'accessibility\')"')+' class="a11y-link">'+A11Y_ICON+txt+'</a>';
+const A11Y_REVIEWED = 'October 11, 2026';
+function viewAccessibility(){
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
+   '<div class="sheet pv" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Accessibility</h1>'+
+   '<span class="hint" style="color:var(--muted)">Last reviewed '+A11Y_REVIEWED+'</span></div><div class="pv-body">'+
+   '<p>The City of Arab Building Department wants everyone to be able to apply for permits and check on them, including people with disabilities. This site is built to meet the <b>Web Content Accessibility Guidelines (WCAG) 2.1, Level AA</b>, the standard the U.S. Department of Justice set for state and local government websites under Title II of the Americans with Disabilities Act.</p>'+
+   '<h2>What we have done</h2><ul>'+
+   '<li>Every page works with a keyboard alone, shows where you are with a visible focus outline, and has a “Skip to main content” link.</li>'+
+   '<li>Every form field has a written label. If something is missing or entered wrong, the form says which field and what to fix.</li>'+
+   '<li>Text and buttons meet WCAG color-contrast levels, and pages still work when zoomed to 200% or viewed on a phone.</li>'+
+   '<li>Images have text descriptions, and decorative images are hidden from screen readers.</li>'+
+   '<li>Pages are checked with automated accessibility tests (axe-core) and by hand with a keyboard before each update.</li></ul>'+
+   '<h2>Known limitations</h2><ul>'+
+   '<li>The <b>Annexation</b> and <b>Subdivision</b> applications are fillable PDF forms. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.</li>'+
+   '<li>Documents you upload are kept as you send them.</li></ul>'+
+   '<h2>Need help or a different format?</h2>'+
+   '<p>If any part of this site is hard to use, or you need information in another format, please contact the Building Department. We will help you apply, give you the information another way, and work to fix the problem.</p><ul>'+
+   '<li>Phone: <a href="tel:+12565865968">256-586-5968</a></li>'+
+   '<li>Email: <a href="mailto:buildingdept@arabcity.org?subject=Website%20accessibility">buildingdept@arabcity.org</a></li>'+
+   '<li>In person: 740 N Main St, Arab, AL 35016</li></ul>'+
+   '<p>When you contact us, please tell us the page and what you were trying to do. You can also use <button class="linkbtn" onclick="openBug()">Report a problem with this site</button>.</p>'+
+   '</div></div></main></div>';
 }
 function viewPrivacy(){
   const P = S.priv;
@@ -1459,21 +1504,26 @@ function viewApps(){
 let FILES = [];        // File objects queued for upload
 let FVALS = {};
 let LAST_RECEIPT = null;   // shown on the confirmation page        // live field values
+// WCAG 1.3.5: fields asking for the applicant's own details say what they are, so browsers can fill them in.
+const AUTOCOMP = { applicant:'name', email:'email', phone:'tel' };
 function fieldHtml(x, f){
   if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
   if (x.type==='note') return '<div class="fld full hint" style="color:var(--ink2);font-size:14px">'+esc(x.text)+'</div>';
   if (x.show && !x.show(f)) return '';
-  const id='f_'+x.id, req = x.req ? ' required' : '', star = x.req ? ' <span class="req">*</span>' : '';
+  const id='f_'+x.id, req = x.req ? ' required' : '', star = x.req ? ' <span class="req" aria-hidden="true">*</span><span class="vh"> (required)</span>' : '';
   const v = f[x.id]==null ? '' : f[x.id];
+  const hid = x.hint ? 'h_'+x.id : '', dby = hid ? ' aria-describedby="'+hid+'"' : '';
+  const ac = AUTOCOMP[x.id] ? ' autocomplete="'+AUTOCOMP[x.id]+'"' : '';
   let inner='';
-  if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup">'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
-  else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
-  else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+'>'+esc(v)+'</textarea>';
-  else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button">'+ic('upload')+'<div><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
+  if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup" aria-labelledby="l_'+id+'"'+(x.req?' aria-required="true"':'')+dby+'>'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
+  else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+dby+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+  else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+dby+'>'+esc(v)+'</textarea>';
+  else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="l_'+id+' dropTxt" aria-describedby="upHint">'+ic('upload')+'<div id="dropTxt"><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
-    inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
-  return '<div class="fld'+(x.full?' full':'')+'"><label class="l" for="'+id+(x.type==='radio'?'_0':'')+'">'+esc(x.label)+star+'</label>'+inner+(x.hint?'<span class="hint">'+esc(x.hint)+'</span>':'')+
-    (x.type==='file'?'<span class="hint upwarn">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
+    inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+ac+dby+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
+  const lab = (x.type==='radio'||x.type==='file') ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
+  return '<div class="fld'+(x.full?' full':'')+'"'+(x.type==='radio'?' data-group="'+id+'"':'')+'>'+lab+inner+(x.hint?'<span class="hint" id="'+hid+'">'+esc(x.hint)+'</span>':'')+
+    (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
   const fe = computeFees(key, FVALS, false);
@@ -1497,13 +1547,13 @@ function formFieldsHtml(){
     '<div class="sect">Fees</div><div class="feebox" id="feebox" aria-live="polite">'+feeBoxHtml(S.form)+'</div>'+
     '<div class="hpf" aria-hidden="true"><label for="hpWebsite">Leave this field empty</label><input type="text" id="hpWebsite" name="website" tabindex="-1" autocomplete="off"></div>'+
     privacyNote()+
-    '<div class="submitrow"><button class="btn primary" type="submit" id="subBtn">Submit application</button><span class="formerr" id="ferr"></span></div>';
+    '<div class="submitrow"><button class="btn primary" type="submit" id="subBtn">Submit application</button><span class="formerr" id="ferr" role="alert"></span></div>';
 }
 function bindForm(){
   const form = document.getElementById('pf'); if (!form) return;
   form.oninput = form.onchange = e => {
     const k = e.target.dataset && e.target.dataset.k; if (!k) return;
-    FVALS[k] = e.target.value;
+    FVALS[k] = e.target.value; clearFieldError(e.target);
     const F = FORMS[S.form];
     // re-render only when a conditional field's visibility changes
     const vis = visSig(F, FVALS);
@@ -1535,12 +1585,42 @@ function paintFiles(){
   const l = document.getElementById('flist'); if (!l) return;
   l.innerHTML = FILES.map((f,i)=>'<div class="fchip"><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" class="btn ghost sm" aria-label="Remove '+esc(f.name)+'" onclick="FILES.splice('+i+',1);paintFiles()">'+ic('x')+'</button></div>').join('');
 }
+// WCAG 3.3.1 / 3.3.3: each field with a problem is marked, and the problem is described in words next to it.
+function fieldErrorText(el){
+  const v = el.validity || {};
+  if (el.type==='radio') return 'Choose one of the options.';
+  if (v.valueMissing) return el.type==='checkbox' ? 'Check this box to continue.' : 'This field is required.';
+  if (v.typeMismatch && el.type==='email') return 'Enter an email address, for example name@example.com.';
+  return el.validationMessage || 'Check this entry.';
+}
+function markFieldErrors(list){
+  const names = [], seen = new Set();
+  list.forEach(el => {
+    const fld = el.closest('.fld') || el.parentElement, key = el.type==='radio' ? el.name : el.id;
+    if (seen.has(key)) return; seen.add(key);
+    const lbl = fld && fld.querySelector('.l'); names.push(lbl ? lbl.textContent.replace(/\s*\*.*$/, '').replace(/\s*\(required\)\s*$/, '').trim() : 'a field');
+    const target = el.type==='radio' ? fld.querySelector('[role=radiogroup]') : el, mid = 've_'+key;
+    if (fld && !document.getElementById(mid)) fld.insertAdjacentHTML('beforeend', '<span class="ferr-f" id="'+mid+'">'+esc(fieldErrorText(el))+'</span>');
+    if (target){ target.setAttribute('aria-invalid', 'true'); const d = (target.getAttribute('aria-describedby')||'').split(' ').filter(Boolean); if (!d.includes(mid)) d.unshift(mid); target.setAttribute('aria-describedby', d.join(' ')); }
+  });
+  return names;
+}
+function clearFieldError(el){
+  const fld = el.closest && el.closest('.fld'); if (!fld) return;
+  const m = fld.querySelector('.ferr-f'); if (!m) return;
+  const t = el.type==='radio' ? fld.querySelector('[role=radiogroup]') : el;
+  if (t){ t.removeAttribute('aria-invalid'); t.setAttribute('aria-describedby', (t.getAttribute('aria-describedby')||'').split(' ').filter(x => x && x!==m.id).join(' ')); if (!t.getAttribute('aria-describedby')) t.removeAttribute('aria-describedby'); }
+  m.remove();
+}
 async function submitForm(e){
   e.preventDefault();
   const form = e.target, err = document.getElementById('ferr'), btn = document.getElementById('subBtn');
   const agMissing = formAgreements(FORMS[S.form], FVALS).filter(a => FVALS['ag_'+a.id]!=='1');
   const otherBad = [...form.querySelectorAll(':invalid')].filter(el => !/^ag_/.test(el.id));
-  if (otherBad.length){ form.reportValidity(); err.textContent = 'Please complete the required fields.'; return; }
+  form.querySelectorAll('.ferr-f').forEach(n => n.remove()); form.querySelectorAll('[aria-invalid]').forEach(n => n.removeAttribute('aria-invalid'));
+  if (otherBad.length){ const names = markFieldErrors(otherBad);
+    err.textContent = 'Please fix '+(names.length===1 ? 'this field' : 'these '+names.length+' fields')+': '+names.join(', ')+'.';
+    const first = otherBad[0]; first.scrollIntoView({block:'center'}); first.focus(); return; }
   if (FORMS[S.form].fields.some(x => x.type==='file' && x.req && (!x.show || x.show(FVALS))) && !FILES.length){ err.textContent = 'Please upload at least one document. This application requires documents.'; const d = document.getElementById('drop'); if (d){ d.scrollIntoView({block:'center'}); d.focus(); } return; }
   if (agMissing.length){ err.textContent = 'Please read and agree to: '+agMissing.map(a=>AGREEMENTS[a.id].title).join(', ')+'.'; const c = document.getElementById('ag_'+agMissing[0].id); if (c){ c.scrollIntoView({block:'center'}); c.focus(); } return; }
   if (S.pubFull){ err.textContent = 'Online storage is full, so applications cannot be submitted right now. Please contact the Building Department.'; return; }
@@ -1994,7 +2074,15 @@ async function buildFillable(key){
     fl.acroField.dict.set(PDFName.of('V'), PDFName.of('Off'));
     fl.acroField.getWidgets().forEach(w => { w.getOrCreateAppearanceCharacteristics().setCaptions({ normal:'4' }); w.dict.set(PDFName.of('AS'), PDFName.of('Off')); });
   });
-  pdf.setTitle(D.title+' - City of Arab');
+  // Accessibility: each field gets a spoken name (/TU), the document a language, and pages follow reading order.
+  const tuName = n => { const pg = (n.match(/^p(\d+)\s/)||[])[1], t = n.replace(/^p\d+\s+/, '').trim();
+    return /^(Field|check|Check box)(\s*\d+)?$/.test(t) ? (t.toLowerCase().startsWith('field') ? 'Additional line' : 'Check box')+(pg ? ', page '+pg : '') : t+(pg ? ' (page '+pg+')' : ''); };
+  form.getFields().forEach(fl => fl.acroField.dict.set(PDFName.of('TU'), PDFString.of(tuName(fl.getName()))));
+  pdf.catalog.set(PDFName.of('Lang'), PDFString.of('en-US'));
+  pdf.setLanguage && pdf.setLanguage('en-US');
+  pdf.catalog.set(PDFName.of('ViewerPreferences'), pdf.context.obj({ DisplayDocTitle:true }));
+  pages.forEach(pg => pg.node.set(PDFName.of('Tabs'), PDFName.of('R')));
+  pdf.setTitle(D.title+' - City of Arab', { showInWindowTitleBar:true });
   return PDF_CACHE[key] = await pdf.save();
 }
 async function pdfFormAction(key, how){
@@ -3063,6 +3151,20 @@ async function exportPayments(){
 async function exportPurgeLog(){ await DL.save({ filename:'purge-log-'+todayISO()+'.csv', data: csvText(LOG_HEAD, (R.log||[]).map(logRow)) }); }
 
 /* ================= render & boot ================= */
+/* ---- accessibility helpers (WCAG 2.4.1 bypass blocks, 2.4.3 focus order) ---- */
+function mainTarget(){ return root.querySelector('#sheet') || root.querySelector('main, [role=main]'); }
+function a11yLandmarks(){
+  if (!root.querySelector('main, [role=main]')){   // staff screens: mark the content area as the main region
+    const c = [...root.children].find(e => !e.matches('header, nav, footer, .jt-top, .sfoot, .pfoot, .verfoot, .toast, .veil, .skip, script'));
+    if (c) c.setAttribute('role', 'main');
+  }
+  if (!root.querySelector('.skip')) root.insertAdjacentHTML('afterbegin', '<a class="skip" href="#" onclick="event.preventDefault();focusMain()">Skip to main content</a>');
+}
+function focusMain(){
+  const m = mainTarget(); if (!m) return;
+  const h = m.querySelector('h1') || m; if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+  h.focus({preventScroll:false});
+}
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
   if (S.view==='apps') root.innerHTML = viewApps();
@@ -3070,6 +3172,7 @@ function render(){
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
   else if (S.view==='status'){ root.innerHTML = viewStatus(); bindStatus(); }
   else if (S.view==='privacy') root.innerHTML = viewPrivacy();
+  else if (S.view==='accessibility') root.innerHTML = viewAccessibility();
   else if (EMBED) root.innerHTML = viewFramed();     // staff screens never load inside another site's frame
   else if (isPhone()) root.innerHTML = viewPhoneBlock();
   else if (!S.staff && S.booting) root.innerHTML = '<div class="booting" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span>Loading the Staff Portal…</div>';
@@ -3096,14 +3199,15 @@ function render(){
     root.innerHTML = viewTable(); bindLinkPick();
     if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
-  const isPub = ['apps','form','pdf','status','privacy'].includes(S.view);
+  a11yLandmarks();
+  const isPub = ['apps','form','pdf','status','privacy','accessibility'].includes(S.view);
   if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
   else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
+  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
   ensureViewData();
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
@@ -3115,8 +3219,8 @@ function ensureViewData(){
   if (['staff','table','cict','records'].includes(S.view) && canBuilding() && !S.loaded && !S.loadingSubs) setTimeout(() => loadSubs(), 0);
 }
 function startForm(){ FORM_T0 = Date.now(); const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
-const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); };
-window.addEventListener('hashchange', () => initRoute());
+const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); setTimeout(focusMain, 0); };
+window.addEventListener('hashchange', () => { initRoute(); setTimeout(focusMain, 0); });
 function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
@@ -3125,6 +3229,7 @@ function initRoute(){
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
   else if (h==='privacy') S.view = 'privacy';
+  else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
   else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
@@ -3506,10 +3611,26 @@ function pwProblem(p, email){
 const IDLE_MIN = 30; let IDLE_AT = Date.now();
 function idleTouch(){ IDLE_AT = Date.now(); }
 ['mousedown','mousemove','keydown','wheel','touchstart'].forEach(ev => document.addEventListener(ev, idleTouch, {passive:true, capture:true}));
+// WCAG 2.2.1: two minutes before the sign-out, a warning lets the person stay signed in.
+const IDLE_WARN_SEC = 120;
+function idleWarnHtml(left){
+  const m = Math.floor(left/60), s = String(left%60).padStart(2,'0');
+  return '<div class="veil"></div><div class="scandlg idlewarn" role="alertdialog" aria-modal="true" aria-labelledby="iwT" aria-describedby="iwD">'+
+    '<h2 id="iwT" style="margin:0;font-size:18px">Are you still there?</h2>'+
+    '<p id="iwD">For your security, you will be signed out in <b id="iwLeft">'+m+':'+s+'</b> because there has been no activity.</p>'+
+    '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" onclick="lockStaff()">Sign out now</button><button type="button" class="btn primary" id="iwStay" onclick="idleStay()">Stay signed in</button></div></div>';
+}
+function idleStay(){ idleTouch(); const b = document.getElementById('idleBox'); if (b) b.remove(); }
 setInterval(() => {
-  if ((S.staff || S.limited) && TOKEN && !tokenRemembered() && Date.now() - IDLE_AT > IDLE_MIN*60000){
-    S.pinMsg = 'For your security, you were signed out after '+IDLE_MIN+' minutes without activity.'; lockStaff(); }
-}, 30000);
+  const box = document.getElementById('idleBox');
+  if (!((S.staff || S.limited) && TOKEN && !tokenRemembered())){ if (box) box.remove(); return; }
+  const left = Math.round((IDLE_MIN*60000 - (Date.now() - IDLE_AT))/1000);
+  if (left <= 0){ if (box) box.remove(); S.pinMsg = 'For your security, you were signed out after '+IDLE_MIN+' minutes without activity.'; lockStaff(); return; }
+  if (left <= IDLE_WARN_SEC){
+    if (!box){ const d = document.createElement('div'); d.id = 'idleBox'; d.innerHTML = idleWarnHtml(left); document.body.appendChild(d); const b = document.getElementById('iwStay'); if (b) b.focus(); }
+    else { const t = document.getElementById('iwLeft'); if (t) t.textContent = Math.floor(left/60)+':'+String(left%60).padStart(2,'0'); }
+  } else if (box) box.remove();
+}, 1000);
 // ---- QR code (loaded only on the set-up screen, checked with a subresource integrity hash) ----
 let qrP = null;
 function loadQr(){
