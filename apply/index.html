@@ -1326,7 +1326,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.18.2';   // shown at the bottom of every page
+const APP_VERSION = '2.18.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1422,7 +1422,7 @@ function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
-   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt (or your permit #) and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
+   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
@@ -2807,20 +2807,20 @@ async function printPayReceipt(pid){
 
 
 /* ================= PUBLIC: permit status lookup (no sign-in) =================
-   bf_permit_status returns only applications whose reference # (or permit #) AND
+   bf_permit_status returns only the application whose reference # AND
    application email both match, and only status details (no staff notes). */
 function viewStatus(){
   const R = S.st || (S.st = { ref:'', email:'' });
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
-     '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt (or your permit #) and the email address you used on the application. They are used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
+     '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt and the email address you used on the application. They are used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
    '<form id="stf" class="fgrid" novalidate>'+
-     '<div class="fld"><label class="l" for="stRef">Reference # or permit #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
+     '<div class="fld"><label class="l" for="stRef">Reference #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
      '<div class="fld"><label class="l" for="stEmail">Email on the application</label><input type="email" id="stEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" value="'+esc(R.email||'')+'"></div>'+
      '<div class="fld full"><button class="btn primary" id="stBtn" type="submit" style="justify-content:center;padding:12px 18px;font-size:15px"'+(R.busy?' disabled':'')+'>'+ic('search')+(R.busy?'Checking…':'Check status')+'</button></div></form>'+
    (R.err ? '<p class="formerr" role="alert" style="margin-top:14px">'+esc(R.err)+'</p>' : '')+
    '<div id="stOut" aria-live="polite">'+(R.res ? (R.res.length ? R.res.map(statusCard).join('') :
-     '<div class="callout warn"><b>No match found</b>We could not find an application with that reference # (or permit #) and email. Check both and try again, or contact the Building Department at buildingdept@arabcity.org.</div>') : '')+'</div>'+
+     '<div class="callout warn"><b>No match found</b>We could not find an application with that reference # and email. Check both and try again, or contact the Building Department at buildingdept@arabcity.org.</div>') : '')+'</div>'+
    '</div></main></div>';
 }
 function statusCard(r){
@@ -2847,8 +2847,8 @@ function statusCard(r){
 function bindStatus(){
   const f = document.getElementById('stf'); if (!f) return;
   f.onsubmit = async e => { e.preventDefault();
-    const R = S.st; R.ref = document.getElementById('stRef').value.trim(); R.email = document.getElementById('stEmail').value.trim(); R.err = ''; R.res = null;
-    if (!R.ref || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(R.email)){ R.err = 'Enter your reference # (or permit #) and the email address on your application.'; render(); return; }
+    const R = S.st; R.ref = document.getElementById('stRef').value.trim().replace(/^ref(erence)?\s*#?\s*/i,'').replace(/[\s#-]/g,'').toUpperCase(); R.email = document.getElementById('stEmail').value.trim(); R.err = ''; R.res = null;
+    if (!R.ref || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(R.email)){ R.err = 'Enter your reference # and the email address on your application.'; render(); return; }
     R.busy = true; render();
     try{ R.res = await sbRpc('bf_permit_status', { p_ref:R.ref, p_email:R.email }) || []; }
     catch(x){ R.err = x.message || 'Could not check right now. Please try again.'; }
