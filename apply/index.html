@@ -338,9 +338,24 @@ html.embed .tile .ico{width:38px;height:38px}
 .fs td,.fs th{padding:6px 4px;border-bottom:1px solid var(--line2);text-align:left}
 .fs th{font-size:13px;color:var(--ink2);padding-top:12px}
 .loginbg{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#212c46;display:flex;align-items:center;justify-content:center;padding:32px 16px 64px}
-.lb-photo{position:absolute;inset:-4%;background:#212c46 url('1.jpg') center 40%/cover no-repeat;animation:lbPan 48s ease-in-out infinite alternate;will-change:transform}
-@keyframes lbPan{from{transform:scale(1.04) translate3d(-1%,0,0)}to{transform:scale(1.14) translate3d(1.5%,-1.5%,0)}}
-@media (prefers-reduced-motion:reduce){.lb-photo{animation:none;transform:scale(1.04)}}
+.lb-art{position:absolute;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 78% 30%,#2c3a5e 0%,#212c46 45%,#161d31 100%)}
+.lb-grid{position:absolute;inset:-120px;background-image:linear-gradient(rgba(192,168,105,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(192,168,105,.09) 1px,transparent 1px),linear-gradient(rgba(192,168,105,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(192,168,105,.035) 1px,transparent 1px);background-size:120px 120px,120px 120px,24px 24px,24px 24px;animation:lbDrift 60s linear infinite}
+@keyframes lbDrift{to{transform:translate3d(120px,120px,0)}}
+.lb-plan{position:absolute;right:-1%;bottom:2%;width:min(980px,78vw);height:auto;opacity:.9}
+.lb-plan .ln{fill:none;stroke:#c0a869;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--l,1600);stroke-dashoffset:var(--l,1600);animation:lbDraw 3.2s cubic-bezier(.6,.05,.3,1) forwards;animation-delay:var(--d,0s)}
+.lb-plan .ln.thin{stroke-width:1.2;stroke:rgba(192,168,105,.65)}
+.lb-plan .ln.white{stroke:rgba(255,255,255,.55)}
+.lb-plan .dim{fill:rgba(192,168,105,.75);font:600 13px/1 var(--f-body);letter-spacing:.08em;opacity:0;animation:lbFade 1s ease forwards;animation-delay:var(--d,0s)}
+.lb-plan .glow{fill:#c0a869;opacity:0;animation:lbWin 6s ease-in-out infinite;animation-delay:var(--d,4s)}
+.lb-plan .hook{animation:lbHook 7s ease-in-out infinite alternate;transform-origin:50% 0;transform-box:fill-box}
+.lb-ring{position:absolute;border-radius:50%;border:2px solid rgba(192,168,105,.14);animation:lbSpin 90s linear infinite}
+@keyframes lbDraw{to{stroke-dashoffset:0}}
+@keyframes lbFade{to{opacity:1}}
+@keyframes lbWin{0%,100%{opacity:0}45%,60%{opacity:.55}}
+@keyframes lbHook{from{transform:translateY(0)}to{transform:translateY(46px)}}
+@keyframes lbSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.lb-grid,.lb-ring,.lb-plan .hook,.lb-plan .glow{animation:none}.lb-plan .ln{animation:none;stroke-dashoffset:0}.lb-plan .dim{animation:none;opacity:1}}
+@media (max-width:860px){.lb-plan{width:150vw;right:-40vw;opacity:.45}}
 .lb-shade{position:absolute;inset:0;background:linear-gradient(110deg,rgba(24,32,52,.94) 0%,rgba(24,32,52,.78) 38%,rgba(24,32,52,.35) 72%,rgba(24,32,52,.55) 100%),radial-gradient(120% 90% at 70% 40%,transparent 40%,rgba(5,14,40,.55) 100%)}
 .lb-wrap{position:relative;z-index:1;width:100%;max-width:1040px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:56px;align-items:center}
 .lb-hero{color:#fff}
@@ -445,7 +460,7 @@ html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
   .pfoot-in{flex-direction:column;align-items:flex-start;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
   .pf-links{flex-direction:column;gap:8px}
 }
-/* ---------- v2.7: payments, Municipal Support Clerk workspace, access controls ---------- */
+/* ---------- v2.7: payments, City Clerk workspace, access controls ---------- */
 .pill.partial{background:var(--sel);color:var(--city)}
 .paybox{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface2)}
 .paylist{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px;font-size:13.5px}
@@ -1359,7 +1374,7 @@ function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel=
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.19.1';   // shown at the bottom of every page
+const APP_VERSION = '2.19.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1783,10 +1798,37 @@ function storageBanner(){
    '<span>'+(full?'Residents see a message telling them to contact the Building Department. ':'')+'Free up space by purging finished permits that have a Certificate of Occupancy.</span>'+
    (isAdmin()?'<button class="btn sm" onclick="go(\'purge\')">Free up space</button>':'<span>Ask an administrator to free up space.</span>')+'</div>';
 }
+function lbArt(){
+  const L = (d, len, delay, cls) => '<path class="ln'+(cls?' '+cls:'')+'" d="'+d+'" style="--l:'+len+';--d:'+delay+'s"/>';
+  return '<div class="lb-art" aria-hidden="true"><div class="lb-grid"></div>'+
+   '<div class="lb-ring" style="width:620px;height:620px;right:-180px;top:-220px"></div><div class="lb-ring" style="width:380px;height:380px;right:120px;top:-120px;border-style:dashed;animation-direction:reverse"></div>'+
+   '<svg class="lb-plan" viewBox="0 0 1100 660" focusable="false">'+
+    L('M40 600H1080', 1100, 0, 'thin')+
+    // house
+    L('M120 600V420H380V600', 820, .2)+ L('M100 430L250 300L400 430', 420, .7)+ L('M215 600V500H285V600', 240, 1.2, 'thin')+
+    L('M150 450h50v40h-50z', 180, 1.4, 'thin')+ L('M300 450h50v40h-50z', 180, 1.5, 'thin')+ L('M320 335V300h28v60', 120, 1.6, 'thin')+
+    // two-storey building
+    L('M470 600V330H700V600', 980, .5)+ L('M460 330H710', 250, 1.1)+
+    L('M500 370h50v50h-50zM620 370h50v50h-50zM500 460h50v50h-50zM620 460h50v50h-50z', 820, 1.6, 'thin')+ L('M560 600v-60h50v60', 160, 1.9, 'thin')+
+    // tower crane
+    L('M850 600V120', 480, .9, 'white')+ L('M830 600V120', 480, .95, 'white')+
+    L('M830 160L850 130M830 200L850 170M830 240L850 210M830 280L850 250M830 320L850 290M830 360L850 330M830 400L850 370M830 440L850 410M830 480L850 450M830 520L850 490M830 560L850 530', 600, 1.4, 'thin white')+
+    L('M700 120H1060', 360, 1.3, 'white')+ L('M720 140H1040', 320, 1.5, 'thin white')+ L('M840 120L840 70L1060 120M840 70L700 120', 520, 1.8, 'thin white')+
+    L('M1000 120V190', 70, 2.2, 'thin')+
+    '<g class="hook">'+L('M985 190h30v26h-30z', 112, 2.4)+'</g>'+
+    // dimension lines
+    L('M120 625H380M120 618v14M380 618v14', 300, 2.2, 'thin')+ L('M470 625H700M470 618v14M700 618v14', 270, 2.3, 'thin')+ L('M80 420V600M73 420h14M73 600h14', 220, 2.4, 'thin')+
+    '<text class="dim" x="250" y="640" text-anchor="middle" style="--d:2.8s">32\' - 0\"</text>'+
+    '<text class="dim" x="585" y="640" text-anchor="middle" style="--d:2.9s">28\' - 6\"</text>'+
+    '<text class="dim" x="60" y="515" text-anchor="middle" transform="rotate(-90 60 515)" style="--d:3s">14\' - 0\"</text>'+
+    // windows lighting up
+    '<rect class="glow" x="152" y="452" width="46" height="36" style="--d:3.4s"/><rect class="glow" x="622" y="372" width="46" height="46" style="--d:5s"/><rect class="glow" x="502" y="462" width="46" height="46" style="--d:6.6s"/>'+
+   '</svg></div>';
+}
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
-  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the Municipal Support Clerk. You go straight to your own workspace.</p></div>'+
+  return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
@@ -1796,7 +1838,7 @@ function viewPin(){
    '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
    '<p style="margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)">jade.cruz@collinsalexander.com</p>'+
    '<a class="btn ghost" '+HOME_LINK+' style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
-   '<div class="lb-cap"><svg viewBox="0 0 24 24" class="i" aria-hidden="true">'+IC.pin+'</svg>Downtown Arab · Main Street from above</div><div class="lb-ver">Version '+APP_VERSION+'</div></div>';
+   '<div class="lb-ver">Version '+APP_VERSION+'</div></div>';
 }
 /* ================= STAFF: workspace (form list) ================= */
 function viewWorkspace(){
@@ -2218,7 +2260,7 @@ function viewPdfForm(){
 
 /* ================= roles & workspace access =================
    Server-side rules live in bf_payments.sql; these only decide what to show.
-   building = Building Department workspace, payments = Municipal Support Clerk tools. */
+   building = Building Department workspace, payments = City Clerk tools. */
 const myAccess = () => {
   const m = S.me || {}, a = m.access;
   if (a) return { building: !!a.building, payments: !!a.payments, admin: !!a.admin, records: !!(a.records || a.admin) };
@@ -2236,7 +2278,7 @@ function routeAllowed(v){
   if (v==='staff' || v==='table' || v==='cict') return canBuilding();
   return false;
 }
-const ROLE_LABEL = { staff:'Building Department', clerk:'Municipal Support Clerk', admin:'Administrator', citizen:'No access' };
+const ROLE_LABEL = { staff:'Building Department', clerk:'City Clerk', admin:'Administrator', citizen:'No access' };
 function goHome(){ go(homeView()); }
 
 /* ================= payment status (one definition used everywhere) ================= */
@@ -2269,12 +2311,12 @@ function payBoxHtml(s){
   return '<div class="paybox"><div class="row" style="justify-content:space-between;gap:8px">'+payPill(s)+
     '<span class="num" style="color:var(--ink2)">'+(st==='none' ? 'No fee due' : 'Paid '+money(p.paid||((st==='paid')?(s.fees&&s.fees.total):0))+' of '+money(p.total!=null?p.total:(s.fees&&s.fees.total))+(st==='partial'?' · <b>'+money(p.balance)+' due</b>':''))+'</span></div>'+
     (rows.length ? '<ul class="paylist">'+rows.map(r => '<li class="'+(r.reversedBy?'rev':'')+'"><span class="num">'+esc(r.receiptNo)+'</span><span>'+pmtLabel(r)+(r.method?' · '+esc(r.method)+(r.checkNo?' #'+esc(r.checkNo):''):'')+(r.receivedOn?' · '+fmtDay(r.receivedOn):'')+(r.reversedBy?' · reversed':'')+'</span><b class="num">'+money(r.amount)+'</b></li>').join('')+'</ul>'+(rows.some(r=>r.scan)?'<div class="scan-row">'+rows.filter(r=>r.scan).map(scanThumbHtml).join('')+'</div>':'') : (h===null ? '<p class="hint">Loading payment history…</p>' : ''))+
-    '<p class="hint" style="margin:6px 0 0;color:var(--muted);font-size:13px">Payments are recorded by the Municipal Support Clerk.'+(canPay()?'':' You can see the status here but cannot change it.')+'</p>'+
+    '<p class="hint" style="margin:6px 0 0;color:var(--muted);font-size:13px">Payments are recorded by the City Clerk.'+(canPay()?'':' You can see the status here but cannot change it.')+'</p>'+
     (canPay() && st!=='none' ? '<button type="button" class="btn sm" style="margin-top:8px" onclick="clerkOpen(\''+s.id+'\')">'+ic('ext')+'Open in Payments</button>' : '')+
   '</div>';
 }
 
-/* ================= Municipal Support Clerk workspace ================= */
+/* ================= City Clerk workspace ================= */
 S.ck = { q:'', status:'due', results:null, sel:null, rec:null, f:null, step:'form', err:'', dupOk:false, done:null, tab:'find', day:todayISO(), dayRows:null, revFor:null };
 let ckTimer = null;
 function ckFreshForm(rec){ const bal = rec && rec.pay ? Number(rec.pay.balance) : 0;
@@ -3330,7 +3372,7 @@ function viewUsers(){
   const hidden = Array.isArray(u) ? u.filter(a => !portal(a)).length : 0;
   const nc = S.newCreds;
   const roleSel = (id, v, lbl) => '<label for="r_'+id+'" class="vh">'+lbl+'</label><select class="mini" id="r_'+id+'" onchange="setAccess(\''+id+'\',{role:this.value})">'+
-    [['staff','Building Department'],['clerk','Municipal Support Clerk'],['admin','Administrator'],['citizen','No access']].map(o=>'<option value="'+o[0]+'"'+(v===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
+    [['staff','Building Department'],['clerk','City Clerk'],['admin','Administrator'],['citizen','No access']].map(o=>'<option value="'+o[0]+'"'+(v===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
   const addon = a => { const id = esc(a.id), pr = a.perms || [];
     const box = (perm, label) => '<label class="addon"><input type="checkbox" '+(pr.includes(perm)?'checked':'')+' onchange="togglePerm(\''+id+'\',\''+perm+'\',this.checked)"> '+label+'</label>';
     if (a.role==='staff') return box('payments','Can also record payments')+box('records','Can manage records (export and purge)');
@@ -3339,7 +3381,7 @@ function viewUsers(){
     return ''; };
   return topBar()+'<div class="purge"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button></div><h1>Staff accounts</h1>'+
    '<div class="roles"><div><b>Building Department</b><span>Applications, permits, inspections and certificates of occupancy. Sees whether a fee is paid but cannot record payments.</span></div>'+
-     '<div><b>Municipal Support Clerk</b><span>Looks up applications and records payments received. Does not see Building Department tools.</span></div>'+
+     '<div><b>City Clerk</b><span>Looks up applications and records payments received. Does not see Building Department tools.</span></div>'+
      '<div><b>Administrator</b><span>Both workspaces, plus staff accounts and records &amp; storage.</span></div>'+
      '<div><b>Records (add-on)</b><span>Lets a Building Department user open Records &amp; storage to export data and purge finished, paid applications.</span></div></div>'+
    '<form class="card" id="addf"><h2>Add a staff member</h2><div class="fgrid">'+
@@ -3347,7 +3389,7 @@ function viewUsers(){
     '<div class="fld"><label class="l" for="nuTitle">Title <span class="hint">(optional, shown when they sign in)</span></label><input id="nuTitle" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Building Inspector"></div>'+
     '<div class="fld"><label class="l" for="nuEmail">Email</label><input id="nuEmail" type="email" required autocomplete="off"></div>'+
     '<div class="fld"><label class="l" for="nuPass">Temporary password</label><div class="row" style="flex-wrap:nowrap"><input id="nuPass" type="text" required minlength="12" autocomplete="off" value="'+genTempPw()+'" style="flex:1"><button type="button" class="btn sm" onclick="document.getElementById(\'nuPass\').value=genTempPw()">New</button></div><span class="hint">Temporary: they must choose their own password the first time they sign in.</span></div>'+
-    '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Building Department</option><option value="clerk">Municipal Support Clerk</option><option value="admin">Administrator</option></select></div>'+
+    '<div class="fld"><label class="l" for="nuRole">Access</label><select id="nuRole"><option value="staff">Building Department</option><option value="clerk">City Clerk</option><option value="admin">Administrator</option></select></div>'+
    '</div><span class="formerr" id="nuErr"></span><div class="row"><button class="btn primary" id="nuBtn">'+ic('user')+'Add staff member</button></div>'+
    (nc?'<div class="creds" role="status"><b>Login created for '+esc(nc.name||nc.email)+'.</b><span>Give them these sign-in details. The password is not shown again. The first time they sign in, they must choose their own password, so this temporary one stops working.</span><span>Sign-in page: <code>arabcityapplications.jadecruz.dev/apply/#staff</code></span><span>Email: <code>'+esc(nc.email)+'</code></span><span>Temporary password: <code>'+esc(nc.pass)+'</code></span></div>':'')+
    '</form>'+
@@ -3449,7 +3491,7 @@ async function removeAcct(id){
 /* ================= "Hello" screen while the dashboard loads after sign-in ================= */
 function helloStart(acc){
   helloEnd(true);
-  const name = (acc.name || acc.email || '').trim(), title = (acc.title || '').trim() || ({admin:'Administrator', clerk:'Municipal Support Clerk', staff:'Building Department'})[acc.role] || 'City of Arab staff';
+  const name = (acc.name || acc.email || '').trim(), title = (acc.title || '').trim() || ({admin:'Administrator', clerk:'City Clerk', staff:'Building Department'})[acc.role] || 'City of Arab staff';
   const h = new Date().getHours(), part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   const d = document.createElement('div'); d.id = 'hello'; d.setAttribute('role','status'); d.setAttribute('aria-live','polite');
   d.innerHTML = '<div class="hl-glow" aria-hidden="true"></div><div class="hl-in">'+
@@ -3712,7 +3754,7 @@ function loadQr(){
 }
 // ---- sign-in step 2 ----
 function viewCode(){
-  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+  return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
    '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2></div>'+
    '<form class="pin" id="codef"><h1 style="font:800 22px var(--f-disp)">2-step verification</h1>'+
    '<p style="margin:0;color:var(--muted)">Open the authenticator app on your phone and enter the 6-digit code for <b style="color:var(--ink)">Arab City Staff Portal</b>.</p>'+
@@ -3736,7 +3778,7 @@ async function submitCode(e){
 // ---- first sign-in with a temporary password: choose your own (server keeps the session limited until then) ----
 function viewMustPw(){
   const m = S.me || {};
-  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+  return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
    '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">Welcome</span><h2>Choose your<br><em>own password</em></h2>'+
      '<p>You signed in with a temporary password. Choose a new one that only you know. The temporary password stops working once you do.</p></div>'+
    '<form class="pin" id="mpwf"><h1 style="font:800 22px var(--f-disp)">Set your password</h1>'+
@@ -3766,7 +3808,7 @@ async function submitMustPw(e){
 // ---- 2-step set-up (required screen after sign-in, or from My account) ----
 function viewMfaRequired(){
   const m = S.me || {};
-  return '<div class="loginbg"><div class="lb-photo" aria-hidden="true"></div><div class="lb-shade" aria-hidden="true"></div>'+
+  return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
    '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">One more step</span><h2>Protect your<br><em>staff login</em></h2>'+
      '<p>Your login needs a code from your phone each time you sign in. Even if someone learns your password, they cannot get in without your phone.</p></div>'+
    '<div class="pin mfa-pin"><h1 style="font:800 22px var(--f-disp)">Set up 2-step verification</h1>'+
@@ -4167,7 +4209,7 @@ async function runZipAttach(){
 }
 /* ================= staff footer + bug reports ================= */
 const BUG_EMAIL = 'jade.cruz@collinsalexander.com';
-const AREAS = [['clerk','Payments (Municipal Support Clerk)'],['staff','Building Department workspace'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['users','Staff accounts or passwords'],['other','Something else']];
+const AREAS = [['clerk','Payments (City Clerk)'],['staff','Building Department workspace'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['users','Staff accounts or passwords'],['other','Something else']];
 function staffFooter(){
   return '<footer class="sfoot"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
