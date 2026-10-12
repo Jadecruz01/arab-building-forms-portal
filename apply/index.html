@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building Permit Applications · City of Arab</title>
+<title>Applications &amp; Fees · City of Arab</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com blob:; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://yighcuismepfmappcfui.supabase.co https://cdnjs.cloudflare.com data: blob:; media-src 'self' blob: data:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
@@ -1501,7 +1501,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.0';   // shown at the bottom of every page
+const APP_VERSION = '2.21.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3647,7 +3647,7 @@ function render(){
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : isPub ? 'Building Permit Applications · City of Arab' : 'Arab City Staff Portal';
+  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+' Application · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Arab City Staff Portal';
   ensureViewData();
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
