@@ -772,6 +772,29 @@ table.grid td.rn,table.grid th.rn{position:static}
 
 /* profile menu */
 .pm{position:relative;display:flex;align-items:center}
+/* v2.21: notifications bell */
+.nb{position:relative;display:flex;align-items:center;margin-right:6px}
+.nb-btn{position:relative;width:40px;height:40px;display:inline-grid;place-items:center;border-radius:999px;border:0;background:none;color:#e9e3d4;cursor:pointer}
+.nb-btn:hover,.nb-btn[aria-expanded=true]{background:rgba(255,255,255,.08)}
+.nb-btn:focus-visible{outline:2px solid #c0a869;outline-offset:2px}
+.nb-btn svg{width:21px;height:21px}
+.nb-count{position:absolute;top:3px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#c4283d;color:#fff;font:700 11px/18px var(--f-body);text-align:center;box-shadow:0 0 0 2px #212c46}
+.nb-menu{position:absolute;right:0;top:calc(100% + 8px);width:min(360px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(6,10,40,.25);z-index:60;overflow:hidden}
+.nb-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.nb-h b{font:700 15px var(--f-body)}
+.nb-h .linkbtn{font-size:13px}
+.nb-list{list-style:none;margin:0;padding:6px;max-height:min(60vh,420px);overflow:auto;overscroll-behavior:contain}
+.nb-item{display:flex;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:10px;cursor:pointer;color:var(--ink);font:inherit}
+.nb-item:hover,.nb-item:focus-visible{background:var(--sel);outline:none}
+.nb-dot{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:transparent}
+.nb-item.new .nb-dot{background:#c4283d}
+.nb-tx{display:grid;gap:2px;min-width:0}
+.nb-tx b{font-size:14px}
+.nb-tx span{font-size:13px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-tx small{font-size:12px;color:var(--muted)}
+.nb-empty{display:flex;gap:8px;align-items:center;margin:0;padding:18px 14px;color:var(--muted);font-size:14px}
+.nb-empty svg{width:18px;height:18px;color:var(--ok)}
+.p-back{margin-right:6px}
 .pm-btn{display:flex;align-items:center;gap:10px;background:none;border:0;color:#e9e3d4;cursor:pointer;font:500 14px var(--f-body);padding:4px 6px;border-radius:999px}
 .pm-btn:hover,.pm-btn[aria-expanded=true]{background:rgba(255,255,255,.08)}
 .pm-car{font-size:11px;opacity:.8}
@@ -1080,6 +1103,7 @@ const IC = {
   upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   down:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
   printer:'<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
   pdf:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6m-3-3l3 3 3-3"/>',
   undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
@@ -1315,7 +1339,10 @@ async function loadSubs(){
   S.loadingSubs = false;
   await loadStorage();
   const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest('.panel,#pf,.pin,.purge');
+  const nb = typeof notifUnread === 'function' ? notifUnread() + ':' + notifList().length : '', nbChanged = nb !== S.lastNb; S.lastNb = nb;
+  const inField = document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
   if (['staff','table','cict','records'].includes(S.view) && !S.editing && !typing) render();
+  else if (nbChanged && S.staff && !S.editing && !inField && !S.nmenu) render();
 }
 async function loadStorage(){ try{ S.storage = await sbRpc('bf_storage_status', {}); }catch(e){} }
 const ATT = {};   // submissionId -> [{id,name,type,size,data(dataURL)}]
@@ -1462,19 +1489,19 @@ async function prefLoad(){
     else PREF.v = server;
     try{ localStorage.setItem('bdPrefs_'+PREF.id, JSON.stringify(PREF.v)); }catch(e){}
   }catch(e){}
-  prefApply();
+  PREF.loaded = true; prefApply();
 }
-function prefClear(){ PREF.v = {}; PREF.dirty = {}; PREF.id = null; prefApply(); }
+function prefClear(){ PREF.v = {}; PREF.dirty = {}; PREF.id = null; PREF.loaded = false; prefApply(); }
 
 const mb = n => (Number(n||0)/1048576).toFixed(n>=10485760?0:1)+' MB';
 const root = document.getElementById('root');
 function toast(msg){ const t = document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
-function go(view, form){ if (S.form!==(form||null) || view!=='table'){ S.rowSel={}; S.bulkDel=false; } S.view = view; S.form = form||null; S.sel=null; S.editing=false; S.confirmDel=false; S.colsOpen=false;
+function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu = false; if (S.form!==(form||null) || view!=='table'){ S.rowSel={}; S.bulkDel=false; } S.view = view; S.form = form||null; S.sel=null; S.editing=false; S.confirmDel=false; S.colsOpen=false;
   try{ history.replaceState(null,'', '#'+(form? view+'-'+form : view)); }catch(e){}
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.20.2';   // shown at the bottom of every page
+const APP_VERSION = '2.21.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1899,7 +1926,7 @@ function visibleCols(k){
 function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); }
 function topBar(){
   return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
-   profileMenuHtml()+'</header>'+storageBanner();
+   (canBuilding() ? bellHtml() : '')+profileMenuHtml()+'</header>'+storageBanner();
 }
 
 /* ================= profile menu (upper right) + My account ================= */
@@ -1922,9 +1949,63 @@ function profileMenuHtml(){
     '</div>' : '')+'</div>';
 }
 function accessLabel(){ const a = myAccess(); return a.admin ? 'Administrator' : [a.building?'Building Department':'', a.payments?'Payments':'', canRecords()?'Records':''].filter(Boolean).join(' · ') || 'Staff'; }
-function togglePMenu(e){ if (e) e.stopPropagation(); S.pmenu = !S.pmenu; render(); if (S.pmenu){ const f = document.querySelector('#pmMenu [role=menuitem]'); if (f) f.focus(); } }
+function togglePMenu(e){ if (e) e.stopPropagation(); S.nmenu = false; S.pmenu = !S.pmenu; render(); if (S.pmenu){ const f = document.querySelector('#pmMenu [role=menuitem]'); if (f) f.focus(); } }
 document.addEventListener('click', e => { if (S.pmenu && !e.target.closest('.pm')){ S.pmenu = false; render(); } });
 document.addEventListener('keydown', e => { if (S.pmenu && e.key==='Escape'){ S.pmenu = false; render(); const b = document.getElementById('pmBtn'); if (b) b.focus(); } });
+/* ================= v2.21: new-application notifications (Building Department) =================
+   Each new application submitted online becomes a notification for every staff member with Building Department
+   access. What each person has seen / cleared / opened is saved to their own account (prefs 'notif'), so it follows
+   them to any computer. Clicking the bell shows the list and clears the count; clicking a notification opens the
+   application; "Clear all" empties the list. Imported records are never notifications. */
+const NOTIF_MAX = 30;
+function notifState(){
+  let n = prefGet('notif', null);
+  if (!n || !n.clearedAt){ const now = new Date().toISOString(); n = { seenAt: now, clearedAt: now, opened: [] }; if (S.me && TOKEN && PREF.loaded) prefSet('notif', n); }
+  return Object.assign({ opened: [] }, n);
+}
+const subTime = x => { const t = Date.parse(x.createdAt); return isNaN(t) ? 0 : t; };
+function notifList(){
+  if (!canBuilding() || !S.loaded) return [];
+  const n = notifState(), cut = Date.parse(n.clearedAt) || 0, opened = new Set(n.opened || []);
+  return S.subs.filter(x => !x.imported && !x.importedBy && FORMS[x.form] && subTime(x) > cut && !opened.has(x.id))
+    .sort((a, b) => subTime(b) - subTime(a)).slice(0, NOTIF_MAX);
+}
+function notifUnread(){ const seen = Date.parse(notifState().seenAt) || 0; return notifList().filter(x => subTime(x) > seen).length; }
+function agoText(iso){
+  const t = Date.parse(iso); if (isNaN(t)) return ''; const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'Just now'; if (m < 60) return m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+  const d = Math.round(h / 24); return d < 7 ? d + (d === 1 ? ' day ago' : ' days ago') : fmtDT(iso);
+}
+function bellHtml(){
+  const list = notifList(), unread = notifUnread(), open = !!S.nmenu, seen = Date.parse((S.nmenuSeen||notifState().seenAt)) || 0;
+  return '<div class="nb"><button type="button" class="nb-btn" id="nbBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="nbMenu" onclick="toggleBell(event)" aria-label="Notifications'+(unread?', '+unread+' new':'')+'">'+
+      ic('bell')+(unread ? '<span class="nb-count" aria-hidden="true">'+(unread > 9 ? '9+' : unread)+'</span>' : '')+'</button>'+
+    (open ? '<div class="nb-menu" id="nbMenu" role="region" aria-label="Notifications">'+
+      '<div class="nb-h"><b>Notifications</b>'+(list.length ? '<button type="button" class="linkbtn" onclick="clearNotifs()">Clear all</button>' : '')+'</div>'+
+      (list.length ? '<ul class="nb-list">'+list.map(x => { const F = FORMS[x.form], f = x.fields || {}, isNew = subTime(x) > seen;
+          return '<li><button type="button" class="nb-item'+(isNew?' new':'')+'" onclick="openNotif(\''+x.id+'\')">'+
+            '<span class="nb-dot" aria-hidden="true"></span><span class="nb-tx"><b>New '+esc(F.short)+' application</b>'+
+            '<span>'+esc([f.applicant || f.subName || 'Applicant', f.address].filter(Boolean).join(' · '))+'</span>'+
+            '<small>'+esc(agoText(x.createdAt))+(isNew?'<span class="vh"> (new)</span>':'')+'</small></span></button></li>'; }).join('')+'</ul>'
+        : '<p class="nb-empty">'+ic('check')+'You\'re all caught up. New applications will show here.</p>')+
+    '</div>' : '')+'</div>';
+}
+function toggleBell(e){
+  if (e) e.stopPropagation(); S.pmenu = false; S.nmenu = !S.nmenu;
+  if (S.nmenu){ const n = notifState(); S.nmenuSeen = n.seenAt; prefSet('notif', Object.assign(n, { seenAt: new Date().toISOString() })); }
+  render(); if (S.nmenu){ const f = document.querySelector('#nbMenu .nb-item, #nbMenu .linkbtn'); if (f) f.focus(); }
+}
+function clearNotifs(){ const now = new Date().toISOString(); prefSet('notif', { seenAt: now, clearedAt: now, opened: [] }); S.nmenu = false; render(); toast('Notifications cleared.');
+  const b = document.getElementById('nbBtn'); if (b) b.focus(); }
+function openNotif(id){
+  const n = notifState(), cut = Date.parse(n.clearedAt) || 0;
+  const opened = (n.opened || []).filter(x => { const s2 = subById(x); return s2 && subTime(s2) > cut; }).concat(id).slice(-200);
+  prefSet('notif', Object.assign(n, { opened }));
+  S.nmenu = false; openSub(id);
+}
+document.addEventListener('click', e => { if (S.nmenu && !e.target.closest('.nb')){ S.nmenu = false; render(); } });
+document.addEventListener('keydown', e => { if (S.nmenu && e.key==='Escape'){ S.nmenu = false; render(); const b = document.getElementById('nbBtn'); if (b) b.focus(); } });
+
 function openAccount(sec){ S.pmenu = false; S.meSec = sec || 'profile'; if (S.view==='me') render(); else go('me');
   setTimeout(() => { const el = document.getElementById('me-'+S.meSec); if (el){ el.scrollIntoView({block:'start'}); const f = el.querySelector('input'); if (f) f.focus(); } }, 0); }
 const canRecords = () => { const a = (S.me && S.me.access) || {}; return !!(a.records || myAccess().admin); };
@@ -2128,11 +2209,53 @@ function colPanelHtml(k){
     '<div class="cp-f"><button type="button" class="btn sm ghost" onclick="resetTable()">Reset to default</button><button type="button" class="btn sm primary" onclick="S.colsOpen=false;render()">Done</button></div></div>';
 }
 async function toggleStar(id){ const s = S.subs.find(x=>x.id===id); if (!s||!DB) return; try{ await DB.doc('submissions/'+id).update({starred:!s.starred}); }catch(e){ toast('Could not update star.'); } }
-async function openSub(id){ S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
+/* v2.21: opening an application remembers where it was opened from (the table, the CICT report, another application,
+   a notification, ...). Back (the panel's Back / close button, Escape, or the browser's back button) returns there,
+   with the same page, record and scroll position. Previous / Next inside the panel do not add steps. */
+const NAV = [];
+const navHash = (v, f) => '#'+(f ? v+'-'+f : v);
+const NAV_LABEL = { cict:'CICT report', staff:'Workspace', records:'Records & storage', me:'My account', clerk:'Payments', users:'Staff accounts', bugs:'Bug reports' };
+function navOriginLabel(o){
+  if (!o) return '';
+  if (o.view==='table' && o.sel){ const p = subById(o.sel); return p ? ((p.fields||{}).applicant || FORMS[p.form].short) : 'previous application'; }
+  if (o.view==='table') return o.form===S.form ? '' : (FORMS[o.form] ? FORMS[o.form].short : 'list');
+  return NAV_LABEL[o.view] || 'previous page';
+}
+async function openSub(id, opt){
+  const x = subById(id);
+  if (!(opt && opt.step)){
+    NAV.push({ view:S.view, form:S.form, sel:S.sel, tab:S.tab, y:window.scrollY||0, cklTop:(document.querySelector('.apptbl-wrap')||{}).scrollTop||0 });
+    const to = x ? navHash('table', x.form) : location.hash;
+    try{ history.pushState({ bdNav: NAV.length }, '', to); }catch(e){}
+    if (x && (S.view!=='table' || S.form!==x.form)){ S.view='table'; S.form=x.form; S.rowSel={}; S.bulkDel=false; S.colsOpen=false; S.q=''; window.scrollTo(0,0); }
+  }
+  S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
   loadAtt(id).then(()=>{ if (S.sel===id) render(); }).catch(e=>{ ATT[id] = {err:e.message}; if (S.sel===id) render(); });
   const s = S.subs.find(x=>x.id===id); if (s && !s.read && DB){ try{ await DB.doc('submissions/'+id).update({read:true}); }catch(e){} } }
-function closeSub(){ S.sel=null; S.editing=false; render(); }
-function stepSub(d){ const rows = filteredRows(), i = rows.findIndex(s=>s.id===S.sel); const n = rows[i+d]; if (n) openSub(n.id); }
+function closeSub(){
+  if (NAV.length && history.state && history.state.bdNav === NAV.length){ try{ history.back(); return; }catch(e){} }
+  navBack();
+}
+function navBack(){
+  const o = NAV.pop();
+  if (!o){ S.sel=null; S.editing=false; render(); return; }
+  S.view=o.view; S.form=o.form; S.sel=o.sel; S.tab=o.tab||'app'; S.editing=false; S.confirmDel=false;
+  try{ history.replaceState(NAV.length ? { bdNav: NAV.length } : null, '', navHash(o.view, o.form)); }catch(e){}
+  render();
+  requestAnimationFrame(() => { window.scrollTo(0, o.y||0); const w = document.querySelector('.apptbl-wrap'); if (w) w.scrollTop = o.cklTop||0; });
+  if (o.sel) loadAtt(o.sel).then(()=>{ if (S.sel===o.sel) render(); }).catch(()=>{});
+}
+let NAV_SKIP_HASH = false;
+window.addEventListener('popstate', e => {
+  const depth = (e.state && e.state.bdNav) || 0;
+  // A typed link or menu link also fires popstate; only a step back to where the application was opened from is handled here.
+  const target = NAV[depth];
+  if (NAV.length && depth < NAV.length && target && navHash(target.view, target.form) === (location.hash || '#')){
+    while (NAV.length > depth + 1) NAV.pop();
+    NAV_SKIP_HASH = true; navBack(); setTimeout(() => { NAV_SKIP_HASH = false; }, 0);
+  }
+});
+function stepSub(d){ const rows = filteredRows(), i = rows.findIndex(s=>s.id===S.sel); const n = rows[i+d]; if (n) openSub(n.id, {step:true}); }
 
 /* ================= STAFF: submission panel ================= */
 function panelHtml(){
@@ -2209,7 +2332,7 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button><span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
-   '<div class="p-head"><button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
+   '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()">'+ic('left')+'Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</button>' : '')+'<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
    '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src">'+ic('link')+'Linked</span>':'')+'</small></div>'+
    '<button class="btn sm" id="fullBtn" onclick="togglePanelFull()" title="'+(S.panelFull?'Exit full screen':'Full screen')+'">'+ic(S.panelFull?'shrink':'expand')+'<span class="hide-sm">'+(S.panelFull?'Exit full screen':'Full screen')+'</span></button>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
@@ -3030,7 +3153,7 @@ const linkedSubs = s => s && isBldg(s.form) ? S.subs.filter(x => x.form === 'sub
 const isLinked = s => !!(linkedMain(s) || linkedSubs(s).length);
 const normAddr = a => String(a||'').toLowerCase().replace(/[.,#]/g,' ').replace(/\b(road|rd|street|st|avenue|ave|drive|dr|lane|ln|trail|trl|circle|cir|court|ct|parkway|pkwy|highway|hwy|boulevard|blvd|northeast|northwest|southeast|southwest|ne|nw|se|sw|n|s|e|w)\b/g,' ').replace(/\s+/g,' ').trim();
 const appLine = x => esc(x.fields.applicant || 'Applicant')+' · '+esc(x.fields.address || 'no address')+((x.staff&&x.staff.permitNo) ? ' · Permit # '+esc(x.staff.permitNo) : '')+' · Ref '+refNo(x.id);
-function openLinked(id){ const x = subById(id); if (!x) { toast('That application is no longer on file.'); return; } S.linkPick = null; go('table', x.form); openSub(id); }
+function openLinked(id){ const x = subById(id); if (!x) { toast('That application is no longer on file.'); return; } S.linkPick = null; openSub(id); }
 function linkCandidates(s){
   const want = s.form === 'subtrade' ? x => isBldg(x.form) : x => x.form === 'subtrade' && x.linkedTo !== s.id;
   const q = String((S.linkPick && S.linkPick.q) || '').trim().toLowerCase(), a = normAddr(s.fields.address), num = (a.match(/^\d+/)||[''])[0];
@@ -3537,7 +3660,7 @@ function ensureViewData(){
 }
 function startForm(){ FORM_T0 = Date.now(); const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
 const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); setTimeout(focusMain, 0); };
-window.addEventListener('hashchange', () => { initRoute(); setTimeout(focusMain, 0); });
+window.addEventListener('hashchange', () => { if (NAV_SKIP_HASH) return; NAV.length = 0; S.nmenu = false; S.pmenu = false; initRoute(); setTimeout(focusMain, 0); });
 function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
@@ -3886,7 +4009,7 @@ async function saveMyProfile(e){
   catch(x){ err.textContent = x.message; btn.disabled = false; }
 }
 async function resetMyPrefs(){
-  const patch = {}; Object.keys(PREF.v).forEach(k => patch[k] = null); PREF.v = {}; PREF.dirty = patch;
+  const keep = PREF.v.notif, patch = {}; Object.keys(PREF.v).forEach(k => { if (k !== 'notif') patch[k] = null; }); PREF.v = keep ? { notif: keep } : {}; PREF.dirty = patch;  // notifications are not a layout setting
   try{ localStorage.removeItem('bdPrefs_'+PREF.id); }catch(e){}
   await prefFlush(); prefApply(); S.meUi = {msg:'Your saved settings were reset to the defaults.'}; render();
 }
@@ -4534,7 +4657,7 @@ async function delBug(id){
         S.booting = false; if (sec && sec.limited){ S.me = sec.account; S.limited = true; S.mustPw = !!sec.mustChangePw; } else signOutLocal(); render(); }
     }catch(e){ S.booting = false; render(); }
   }
-  setInterval(()=>{ if (S.staff && document.visibilityState==='visible' && (S.view==='staff'||S.view==='table')) loadSubs(); }, 30000);
+  setInterval(()=>{ if (S.staff && canBuilding() && document.visibilityState==='visible' && !S.editing) loadSubs(); }, 30000);
 })();
 </script>
 </body>
