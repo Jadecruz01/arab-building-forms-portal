@@ -1528,14 +1528,12 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.5';   // shown at the bottom of every page
+const APP_VERSION = '2.21.6';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
-  return '<div class="offbar" role="note" aria-label="Official site"><div class="offbar-in">'+ic('check')+'<span><span class="ob-long">The official permit application site of the City of Arab Building Department</span><span class="ob-short">Official City of Arab permit site</span></span>'+
-    '<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a></div></div>'+
-    '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
+  return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a></nav>'+
     '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>'+
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
