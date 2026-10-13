@@ -355,6 +355,7 @@ html.embed .tile .ico{width:38px;height:38px}
 .lb-plan .ln{fill:none;stroke:#c0a869;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--l,1600);stroke-dashoffset:var(--l,1600);animation:lbDraw 3.2s cubic-bezier(.6,.05,.3,1) forwards;animation-delay:var(--d,0s)}
 .lb-plan .ln.thin{stroke-width:1.2;stroke:rgba(192,168,105,.65)}
 .lb-plan .ln.white{stroke:rgba(255,255,255,.55)}
+.lb-plan .tb{fill:rgba(192,168,105,.16);font:600 7.5px/1 var(--f-body);letter-spacing:.22em}
 .lb-plan .dim{fill:rgba(192,168,105,.75);font:600 13px/1 var(--f-body);letter-spacing:.08em;opacity:0;animation:lbFade 1s ease forwards;animation-delay:var(--d,0s)}
 .lb-plan .glow{fill:#c0a869;opacity:0;animation:lbWin 6s ease-in-out infinite;animation-delay:var(--d,4s)}
 .lb-plan .hook{animation:lbHook 7s ease-in-out infinite alternate;transform-origin:50% 0;transform-box:fill-box}
@@ -1507,7 +1508,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.2';   // shown at the bottom of every page
+const APP_VERSION = '2.21.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2048,6 +2049,7 @@ function lbArt(){
     '<text class="dim" x="250" y="640" text-anchor="middle" style="--d:2.8s">32\' - 0\"</text>'+
     '<text class="dim" x="585" y="640" text-anchor="middle" style="--d:2.9s">28\' - 6\"</text>'+
     '<text class="dim" x="60" y="515" text-anchor="middle" transform="rotate(-90 60 515)" style="--d:3s">14\' - 0\"</text>'+
+    '<text class="tb" x="1078" y="655" text-anchor="end">DWG A-1 · DRAWN J.C. · 2026</text>'+
     // windows lighting up
     '<rect class="glow" x="152" y="452" width="46" height="36" style="--d:3.4s"/><rect class="glow" x="622" y="372" width="46" height="46" style="--d:5s"/><rect class="glow" x="502" y="462" width="46" height="46" style="--d:6.6s"/>'+
    '</svg></div>';
@@ -2055,7 +2057,7 @@ function lbArt(){
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
@@ -4087,7 +4089,7 @@ function loadQr(){
 // ---- sign-in step 2 ----
 function viewCode(){
   return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<span class="lb-kicker">City of Arab, Alabama</span><h2>Arab City<br><em>Staff Portal</em></h2></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Staff Portal</em></h2></div>'+
    '<form class="pin" id="codef"><h1 style="font:800 22px var(--f-disp)">2-step verification</h1>'+
    '<p style="margin:0;color:var(--muted)">Open the authenticator app on your phone and enter the 6-digit code for <b style="color:var(--ink)">Arab City Staff Portal</b>.</p>'+
    '<div class="fld" style="text-align:left"><label class="l" for="mfaCode">Code</label><input id="mfaCode" class="mfa-in" type="text" autocomplete="one-time-code" maxlength="11" required spellcheck="false"></div>'+
