@@ -1055,6 +1055,66 @@ table.grid.apptbl tr.unread td{font-weight:700}
 .sitenotice a{color:inherit;text-decoration:underline;font-weight:600}
 .sn-body p{margin:0 0 6px}.sn-body p:last-child{margin:0}
 .noticedlg{max-width:520px;z-index:1200}#noticeBox .veil{z-index:1199}
+/* v2.22: feedback survey */
+#fbBox .veil{z-index:1199}
+.fa-page{max-width:980px}
+.fa-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.fa-tiles div{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;display:grid;gap:3px}
+.fa-tiles span{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.fa-tiles b{font:800 26px/1.1 var(--f-disp);color:var(--ink)}
+.fa-tiles b em{font-style:normal;font-size:15px;color:var(--muted);font-weight:600}
+.fa-tiles small{font-size:12.5px;color:var(--muted)}
+.fa-card{margin-bottom:14px}
+.fa-card h2{font:700 15px var(--f-body);margin:0 0 10px}
+.fa-bar{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;margin:6px 0;font-size:13.5px}
+.fa-bl{color:var(--ink2)}
+.fa-track{height:12px;border-radius:6px;background:var(--line2,#eceef2);overflow:hidden}
+.fa-track i{display:block;height:100%;background:#212c46;border-radius:6px}
+.fa-bn{text-align:right;font-weight:700}
+.fa-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fa-list li{border:1px solid var(--line2,#e6e8ee);border-radius:10px;padding:10px 12px}
+.fa-top{display:flex;gap:10px;align-items:center}
+.fa-top > div{flex:1;min-width:0;display:grid}
+.fa-top small{color:var(--muted);font-size:12.5px}
+.fa-rate{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:800 15px var(--f-disp);background:#eef0f4;color:var(--ink)}
+.fa-rate.r4,.fa-rate.r5{background:var(--okbg);color:var(--ok)}
+.fa-rate.r1,.fa-rate.r2{background:var(--redbg);color:var(--red)}
+.fa-c{margin:8px 0 0 44px;font-size:14px;color:var(--ink);white-space:pre-wrap}
+.fa-c.none{color:var(--muted);font-style:italic}
+@media (max-width:760px){ .fa-tiles{grid-template-columns:repeat(2,1fr)} .fa-bar{grid-template-columns:96px 1fr 30px} .fa-c{margin-left:0} }
+.fbdlg{z-index:1200;width:min(560px,calc(100% - 24px));padding:0;gap:0;border-top:5px solid #c0a869}
+.fb-head{padding:18px 22px 6px}
+.fb-k{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fb-head h2,.fb-done h2{margin:4px 0 2px;font:800 21px/1.2 var(--f-disp);color:var(--ink)}
+.fb-head p,.fb-done p{margin:0;color:var(--ink2);font-size:14px}
+.fb-q{border:0;margin:0;padding:14px 22px 6px;min-width:0}
+.fb-q + .fb-q{padding-top:18px}
+.fb-q legend{float:left;width:100%}
+.fb-q legend + *{clear:both}
+.fb-q legend,.fb-l{padding:0;font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:8px;display:block}
+.fb-l span{font-weight:500;color:var(--muted)}
+.fb-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.fb-pt{position:relative;display:grid;justify-items:center;gap:3px;border:1.5px solid var(--line);border-radius:10px;padding:9px 4px 8px;cursor:pointer;background:var(--surface);text-align:center}
+.fb-pt b{font:800 18px/1 var(--f-disp);color:var(--ink)}
+.fb-pt span{font-size:11.5px;color:var(--muted);line-height:1.2}
+.fb-pt:hover,.fb-chip:hover{border-color:#c0a869}
+.fb-pt.on{border-color:#212c46;background:#212c46}
+.fb-pt.on b,.fb-pt.on span{color:#fff}
+.fb-pt input,.fb-chip input{position:absolute;opacity:0;width:1px;height:1px}
+.fb-pt:focus-within,.fb-chip:focus-within{outline:3px solid #c0a869;outline-offset:2px}
+.fb-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fb-chip{position:relative;border:1.5px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink)}
+.fb-chip.on{border-color:#212c46;background:#212c46;color:#fff}
+.fb-q textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;font-size:14.5px;resize:vertical;background:var(--surface);color:var(--ink)}
+.fb-err{margin:0;padding:0 22px;color:var(--red);font-size:13.5px}
+.fb-err:empty{display:none}
+.fb-acts{display:flex;align-items:center;gap:10px;padding:14px 22px 18px}
+.fb-acts .sp{flex:1}
+.fb-acts .btn{height:40px;padding:0 18px;justify-content:center}
+.fb-done{display:grid;justify-items:center;text-align:center;padding:26px 22px 4px}
+.fb-done > svg{width:44px;height:44px;padding:10px;border-radius:50%;background:var(--okbg);color:var(--ok);box-sizing:border-box}
+.fb-done .fb-acts{padding-left:0;padding-right:0}
+@media (max-width:520px){ .fb-scale{gap:4px} .fb-pt span{font-size:10px} .fb-acts{flex-direction:column-reverse;align-items:stretch} .fb-acts .sp{display:none} }
 .noticedlg.warn{border-top:5px solid #c9971f}.noticedlg.info{border-top:5px solid var(--city)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sitenotice.info{background:#1e2a44;border-color:#3a4c72;color:#e8ecf5} :root:not([data-theme="light"]) .sitenotice.info svg{stroke:#a9c0ea} :root:not([data-theme="light"]) .sitenotice.warn{background:#3a3018;border-color:#6d5a26;color:#f5ead0} :root:not([data-theme="light"]) .sitenotice.warn svg{stroke:#e3c97f}}
 :root[data-theme="dark"] .sitenotice.info{background:#1e2a44;border-color:#3a4c72;color:#e8ecf5} :root[data-theme="dark"] .sitenotice.warn{background:#3a3018;border-color:#6d5a26;color:#f5ead0}
@@ -1472,7 +1532,7 @@ function queueOptimize(f){
 // size note used on the Documents tab and in the PDF
 const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function signOutLocal(){ TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mustPw=false; S.signinPw=null; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
+function signOutLocal(){ if (typeof FBA!=='undefined') FBA.data = null; TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mustPw=false; S.signinPw=null; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
 /* ================= saved settings (per staff login, stored in the database) =================
    Layout and report choices are saved to the signed-in account (bf_set_my_prefs), so they come
    back after signing out, on another computer, or after the browser is cleared. A small copy is
@@ -1528,7 +1588,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.7';   // shown at the bottom of every page
+const APP_VERSION = '2.22.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1881,6 +1941,7 @@ async function submitForm(e){
       '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
+    maybeAskFeedback(F, vals.email);
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
 
@@ -1907,6 +1968,76 @@ function syncScrollLock(){
   new MutationObserver(syncScrollLock).observe(document.body, { childList:true, subtree:true });
   syncScrollLock();
 })();
+
+/* v2.22: short feedback survey. After a submission, about 1 in 3 applicants are picked at random. It is
+   one and done: once someone has been asked (answered or "No thanks") they are never asked again, in this
+   browser (localStorage) or on another device (the server keeps a salted hash of their email, never the
+   email itself). Responses go to bf_feedback, which only administrators can read (bf_feedback_list). */
+const FB_RATE = 1/3;
+const FB = { form:'', who:'', rating:0, compare:'', comment:'', sent:false, busy:false, ret:null, closed:false };
+async function maybeAskFeedback(F, email){
+  try{ if (localStorage.getItem('bdFbDone')) return; }catch(e){}
+  const em = String(email||'').trim().toLowerCase(); if (!em) return;
+  if (Math.random() >= FB_RATE) return;
+  try{
+    const who = await sha256hex('arabcity-feedback:' + em);
+    if (await sbRpc('bf_feedback_done', { p_who: who })){ try{ localStorage.setItem('bdFbDone', '1'); }catch(e){} return; }
+    try{ localStorage.setItem('bdFbDone', '1'); }catch(e){}
+    setTimeout(() => { if (S.view==='form') openFeedback(F && F.short, who); }, 1400);
+  }catch(e){}
+}
+const FB_RATINGS = [[1,'Very hard'],[2,'Hard'],[3,'Okay'],[4,'Easy'],[5,'Very easy']];
+const FB_COMPARE = ['Much easier','A little easier','About the same','Harder'];
+function fbHtml(){
+  if (FB.sent) return '<div class="fb-done">'+ic('check')+'<h2 id="fbT">Thank you!</h2><p id="fbD">Your feedback goes straight to the Building Department and helps us improve this site.</p>'+
+    '<div class="fb-acts"><button type="button" class="btn primary" id="fbFirst" onclick="closeFeedback()">Close</button></div></div>';
+  return '<div class="fb-head"><span class="fb-k">Quick feedback · 3 questions</span><h2 id="fbT">How was applying online?</h2><p id="fbD">Optional and anonymous. It takes about 30 seconds, and we will only ask once.</p></div>'+
+    '<fieldset class="fb-q"><legend>1. How easy was it to complete your application?</legend><div class="fb-scale">'+
+      FB_RATINGS.map(([n,l]) => '<label class="fb-pt'+(FB.rating===n?' on':'')+'"><input type="radio" name="fbR" value="'+n+'"'+(FB.rating===n?' checked':'')+(n===1?' id="fbFirst"':'')+' onchange="FB.rating='+n+';fbPaint(\'fbR\')"><b>'+n+'</b><span>'+l+'</span></label>').join('')+
+    '</div></fieldset>'+
+    '<fieldset class="fb-q"><legend>2. Compared with a paper form or a trip to City Hall, this was:</legend><div class="fb-chips">'+
+      FB_COMPARE.map(c => '<label class="fb-chip'+(FB.compare===c?' on':'')+'"><input type="radio" name="fbC" value="'+c+'"'+(FB.compare===c?' checked':'')+' onchange="FB.compare=this.value;fbPaint(\'fbC\')">'+c+'</label>').join('')+
+    '</div></fieldset>'+
+    '<div class="fb-q"><label for="fbText" class="fb-l">3. What is one thing we could improve? <span>(optional)</span></label>'+
+      '<textarea id="fbText" maxlength="1000" rows="3" placeholder="For example: a question that was confusing, or something you could not find" oninput="FB.comment=this.value">'+esc(FB.comment)+'</textarea></div>'+
+    '<p class="fb-err" id="fbErr" role="alert"></p>'+
+    '<div class="fb-acts"><button type="button" class="btn ghost" onclick="closeFeedback()">No thanks</button><span class="sp"></span><button type="button" class="btn primary" id="fbSend" onclick="sendFeedback()"'+(FB.busy?' disabled':'')+'>'+(FB.busy?'Sending…':'Send feedback')+'</button></div>';
+}
+function openFeedback(formName, who){
+  if (document.getElementById('fbBox')) return;
+  Object.assign(FB, { form: formName||'', who: who||'', rating:0, compare:'', comment:'', sent:false, busy:false, closed:false, ret: document.activeElement });
+  const d = document.createElement('div'); d.id = 'fbBox';
+  d.innerHTML = '<div class="veil" onclick="closeFeedback()"></div><div class="scandlg fbdlg" role="dialog" aria-modal="true" aria-labelledby="fbT" aria-describedby="fbD"></div>';
+  document.body.appendChild(d); fbPaint(); document.addEventListener('keydown', fbKeys, true);
+  const f = document.getElementById('fbFirst'); if (f) f.focus();
+}
+function fbPaint(group){
+  const d = document.querySelector('#fbBox .fbdlg'); if (!d) return;
+  d.innerHTML = fbHtml();
+  if (group){ const e = document.querySelector('#fbBox input[name="'+group+'"]:checked'); if (e) e.focus(); }
+}
+function fbKeys(e){
+  if (e.key==='Escape'){ e.preventDefault(); closeFeedback(); return; }
+  if (e.key==='Tab'){
+    const all = [...document.querySelectorAll('#fbBox .fbdlg button, #fbBox .fbdlg textarea, #fbBox .fbdlg input')].filter(x => !x.disabled);
+    if (!all.length) return; const first = all[0], last = all[all.length-1], a = document.activeElement;
+    if (e.shiftKey && (a === first || (a && a.name === 'fbR'))){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && a === last){ e.preventDefault(); (document.querySelector('#fbBox input[name=fbR]:checked') || first).focus(); }
+  }
+}
+function closeFeedback(){
+  if (!FB.sent && !FB.closed && FB.who){ sbRpc('bf_feedback_add', { p_who:FB.who, p_form:FB.form, p_rating:null, p_compare:'', p_text:'', p_dismissed:true, p_version:APP_VERSION }).catch(()=>{}); }
+  FB.closed = true; const d = document.getElementById('fbBox'); if (d) d.remove(); document.removeEventListener('keydown', fbKeys, true); if (FB.ret && FB.ret.focus) try{ FB.ret.focus({preventScroll:true}); }catch(e){} }
+async function sendFeedback(){
+  const err = document.getElementById('fbErr');
+  if (!FB.rating){ err.textContent = 'Please choose how easy it was (1 to 5), or select No thanks.'; const r = document.getElementById('fbFirst'); if (r) r.focus(); return; }
+  FB.busy = true; fbPaint();
+  try{
+    await sbRpc('bf_feedback_add', { p_who: FB.who, p_form: FB.form, p_rating: FB.rating, p_compare: FB.compare,
+      p_text: String(FB.comment||'').trim().slice(0,1000), p_dismissed: false, p_version: APP_VERSION });
+    FB.sent = true; FB.busy = false; fbPaint(); const c = document.getElementById('fbFirst'); if (c) c.focus();
+  }catch(x){ FB.busy = false; fbPaint(); const e2 = document.getElementById('fbErr'); if (e2) e2.textContent = 'Could not send right now. You can close this; your application was received.'; }
+}
 
 /* ================= STAFF: shared bits ================= */
 const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
@@ -1970,6 +2101,7 @@ function profileMenuHtml(){
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'privacy-statement\')">'+ic('lock')+'Privacy statement (public site)</button>'+
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement (public site)</button>'+
       (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'site-notice\')">'+ic('info')+'Site notice (public site)</button>' : '')+
+      (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'feedback\')">'+ic('star')+'Applicant feedback</button>' : '')+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -2101,6 +2233,7 @@ function viewWorkspace(){
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
    (isAdmin()?'<a class="navi" href="#site-notice" onclick="event.preventDefault();go(\'site-notice\')">'+ic('info')+'Site notice</a>':'')+
+   (isAdmin()?'<a class="navi" href="#feedback" onclick="event.preventDefault();go(\'feedback\')">'+ic('star')+'Applicant feedback</a>':'')+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
@@ -2628,7 +2761,7 @@ const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building |
 function routeAllowed(v){
   if (v==='me' || v==='privacy-statement' || v==='accessibility-statement') return true;
   if (v==='clerk') return canPay();
-  if (['users','bugs','site-notice'].includes(v)) return isAdmin();
+  if (['users','bugs','site-notice','feedback'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
   if (v==='staff' || v==='table' || v==='cict') return canBuilding();
   return false;
@@ -3657,6 +3790,7 @@ function render(){
   else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='records') root.innerHTML = viewRecords();
   else if (S.view==='site-notice' && isAdmin()){ root.innerHTML = viewNoticeEdit(); if (!NT.st && !NT.loading) noticeLoad(); }
+  else if (S.view==='feedback' && isAdmin()){ root.innerHTML = viewFeedback(); if (!FBA.data && !FBA.loading && !FBA.err) fbaLoad(); }
   else if (S.view==='privacy-statement' || S.view==='accessibility-statement'){ pvOpen(S.view==='privacy-statement' ? 'privacy' : 'accessibility'); root.innerHTML = viewPrivacyEdit(); if (!PV.st && !PV.loading) privLoad(); }
   else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; bindMfaSetup(); if (!S.sec) loadMySecurity(); }
@@ -3701,7 +3835,7 @@ function initRoute(){
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement','accessibility-statement','site-notice'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','privacy-statement','accessibility-statement','site-notice','feedback'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -4690,6 +4824,45 @@ async function delBug(id){
   }
   setInterval(()=>{ if (S.staff && canBuilding() && document.visibilityState==='visible' && !S.editing) loadSubs(); }, 30000);
 })();
+
+/* ================= v2.22: applicant feedback (administrators only; server-checked in bf_feedback_list) ================= */
+const FBA = { data:null, err:'', loading:false };
+async function fbaLoad(){
+  FBA.loading = true; FBA.err = '';
+  try{ FBA.data = await sbRpc('bf_feedback_list', { p_token: TOKEN }); }catch(e){ FBA.err = e.message; }
+  FBA.loading = false; if (S.view==='feedback') render();
+}
+async function fbaRemove(id){
+  if (!confirm('Remove this response? It will no longer appear here or count in the totals.')) return;
+  try{ await sbRpc('bf_feedback_delete', { p_token: TOKEN, p_id: id }); toast('Response removed.'); fbaLoad(); }catch(e){ toast('Could not remove: '+e.message); }
+}
+function viewFeedback(){
+  const d = FBA.data, sm = (d && d.summary) || {};
+  let body;
+  if (!d) body = FBA.err ? '<p class="formerr">'+esc(FBA.err)+'</p>' : '<p class="empty">Loading…</p>';
+  else {
+    const n = Number(sm.answered)||0, pct = (a, b) => b ? Math.round(100*a/b)+'%' : '—';
+    const bars = [5,4,3,2,1].map(r => { const c = Number(sm['r'+r])||0, w = n ? Math.round(100*c/n) : 0;
+      return '<div class="fa-bar"><span class="fa-bl">'+r+' · '+['','Very hard','Hard','Okay','Easy','Very easy'][r]+'</span><span class="fa-track"><i style="width:'+w+'%"></i></span><span class="fa-bn num">'+c+'</span></div>'; }).join('');
+    body =
+      '<div class="fa-tiles">'+
+        '<div><span>Responses</span><b class="num">'+n+'</b><small>'+(Number(sm.dismissed)||0)+' said No thanks</small></div>'+
+        '<div><span>Average ease</span><b class="num">'+(sm.avg!=null ? Number(sm.avg).toFixed(1) : '—')+'<em> / 5</em></b><small>1 very hard · 5 very easy</small></div>'+
+        '<div><span>Easier than paper</span><b class="num">'+pct(Number(sm.better)||0, Number(sm.compared)||0)+'</b><small>'+(Number(sm.better)||0)+' of '+(Number(sm.compared)||0)+' who answered</small></div>'+
+        '<div><span>Harder than paper</span><b class="num">'+(Number(sm.worse)||0)+'</b><small>'+(Number(sm.same)||0)+' said about the same</small></div>'+
+      '</div>'+
+      '<section class="card fa-card"><h2>How easy was it?</h2>'+(n ? bars : '<p class="empty">No responses yet.</p>')+'</section>'+
+      '<section class="card fa-card"><h2>Responses</h2>'+
+        ((d.rows||[]).length ? '<ul class="fa-list">'+d.rows.map(r =>
+          '<li><div class="fa-top"><span class="fa-rate r'+(r.rating||0)+'">'+(r.rating||'–')+'</span><div><b>'+esc(r.form||'Application')+'</b><small>'+esc(fmtDT(r.at))+(r.compare?' · '+esc(r.compare==='About the same'?'About the same as paper':r.compare+' than paper'):'')+'</small></div>'+
+          '<button type="button" class="btn sm ghost" onclick="fbaRemove('+Number(r.id)+')" aria-label="Remove this response">'+ic('x')+'</button></div>'+
+          (r.comment ? '<p class="fa-c">'+esc(r.comment)+'</p>' : '<p class="fa-c none">No comment</p>')+'</li>').join('')+'</ul>'
+          : '<p class="empty">No responses yet. About 1 in 3 applicants are asked, once each, right after they submit.</p>')+
+      '</section>';
+  }
+  return topBar()+'<div class="purge acctpage fa-page"><div class="row"><button class="btn sm" onclick="goHome()">'+ic('left')+'Workspace</button><span style="flex:1"></span><button class="btn sm" onclick="fbaLoad()">Refresh</button></div>'+
+    '<h1>Applicant feedback</h1><p class="hint" style="margin:-4px 0 14px">Anonymous answers from the short survey shown after some applications. Only administrators can see this page.</p>'+body+'</div>';
+}
 </script>
 </body>
 </html>
