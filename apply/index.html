@@ -1528,7 +1528,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.6';   // shown at the bottom of every page
+const APP_VERSION = '2.21.7';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3622,12 +3622,15 @@ function a11yLandmarks(){
     if (c) c.setAttribute('role', 'main');
   }
   const mn = root.querySelector('main, [role=main]'); if (mn && !mn.id) mn.id = 'main-content';
-  if (!root.querySelector('.skip')) root.insertAdjacentHTML('afterbegin', '<a class="skip" href="#'+(mn ? mn.id : 'root')+'" onclick="event.preventDefault();focusMain()">Skip to main content</a>');
+  if (!root.querySelector('.skip')) root.insertAdjacentHTML('afterbegin', '<a class="skip" href="#'+(mn ? mn.id : 'root')+'" onclick="event.preventDefault();focusMain(true)">Skip to main content</a>');
 }
-function focusMain(){
+// v2.21.7: moving focus to the new page must not scroll the page (it hid the top bar and the Workspace button).
+// Only the "Skip to main content" link scrolls to the content.
+function focusMain(scroll){
   const m = mainTarget(); if (!m) return;
   const h = m.querySelector('h1') || m; if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
-  h.focus({preventScroll:false});
+  h.focus({preventScroll: !scroll});
+  if (scroll) h.scrollIntoView({block:'start'});
 }
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
@@ -3686,7 +3689,8 @@ function ensureViewData(){
 }
 function startForm(){ FORM_T0 = Date.now(); const d = new Date(); FVALS = { date: d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }; FILES = []; }
 const _go = go; go = function(view, form){ if (view==='form') startForm(); _go(view, form); setTimeout(focusMain, 0); };
-window.addEventListener('hashchange', () => { if (NAV_SKIP_HASH) return; NAV.length = 0; S.nmenu = false; S.pmenu = false; initRoute(); setTimeout(focusMain, 0); });
+window.addEventListener('hashchange', () => { if (NAV_SKIP_HASH) return; NAV.length = 0; S.nmenu = false; S.pmenu = false; initRoute(); window.scrollTo(0, 0); setTimeout(focusMain, 0); });
+try{ history.scrollRestoration = 'manual'; }catch(e){}   // a reload opens at the top, not part-way down
 function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
