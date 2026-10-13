@@ -952,6 +952,14 @@ html:not(.embed) .app.pub .sheet{margin-top:-68px;position:relative;z-index:1;bo
 .pv-sec{margin-top:22px}.pv-sec h2{font:600 18px var(--f-disp);color:var(--ink);margin-bottom:8px}
 .pv-sec p,.pv-sec li{color:var(--ink2);font-size:15px;line-height:1.6}.pv-sec ul{margin:0;padding-left:20px;display:grid;gap:6px}
 .pinmsg{margin:0;background:var(--amberbg);color:var(--ink);border-radius:6px;padding:8px 10px;font-size:13.5px}
+.pwhelp{display:grid;gap:10px}
+.pwhelp[hidden]{display:none}
+.pwhelp.in{animation:pwIn .35s ease}
+@keyframes pwIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.pwhelp-msg{display:flex;gap:10px;align-items:flex-start;text-align:left;background:var(--amberbg);color:var(--ink);border:1px solid rgba(192,168,105,.55);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.45}
+.pwhelp-msg svg{flex:none;width:18px;height:18px;margin-top:1px;color:var(--amber)}
+.pwhelp .btn{justify-content:center}
+@media (prefers-reduced-motion:reduce){.pwhelp.in{animation:none}}
 .mfa-pin{max-width:520px}
 .mfa-steps{margin:0;padding-left:22px;display:grid;gap:14px;text-align:left}
 .mfa-steps li{padding-left:4px}.mfa-steps li > b{display:block;color:var(--ink)}.mfa-steps li > span{display:block;color:var(--ink2);font-size:14px}
@@ -1508,7 +1516,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.3';   // shown at the bottom of every page
+const APP_VERSION = '2.21.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2059,12 +2067,13 @@ function viewPin(){
   return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
    '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
-   '<p style="margin:0;color:var(--muted)">Sign in to view applications. Your login is set up by the web administrator, Jade Cruz. Need a login or a password reset? Use the email button below.</p>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0;text-align:left;background:transparent"><input type="checkbox" id="lgRem"> <span>Keep me signed in for 7 days <span style="color:var(--muted)">(only on a computer that is yours)</span></span></label>'+
    (S.pinMsg?'<p class="pinmsg" role="status">'+esc(S.pinMsg)+'</p>':'')+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
-   '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Email the web administrator</a>'+
+   // v2.21.4: the reset help appears only after a sign-in attempt fails
+   '<div class="pwhelp" id="pwHelp"'+(S.pwHelp?'':' hidden')+'><div class="pwhelp-msg" role="alert">'+ic('lock')+'<span><b>Trouble signing in?</b> Contact the web administrator to reset your password.</span></div>'+
+   '<a class="btn" href="mailto:jade.cruz@collinsalexander.com?subject='+encodeURIComponent('Building Department staff login')+'&body='+encodeURIComponent('Hi Jade,\n\nI need help with my Building Department staff login (new login / password reset).\n\nName:\nEmail I use to sign in:\n\nThank you.')+'" target="_top" style="justify-content:center">'+ic('mail')+'Contact the web administrator</a></div>'+
    '<a class="btn ghost" '+HOME_LINK+' style="justify-content:center">Back to Applications &amp; Fees</a></form></div>'+
    '<div class="lb-ver">Version '+APP_VERSION+'</div></div>';
 }
@@ -3863,13 +3872,14 @@ async function staffSignIn(e){
     S.pinMsg = '';
     if (r && r.mfa){ S.mfa = { challenge:r.challenge, remember, email }; render(); const c = document.getElementById('mfaCode'); if (c) c.focus(); return; }
     await finishSignIn(r, remember);
-  }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false; }
+  }catch(x){ helloEnd(true); err.textContent = x.message; btn.disabled = false;
+    if (SB_KEY.indexOf('PASTE_')!==0){ S.pwHelp = true; const h = document.getElementById('pwHelp'); if (h && h.hidden){ h.hidden = false; h.classList.add('in'); } } }
 }
 async function finishSignIn(r, remember){
   if (r && r.limited){ TOKEN = r.token; saveToken(TOKEN, remember); S.me = r.account; S.limited = true; S.mustPw = !!r.mustChangePw; S.mfa = null; S.mfaSet = null; render(); if (S.mustPw){ const f = document.getElementById('mpNew'); if (f) f.focus(); } return; }
   S.signinPw = null;
   if (!r || !r.account || !hasPortal(r.account)){ try{ await sbRpc('bf_sign_out',{p_token:r&&r.token}); }catch(x){} throw new Error('Your account does not have staff access yet. Ask an administrator to turn it on under Staff accounts.'); }
-  TOKEN = r.token; S.me = r.account; S.staff = true; S.limited = false; S.mfa = null; saveToken(TOKEN, remember); idleTouch();
+  TOKEN = r.token; S.me = r.account; S.staff = true; S.limited = false; S.mfa = null; saveToken(TOKEN, remember); idleTouch(); S.pwHelp = false;
   S.loaded = false; const hello = helloStart(r.account);
   await prefLoad();
   if (!routeAllowed(S.view) || S.view==='staff') S.view = homeView();
