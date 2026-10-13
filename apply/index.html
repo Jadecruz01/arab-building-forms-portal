@@ -130,6 +130,12 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .submitrow{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px}
 .done{text-align:center;padding:24px 8px}
 .done .ck{width:56px;height:56px;border-radius:50%;background:var(--okbg);color:var(--ok);display:grid;place-items:center;margin:0 auto 12px}
+.done-note{max-width:420px;margin:0 auto 22px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.done-acts{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+.done-acts .btn{height:44px;padding:0 18px;justify-content:center;text-decoration:none;border-color:var(--line);color:var(--ink)}
+.done-acts .btn.primary{color:#fff;border-color:transparent}
+.done-acts .btn svg{width:17px;height:17px}
+@media (max-width:640px){ .done-acts{flex-direction:column;align-items:stretch;max-width:360px;margin:0 auto} .done-acts .btn{width:100%} }
 
 /* ---------- STAFF ---------- */
 .jt-top{background:var(--navy);color:#fff;display:flex;align-items:center;gap:18px;padding:0 18px;height:60px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
@@ -1501,7 +1507,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.21.1';   // shown at the bottom of every page
+const APP_VERSION = '2.21.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1851,8 +1857,8 @@ async function submitForm(e){
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
-      '<p class="pg-sub" style="font-size:14px">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # '+refNo(subId)+' and '+esc(vals.email||'your email')+'.</p>'+
-      '<div class="row" style="justify-content:center;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
+      '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
+      '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -2232,10 +2238,7 @@ async function openSub(id, opt){
   S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
   loadAtt(id).then(()=>{ if (S.sel===id) render(); }).catch(e=>{ ATT[id] = {err:e.message}; if (S.sel===id) render(); });
   const s = S.subs.find(x=>x.id===id); if (s && !s.read && DB){ try{ await DB.doc('submissions/'+id).update({read:true}); }catch(e){} } }
-function closeSub(){
-  if (NAV.length && history.state && history.state.bdNav === NAV.length){ try{ history.back(); return; }catch(e){} }
-  navBack();
-}
+function closeSub(){ navBack(); }   // in-page Back / close: return at once (safe even if another page is opened right after)
 function navBack(){
   const o = NAV.pop();
   if (!o){ S.sel=null; S.editing=false; render(); return; }
