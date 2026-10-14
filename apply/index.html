@@ -1588,7 +1588,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.22.1';   // shown at the bottom of every page
+const APP_VERSION = '2.22.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -4896,9 +4896,9 @@ function jobCardHtml(d){
       '<div class="ln'+(boldItem?' b':'')+'"><span class="k">Date:</span>'+v(r && r.date)+'</div><div class="ln'+(boldItem?' b':'')+'"><span class="k">Inspector:</span>'+v(r && r.by)+'</div></div>';
   const name = x => '<div class="ln"><span class="k">Name:</span>'+v(x)+'</div>';
   return '<!doctype html><html><head><meta charset="utf-8"><title>Building Permit '+esc(d.permitNo)+' – Job Site Card</title><style>'+
-  '@page{size:8.5in 11in;margin:0.35in 0.5in 0.3in}*{box-sizing:border-box}html,body{margin:0;background:transparent;color:#000}'+
+  '@page{size:8.5in 11in;margin:0.35in 0.5in 0.3in}*{box-sizing:border-box}html,body{margin:0;background:#fff;color:#000}'+
   'body{width:7.5in;font:11pt "Times New Roman",Times,serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
-  '.hd{display:grid;grid-template-columns:0.9in 1fr 0.9in;align-items:center}.hd img{width:0.85in;height:0.85in;border-radius:50%}'+
+  '.hd{text-align:center}'+
   '.ttl{text-align:center;font-family:"Arial Black","Helvetica Neue",Arial,sans-serif;font-weight:900;line-height:1}'+
   '.ttl .c{font-size:19pt;letter-spacing:.04em}.ttl .b{font-size:34pt;letter-spacing:.06em;margin-top:2pt}'+
   '.sub{display:flex;justify-content:space-between;font:italic bold 12pt "Times New Roman",serif;margin:3pt 0 0}'+
@@ -4920,7 +4920,7 @@ function jobCardHtml(d){
   '.foot{text-align:center;font:bold 10pt "Times New Roman",serif;margin:7pt 0 6pt}'+
   '.warn{border:2pt solid #000;text-align:center;font:900 15pt "Arial Black",Arial,sans-serif;line-height:1.2;padding:4pt 6pt;margin:0 0.35in}'+
   '</style></head><body>'+
-  '<div class="hd"><img src="'+CITY_LOGO+'" alt="City of Arab seal"><div class="ttl"><div class="c">CITY OF ARAB</div><div class="b">BUILDING PERMIT</div></div><div></div></div>'+
+  '<div class="hd"><div class="ttl"><div class="c">CITY OF ARAB</div><div class="b">BUILDING PERMIT</div></div></div>'+
   '<div class="sub"><span>Inspection Department</span><span>256.586.5968</span></div>'+
   '<div class="pn">Permit No. '+v(d.permitNo)+'</div>'+
   '<div class="f"><span class="k">Owner:</span>'+v(d.owner)+'<span class="k">Date:</span>'+v(d.date,'s')+'</div>'+
