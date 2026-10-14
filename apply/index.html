@@ -1313,6 +1313,7 @@ const FORMS = {
   pool:{ key:'pool', title:'Swimming Pool Permit Application', short:'Swimming Pool Permit', icon:'pool', group:'Other Permits', feeLabel:'$50 flat fee', created:'Oct 6, 2026',
     fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY, {type:'section',label:'Pool'},
       T('poolType','Pool type',{type:'radio',req:true,opts:['In-ground','Above-ground'],full:true}),
+      T('estCost','Estimated construction cost',{type:'money',req:true,hint:'For our records only. The pool permit fee is a flat $50.'}),
       T('contractor','Pool Contractor Name'), T('tradeLicense','Contractor License #'),
       T('description','Brief description of work',{type:'textarea',req:true,full:true}) ] },
   demo:{ key:'demo', title:'Demolition Permit Application', short:'Demolition Permit', icon:'demo', group:'Other Permits', feeLabel:'$100 flat fee', created:'Oct 6, 2026',
@@ -1588,7 +1589,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.22.2';   // shown at the bottom of every page
+const APP_VERSION = '2.22.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
