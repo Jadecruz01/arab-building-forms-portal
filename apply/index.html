@@ -1602,7 +1602,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.23.0';   // shown at the bottom of every page
+const APP_VERSION = '2.23.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1955,7 +1955,7 @@ async function submitForm(e){
       '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
-    maybeAskFeedback(F, vals.email);
+    // v2.23.1: applicant feedback survey removed (Jade's request); maybeAskFeedback is no longer called.
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
 
@@ -2124,7 +2124,6 @@ function profileMenuHtml(){
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'privacy-statement\')">'+ic('lock')+'Privacy statement (public site)</button>'+
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement (public site)</button>'+
       (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'site-notice\')">'+ic('info')+'Site notice (public site)</button>' : '')+
-      (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'feedback\')">'+ic('star')+'Applicant feedback</button>' : '')+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -2257,7 +2256,6 @@ function viewWorkspace(){
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
    (isAdmin()?'<a class="navi" href="#site-notice" onclick="event.preventDefault();go(\'site-notice\')">'+ic('info')+'Site notice</a>':'')+
-   (isAdmin()?'<a class="navi" href="#feedback" onclick="event.preventDefault();go(\'feedback\')">'+ic('star')+'Applicant feedback</a>':'')+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
@@ -2787,7 +2785,7 @@ const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building |
 function routeAllowed(v){
   if (v==='me' || v==='privacy-statement' || v==='accessibility-statement') return true;
   if (v==='clerk') return canPay();
-  if (['users','bugs','site-notice','feedback'].includes(v)) return isAdmin();
+  if (['users','bugs','site-notice'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
   if (v==='staff' || v==='table' || v==='cict' || v==='ar') return canBuilding();
   return false;
@@ -3825,7 +3823,6 @@ function render(){
   else if (S.view==='clerk'){ root.innerHTML = viewClerk(); bindClerk(); }
   else if (S.view==='records') root.innerHTML = viewRecords();
   else if (S.view==='site-notice' && isAdmin()){ root.innerHTML = viewNoticeEdit(); if (!NT.st && !NT.loading) noticeLoad(); }
-  else if (S.view==='feedback' && isAdmin()){ root.innerHTML = viewFeedback(); if (!FBA.data && !FBA.loading && !FBA.err) fbaLoad(); }
   else if (S.view==='privacy-statement' || S.view==='accessibility-statement'){ pvOpen(S.view==='privacy-statement' ? 'privacy' : 'accessibility'); root.innerHTML = viewPrivacyEdit(); if (!PV.st && !PV.loading) privLoad(); }
   else if (S.view==='users' && isAdmin()){ const keep = {}; ['nuName','nuTitle','nuEmail','nuPass','nuRole'].forEach(k=>{ const el = document.getElementById(k); if (el) keep[k] = el.value; }); root.innerHTML = viewUsers(); Object.keys(keep).forEach(k=>{ const el = document.getElementById(k); if (el && keep[k]) el.value = keep[k]; }); const af = document.getElementById('addf'); if (af) af.onsubmit = addStaff; if (!S.users) loadUsers(); }
   else if (S.view==='me'){ root.innerHTML = viewMe(); document.getElementById('me-password').onsubmit = changeMyPassword; bindMfaSetup(); if (!S.sec) loadMySecurity(); }
@@ -3871,7 +3868,7 @@ function initRoute(){
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','feedback'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
