@@ -705,6 +705,7 @@ html{overflow-x:clip}
 .st-insp{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;max-width:360px}
 .st-insp li{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:5px 10px;border-radius:6px;background:var(--surface2);color:var(--muted)}
 .st-insp li.ok{color:var(--ink)}
+.st-insp li.pend span:last-child{color:var(--amber);font-weight:600}
 .st-fees{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .st-fees > div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
 .st-fees span{color:var(--muted);font-size:12.5px}
@@ -1589,7 +1590,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.22.3';   // shown at the bottom of every page
+const APP_VERSION = '2.22.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2046,6 +2047,11 @@ const fmtDT = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocal
 const isPaid = s => { const st = payStatus(s); return st==='paid' || st==='none'; };   // 'none' = no fee due
 const subsFor = k => S.subs.filter(s => s.form===k);
 const INSPECT = ['Footing','Framing','Electrical','Plumbing','Final'];
+/* Footing/Framing/Electrical/Plumbing/Final inspections apply to building permits (contractor, homeowner) and sub trade only.
+   Pool, sign, demolition and moving permits do not track them (v2.22.4). Older records that already have inspection
+   entries keep them: staff still see them in Office use and the export. */
+const inspForm = k => k==='building' || k==='homeowner' || k==='subtrade';
+const inspHasData = ins => !!ins && typeof ins==='object' && Object.values(ins).some(r => r && (typeof r==='string' ? r : (r.date||r.by||r.recorded||r.comment)));
 const COLS = [
   {k:'createdAt', l:'Submission Date', t:'D', get:s=>s.createdAt, fmt:s=>fmtDate(s.createdAt)},
   {k:'permitNo', l:'Permit #', t:'T', get:s=>(s.staff&&s.staff.permitNo)||'', fmt:s=>esc((s.staff&&s.staff.permitNo)||'')||'<span style="color:var(--muted)">—</span>'},
@@ -2454,7 +2460,7 @@ function panelHtml(){
     }
   } else if (S.tab==='office'){
     const ins = st.inspections||{};
-    const hasInsp = ['building','homeowner','subtrade','pool'].includes(s.form);
+    const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
     body = '<form id="offf" class="fgrid">'+
       '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
@@ -3512,14 +3518,22 @@ function statusCard(r){
   const F = FORMS[r.form] || { short:r.form, title:r.form };
   const s = { pay:(r.pay && r.pay.status) ? r.pay : null, staff:{ payment:r.payment||'' }, fees:r.fees||{} };
   const ps = payStatus(s), p = r.pay || {}, total = p.total!=null ? p.total : (r.fees||{}).total, bal = p.balance!=null ? p.balance : (ps==='paid' ? 0 : total);
-  const hasInsp = ['building','homeowner','subtrade','pool'].includes(r.form), hasCo = isBldg(r.form) || r.form==='subtrade';
-  const ins = r.inspections || {}, doneN = INSPECT.filter(n => ins[n]).length;
+  const hasInsp = inspForm(r.form), hasCo = isBldg(r.form) || r.form==='subtrade';
+  /* Inspections: only the ones the inspector has entered are listed. Server (v2.22.4) sends {status, date};
+     an older server sent just a date string, treated as complete. */
+  const insRaw = r.inspections || {}, insL = INSPECT.concat(Object.keys(insRaw).filter(k => !INSPECT.includes(k)))
+    .map(n => { const v = insRaw[n]; if (!v) return null; if (typeof v === 'string') return { n, st:'complete', date:v };
+      return (v.status==='complete' || v.status==='pending') ? { n, st:v.status, date:v.date||'' } : null; }).filter(Boolean);
+  const doneN = insL.filter(x => x.st==='complete').length, pendN = insL.length - doneN, finalDone = insL.some(x => x.n==='Final' && x.st==='complete');
   const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
     { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }];
   if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
   steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
-  if (hasInsp) steps.push({ t:'Inspections', d:doneN+' of '+INSPECT.length+' complete', st:doneN===INSPECT.length ? 'ok' : doneN ? 'part' : '',
-    list:'<ul class="st-insp">'+INSPECT.map(n => '<li class="'+(ins[n]?'ok':'')+'"><span>'+n+'</span><span>'+(ins[n] ? esc(fmtDay(ins[n])) : 'Not yet')+'</span></li>').join('')+'</ul>' });
+  if (hasInsp) steps.push({ t:'Inspections',
+    d: !insL.length ? 'None complete' : [doneN ? doneN+' complete' : 'None complete', pendN ? pendN+' pending' : ''].filter(Boolean).join(' · '),
+    st: finalDone ? 'ok' : insL.length ? 'part' : '',
+    list: insL.length ? '<ul class="st-insp">'+insL.map(x => '<li class="'+(x.st==='complete'?'ok':'pend')+'"><span>'+esc(x.n)+'</span><span>'+
+      (x.st==='complete' ? 'Complete'+(x.date ? ' · '+esc(fmtDay(x.date)) : '') : 'Pending')+'</span></li>').join('')+'</ul>' : '' });
   if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
   const complete = steps.every(x => x.st==='ok');
   return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</span></div>'+
@@ -3695,7 +3709,7 @@ async function fetchAllRecords(){
 function formCsv(k, recs){
   const F = FORMS[k], defs = F ? F.fields.filter(x => x.id && x.type!=='section' && x.type!=='note' && x.type!=='file') : [];
   const known = new Set(defs.map(x => x.id)), extra = [...new Set(recs.flatMap(r => Object.keys((r.data.fields)||{})).filter(x => !known.has(x)))].sort();
-  const insp = ['building','homeowner','subtrade','pool'].includes(k), co = isBldg(k) || k==='subtrade';
+  const insp = inspForm(k) || recs.some(r => inspHasData(((r.data||{}).staff||{}).inspections)), co = isBldg(k) || k==='subtrade';
   const seen = {}; const lab = x => { let l = x.label.length > 90 ? x.label.slice(0, 90)+'…' : x.label; if (seen[l]) l += ' ('+x.id+')'; seen[l] = 1; return l; };
   const head = ['Reference #','Record ID','Form','Submitted','Last updated','Imported','Payment status','Total fee','Paid','Balance','Last receipt #','Last payment method','Last check #','Last payment date',
     'Construction value','Permit fee','CICT fee','Fee basis','Double fee (no permit)','Permit #','Approved by (initials)','Approval date']
