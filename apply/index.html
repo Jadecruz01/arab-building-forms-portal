@@ -561,6 +561,11 @@ tr.off td{color:var(--muted)}
 .ck-rev{display:grid;gap:6px}
 .ck-rev input{border:1px solid var(--line);border-radius:7px;padding:9px 10px;background:var(--surface)}
 .ck-tot{display:flex;gap:10px;flex-wrap:wrap}
+.ck-dayhead{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px}
+.ck-dayhead .fld{flex:0 1 260px;min-width:200px;margin:0}
+.ck-dayhead .btn{min-height:46px}
+tr.ck-click{cursor:pointer}
+tr.ck-click:hover td{background:var(--surface2)}
 .ck-tot div{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface);display:grid;gap:2px;min-width:120px}
 .ck-tot span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
 .ck-tot b{font-size:18px}
@@ -1606,7 +1611,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.23.2';   // shown at the bottom of every page
+const APP_VERSION = '2.23.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2850,8 +2855,10 @@ async function clerkLoadRec(id){
   catch(e){ S.ck.rec = {err:e.message}; }
   if (S.view==='clerk') render();
 }
-function clerkOpen(id){ S.ck.scan = null; S.ck.sel = id; S.ck.rec = null; S.ck.f = null; S.ck.step = 'form'; S.ck.err = ''; S.ck.done = null; S.ck.revFor = null; S.ck.tab = 'find'; go('clerk'); clerkLoadRec(id); }
-function clerkBack(){ S.ck.sel = null; S.ck.rec = null; S.ck.f = null; S.ck.done = null; S.ck.revFor = null; render(); clerkSearch(); }
+function clerkOpen(id, from){ S.ck.scan = null; S.ck.sel = id; S.ck.rec = null; S.ck.f = null; S.ck.step = 'form'; S.ck.err = ''; S.ck.done = null; S.ck.revFor = null; S.ck.from = from==='day' ? 'day' : 'find'; S.ck.tab = S.ck.from; go('clerk'); clerkLoadRec(id); }
+function clerkBack(){ S.ck.sel = null; S.ck.rec = null; S.ck.f = null; S.ck.done = null; S.ck.revFor = null;
+  if (S.ck.from === 'day'){ S.ck.tab = 'day'; ckLoadDay(); return; }   // back to the same day's payments (amounts refreshed)
+  render(); clerkSearch(); }
 function ckSet(k, v){ S.ck.f[k] = v; if (k==='method'){ S.ck.err=''; render(); } }
 
 function ckFindHtml(){
@@ -2875,7 +2882,7 @@ function ckFindHtml(){
 
 function ckRecordHtml(){
   const C = S.ck, r = C.rec;
-  const back = '<button type="button" class="btn sm" onclick="clerkBack()">'+ic('left')+'Back to search</button>';
+  const back = '<button type="button" class="btn sm" onclick="clerkBack()">'+ic('left')+(S.ck.from==='day' ? 'Back to payments for '+esc(fmtDay(S.ck.day)) : 'Back to search')+'</button>';
   if (!r) return back+'<p class="empty">Loading application…</p>';
   if (r.err) return back+'<p class="formerr">Could not open this application: '+esc(r.err)+'</p>';
   const f = r.fields || {}, fe = r.fees || {}, p = r.pay || {}, F = FORMS[r.form] || {title:r.form, short:r.form};
@@ -2991,7 +2998,7 @@ async function ckLoadDay(){ S.ck.dayRows = null; render();
   render(); }
 function ckDayHtml(){
   const rows = S.ck.dayRows;
-  const head = '<div class="row" style="gap:10px;align-items:flex-end;flex-wrap:wrap"><div class="fld"><label class="l" for="ckDay">Day</label><input id="ckDay" type="date" max="'+todayISO()+'" value="'+esc(S.ck.day)+'" onchange="S.ck.day=this.value;ckLoadDay()"></div>'+
+  const head = '<div class="ck-dayhead"><div class="fld"><label class="l" for="ckDay">Day</label><input id="ckDay" type="date" max="'+todayISO()+'" value="'+esc(S.ck.day)+'" onchange="S.ck.day=this.value;ckLoadDay()"></div>'+
     (Array.isArray(rows) && rows.length ? '<button type="button" class="btn" onclick="ckDayCsv()">'+ic('down')+'Download CSV</button>' : '')+'</div>';
   if (!rows) return head+'<p class="empty">Loading…</p>';
   if (rows.err) return head+'<p class="formerr">'+esc(rows.err)+'</p>';
@@ -3000,8 +3007,8 @@ function ckDayHtml(){
   const total = rows.reduce((a,x)=>a+Number(x.amount),0);
   return head+'<div class="ck-tot">'+Object.keys(by).map(m=>'<div><span>'+esc(m)+'</span><b class="num">'+money(by[m])+'</b></div>').join('')+'<div class="t"><span>Total</span><b class="num">'+money(total)+'</b></div></div>'+
     '<div class="dwrap"><table class="grid"><thead><tr><th>Time</th><th>Receipt</th><th>Application</th><th>Method</th><th style="text-align:right">Amount</th><th>Recorded by</th></tr></thead><tbody>'+
-    rows.map(x=>'<tr'+(x.reversedBy?' class="rev"':'')+'><td>'+new Date(x.recordedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</td><td class="num">'+esc(x.receiptNo)+(x.reversedBy?' <span class="pill unpaid">reversed</span>':'')+(x.kind==='reversal'?' <span class="pill src">reversal</span>':'')+'</td>'+
-      '<td><button type="button" class="linkbtn" onclick="clerkOpen(\''+x.submissionId+'\')">'+esc(x.applicant||'Applicant')+'</button><br><small class="num" style="color:var(--muted)">Ref '+esc(x.ref)+'</small></td>'+
+    rows.map(x=>'<tr class="ck-click'+(x.reversedBy?' rev':'')+'" onclick="clerkOpen(\''+x.submissionId+'\',\'day\')" title="Open this application"><td>'+new Date(x.recordedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</td><td class="num">'+esc(x.receiptNo)+(x.reversedBy?' <span class="pill unpaid">reversed</span>':'')+(x.kind==='reversal'?' <span class="pill src">reversal</span>':'')+'</td>'+
+      '<td><button type="button" class="linkbtn" onclick="event.stopPropagation();clerkOpen(\''+x.submissionId+'\',\'day\')">'+esc(x.applicant||'Applicant')+'</button><br><small class="num" style="color:var(--muted)">Ref '+esc(x.ref)+'</small></td>'+
       '<td>'+esc(x.method)+(x.checkNo?' #'+esc(x.checkNo):'')+'</td><td class="num" style="text-align:right">'+money(x.amount)+'</td><td>'+esc(x.recordedBy||'')+'</td></tr>').join('')+
     '</tbody></table></div><p class="hint" style="color:var(--muted)">Reversals appear as negative amounts, so the total matches the money actually kept.</p>';
 }
