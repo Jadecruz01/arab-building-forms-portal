@@ -87,6 +87,26 @@ svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .tile .fee{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--ok);background:var(--okbg);border-radius:6px;padding:2px 9px}
 .tile.paper .fee{color:var(--amber);background:var(--amberbg)}
 .tile.paper .fee{margin-right:8px}
+.docslot{display:grid;gap:8px}
+.docslot .docbtn{justify-self:start}
+.docslot.has .docbtn{background:var(--surface)}
+.docslot .fchip{justify-content:flex-start;gap:10px}
+.docslot .fchip>span{flex:1;text-align:left}
+.docslot .fchip .i{color:var(--ok);flex:none}
+.docck{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px;background:var(--surface)}
+.docck ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.docck li{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;font-size:14px}
+.docck li .i{width:16px;height:16px}
+.docck li.ok .i{color:var(--ok)} .docck li.no{color:var(--red)} .docck li small{color:var(--muted)} .docck li.no small{color:var(--red);font-weight:700}
+.fcard .dlab{font-size:12px;font-weight:700;color:var(--ink);margin-top:4px}
+.revbox{display:grid;gap:6px;justify-items:start;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);font-size:14px}
+.revbox.rv-pending{border-color:var(--amber);background:var(--amberbg)} .revbox.rv-info{border-color:var(--red);background:var(--redbg)} .revbox.rv-approved{border-color:var(--ok);background:var(--okbg)}
+.revbox .revmiss{display:flex;gap:6px;align-items:center;color:var(--red);font-weight:700}
+.revbox .revmiss .i{width:16px;height:16px}
+.revmail{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ck-wait{display:grid;gap:6px;border-color:var(--amber)!important;background:var(--amberbg)!important}
+.ck-wait b{display:flex;gap:8px;align-items:center}
+.st-info{margin-top:6px;border-left:3px solid var(--red);background:var(--redbg);padding:8px 10px;border-radius:6px;font-size:14px;color:var(--ink)}
 .tile .soon{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0 0;font-size:12.5px;font-weight:700;color:var(--blue);background:transparent;border:1px dashed currentColor;border-radius:6px;padding:1px 9px}
 .tile .soon::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8}
 html.embed .tile .soon{margin-top:4px}
@@ -1273,6 +1293,21 @@ const LICENSE_OPTS = [
   'I am the Property Owner acting as my own contractor and providing all material supervision myself on property for my own occupancy or use, and not offered for sale. Ala. Code 34-14A-6(5).'
 ];
 const UPLOAD = T('files','Please upload proof of Arab City Business License, Trade License #, Contract/Invoice, and Insurance',{type:'file',req:true,full:true,hint:'PDF, JPG or PNG. Up to 10 files, 30 MB each. Phone photos work too.'});
+/* v2.24: contractor and sub trade applications ask for each required document separately (Kim Johnson, Oct 15 2026),
+   so the application cannot be submitted while one is missing and staff can see which file is which. */
+const DOC = (id, label, o) => T(id, label, Object.assign({type:'doc', req:true, full:true}, o||{}));
+const DOCS_HEAD = [{type:'section', label:'Required documents', docs:true},
+  {type:'note', docs:true, text:'Attach each document below. The application cannot be submitted until every required document is attached. PDF, JPG or PNG; phone photos work too.'}];
+const OTHER_UPLOAD = T('files','Other documents (optional)',{type:'file',req:false,full:true,hint:'For example, proof of insurance, construction plans or a site plan. PDF, JPG or PNG. Up to 10 files in total, 30 MB each.'});
+const isUpField = x => x.type==='file' || x.type==='doc';
+/* Building Department review: these applications are reviewed and approved before payment is taken
+   (enforced on the server in bf_record_payment for applications submitted from REVIEW_FROM on). */
+const REVIEW_FORMS = ['building','homeowner','subtrade'];
+const REVIEW_FROM = '2026-10-15T05:00:00Z';
+const reviewRequired = s => !!s && REVIEW_FORMS.includes(s.form) && String(s.createdAt||'') >= REVIEW_FROM;
+const reviewApproved = s => { const st = (s && s.staff) || {}; return !!(String(st.approvedBy||'').trim() || String(st.approvedDate||'').trim()); };
+const reviewState = s => reviewApproved(s) ? 'approved' : !reviewRequired(s) ? 'none' : String(((s.staff||{}).infoNeeded)||'').trim() ? 'info' : 'pending';
+const REVIEW_LABEL = { pending:'Under review', info:'Information needed', approved:'Approved', none:'' };
 const APPLICANT = [
   T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true,hint:'Used with your reference # to check your permit status online.'}),
   T('phone','Applicant Phone #',{type:'tel',hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true})
@@ -1299,7 +1334,11 @@ const FORMS = {
       {type:'section',label:'Licensing'},
       T('exempt','Are you an authorized employee of a Federal, State, or Local Government, General Contractor (licensed prior to January 1, 1992), or Property Owner acting as your own contractor?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
       T('exemptReason','I do hereby solemnly swear that I, or the entity of which I am a qualifying representative, am exempt from the licensing requirements of the State of Alabama Home Builders Licensure law for the following reason:',{type:'radio',stack:true,req:true,opts:LICENSE_OPTS,full:true,show:f=>f.exempt==='Yes'}),
-      UPLOAD ] },
+      ...DOCS_HEAD,
+      DOC('docBiz','City of Arab business license'),
+      DOC('docStateLic',"State of Alabama home builder's license",{show:f=>f.exempt!=='Yes',hint:'Not needed if you answered Yes to the exemption question above.'}),
+      DOC('docContract','Invoice or contract for this job'),
+      OTHER_UPLOAD ] },
   subtrade:{ key:'subtrade', title:'Sub Trade Application for Building Permit', short:'Sub Trade Permit', icon:'wrench', agreements:[{id:'appAgree'}], group:'Building Permits', feeLabel:'Fee based on estimated project cost', created:'Jun 7, 2026',
     fields:[ T('applicant','Applicant Name or Business Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone #',{type:'tel'}), T('date','Date',{type:'date',req:true}),
       {type:'section',label:'Property'}, ...PROPERTY,
@@ -1311,7 +1350,11 @@ const FORMS = {
       T('buildType','What type of build?',{type:'radio',req:true,opts:['Residential','Commercial'],full:true}),
       T('estCost','Estimated project cost',{type:'money',req:true}),
       T('description','Brief description of work',{type:'textarea',req:true,full:true}),
-      UPLOAD ] },
+      ...DOCS_HEAD,
+      DOC('docBiz','City of Arab business license'),
+      DOC('docTradeLic','State of Alabama trade license'),
+      DOC('docContract','Invoice or contract for this job'),
+      OTHER_UPLOAD ] },
   sign:{ key:'sign', title:'Sign Permit Application', short:'Sign Permit', icon:'sign', agreements:[{id:'signAgree'}], group:'Sign Permit', feeLabel:'$50 non-illuminated · $75 illuminated', created:'Jul 11, 2026',
     fields:[ T('date','Date',{type:'date',req:true}), T('applicant','Applicant Name',{req:true}), T('email','Applicant Email',{type:'email',req:true}), T('phone','Applicant Phone Number',{type:'tel'}),
       T('address','Address of Sign',{req:true,full:true}), T('estCost','Estimated Cost of Work',{type:'money',req:true}), T('zoning','Zone'),
@@ -1358,9 +1401,10 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
   // No contractor section: the homeowner is the one doing the work (Oct 11, 2026). The contractor fields stay on the
   // form definition as hidden "legacy" fields so details on earlier homeowner applications still show to staff.
   fields: (() => { let inC = false; return FORMS.building.fields.map(x => {
+    if (x.docs || x.type==='doc') return null;                 // homeowners: no license / contract documents
     if (x.type==='section'){ inC = x.label==='Contractor'; return inC ? Object.assign({}, x, {label:'Contractor (earlier applications)', legacy:true}) : x; }
     if (inC) return Object.assign({}, x, {req:false, legacy:true, show:()=>false});
-    return x === UPLOAD ? PLANS_UPLOAD : x; }); })(),
+    return x === OTHER_UPLOAD ? PLANS_UPLOAD : x; }).filter(Boolean); })(),
   agreements:[{id:'appAgree'},{id:'occupancy'}] });
 const isBldg = k => k==='building' || k==='homeowner';
 const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving'];
@@ -1410,7 +1454,7 @@ function openAgreement(id){
   document.body.appendChild(box); document.addEventListener('keydown', agKey); box.querySelector('.btn.primary').focus();
 }
 function acceptAgreement(id){ FVALS['ag_'+id] = '1'; const c = document.getElementById('ag_'+id); if (c) c.checked = true; closeAgreement(); }
-const valueFields = f => f.fields.filter(x => x.id && x.type!=='file');
+const valueFields = f => f.fields.filter(x => x.id && !isUpField(x));
 
 /* ================= state & capabilities ================= */
 const S = { rowSel:{}, wsSel:{}, view:'apps', form:null, staff:false, subs:[], loaded:false, sel:null, tab:'app', editing:false,
@@ -1611,7 +1655,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.23.3';   // shown at the bottom of every page
+const APP_VERSION = '2.24.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1773,7 +1817,7 @@ Driver's licenses, Social Security numbers, or bank or card details. They are no
 ## Questions or corrections
 City of Arab Building Department, 740 N Main St, Arab, AL 35016 · 256-586-5968 · buildingdept@arabcity.org. To fix something on an application you sent, contact the Building Department with your reference #.`;
 
-function uploadNote(f){ const u = f.fields.find(x => x.type==='file'); return !u ? 'Apply online' : u.req ? 'Apply online · upload documents' : f.key==='homeowner' ? 'Apply online · construction plans optional' : 'Apply online · documents optional'; }
+function uploadNote(f){ const u = f.fields.find(x => x.type==='doc') || f.fields.find(x => x.type==='file'); return !u ? 'Apply online' : u.req ? 'Apply online · upload documents' : f.key==='homeowner' ? 'Apply online · construction plans optional' : 'Apply online · documents optional'; }
 function tile(k){ const f = FORMS[k];
   if (EMBED) return '<a class="tile" target="_top" href="https://arabcityapplications.jadecruz.dev/apply/#form-'+k+'"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.title)+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></a>';
   return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
@@ -1833,10 +1877,13 @@ function fieldHtml(x, f){
   if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup" aria-labelledby="l_'+id+'"'+(x.req?' aria-required="true"':'')+dby+'>'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
   else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+dby+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
   else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+dby+'>'+esc(v)+'</textarea>';
+  else if (x.type==='doc'){ const n = FILES.filter(f => f._slot===x.id).length;
+    inner = '<div class="docslot" data-slot="'+x.id+'"><button type="button" class="btn docbtn" id="'+id+'" aria-labelledby="l_'+id+' '+id+'" onclick="document.getElementById(\'docIn_'+x.id+'\').click()"'+dby+'>'+ic('upload')+'<span class="dbt">'+(n?'Add another file':'Choose file')+'</span></button>'+
+      '<input type="file" id="docIn_'+x.id+'" multiple accept="application/pdf,image/*,.heic,.heif" hidden onchange="addFiles(this.files,\''+x.id+'\');this.value=\'\'"><div class="filelist" id="flist_'+x.id+'"></div></div>'; }
   else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="l_'+id+' dropTxt" aria-describedby="upHint">'+ic('upload')+'<div id="dropTxt"><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
     inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+ac+dby+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
-  const lab = (x.type==='radio'||x.type==='file') ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
+  const lab = (x.type==='radio'||isUpField(x)) ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
   return '<div class="fld'+(x.full?' full':'')+'"'+(x.type==='radio'?' data-group="'+id+'"':'')+'>'+lab+inner+(x.hint?'<span class="hint" id="'+hid+'">'+esc(x.hint)+'</span>':'')+
     (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
@@ -1847,7 +1894,8 @@ function feeBoxHtml(key){
     '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
     (showVal?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
     '<div class="r t"><span>Grand total</span><span class="num">'+money(fe.total)+'</span></div>'+
-    '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>';
+    (REVIEW_FORMS.includes(key) ? '<small>The Building Department reviews your application first. Once it is approved, they will contact you to pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>'
+      : '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>');
 }
 function viewForm(){
   const F = FORMS[S.form];
@@ -1886,19 +1934,24 @@ function bindFiles(){
   d.ondragleave = () => d.classList.remove('on');
   d.ondrop = e => { e.preventDefault(); d.classList.remove('on'); addFiles(e.dataTransfer.files); };
 }
-function addFiles(list){
+function addFiles(list, slot){
   const err = document.getElementById('ferr'); err.textContent='';
   for (const f of list){
     if (FILES.length >= 10){ err.textContent = 'You can attach up to 10 files.'; break; }
     if (!(f.type==='application/pdf' || /^image\//.test(f.type) || /\.(pdf|jpe?g|png|heic|heif)$/i.test(f.name))){ err.textContent = f.name+' is not a PDF or a photo. Save it as a PDF, JPG or PNG and try again.'; continue; }
     if (f.size > MAX_UPLOAD_MB*1048576){ err.textContent = f.name+' is larger than '+MAX_UPLOAD_MB+' MB. Split the PDF into smaller files or take a smaller photo.'; continue; }
-    FILES.push(f); queueOptimize(f);
+    try{ f._slot = slot || ''; }catch(e){} FILES.push(f); queueOptimize(f);
   }
   paintFiles();
 }
 function paintFiles(){
+  // each required-document slot has its own list; everything else goes in the general list
+  document.querySelectorAll('.docslot').forEach(d => { const slot = d.dataset.slot, l = document.getElementById('flist_'+slot), has = FILES.some(f => f._slot===slot);
+    d.classList.toggle('has', has); const t = d.querySelector('.dbt'); if (t) t.textContent = has ? 'Add another file' : 'Choose file';
+    if (has){ const fld = d.closest('.fld'), m = fld && fld.querySelector('.ferr-f'); if (m){ m.remove(); const b = d.querySelector('.docbtn'); if (b){ b.removeAttribute('aria-invalid'); } } }
+    if (l) l.innerHTML = FILES.map((f,i)=>({f,i})).filter(o => o.f._slot===slot).map(({f,i})=>'<div class="fchip">'+ic('check')+'<span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" class="btn ghost sm" aria-label="Remove '+esc(f.name)+'" onclick="FILES.splice('+i+',1);paintFiles()">'+ic('x')+'</button></div>').join(''); });
   const l = document.getElementById('flist'); if (!l) return;
-  l.innerHTML = FILES.map((f,i)=>'<div class="fchip"><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" class="btn ghost sm" aria-label="Remove '+esc(f.name)+'" onclick="FILES.splice('+i+',1);paintFiles()">'+ic('x')+'</button></div>').join('');
+  l.innerHTML = FILES.map((f,i)=>({f,i})).filter(o => !o.f._slot).map(({f,i})=>'<div class="fchip"><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" class="btn ghost sm" aria-label="Remove '+esc(f.name)+'" onclick="FILES.splice('+i+',1);paintFiles()">'+ic('x')+'</button></div>').join('');
 }
 // WCAG 3.3.1 / 3.3.3: each field with a problem is marked, and the problem is described in words next to it.
 function fieldErrorText(el){
@@ -1936,6 +1989,16 @@ async function submitForm(e){
   if (otherBad.length){ const names = markFieldErrors(otherBad);
     err.textContent = 'Please fix '+(names.length===1 ? 'this field' : 'these '+names.length+' fields')+': '+names.join(', ')+'.';
     const first = otherBad[0]; first.scrollIntoView({block:'center'}); first.focus(); return; }
+  { // required documents, one slot each (v2.24): drop files from slots that are no longer shown, then name what is missing
+    const F0 = FORMS[S.form], shown = x => !x.show || x.show(FVALS);
+    FILES = FILES.filter(f => !f._slot || F0.fields.some(x => x.type==='doc' && x.id===f._slot && shown(x))); paintFiles();
+    const miss = F0.fields.filter(x => x.type==='doc' && x.req && shown(x) && !FILES.some(f => f._slot===x.id));
+    if (miss.length){
+      miss.forEach(x => { const d = document.querySelector('.docslot[data-slot="'+x.id+'"]'), fld = d && d.closest('.fld'), b = d && d.querySelector('.docbtn');
+        if (fld && !fld.querySelector('.ferr-f')) fld.insertAdjacentHTML('beforeend', '<span class="ferr-f" id="ve_doc_'+x.id+'">Attach this document to continue.</span>');
+        if (b){ b.setAttribute('aria-invalid','true'); const dd = (b.getAttribute('aria-describedby')||'').split(' ').filter(Boolean); if (!dd.includes('ve_doc_'+x.id)) dd.unshift('ve_doc_'+x.id); b.setAttribute('aria-describedby', dd.join(' ')); } });
+      err.textContent = 'Please attach '+(miss.length===1 ? 'this required document' : 'these '+miss.length+' required documents')+': '+miss.map(x => x.label).join(', ')+'.';
+      const b0 = document.querySelector('.docslot[data-slot="'+miss[0].id+'"] .docbtn'); if (b0){ b0.scrollIntoView({block:'center'}); b0.focus(); } return; } }
   if (FORMS[S.form].fields.some(x => x.type==='file' && x.req && (!x.show || x.show(FVALS))) && !FILES.length){ err.textContent = 'Please upload at least one document. This application requires documents.'; const d = document.getElementById('drop'); if (d){ d.scrollIntoView({block:'center'}); d.focus(); } return; }
   if (agMissing.length){ err.textContent = 'Please read and agree to: '+agMissing.map(a=>AGREEMENTS[a.id].title).join(', ')+'.'; const c = document.getElementById('ag_'+agMissing[0].id); if (c){ c.scrollIntoView({block:'center'}); c.focus(); } return; }
   if (S.pubFull){ err.textContent = 'Online storage is full, so applications cannot be submitted right now. Please contact the Building Department.'; return; }
@@ -1945,7 +2008,9 @@ async function submitForm(e){
   let opt;
   try{ btn.textContent = 'Preparing documents…'; opt = await Promise.all(FILES.map(f => OPT.get(f) || queueOptimize(f))); }
   catch(x){ err.textContent = x.message; btn.disabled=false; btn.textContent='Submit application'; return; }
-  const files = opt.map(o => ({ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed }));
+  const slotLabel = id => { const x = F.fields.find(y => y.type==='doc' && y.id===id); return x ? x.label : ''; };
+  const files = opt.map((o, i) => Object.assign({ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed },
+    FILES[i] && FILES[i]._slot ? { slot:FILES[i]._slot, docLabel:slotLabel(FILES[i]._slot) } : {}));
   try{
     btn.textContent = 'Submitting…';
     const fees = computeFees(S.form, vals, false);
@@ -1960,7 +2025,9 @@ async function submitForm(e){
     LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, agreements, files };
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
-      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div><div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>'+
+      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(REVIEW_FORMS.includes(S.form)
+        ? '<div class="r t"><span>Amount due after approval</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> The Building Department will review your application and contact you when it is approved and ready for payment, or if anything else is needed.</small></div>'
+        : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
       '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
@@ -2083,6 +2150,7 @@ const COLS = [
   {k:'total', l:'Grand Total Fee', t:'$', get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
   {k:'permitFee', l:'Permit Fee', t:'$', hide:true, get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
   {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','homeowner','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
+  {k:'review', l:'Review', t:'S', only:REVIEW_FORMS, get:s=>({pending:0, info:1, approved:2, none:3})[reviewState(s)], fmt:s=>reviewPill(s)||'<span style="color:var(--muted)">—</span>'},
   {k:'payment', l:'Payment', t:'S', get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
   {k:'buildType', l:'Build Type', t:'T', only:['building','homeowner','subtrade'], get:s=>s.fields.buildType||''},
   {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
@@ -2093,7 +2161,7 @@ const COLS = [
 ];
 const colsFor = k => COLS.filter(c => (!c.only || c.only.includes(k)) && (!c.not || !c.not.includes(k)));
 // Column widths (px) — the table keeps these so pinned columns line up and headers stay on one line.
-const COL_W = { createdAt:176, fy:138, permitNo:132, address:260, lot:100, files:142, total:178, permitFee:152, cict:134, payment:142, buildType:150, signFeature:170, applicant:220, email:260, phone:180, description:320 };
+const COL_W = { createdAt:176, fy:138, review:170, permitNo:132, address:260, lot:100, files:142, total:178, permitFee:152, cict:134, payment:142, buildType:150, signFeature:170, applicant:220, email:260, phone:180, description:320 };
 const RN_W = 104;
 const colDefaultOn = k => colsFor(k).filter(c=>!c.hide).map(c=>c.k);
 function colState(k){
@@ -2103,6 +2171,7 @@ function colState(k){
     // v2.23: show the new Fiscal Year column once to people who already saved a column layout
     // (nothing is saved until the person changes their columns; colSave then marks fyCol.<form> so a hidden column stays hidden)
     if (Array.isArray(saved) && !prefGet('fyCol.'+k, false) && !on.includes('fy')) on.splice(Math.max(on.indexOf('createdAt'), -1)+1, 0, 'fy');
+    if (Array.isArray(saved) && REVIEW_FORMS.includes(k) && !prefGet('revCol.'+k, false) && !on.includes('review')) on.splice(Math.max(on.indexOf('permitNo'), on.indexOf('createdAt'))+1, 0, 'review');
     S.cols = { form:k, on, pin: Array.isArray(pins) ? pins.filter(x => on.includes(x)) : [] };
   }
   return S.cols;
@@ -2113,7 +2182,7 @@ function visibleCols(k){
   const shown = st.on.map(x=>by[x]).filter(Boolean);
   return shown.filter(c=>st.pin.includes(c.k)).concat(shown.filter(c=>!st.pin.includes(c.k)));
 }
-function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); prefSet('fyCol.'+st.form, true); }
+function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); prefSet('fyCol.'+st.form, true); prefSet('revCol.'+st.form, true); }
 function topBar(){
   return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
    (canBuilding() ? bellHtml() : '')+profileMenuHtml()+'</header>'+storageBanner();
@@ -2308,6 +2377,7 @@ function filteredRows(){
   if (S.filter==='unpaid') rows = rows.filter(s=>!isPaid(s));
   if (S.filter==='paid') rows = rows.filter(isPaid);
   if (S.filter==='partial') rows = rows.filter(s=>payStatus(s)==='partial');
+  if (S.filter==='review') rows = rows.filter(s=>['pending','info'].includes(reviewState(s)));
   if (q) rows = rows.filter(s => (JSON.stringify(s.fields)+' '+((s.staff&&s.staff.permitNo)||'')+' '+refNo(s.id)).toLowerCase().includes(q));
   const c = cols.find(c=>c.k===S.sort.k) || cols[0];
   return rows.slice().sort((a,b)=>{ const x=c.get(a), y=c.get(b); return (x<y?-1:x>y?1:0)*S.sort.d; });
@@ -2334,7 +2404,7 @@ function viewTable(){
    '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
    dashHtml(k)+
    '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
-   '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;prefSet(\'filter\',this.value);render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid (incl. partly paid)'],['partial','Partially paid'],['paid','Paid']].map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+   '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;prefSet(\'filter\',this.value);render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid (incl. partly paid)'],['partial','Partially paid'],['paid','Paid']].concat(REVIEW_FORMS.includes(S.form) ? [['review','Needs review']] : []).map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
    '<span class="sp"></span><div class="colmenu"><button class="btn sm" id="colsBtn" aria-expanded="'+!!S.colsOpen+'" onclick="event.stopPropagation();S.colsOpen=!S.colsOpen;S.colMenu=null;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?colPanelHtml(k):'')+'</div>'+
 '<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
    (selN?rowBulkHtml(rows):'')+
@@ -2359,7 +2429,7 @@ function colDrop(from, to){ if (!from || from===to) return; const st = colState(
   order.splice(j, 0, order.splice(i, 1)[0]);
   if (st.pin.includes(to) !== st.pin.includes(from)){ st.pin = st.pin.includes(to) ? st.pin.concat(from) : st.pin.filter(x=>x!==from); }
   st.on = order.concat(st.on.filter(x=>!order.includes(x))); st.pin = order.filter(x=>st.pin.includes(x)); colSave(); render(); }
-function resetTable(){ const k = S.form; prefSet('cols.'+k, null); prefSet('pins.'+k, null); prefSet('fyCol.'+k, null);
+function resetTable(){ const k = S.form; prefSet('cols.'+k, null); prefSet('pins.'+k, null); prefSet('fyCol.'+k, null); prefSet('revCol.'+k, null);
   S.sort = Object.assign({}, PREF_DEFAULTS.sort); prefSet('sort', S.sort); S.filter = 'all'; prefSet('filter', 'all'); S.q = '';
   S.cols = null; S.colsOpen = false; S.colMenu = null; render(); toast('The table is back to its original settings.'); }
 function colMenu(e, k){ e.stopPropagation(); if (S.colMenu && S.colMenu.k===k){ S.colMenu = null; render(); return; }
@@ -2455,7 +2525,7 @@ function panelHtml(){
   if (S.tab==='app'){
     if (S.editing){
       const hasLegacy = F.fields.some(x => x.legacy && x.id && s.fields[x.id]);
-      body = '<form id="editf" class="fgrid">'+F.fields.filter(x=>x.type!=='file' && (!x.legacy || hasLegacy)).map(x=>{
+      body = '<form id="editf" class="fgrid">'+F.fields.filter(x=>!isUpField(x) && !x.docs && (!x.legacy || hasLegacy)).map(x=>{
         if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
         if (x.type==='note') return '';
         const v = s.fields[x.id]||'', id='e_'+x.id;
@@ -2485,12 +2555,13 @@ function panelHtml(){
   } else if (S.tab==='office'){
     const ins = st.inspections||{};
     const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
-    body = '<form id="offf" class="fgrid">'+
+    body = '<form id="offf" class="fgrid">'+(REVIEW_FORMS.includes(s.form) ? reviewBoxHtml(s).replace('<div class="sect">', '<div class="sect" style="margin-top:0">') : '')+
       '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
       '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> Work started without a permit (double the permit fee)</label></div>'+
+      (REVIEW_FORMS.includes(s.form) ? '' :
       '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
-      '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>'+
+      '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>')+
       (hasInsp?'<div class="sect">Inspections</div><div class="fld full"><div class="insp"><span></span><span class="ihead">Date of inspection</span><span class="ihead">Completed by</span><span class="ihead">Date recorded</span>'+
         INSPECT.map(n=>{ const r = ins[n]||{}; return '<b>'+n+'</b><input type="date" id="i_'+n+'_d" aria-label="'+n+' date of inspection" value="'+esc(r.date||'')+'"><input type="text" id="i_'+n+'_b" aria-label="'+n+' completed by" placeholder="Completed by" value="'+esc(r.by||'')+'"><input type="date" id="i_'+n+'_r" aria-label="'+n+' date recorded" value="'+esc(r.recorded||'')+'">'+
           '<textarea class="icomm" id="i_'+n+'_c" rows="2" aria-label="'+n+' inspection comments" placeholder="'+n+' comments (what was checked, corrections needed, re-inspection notes)">'+esc(r.comment||'')+'</textarea>'; }).join('')+'</div></div>':'')+
@@ -2506,13 +2577,13 @@ function panelHtml(){
   } else {
     const at = ATT[s.id], ext = (s.files||[]).filter(f=>f.url), own = (s.files||[]).filter(f=>!f.url);
     const extHtml = ext.length ? '<p style="margin:0 0 8px;color:var(--ink2);font-size:14px">Imported application. These documents are stored in the previous online forms system; open one to view or download it. An administrator can copy them into the portal under Records &amp; storage.</p><div class="files" style="margin-bottom:14px">'+ext.map(f=>'<div class="fcard"><div class="th"><span class="pdfi'+(/^image/.test(f.type)?' img':'')+'" style="width:44px;height:54px;font-size:11px">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span></div><div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div><div class="ac"><a class="btn sm" href="'+esc(f.url)+'" target="_blank" rel="noopener">'+ic('ext')+'Open document</a></div></div>').join('')+'</div>' : '';
-    if (!(s.files||[]).length) body = '<p class="empty">No documents were uploaded with this application.</p>';
+    if (!(s.files||[]).length) body = docChecklistHtml(s) + '<p class="empty">No documents were uploaded with this application.</p>';
     else if (!own.length) body = extHtml;
     else if (!at) body = '<p class="empty">Loading documents…</p>';
     else if (at.err) body = '<p class="empty">Could not load documents: '+esc(at.err)+'</p>';
-    else body = extHtml + (at.length < own.length ? '<p class="formerr">'+(own.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
+    else body = docChecklistHtml(s) + extHtml + (at.length < own.length ? '<p class="formerr">'+(own.length-at.length)+' document(s) did not finish uploading.</p>' : '')+
       '<div class="files">'+at.map((f,i)=>'<div class="fcard"><div class="th">'+(/^image/.test(f.type)?'<img src="'+esc(f.data)+'" alt="'+esc(f.name)+'">':'<span class="pdfi" style="width:44px;height:54px;font-size:11px">PDF</span>')+'</div>'+
-      '<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div>'+(sizeNote(f)?'<div class="fsz">'+esc(sizeNote(f))+'</div>':'')+'<div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
+      (f.docLabel ? '<div class="dlab">'+esc(f.docLabel)+'</div>' : '')+'<div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div>'+(sizeNote(f)?'<div class="fsz">'+esc(sizeNote(f))+'</div>':'')+'<div class="ac"><button class="btn sm" onclick="openFile('+i+')">'+ic('ext')+'Open</button><button class="btn sm" onclick="saveFile('+i+')">'+ic('down')+'Save</button></div></div>').join('')+'</div>';
   }
   const actions = S.confirmDel
     ? '<div class="confirm"><b>Delete this application and its '+(s.files||[]).length+' document(s)?</b> This cannot be undone.<span style="flex:1"></span><button class="btn sm" onclick="S.confirmDel=false;render()">Keep it</button><button class="btn sm danger" onclick="deleteSub()">Delete</button></div>'
@@ -2550,6 +2621,9 @@ async function saveOffice(){
   const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
   const prev = s.staff||{};
   const st = Object.assign({}, prev, { permitNo:g('o_permitNo')||'', payment:prev.payment||'', checkNo:prev.checkNo||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' });
+  if (document.getElementById('o_infoNeeded')) st.infoNeeded = (g('o_infoNeeded')||'').trim().slice(0, 1000);
+  if (String(st.approvedBy).trim() && !st.approvedDate) st.approvedDate = todayISO();      // initials approve; date defaults to today
+  { const de = document.getElementById('o_approvedDate'); if (de && !de.value && st.approvedDate) de.value = st.approvedDate; }
   if (document.getElementById('i_Footing_d')){ st.inspections = {}; INSPECT.forEach(n=>{ st.inspections[n] = { date:g('i_'+n+'_d')||'', by:g('i_'+n+'_b')||'', recorded:g('i_'+n+'_r')||'', comment:(g('i_'+n+'_c')||'').trim() }; }); }
   if (document.getElementById('o_co')){ st.co=g('o_co')||''; st.coInit=g('o_coInit')||''; st.coComments=g('o_coComments')||'';
     if (st.co!=='Given'){ delete st.coOverrideInit; delete st.coOverrideBy; delete st.coOverrideAt; delete st.coOverrideBalance; }
@@ -2876,7 +2950,7 @@ function ckFindHtml(){
       return '<button type="button" class="ck-row" onclick="clerkOpen(\''+r.id+'\')"><span class="ico">'+ic(F.icon||'doc')+'</span>'+
         '<span class="ck-main"><b>'+esc(f.applicant || 'Applicant')+'</b><small>'+esc(F.short||'')+' · Ref <span class="num">'+esc(r.ref)+'</span>'+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</small>'+
         '<small>'+esc([f.address, f.owner && f.owner!==f.applicant ? 'Owner: '+f.owner : ''].filter(Boolean).join(' · '))+'</small></span>'+
-        '<span class="ck-amt">'+payPill(r)+'<b class="num">'+money(r.pay && r.pay.status ? (r.pay.status==='paid'||r.pay.status==='none' ? r.pay.total : r.pay.balance) : (r.fees||{}).total)+'</b><small>'+(r.pay && r.pay.status==='paid' ? 'paid' : r.pay && r.pay.status==='none' ? '' : 'due')+'</small></span></button>'; }).join('')+'</div>'+
+        '<span class="ck-amt">'+(r.review && r.review.required && !r.review.approved ? '<span class="pill partial">Awaiting approval</span>' : payPill(r))+'<b class="num">'+money(r.pay && r.pay.status ? (r.pay.status==='paid'||r.pay.status==='none' ? r.pay.total : r.pay.balance) : (r.fees||{}).total)+'</b><small>'+(r.pay && r.pay.status==='paid' ? 'paid' : r.pay && r.pay.status==='none' ? '' : 'due')+'</small></span></button>'; }).join('')+'</div>'+
     (rows.length >= 50 ? '<p class="hint" style="text-align:center">Showing the 50 newest matches. Add more detail to narrow the search.</p>' : ''));
 }
 
@@ -2899,6 +2973,9 @@ function ckRecordHtml(){
   }
   if (st==='none') pay += '<div class="ck-card"><p style="margin:0">This application has no fee, so there is nothing to collect.</p></div>';
   else if (st==='paid') pay += '<div class="ck-card ck-paid"><b>Paid in full</b><span>'+money(p.paid)+(p.lastReceipt?' · last receipt '+esc(p.lastReceipt):'')+'</span></div>';
+  else if (r.review && r.review.required && !r.review.approved && !C.done)
+    pay += '<div class="ck-card ck-wait" role="status"><b>'+ic('lock')+'Waiting for Building Department approval</b><span>This application has to be reviewed and approved by the Building Department before payment can be taken. The applicant was told not to pay yet; the Building Department will contact them when it is approved.</span>'+
+      (r.review.infoNeeded ? '<span><b>Information requested from the applicant:</b> '+esc(r.review.infoNeeded)+'</span>' : '')+'</div>';
   else if (C.step==='confirm'){
     pay += '<div class="ck-card ck-confirm"><h2>Check before recording</h2>'+
       '<p class="ck-big"><b class="num">'+money(f2.amount)+'</b> '+esc(f2.method.toLowerCase())+(f2.checkNo?' #'+esc(f2.checkNo):'')+'</p>'+
@@ -3553,10 +3630,14 @@ function statusCard(r){
     .map(n => { const v = insRaw[n]; if (!v) return null; if (typeof v === 'string') return { n, st:'complete', date:v };
       return (v.status==='complete' || v.status==='pending') ? { n, st:v.status, date:v.date||'' } : null; }).filter(Boolean);
   const doneN = insL.filter(x => x.st==='complete').length, pendN = insL.length - doneN, finalDone = insL.some(x => x.n==='Final' && x.st==='complete');
-  const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
-    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }];
+  const revReq = r.reviewRequired != null ? !!r.reviewRequired : reviewRequired(r), revOk = !!r.approved, info = String(r.infoNeeded||'').trim(), holdPay = revReq && !revOk;
+  const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' }].concat(revReq ? [{ t:'Building Department review',
+    d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
+    st: revOk ? 'ok' : info ? 'part' : '',
+    list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'<br><small>Email it to buildingdept@arabcity.org (include reference # '+esc(r.ref)+') or bring it to City Hall, 740 N Main St.</small></div>' : '' }] : []).concat([
+    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }]);
   if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
-  steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
+  steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? money(total)+' due after approval' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
   if (hasInsp) steps.push({ t:'Inspections',
     d: !insL.length ? 'None complete' : [doneN ? doneN+' complete' : 'None complete', pendN ? pendN+' pending' : ''].filter(Boolean).join(' · '),
     st: finalDone ? 'ok' : insL.length ? 'part' : '',
@@ -3568,7 +3649,8 @@ function statusCard(r){
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     '<ol class="steps">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
     '<div class="st-fees num"><div><span>Amount due</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>'+
-    ((ps==='unpaid'||ps==='partial') ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
+    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note">Please do not pay yet. The Building Department will contact you when your application is approved and ready for payment.</p>' : '')+
+    ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
     '</section>';
 }
 function bindStatus(){
@@ -3736,7 +3818,7 @@ async function fetchAllRecords(){
   const out = []; for (let off = 0; ; off += 200){ const r = await sbRpc('bf_records_export', {p_token:TOKEN, p_offset:off, p_limit:200}) || []; out.push(...r); if (r.length < 200) break; } return out;
 }
 function formCsv(k, recs){
-  const F = FORMS[k], defs = F ? F.fields.filter(x => x.id && x.type!=='section' && x.type!=='note' && x.type!=='file') : [];
+  const F = FORMS[k], defs = F ? F.fields.filter(x => x.id && x.type!=='section' && x.type!=='note' && !isUpField(x)) : [];
   const known = new Set(defs.map(x => x.id)), extra = [...new Set(recs.flatMap(r => Object.keys((r.data.fields)||{})).filter(x => !known.has(x)))].sort();
   const insp = inspForm(k) || recs.some(r => inspHasData(((r.data||{}).staff||{}).inspections)), co = isBldg(k) || k==='subtrade';
   const seen = {}; const lab = x => { let l = x.label.length > 90 ? x.label.slice(0, 90)+'…' : x.label; if (seen[l]) l += ' ('+x.id+')'; seen[l] = 1; return l; };
@@ -4110,6 +4192,7 @@ function dashHtml(k){
     tile('', 'all', 'Applications', all.length, all.filter(s=>!s.read).length+' unread · '+money(sum(all,'total'))+' in fees')+
     tile('unpaid','unpaid','Unpaid', unpaid.length, money(sum(unpaid,'total'))+' due')+
     tile('paid','paid','Paid', paid.length, money(sum(paid,'total'))+' collected')+
+    (REVIEW_FORMS.includes(k) ? (() => { const rv = all.filter(s => ['pending','info'].includes(reviewState(s))); return tile('review','review','Needs review', rv.length, rv.filter(s => reviewState(s)==='info').length+' waiting on the applicant'); })() : '')+
     (HAS_CICT(k)?'<div class="dtile" style="cursor:default"><span class="lbl">CICT fees</span><span class="big num">'+money(sum(all,'cict'))+'</span><span class="sub num">'+money(sum(paid,'cict'))+' collected · '+money(sum(unpaid,'cict'))+' due</span></div>':'')+
     '</div>';
 }
@@ -4637,7 +4720,7 @@ async function buildReceipt(r){
   row('Type of work', [f.buildType, f.projectType, f.signType, f.signFeature, f.poolType].filter(Boolean).join(' · '));
   row('Description', f.description);
   if (Array.isArray(r.agreements) && r.agreements.length) row('Agreed to', r.agreements.map(a=>a.title||a.id).join('; '));
-  row('Documents uploaded', (r.files||[]).length ? (r.files.length+' file'+(r.files.length===1?'':'s')) : 'None');
+  row('Documents uploaded', (r.files||[]).length ? (r.files.length+' file'+(r.files.length===1?'':'s'))+((r.files||[]).some(x => x.docLabel) ? ': '+[...new Set(r.files.map(x => x.docLabel || 'Other'))].join(', ') : '') : 'None');
   y -= 6; page.drawLine({start:{x:M,y}, end:{x:W-M,y}, thickness:1, color:line}); y -= 22;
   page.drawText('FEES', {x:M, y, size:10, font:bold, color:grey}); y -= 20;
   const fee = (l, v, b) => { page.drawText(l, {x:M, y, size:11.5, font:b?bold:reg, color:ink}); const t = money(v); page.drawText(t, {x:W-M-(b?bold:reg).widthOfTextAtSize(t, b?14:11.5), y, size:b?14:11.5, font:b?bold:reg, color:ink}); y -= b ? 26 : 18; };
@@ -4645,13 +4728,21 @@ async function buildReceipt(r){
   fee('Permit fee'+(fe.doubled?' (doubled)':''), fe.permit||0);
   if (isBldg(r.form) || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
   page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
-  fee('Amount due', fe.total||0, true);
+  const holdR = reviewRequired(r) && !reviewApproved(r);
+  fee(holdR ? 'Amount due after approval' : 'Amount due', fe.total||0, true);
   y -= 8;
   page.drawRectangle({x:M, y:y-74, width:W-2*M, height:82, color:rgb(1,0.96,0.86)});
+  if (holdR){
+  page.drawText('Please do not pay yet', {x:M+14, y:y-12, size:11, font:bold, color:ink});
+  page.drawText('The Building Department will review your application and contact you when it is approved', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
+  page.drawText('and ready for payment, or if anything else is needed. Then pay in person at 740 N Main St,', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
+  page.drawText('Arab, by cash or check made payable to "City of Arab," with reference # '+ref+'.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
+  } else {
   page.drawText('How to pay', {x:M+14, y:y-12, size:11, font:bold, color:ink});
   page.drawText('Pay in person at City of Arab, 740 N Main St, Arab, AL 35016, by cash or check', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
   page.drawText('made payable to "City of Arab." Show this receipt (printed or on your phone) when you pay', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
   page.drawText('so your payment is matched to reference # '+ref+'. The Building Department will contact you.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
+  }
   page.drawText(pdfSafe('Check your permit status anytime at arabcityapplications.jadecruz.dev/apply/#status with reference # '+ref+' and your email.'), {x:M, y:56, size:9, font:bold, color:ink});
   page.drawText(pdfSafe('This receipt confirms your application was received. It is not proof of payment or an issued permit.  ·  Reference '+ref), {x:M, y:40, size:8.5, font:reg, color:grey});
   return pdf.save();
@@ -5218,6 +5309,46 @@ async function arPdf(){
     pdf.getPages().forEach((p, i) => p.drawText('Page '+(i+1)+' of '+pn, { x:W-M-50, y:22, size:8, font:reg, color:grey }));
     await DL.save({ filename:'AR-report-'+fyName(A.fy).replace(' ','')+'.pdf', data: await pdf.save() });
   }catch(e){ toast('Could not build the report: '+((e&&e.message)||'try again')); }
+}
+
+
+/* ================= Building Department review (v2.24) =================
+   Contractor, Homeowner and Sub Trade applications submitted from Oct 15, 2026 are reviewed before payment.
+   Approve = initials (and date) in Office use; the City Clerk cannot take payment until then (bf_record_payment).
+   "Information needed" is shown to the applicant on the permit status page until the application is approved. */
+function reviewPill(s){ const r = reviewState(s); if (r==='none') return '';
+  return '<span class="pill '+({pending:'partial', info:'unpaid', approved:'paid'})[r]+'">'+REVIEW_LABEL[r]+'</span>'; }
+function docSlots(s){ const F = FORMS[s.form]; if (!F) return [];
+  return F.fields.filter(x => x.type==='doc' && (!x.show || x.show(s.fields||{}))); }
+function docChecklistHtml(s){
+  const slots = docSlots(s); if (!slots.length || !((s.files||[]).some(f => f.slot) || reviewRequired(s))) return '';
+  const have = id => (s.files||[]).filter(f => f.slot===id).length;
+  const miss = slots.filter(x => !have(x.id)).length;
+  return '<div class="docck"><b>Required documents</b>'+(miss ? ' <span class="pill unpaid">'+miss+' missing</span>' : ' <span class="pill paid">All attached</span>')+'<ul>'+
+    slots.map(x => { const n = have(x.id); return '<li class="'+(n?'ok':'no')+'">'+ic(n?'check':'x')+'<span>'+esc(x.label)+'</span><small>'+(n ? n+' file'+(n===1?'':'s') : 'Missing')+'</small></li>'; }).join('')+'</ul></div>';
+}
+function reviewMail(s, kind){
+  const f = s.fields||{}, F = FORMS[s.form]||{}, ref = refNo(s.id), st = s.staff||{}, total = (s.pay && s.pay.total!=null) ? s.pay.total : (s.fees||{}).total;
+  const subj = 'Your City of Arab '+(F.short||'permit')+' application (Ref '+ref+')';
+  const body = kind==='approved'
+    ? 'Hello '+(f.applicant||'')+',\n\nYour '+(F.title||'permit application')+' for '+(f.address||'your project')+' (reference # '+ref+') has been approved by the Building Department.\n\nAmount due: '+money(total)+'\n\nPlease pay in person at City Hall, 740 N Main St, Arab, AL 35016, by cash or check made payable to "City of Arab." Bring your reference # '+ref+'.\n\nYou can check your permit status at https://arabcityapplications.jadecruz.dev/apply/#status with your reference # and email.\n\nThank you,\nCity of Arab Building Department\n256-586-5968'
+    : 'Hello '+(f.applicant||'')+',\n\nThank you for your '+(F.title||'permit application')+' for '+(f.address||'your project')+' (reference # '+ref+'). Before we can approve it, we need the following:\n\n'+(st.infoNeeded||'')+'\n\nPlease reply to this email with the information, or bring it to City Hall, 740 N Main St, Arab. Please do not pay until your application is approved.\n\nThank you,\nCity of Arab Building Department\n256-586-5968';
+  return 'mailto:'+encodeURIComponent(f.email||'')+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+}
+function reviewBoxHtml(s){
+  const st = s.staff||{}, r = reviewState(s), req = reviewRequired(s), slots = docSlots(s), have = id => (s.files||[]).some(f => f.slot===id);
+  const miss = (req || (s.files||[]).some(f => f.slot)) ? slots.filter(x => !have(x.id)) : [];
+  const msg = { pending:'Not approved yet. The applicant was told not to pay until you approve; the City Clerk cannot take payment until then.',
+    info:'Waiting on the applicant for the information below. They see it on their permit status page. Payment stays on hold until you approve.',
+    approved:'Approved'+(st.approvedBy?' by '+esc(st.approvedBy):'')+(st.approvedDate?' on '+esc(fmtDay(st.approvedDate)):'')+'. The City Clerk can take payment.',
+    none:'Submitted before reviews started (Oct 15, 2026). Payment is not held for this application.' }[r];
+  return '<div class="sect">Building Department review</div>'+
+    '<div class="fld full"><div class="revbox rv-'+r+'">'+(reviewPill(s)||'<span class="pill src">No review hold</span>')+'<span>'+msg+'</span>'+
+      (miss.length ? '<span class="revmiss">'+ic('alert')+'Missing documents: '+miss.map(x => esc(x.label)).join(', ')+'</span>' : '')+'</div></div>'+
+    '<div class="fld full"><label class="l" for="o_infoNeeded">Information needed from the applicant <span class="hint">(optional; shown on their permit status page until approved)</span></label><textarea id="o_infoNeeded" rows="2" maxlength="1000" placeholder="e.g. Please send a site plan showing the setbacks from all property lines.">'+esc(st.infoNeeded||'')+'</textarea></div>'+
+    '<div class="fld"><label class="l" for="o_approvedBy">Approved by (initials)</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"><span class="hint">Entering your initials approves the application. Leave blank until it is ready.</span></div>'+
+    '<div class="fld"><label class="l" for="o_approvedDate">Date approved</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"><span class="hint">Today\u2019s date is used if left blank.</span></div>'+
+    ((s.fields||{}).email && (r==='approved' || r==='info') ? '<div class="fld full"><div class="row revmail"><a class="btn sm" href="'+esc(reviewMail(s, r))+'">'+ic('mail')+(r==='approved' ? 'Email the applicant: approved, ready to pay' : 'Email the applicant: information needed')+'</a><span class="hint">Opens an email in your mail program, already filled in. Save office use first.</span></div></div>' : '');
 }
 </script>
 </body>
