@@ -1655,7 +1655,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.24.2';   // shown at the bottom of every page
+const APP_VERSION = '2.24.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2029,7 +2029,7 @@ async function submitForm(e){
         ? '<div class="r t"><span>Estimated total</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> This is an estimate. The Building Department will review your application and confirm the final total when it is approved, then contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy. They will also contact you if anything else is needed.</small></div>'
         : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
       '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
-      '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
+      '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
     // v2.23.1: applicant feedback survey removed (Jade's request); maybeAskFeedback is no longer called.
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
@@ -3657,15 +3657,31 @@ function statusCard(r){
 }
 function bindStatus(){
   const f = document.getElementById('stf'); if (!f) return;
-  f.onsubmit = async e => { e.preventDefault();
-    const R = S.st; R.ref = document.getElementById('stRef').value.trim().replace(/^ref(erence)?\s*#?\s*/i,'').replace(/[\s#-]/g,'').toUpperCase(); R.email = document.getElementById('stEmail').value.trim(); R.err = ''; R.res = null;
-    if (!R.ref || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(R.email)){ R.err = 'Enter your reference # and the email address on your application.'; render(); return; }
-    R.busy = true; render();
-    try{ R.res = await sbRpc('bf_permit_status', { p_ref:R.ref, p_email:R.email }) || []; }
-    catch(x){ R.err = x.message || 'Could not check right now. Please try again.'; }
-    R.busy = false; render();
-    const o = document.getElementById(R.err ? 'stf' : 'stOut'); if (o && o.scrollIntoView) o.scrollIntoView({ behavior:'smooth', block:'start' }); };
+  f.onsubmit = e => { e.preventDefault(); statusLookup(); };
+  // v2.24.3: arriving from the submission screen ("Check permit status"): reference # and email are filled in and looked up
+  if (!S.st.ref && !S.st.res){ const h = takeStatusHandoff(); if (h){ S.st.ref = h.ref; S.st.email = h.email; S.st.auto = true; render(); return; } }
+  if (S.st.auto && !S.st.busy){ S.st.auto = false; setTimeout(statusLookup, 0); }
 }
+async function statusLookup(){
+  const R = S.st, ri = document.getElementById('stRef'), ei = document.getElementById('stEmail');
+  if (ri) R.ref = ri.value; if (ei) R.email = ei.value;
+  R.ref = String(R.ref||'').trim().replace(/^ref(erence)?\s*#?\s*/i,'').replace(/[\s#-]/g,'').toUpperCase(); R.email = String(R.email||'').trim(); R.err = ''; R.res = null;
+  if (!R.ref || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(R.email)){ R.err = 'Enter your reference # and the email address on your application.'; render(); return; }
+  R.busy = true; render();
+  try{ R.res = await sbRpc('bf_permit_status', { p_ref:R.ref, p_email:R.email }) || []; }
+  catch(x){ R.err = x.message || 'Could not check right now. Please try again.'; }
+  R.busy = false; render();
+  const o = document.getElementById(R.err ? 'stf' : 'stOut'); if (o && o.scrollIntoView) o.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+/* Submission screen -> status page. Same page: state is passed directly. Embedded form (opens the full site in the
+   same tab): the reference # and email are handed over in this tab's sessionStorage for 10 minutes and removed when read.
+   Never put in the address bar. */
+function openMyStatus(){ const r = LAST_RECEIPT; if (!r) return go('status');
+  S.st = { ref:refNo(r.id), email:String((r.fields||{}).email||''), auto:true }; go('status'); }
+function statusHandoff(){ const r = LAST_RECEIPT; if (!r) return;
+  try{ sessionStorage.setItem('bdStHandoff', JSON.stringify({ ref:refNo(r.id), email:String((r.fields||{}).email||''), at:Date.now() })); }catch(e){} }
+function takeStatusHandoff(){ try{ const v = JSON.parse(sessionStorage.getItem('bdStHandoff')||'null'); sessionStorage.removeItem('bdStHandoff');
+  return v && v.ref && v.email && Date.now() - v.at < 600000 ? v : null; }catch(e){ return null; } }
 
 
 /* ================= Records & storage: export (CSV / ZIP) and controlled purge =================
