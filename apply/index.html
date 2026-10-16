@@ -1655,7 +1655,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.24.0';   // shown at the bottom of every page
+const APP_VERSION = '2.24.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1893,8 +1893,8 @@ function feeBoxHtml(key){
   return (showVal?'<div class="r"><span>Construction value <small>('+esc(fe.basis||'enter project details')+')</small></span><b class="num">'+money(fe.value)+'</b></div>':'')+
     '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
     (showVal?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
-    '<div class="r t"><span>Grand total</span><span class="num">'+money(fe.total)+'</span></div>'+
-    (REVIEW_FORMS.includes(key) ? '<small>The Building Department reviews your application first. Once it is approved, they will contact you to pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>'
+    '<div class="r t"><span>'+(REVIEW_FORMS.includes(key) ? 'Estimated total' : 'Grand total')+'</span><span class="num">'+money(fe.total)+'</span></div>'+
+    (REVIEW_FORMS.includes(key) ? '<small><b>This is an estimate.</b> The final total is confirmed when the Building Department approves your application. They will contact you then to pay in person by cash or check at 740 N Main St, and the permit moves on to inspections and the Certificate of Occupancy. If work started before this permit, staff will double the permit fee.</small>'
       : '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>');
 }
 function viewForm(){
@@ -2026,7 +2026,7 @@ async function submitForm(e){
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(REVIEW_FORMS.includes(S.form)
-        ? '<div class="r t"><span>Amount due after approval</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> The Building Department will review your application and contact you when it is approved and ready for payment, or if anything else is needed.</small></div>'
+        ? '<div class="r t"><span>Estimated total</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> This is an estimate. The Building Department will review your application and confirm the final total when it is approved, then contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy. They will also contact you if anything else is needed.</small></div>'
         : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
       '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();S.st={ref:\''+refNo(subId)+'\',email:\''+esc(String(vals.email||'').replace(/[\\\'"]/g,''))+'\'};go(\'status\')"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
@@ -3635,9 +3635,9 @@ function statusCard(r){
     d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
     st: revOk ? 'ok' : info ? 'part' : '',
     list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'<br><small>Email it to buildingdept@arabcity.org (include reference # '+esc(r.ref)+') or bring it to City Hall, 740 N Main St.</small></div>' : '' }] : []).concat([
-    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }]);
+    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : (revReq && revOk) ? 'Not assigned yet' : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }]);
   if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
-  steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? money(total)+' due after approval' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
+  steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? 'Estimated '+money(total)+'. The final total is confirmed when your application is approved.' : (revReq && revOk && ps==='unpaid') ? 'Confirmed total '+money(total)+' due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
   if (hasInsp) steps.push({ t:'Inspections',
     d: !insL.length ? 'None complete' : [doneN ? doneN+' complete' : 'None complete', pendN ? pendN+' pending' : ''].filter(Boolean).join(' · '),
     st: finalDone ? 'ok' : insL.length ? 'part' : '',
@@ -3648,8 +3648,10 @@ function statusCard(r){
   return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     '<ol class="steps">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
-    '<div class="st-fees num"><div><span>Amount due</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>'+
-    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note">Please do not pay yet. The Building Department will contact you when your application is approved and ready for payment.</p>' : '')+
+    (holdPay && ps==='unpaid'
+      ? '<div class="st-fees num"><div><span>Estimated total</span><b>'+money(total)+'</b></div></div>'
+      : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
+    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy.</p>' : '')+
     ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
     '</section>';
 }
@@ -4729,14 +4731,14 @@ async function buildReceipt(r){
   if (isBldg(r.form) || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
   page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
   const holdR = reviewRequired(r) && !reviewApproved(r);
-  fee(holdR ? 'Amount due after approval' : 'Amount due', fe.total||0, true);
+  fee(holdR ? 'Estimated total' : 'Amount due', fe.total||0, true);
   y -= 8;
   page.drawRectangle({x:M, y:y-74, width:W-2*M, height:82, color:rgb(1,0.96,0.86)});
   if (holdR){
-  page.drawText('Please do not pay yet', {x:M+14, y:y-12, size:11, font:bold, color:ink});
-  page.drawText('The Building Department will review your application and contact you when it is approved', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
-  page.drawText('and ready for payment, or if anything else is needed. Then pay in person at 740 N Main St,', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
-  page.drawText('Arab, by cash or check made payable to "City of Arab," with reference # '+ref+'.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
+  page.drawText('Please do not pay yet. This total is an estimate.', {x:M+14, y:y-12, size:11, font:bold, color:ink});
+  page.drawText('The Building Department will review your application, confirm the final total when it is approved,', {x:M+14, y:y-30, size:10, font:reg, color:ink});
+  page.drawText('and contact you to pay in person at 740 N Main St, Arab, by cash or check made payable to "City of Arab"', {x:M+14, y:y-45, size:10, font:reg, color:ink});
+  page.drawText('(reference # '+ref+'). The permit then moves on to inspections and the Certificate of Occupancy.', {x:M+14, y:y-60, size:10, font:reg, color:ink});
   } else {
   page.drawText('How to pay', {x:M+14, y:y-12, size:11, font:bold, color:ink});
   page.drawText('Pay in person at City of Arab, 740 N Main St, Arab, AL 35016, by cash or check', {x:M+14, y:y-30, size:10.5, font:reg, color:ink});
