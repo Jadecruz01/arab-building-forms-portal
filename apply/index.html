@@ -107,8 +107,15 @@ svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .ck-wait{display:grid;gap:6px;border-color:var(--amber)!important;background:var(--amberbg)!important}
 .ck-wait b{display:flex;gap:8px;align-items:center}
 .st-info{margin-top:6px;border-left:3px solid var(--red);background:var(--redbg);padding:8px 10px;border-radius:6px;font-size:14px;color:var(--ink)}
-html.demo-on body{padding-top:46px}
+/* demo mode: the bar is pinned to the top; everything else that is pinned to the top moves below it (--demo-h = bar height, measured) */
+html.demo-on{--demo-h:46px;scroll-padding-top:var(--demo-h)}
+#demobarSpace{height:var(--demo-h)}
 #demobarWrap{position:fixed;top:0;left:0;right:0;z-index:90}
+html.demo-on .panel{top:var(--demo-h)}
+html.demo-on .side{top:var(--demo-h);height:calc(100vh - var(--demo-h))}
+html.demo-on .jt-top{top:var(--demo-h)}
+html.demo-on .veil{top:var(--demo-h)}
+html.demo-on .bugdlg,html.demo-on .scandlg{top:calc(50% + var(--demo-h) / 2);max-height:calc(100% - var(--demo-h) - 32px)}
 .demobar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:7px 14px;min-height:46px;background:repeating-linear-gradient(135deg,#f6c445 0 18px,#f2b929 18px 36px);color:#1d1600;font-size:13px;border-bottom:2px solid #1d1600;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .demobar b{display:inline-flex;align-items:center;gap:6px;letter-spacing:.08em;font-size:13px}
 .demobar b .i{width:16px;height:16px}
@@ -1677,7 +1684,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.25.0';   // shown at the bottom of every page
+const APP_VERSION = '2.25.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -5638,7 +5645,11 @@ function demoBarHtml(){
     '<span class="dm-grp"><span class="dm-l">View as:</span>'+[['admin','Administrator'],['staff','Building Dept'],['clerk','City Clerk']].map(([r,l]) => '<button type="button" class="'+(k===r?'on':'')+'" onclick="demoAs(\''+r+'\')"'+(k===r?' aria-pressed="true"':'')+'>'+l+'</button>').join('')+'</span>'+
     '<span class="dm-grp"><button type="button" onclick="if(confirm(\'Start the demo over with fresh sample data?\'))demoReset()">Reset demo</button><button type="button" class="dm-exit" onclick="demoExit()">Exit demo</button></span></div>';
 }
-function demoPaintBar(){ if (!DEMO) return; let b = document.getElementById('demobarWrap'); if (!b){ b = document.createElement('div'); b.id = 'demobarWrap'; document.body.insertBefore(b, document.body.firstChild); document.documentElement.classList.add('demo-on'); } b.innerHTML = demoBarHtml(); }
+function demoPaintBar(){ if (!DEMO) return; let b = document.getElementById('demobarWrap');
+  if (!b){ b = document.createElement('div'); b.id = 'demobarWrap'; document.body.insertBefore(b, document.body.firstChild); const sp = document.createElement('div'); sp.id = 'demobarSpace'; sp.setAttribute('aria-hidden','true'); b.after(sp); document.documentElement.classList.add('demo-on');
+    window.addEventListener('resize', demoBarHeight); }
+  b.innerHTML = demoBarHtml(); demoBarHeight(); }
+function demoBarHeight(){ const b = document.getElementById('demobarWrap'); if (b) document.documentElement.style.setProperty('--demo-h', Math.ceil(b.getBoundingClientRect().height)+'px'); }
 /* status page: one-click samples */
 function demoStatusHtml(){ if (!DEMO) return ''; const s = demoSamples(); if (!s.length) return '';
   return '<div class="demo-samples"><b>Demo: try a sample application</b><div>'+s.map(x => '<button type="button" class="chip" onclick="S.st={ref:\''+x.ref+'\',email:\''+esc(x.email)+'\',auto:true};render()"><span>'+esc(x.tag)+'</span><small>'+esc(x.who)+' · '+esc(x.form||'')+'</small></button>').join('')+'</div><small>Or submit your own application in demo mode, then choose Check permit status on the confirmation screen.</small></div>'; }
