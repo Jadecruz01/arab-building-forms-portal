@@ -107,6 +107,24 @@ svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .ck-wait{display:grid;gap:6px;border-color:var(--amber)!important;background:var(--amberbg)!important}
 .ck-wait b{display:flex;gap:8px;align-items:center}
 .st-info{margin-top:6px;border-left:3px solid var(--red);background:var(--redbg);padding:8px 10px;border-radius:6px;font-size:14px;color:var(--ink)}
+html.demo-on body{padding-top:46px}
+#demobarWrap{position:fixed;top:0;left:0;right:0;z-index:90}
+.demobar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:7px 14px;min-height:46px;background:repeating-linear-gradient(135deg,#f6c445 0 18px,#f2b929 18px 36px);color:#1d1600;font-size:13px;border-bottom:2px solid #1d1600;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.demobar b{display:inline-flex;align-items:center;gap:6px;letter-spacing:.08em;font-size:13px}
+.demobar b .i{width:16px;height:16px}
+.demobar .dm-note{font-weight:600}
+.demobar .dm-grp{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.demobar .dm-l{font-weight:700;margin-right:2px}
+.demobar a,.demobar button{font:600 12.5px var(--f-body);color:#1d1600;background:rgba(255,255,255,.55);border:1px solid rgba(29,22,0,.35);border-radius:6px;padding:4px 9px;cursor:pointer;text-decoration:none}
+.demobar a.on,.demobar button.on{background:#1d1600;color:#f6c445;border-color:#1d1600}
+.demobar .dm-exit{background:#1d1600;color:#fff;border-color:#1d1600}
+.demobar a:focus-visible,.demobar button:focus-visible{outline:2px solid #1d1600;outline-offset:2px}
+.demo-samples{border:2px dashed #e0a800;background:#fff8df;border-radius:10px;padding:12px 14px;margin:0 0 16px;display:grid;gap:8px;color:#1d1600}
+.demo-samples>div{display:flex;flex-wrap:wrap;gap:8px}
+.demo-samples .chip{display:grid;text-align:left;gap:1px;padding:7px 12px;border-radius:10px;background:#fff;border:1px solid #e0c56a;cursor:pointer}
+.demo-samples .chip span{font-weight:700;font-size:13.5px;color:#1d1600}
+.demo-samples .chip small{font-size:12px;color:#5c5030}
+.demo-samples>small{color:#5c5030;font-size:12.5px}
 .tile .soon{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0 0;font-size:12.5px;font-weight:700;color:var(--blue);background:transparent;border:1px dashed currentColor;border-radius:6px;padding:1px 9px}
 .tile .soon::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8}
 html.embed .tile .soon{margin-top:4px}
@@ -1464,15 +1482,19 @@ const SB_URL = 'https://yighcuismepfmappcfui.supabase.co';
 const SB_KEY = 'sb_publishable_nGh6iXqOO0iKTPo6uOvXSA_x4ZjIEUi';   // Supabase > Project Settings > API Keys > publishable key (meant to be public)
 const APP_TAG = 'jf';                                    // marks records made by these forms
 const MAX_FILE_MB = 8;
+/* demo mode (administrators only; see the DEMO MODE section): read once per page load from this tab's storage */
+var DEMO = (function(){ try{ const s = JSON.parse(sessionStorage.getItem('bdDemo')||'null'); if (s && s.v===1 && Date.now()-s.started < 12*3600e3) return s; sessionStorage.removeItem('bdDemo'); }catch(e){} return null; })();
 async function sbRpc(fn, args){
+  if (DEMO){ if (window.__demoOff) throw new Error('Leaving demo mode.'); return demoRpc(fn, args||{}); }      // demo: answered in this browser tab, never sent to the server
   const r = await fetch(SB_URL+'/rest/v1/rpc/'+fn, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' }, body:JSON.stringify(args||{}) });
   const t = await r.text(); let j = null; try{ j = t ? JSON.parse(t) : null; }catch(e){}
   if (!r.ok) throw new Error(((j && (j.message || j.hint)) || ('Server error '+r.status)).replace(/^STORAGE_FULL:\s*/,''));
   return j;
 }
 let TOKEN = null; try{ TOKEN = localStorage.getItem('bdStaffToken') || sessionStorage.getItem('bdStaffToken'); }catch(e){}
+if (DEMO) TOKEN = DEMO.token;   // the real sign-in stays in storage, untouched
 // "Keep me signed in" keeps the token for 7 days (localStorage); otherwise it lives only until the browser is closed.
-function saveToken(t, remember){ try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); (remember ? localStorage : sessionStorage).setItem('bdStaffToken', t); }catch(e){} }
+function saveToken(t, remember){ if (DEMO){ DEMO.token = t; demoSave(); return; } try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); (remember ? localStorage : sessionStorage).setItem('bdStaffToken', t); }catch(e){} }
 const tokenRemembered = () => { try{ return !!localStorage.getItem('bdStaffToken'); }catch(e){ return false; } };
 S.booting = !!TOKEN;   // a remembered sign-in is being checked: show "Loading", not the sign-in form
 const DL = { save: async ({filename, data}) => { const b = data instanceof Blob ? data : new Blob([data], {type: /\.pdf$/.test(filename)?'application/pdf':/\.csv$/.test(filename)?'text/csv':'application/octet-stream'});
@@ -1599,7 +1621,7 @@ function queueOptimize(f){
 // size note used on the Documents tab and in the PDF
 const sizeNote = f => f.compressed && f.origSize ? 'original '+mb(f.origSize)+', stored '+mb(f.size) : (f.size ? mb(f.size) : '');
 async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function signOutLocal(){ if (typeof FBA!=='undefined') FBA.data = null; TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mustPw=false; S.signinPw=null; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} prefClear(); }
+function signOutLocal(){ if (typeof FBA!=='undefined') FBA.data = null; TOKEN=null; S.staff=false; S.me=null; S.subs=[]; S.loaded=false; S.users=null; S.ck && (S.ck.results=null, S.ck.sel=null, S.ck.rec=null); S.limited=false; S.mustPw=false; S.signinPw=null; S.mfa=null; S.mfaSet=null; S.sec=null; S.secList=null; if (typeof PV!=='undefined') Object.assign(PV, {st:null, title:'', body:'', dirty:false, msg:'', err:'', preview:false}); if (!DEMO){ try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); }catch(e){} } prefClear(); }
 /* ================= saved settings (per staff login, stored in the database) =================
    Layout and report choices are saved to the signed-in account (bf_set_my_prefs), so they come
    back after signing out, on another computer, or after the browser is cleared. A small copy is
@@ -1655,7 +1677,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.24.3';   // shown at the bottom of every page
+const APP_VERSION = '2.25.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1900,7 +1922,7 @@ function feeBoxHtml(key){
 function viewForm(){
   const F = FORMS[S.form];
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
-   '<div class="sheet" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
+   '<div class="sheet" id="sheet">'+(DEMO ? '<div class="demo-samples"><b>Demo: fill this form with sample answers</b><div><button type="button" class="btn sm primary" onclick="demoFillForm()">'+ic('edit')+'Fill with sample answers</button></div><small>Sample documents are attached too. Submitting only adds it to the demo.</small></div>' : '')+'<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
    '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
 }
@@ -2202,6 +2224,7 @@ function profileMenuHtml(){
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'privacy-statement\')">'+ic('lock')+'Privacy statement (public site)</button>'+
       '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement (public site)</button>'+
       (isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;go(\'site-notice\')">'+ic('info')+'Site notice (public site)</button>' : '')+
+      (DEMO ? '<button type="button" role="menuitem" onclick="S.pmenu=false;demoExit()">'+ic('x')+'Exit demo mode</button>' : isAdmin() ? '<button type="button" role="menuitem" onclick="S.pmenu=false;render();openDemoDlg()">'+ic('star')+'Demo mode</button>' : '')+
       '<button type="button" role="menuitem" onclick="openAccount(\'settings\')">'+ic('cols')+'Saved settings and devices</button>'+
       '<div class="pm-sep" role="separator"></div>'+
       '<button type="button" role="menuitem" class="pm-out" onclick="S.pmenu=false;lockStaff()">'+ic('left')+'Sign out</button>'+
@@ -2268,7 +2291,7 @@ document.addEventListener('keydown', e => { if (S.nmenu && e.key==='Escape'){ S.
 function openAccount(sec){ S.pmenu = false; S.meSec = sec || 'profile'; if (S.view==='me') render(); else go('me');
   setTimeout(() => { const el = document.getElementById('me-'+S.meSec); if (el){ el.scrollIntoView({block:'start'}); const f = el.querySelector('input'); if (f) f.focus(); } }, 0); }
 const canRecords = () => { const a = (S.me && S.me.access) || {}; return !!(a.records || myAccess().admin); };
-async function lockStaff(){ await prefFlush(); const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
+async function lockStaff(){ if (DEMO) return demoExit(); await prefFlush(); const t = TOKEN; signOutLocal(); try{ if (t) await sbRpc('bf_sign_out',{p_token:t}); }catch(e){} go('staff'); }
 const isAdmin = () => myAccess().admin;
 function storageBanner(){
   const st = S.storage; if (!st || st.pct < 80) return '';
@@ -2335,6 +2358,7 @@ function viewWorkspace(){
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
    (isAdmin()?'<a class="navi" href="#site-notice" onclick="event.preventDefault();go(\'site-notice\')">'+ic('info')+'Site notice</a>':'')+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
+   (isAdmin() && !DEMO ?'<a class="navi" href="#staff" onclick="event.preventDefault();openDemoDlg()">'+ic('star')+'Demo mode</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unread</span><b class="num">'+S.subs.filter(s=>!s.read).length+'</b></div>'+
    '<div class="navi" style="justify-content:space-between"><span>Unpaid</span><b class="num">'+S.subs.filter(s=>!isPaid(s)).length+'</b></div></aside>'+
@@ -3610,7 +3634,7 @@ function viewStatus(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
      '<span class="hint" style="color:var(--muted)">Enter the reference # from your receipt and the email address you used on the application. They are used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
-   '<form id="stf" class="fgrid" novalidate>'+
+   demoStatusHtml()+'<form id="stf" class="fgrid" novalidate>'+
      '<div class="fld"><label class="l" for="stRef">Reference #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
      '<div class="fld"><label class="l" for="stEmail">Email on the application</label><input type="email" id="stEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" value="'+esc(R.email||'')+'"></div>'+
      '<div class="fld full"><button class="btn primary" id="stBtn" type="submit" style="justify-content:center;padding:12px 18px;font-size:15px"'+(R.busy?' disabled':'')+'>'+ic('search')+(R.busy?'Checking…':'Check status')+'</button></div></form>'+
@@ -3956,6 +3980,7 @@ function render(){
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
   document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+' Application · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Arab City Staff Portal';
   ensureViewData();
+  if (DEMO) demoPaintBar();
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
 /* Start loading what the current page needs, once, whichever way the user got there
@@ -4377,7 +4402,7 @@ function idleWarnHtml(left){
 function idleStay(){ idleTouch(); const b = document.getElementById('idleBox'); if (b) b.remove(); }
 setInterval(() => {
   const box = document.getElementById('idleBox');
-  if (!((S.staff || S.limited) && TOKEN && !tokenRemembered())){ if (box) box.remove(); return; }
+  if (DEMO || !((S.staff || S.limited) && TOKEN && !tokenRemembered())){ if (box) box.remove(); return; }
   const left = Math.round((IDLE_MIN*60000 - (Date.now() - IDLE_AT))/1000);
   if (left <= 0){ if (box) box.remove(); S.pinMsg = 'For your security, you were signed out after '+IDLE_MIN+' minutes without activity.'; lockStaff(); return; }
   if (left <= IDLE_WARN_SEC){
@@ -5367,6 +5392,277 @@ function reviewBoxHtml(s){
     '<div class="fld"><label class="l" for="o_approvedBy">Approved by (initials)</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"><span class="hint">Entering your initials approves the application. Leave blank until it is ready.</span></div>'+
     '<div class="fld"><label class="l" for="o_approvedDate">Date approved</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"><span class="hint">Today\u2019s date is used if left blank.</span></div>'+
     ((s.fields||{}).email && (r==='approved' || r==='info') ? '<div class="fld full"><div class="row revmail"><a class="btn sm" href="'+esc(reviewMail(s, r))+'">'+ic('mail')+(r==='approved' ? 'Email the applicant: approved, ready to pay' : 'Email the applicant: information needed')+'</a><span class="hint">Opens an email in your mail program, already filled in. Save office use first.</span></div></div>' : '');
+}
+
+/* ================= DEMO MODE (v2.25, administrators only) =================
+   For showing the portal in person without touching real data. An administrator turns it on from the
+   account menu (their real admin access is checked with the server first). While it is on, EVERY server
+   call (sbRpc) is answered by this in-browser stand-in, loaded with made-up sample applications; nothing is
+   sent to the real database. The demo lives only in this browser tab (sessionStorage 'bdDemo', 12 hours)
+   and the real sign-in is left untouched, so "Exit demo" returns to the real portal. */
+const DEMO_PDF = 'data:application/pdf;base64,JVBERi0xLjcKJYGBgYEKCjcgMCBvYmoKPDwKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL0xlbmd0aCAyODMKPj4Kc3RyZWFtCniclZC7TkMxDIZ3P0VmpBbH8SWREEPPBQYW4GyIAbXlplOhIgSvjwNtoaILUmznz+3/4jXgVANOxYPC1Rmk8AE3twHDAqJnDDEw1jFf7RZq/itrqdkihREk0a8Zen2Ea7iENcyGPc/XBzg+X47vy7en+d1k9jIuJoYlc0bLpRoP90AchoudXxQHMt9YwYkkjtwKcsNCyMw9JxFuWbgTPg3DMwxH0A0/zilsY9+5GJNmEs0h5gOmJoHp25RZRVvtCWtWV4TUuuq091dQI6GRn4nauGI/k6zeEO3sX1CEiBmlZA2RD3cilQ1UUv+CFTfsVb0X0RGiks/IzYs2DlIc0WqfVMwxjYy3WI6Mvkquy0b1X/v+iT3kT0nCd3sKZW5kc3RyZWFtCmVuZG9iagoKOCAwIG9iago8PAovRmlsdGVyIC9GbGF0ZURlY29kZQovVHlwZSAvT2JqU3RtCi9OIDYKL0ZpcnN0IDMyCi9MZW5ndGggNDM3Cj4+CnN0cmVhbQp4nNVTTWvcMBC961fMsT0EfdiW5LIs7K7XLZTQkARaEnpwbLG4LFKxtSX9952RvAkJlEBvxQzWzDzNvCdmJAhQUJZQgLFQgi5KqMAaPEGtJaxWjN/+/umAX3UHNzP+eRxmuEekgGv4zvgunHwEydZr9ozddbE7hgPLl0AS+Iy4msJw6t0Eq3bftkIYIYQu0bQQqsH/Dq1GU+hjTlk8o5lyMYyZQohig7k2mzb5DuUTtlru7/GPWE2YJmNLm/2nvtRrn2uot/jUa8Yvw9B00cG75oMSSkshMSWtKO7e43NMrovh/xWX+I/B/13h7RiP7qyvov4y90+1qV6VtaU+beaYODc5R3xIy5P+cok3GU88XkwTDRGN0uRo0tIs8Ws3h9PU43ARrg2YocMnd/zl4th3F9twHC6MqC0+ibE1DnW69wyoTam0VZW2OOqvckTNiqq2eskhH/7ty8MP16c+5O4f48ebSM+UAxS7dMPYbcMjLojAT0sFpla0JhvvQ6TFSSvjI0ohzyxr9EIvqWH85vQQk0tByfi2m13S+UokMvF9GEZ/AP519Bs/j+fAP5Z9o+Ifp5gJLAplbmRzdHJlYW0KZW5kb2JqCgo5IDAgb2JqCjw8Ci9TaXplIDEwCi9Sb290IDIgMCBSCi9JbmZvIDMgMCBSCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCi9UeXBlIC9YUmVmCi9MZW5ndGggNDIKL1cgWyAxIDIgMiBdCi9JbmRleCBbIDAgMTAgXQo+PgpzdHJlYW0KeJwVxMERACAIA8EL4IxPi7UPSkazjwVmgg1OLly6cksckO4vGx5rtwNkCmVuZHN0cmVhbQplbmRvYmoKCnN0YXJ0eHJlZgo5MTEKJSVFT0Y=';
+function demoSave(){ if (!DEMO || window.__demoOff) return;
+  try{ sessionStorage.setItem('bdDemo', JSON.stringify(DEMO)); }
+  catch(e){ // storage full (many uploads): keep the newest documents' contents only
+    try{ const att = Object.values(DEMO.docs.attachments||{}); att.slice(0, Math.max(att.length-6, 0)).forEach(a => { if (a.data && a.data.data && a.data.data.length > 4000) a.data.data = DEMO_PDF; });
+      sessionStorage.setItem('bdDemo', JSON.stringify(DEMO)); }catch(x){} } }
+const dClone = x => x == null ? x : JSON.parse(JSON.stringify(x));
+const dUuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+const dRef = id => String(id).replace(/-/g,'').slice(0,8).toUpperCase();
+const dIsoDay = d => { const x = new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
+const DEMO_ROLES = { admin:{ name:'Demo Administrator', title:'Web Administrator', role:'admin', email:'demo.admin@example.com' },
+  staff:{ name:'Demo Building Official', title:'Building Official', role:'staff', email:'demo.building@example.com' },
+  clerk:{ name:'Demo City Clerk', title:'City Clerk', role:'clerk', email:'demo.clerk@example.com' } };
+function dAccJson(k){ const a = DEMO_ROLES[k], over = (DEMO && DEMO.acc && DEMO.acc[k]) || {};
+  return { id:'demo-'+k, email:a.email, name:over.name||a.name, role:a.role, createdAt:'2026-10-01T14:00:00Z', title:over.title!=null?over.title:a.title, active:true, perms:[],
+    access:{ building:a.role!=='clerk', payments:a.role!=='staff', admin:a.role==='admin' } }; }
+function dAcc(token){ const k = String(token||'').replace(/^demo-/,''); return DEMO_ROLES[k] ? Object.assign(dAccJson(k), {key:k}) : null; }
+function dNeed(token, what){ const a = dAcc(token); if (!a) throw new Error('Sign in again.');
+  if (what==='building' && !a.access.building) throw new Error('Building Department access required.');
+  if (what==='payments' && !a.access.payments) throw new Error('Payment access required.');
+  if (what==='admin' && !a.access.admin) throw new Error('Administrator access required.');
+  return a; }
+function dAudit(a, action, target, details){ DEMO.audit.unshift({ at:new Date().toISOString(), by:(a&&a.name)||'System', action, target:target||'', details:details||{} }); DEMO.audit = DEMO.audit.slice(0, 300); }
+function dSub(id){ const d = DEMO.docs.submissions[id]; return d || null; }
+function dReviewRequired(id, data){ const d = DEMO.docs.submissions[id]; return REVIEW_FORMS.includes(data.form) && String((d && d.created) || new Date().toISOString()) >= REVIEW_FROM; }
+const dApproved = data => !!(String(((data.staff||{}).approvedBy)||'').trim() || String(((data.staff||{}).approvedDate)||'').trim());
+function dPayJson(p){ const s = DEMO.scans[p.id]; return Object.assign({}, p, { scan: s ? { id:s.id, addedBy:s.addedBy, addedAt:s.addedAt, width:s.width, height:s.height } : null }); }
+function dPaySync(id){ const d = dSub(id); if (!d) return null;
+  const total = Math.round((Number((d.data.fees||{}).total)||0)*100)/100, ps = DEMO.payments.filter(p => p.submissionId===id);
+  const paid = Math.round(ps.reduce((a,p) => a + Number(p.amount), 0)*100)/100, live = ps.filter(p => p.kind!=='reversal' && !p.reversedBy), last = live[live.length-1];
+  const status = paid <= 0 && total <= 0 ? 'none' : paid <= 0 ? 'unpaid' : paid < total ? 'partial' : 'paid';
+  d.data.pay = { status, total, paid, balance:Math.max(total-paid, 0), count:live.length, lastReceipt:last?last.receiptNo:'', lastMethod:last?last.method:'', lastCheckNo:last?last.checkNo:'', lastPaidOn:last?last.receivedOn:null, syncedAt:new Date().toISOString() };
+  d.data.staff = Object.assign({}, d.data.staff, { payment: status==='paid' ? (last && last.method || 'Paid') : '', checkNo: status==='paid' ? (last && last.checkNo || '') : '' });
+  return d.data.pay; }
+function dRecordJson(id){ const d = dSub(id), data = d.data;
+  return { id, ref:dRef(id), form:data.form, createdAt:data.createdAt, imported:!!data.imported, permitNo:(data.staff||{}).permitNo||'', fields:data.fields||{}, fees:data.fees||{}, pay:data.pay||{},
+    review:{ required:dReviewRequired(id, data), approved:dApproved(data), approvedDate:(data.staff||{}).approvedDate||'', infoNeeded:String((data.staff||{}).infoNeeded||'').trim() } }; }
+function dClerkGet(id){ if (!dSub(id)) throw new Error('Application not found.');
+  return Object.assign(dRecordJson(id), { payments: DEMO.payments.filter(p => p.submissionId===id).map(dPayJson) }); }
+function dAddPayment(a, o){ const id = ++DEMO.nextPay; const p = Object.assign({ id, receiptNo:'D-'+String(id).padStart(6,'0'), kind:'payment', checkNo:'', note:'', reverses:null, reversedBy:null,
+    recordedBy:a.name, recordedByEmail:a.email, recordedAt:new Date().toISOString(), receivedOn:dIsoDay(new Date()) }, o); DEMO.payments.push(p); return p; }
+
+async function demoRpc(fn, A){
+  A = A || {}; await new Promise(r => setTimeout(r, 60));   // feel like a network call
+  const out = demoCall(fn, A); demoSave(); return dClone(out);
+}
+function demoCall(fn, A){
+  const T = A.p_token, S2 = DEMO.docs.submissions;
+  switch (fn){
+    case 'bf_me': { const a = dAcc(T); if (!a) throw new Error('Sign in again.'); delete a.key; return a; }
+    case 'bf_my_security': { const a = dAcc(T); if (!a) return null; delete a.key; return { account:a, limited:false, mfaEnabled:false, mfaRequired:false, mfaOnAt:null, recoveryLeft:0 }; }
+    case 'bf_admin_security': dNeed(T,'admin'); return Object.keys(DEMO_ROLES).map(k => ({ id:'demo-'+k, mfaEnabled:false, mfaRequired:false, mfaRoleRequired:k==='admin', mfaOnAt:null, recoveryLeft:0, locked:false, failedToday:0, lastSignIn:new Date().toISOString() }));
+    case 'bf_sign_out': setTimeout(demoExit, 50); return null;
+    case 'bf_sign_in': case 'bf_sign_in_code': case 'bf_sign_up': throw new Error('Demo mode: use the "View as" buttons in the demo bar to switch between Administrator, Building Department and City Clerk.');
+    case 'bf_my_prefs': { const a = dNeed(T); return DEMO.prefs[a.id] || {}; }
+    case 'bf_set_my_prefs': { const a = dNeed(T); const v = Object.assign({}, DEMO.prefs[a.id], A.p_patch||{}); Object.keys(v).forEach(k => { if (v[k] == null) delete v[k]; }); DEMO.prefs[a.id] = v; return v; }
+    case 'bf_storage_status': { const used = 23.4*1048576, limit = 400*1048576; return { used, limit, pct:Math.round(used*1000/limit)/10, full:false }; }
+    case 'bf_public_notice': case 'bf_public_privacy': case 'bf_public_a11y': return null;
+    case 'bf_query': {
+      const c = A.p_collection;
+      if (c==='citizens'){ dNeed(T,'admin'); return Object.keys(DEMO_ROLES).map(k => ({ id:'demo-'+k, data:dAccJson(k) })); }
+      if (c==='submissions' || c==='attachments' || c==='suggestions'){ dNeed(T,'building');
+        let rows = Object.entries(DEMO.docs[c]||{}).map(([id, d]) => ({ id, data:d.data }));
+        if (A.p_where_field && A.p_where_value != null) rows = rows.filter(r => String((r.data||{})[A.p_where_field]) === String(A.p_where_value));
+        if (A.p_order_field){ const f = A.p_order_field, dsc = String(A.p_order_dir).toLowerCase()==='desc'; rows.sort((x,y) => { const a = x.data[f], b = y.data[f]; return (a < b ? -1 : a > b ? 1 : 0) * (dsc ? -1 : 1); }); }
+        return rows.slice(0, Math.min(A.p_limit || 100, 500)); }
+      throw new Error('Not available in demo mode.'); }
+    case 'bf_get': { if (A.p_collection==='submissions' || A.p_collection==='attachments'){ dNeed(T,'building'); const d = (DEMO.docs[A.p_collection]||{})[A.p_id]; return d ? d.data : null; } throw new Error('Not available in demo mode.'); }
+    case 'bf_add': {
+      const c = A.p_collection, a = dAcc(T); let data = dClone(A.p_data) || {}; delete data.hp; delete data.fillMs;
+      if (!['submissions','attachments','suggestions'].includes(c)) throw new Error('Not available in demo mode.');
+      const id = dUuid();
+      if (c==='submissions'){ if (!(a && a.access.building)){ data.staff = { permitNo:'', payment:'' }; data.read = false; data.starred = false; delete data.linkedTo; delete data.linkedAt; delete data.linkedBy; delete data.imported; }
+        delete data.pay; S2[id] = { data, created:new Date().toISOString() }; dPaySync(id); }
+      else DEMO.docs[c][id] = { data, created:new Date().toISOString() };
+      return id; }
+    case 'bf_update': {
+      if (A.p_collection==='citizens') throw new Error('Staff accounts cannot be changed in demo mode.');
+      const a = dNeed(T,'building'), d = S2[A.p_id]; if (!d) throw new Error('Record not found.');
+      const old = dClone(d.data), patch = dClone(A.p_patch)||{}; delete patch.pay;
+      const nw = Object.assign({}, old, patch); nw.pay = old.pay; nw.staff = Object.assign({}, patch.staff || old.staff, { payment:(old.staff||{}).payment||'', checkNo:(old.staff||{}).checkNo||'' });
+      d.data = nw; dPaySync(A.p_id);
+      const st = d.data.staff || {};
+      if (st.co==='Given' && (old.staff||{}).co!=='Given'){
+        if (['paid','none'].includes(d.data.pay.status)){ delete st.coOverrideInit; delete st.coOverrideBy; delete st.coOverrideAt; delete st.coOverrideBalance; }
+        else if (!String(st.coOverrideInit||'').trim()){ d.data = old; throw new Error('The Certificate of Occupancy cannot be given until this permit is paid in full. To give it anyway, enter your initials in the override box.'); }
+        else { Object.assign(st, { coOverrideInit:String(st.coOverrideInit).trim(), coOverrideBy:a.name, coOverrideAt:new Date().toISOString(), coOverrideBalance:d.data.pay.balance }); dAudit(a, 'co.override', A.p_id, { initials:st.coOverrideInit }); } }
+      return null; }
+    case 'bf_delete': case 'bf_purge_submission': { dNeed(T,'admin'); const c = fn==='bf_delete' ? A.p_collection : 'submissions'; if (DEMO.docs[c]) delete DEMO.docs[c][A.p_id]; return null; }
+    case 'bf_permit_status': {
+      const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9-]/g,'').toUpperCase(), em = String(A.p_email||'').trim().toLowerCase();
+      if (ref.length < 3 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) throw new Error('Enter your reference # and the email address on your application.');
+      return Object.entries(S2).filter(([id, d]) => dRef(id)===ref && String((d.data.fields||{}).email||'').trim().toLowerCase()===em).map(([id, d]) => { const x = d.data, st = x.staff || {}, ok = dApproved(x);
+        const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (!v || typeof v!=='object') return; const has = [v.date, v.by, v.recorded, v.comment].some(z => String(z||'').trim()); if (!has) return;
+          const done = String(v.by||'').trim() && String(v.recorded||'').trim(); ins[k] = { status:done?'complete':'pending', date:done ? (String(v.date||'').trim() || v.recorded) : '' }; });
+        return { ref:dRef(id), form:x.form, createdAt:x.createdAt, applicant:(x.fields||{}).applicant, address:(x.fields||{}).address, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', approved:!!(st.approvedBy||st.approvedDate),
+          reviewRequired:dReviewRequired(id, x), infoNeeded: ok ? '' : String(st.infoNeeded||'').trim().slice(0,1000), inspections:ins, co:st.co||'',
+          fees:{ permit:(x.fees||{}).permit, cict:(x.fees||{}).cict, total:(x.fees||{}).total, doubled:(x.fees||{}).doubled },
+          pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'' }; }); }
+    case 'bf_fy_get': { dNeed(T); return Object.assign({ updatedBy:'', updatedAt:null }, DEMO.fy); }
+    case 'bf_fy_set_start': { const a = dNeed(T,'building'); if (!(A.p_month>=1 && A.p_month<=12)) throw new Error('Pick a month.'); if (!(A.p_day>=1 && A.p_day<=28)) throw new Error('Pick a day from 1 to 28.');
+      Object.assign(DEMO.fy, { month:A.p_month, day:A.p_day, updatedBy:a.name, updatedAt:new Date().toISOString() }); dAudit(a, 'fiscal.start', '', { to:A.p_month+'/'+A.p_day }); return dClone(DEMO.fy); }
+    case 'bf_fy_override': { const a = dNeed(T,'building'); if (!S2[A.p_id]) throw new Error('Application not found.');
+      if (A.p_fy == null){ delete DEMO.fy.overrides[A.p_id]; return { fy:null }; }
+      if (String(A.p_reason||'').trim().length < 3) throw new Error('Give a short reason for moving this application.');
+      const o = { fy:A.p_fy, reason:String(A.p_reason).trim(), by:a.name, at:new Date().toISOString() }; DEMO.fy.overrides[A.p_id] = o; dAudit(a, 'fiscal.override', A.p_id, { fy:A.p_fy }); return o; }
+    case 'bf_clerk_search': { dNeed(T,'payments'); const st = A.p_status || 'all', w = String(A.p_q||'').toLowerCase().replace(/[#,]/g,' ').split(/\s+/).filter(Boolean);
+      return Object.entries(S2).filter(([id, d]) => { const ps = (d.data.pay||{}).status || 'unpaid';
+          if (st==='due' ? !['unpaid','partial'].includes(ps) : st!=='all' && st!==ps) return false;
+          const hay = (JSON.stringify(d.data.fields||{})+' '+((d.data.staff||{}).permitNo||'')+' '+dRef(id)+' '+id.replace(/-/g,'')).toLowerCase(); return w.every(x => hay.includes(x)); })
+        .sort((a,b) => String(b[1].data.createdAt).localeCompare(String(a[1].data.createdAt))).slice(0, A.p_limit||50).map(([id]) => dRecordJson(id)); }
+    case 'bf_clerk_get': dNeed(T,'payments'); return dClerkGet(A.p_sid);
+    case 'bf_payment_history': dNeed(T); return DEMO.payments.filter(p => p.submissionId===A.p_sid).map(dPayJson);
+    case 'bf_record_payment': {
+      const a = dNeed(T,'payments'), d = S2[A.p_sid]; if (!d) throw new Error('Application not found.');
+      if (dReviewRequired(A.p_sid, d.data) && !dApproved(d.data)) throw new Error('NOT_APPROVED: The Building Department has not approved this application yet, so payment cannot be taken. Ask the applicant to wait until the Building Department contacts them.');
+      const m = String(A.p_method||'').trim(), chk = String(A.p_check_no||'').trim().slice(0,40), amt = Math.round((Number(A.p_amount)||0)*100)/100;
+      if (!['Cash','Check','Money order','Other'].includes(m)) throw new Error('Choose how the payment was made.');
+      if ((m==='Check'||m==='Money order') && !chk) throw new Error('Enter the '+m.toLowerCase()+' number.');
+      if (amt <= 0) throw new Error('Enter the amount received.');
+      const total = Number((d.data.fees||{}).total)||0, paid = DEMO.payments.filter(p => p.submissionId===A.p_sid).reduce((x,p) => x + Number(p.amount), 0);
+      if (total <= 0) throw new Error('This application has no fee to collect.');
+      if (paid >= total) throw new Error('This application is already paid in full.');
+      if (amt > total - paid + 0.001) throw new Error('That is more than the balance due ($'+(total-paid).toFixed(2)+').');
+      if (!A.p_allow_duplicate){ const dup = DEMO.payments.find(p => p.submissionId===A.p_sid && p.kind!=='reversal' && !p.reversedBy && Number(p.amount)===amt && p.method===m && (!chk || p.checkNo===chk) && Date.now()-new Date(p.recordedAt) < 2*864e5);
+        if (dup) throw new Error('DUPLICATE: '+dup.recordedBy+' already recorded a $'+amt.toFixed(2)+' '+m.toLowerCase()+' payment for this application (receipt '+dup.receiptNo+').'); }
+      const p = dAddPayment(a, { submissionId:A.p_sid, amount:amt, method:m, checkNo:chk, receivedOn:A.p_received_on || dIsoDay(new Date()), note:String(A.p_note||'').trim().slice(0,500) });
+      dPaySync(A.p_sid); dAudit(a, 'payment.recorded', A.p_sid, { receiptNo:p.receiptNo, amount:amt });
+      return { payment:dPayJson(p), record:dClerkGet(A.p_sid) }; }
+    case 'bf_reverse_payment': {
+      const a = dNeed(T,'payments'), why = String(A.p_reason||'').trim(); if (why.length < 3) throw new Error('Explain why this payment is being reversed.');
+      const o = DEMO.payments.find(p => p.id===A.p_payment_id); if (!o) throw new Error('Payment not found.');
+      if (o.kind==='reversal') throw new Error('A reversal cannot be reversed. Record a new payment instead.'); if (o.reversedBy) throw new Error('This payment was already reversed.');
+      const r = dAddPayment(a, { submissionId:o.submissionId, kind:'reversal', amount:-o.amount, method:o.method, checkNo:o.checkNo, note:why.slice(0,500), reverses:o.id }); o.reversedBy = r.id;
+      dPaySync(o.submissionId); dAudit(a, 'payment.reversed', o.submissionId, { original:o.receiptNo });
+      return { payment:dPayJson(r), record:dClerkGet(o.submissionId) }; }
+    case 'bf_clerk_day': { dNeed(T,'payments'); const day = A.p_day || dIsoDay(new Date());
+      return DEMO.payments.filter(p => p.kind!=='legacy' && dIsoDay(p.recordedAt)===day).map(p => { const d = S2[p.submissionId]; return Object.assign(dPayJson(p), { ref:dRef(p.submissionId), form:d&&d.data.form, applicant:d&&(d.data.fields||{}).applicant, address:d&&(d.data.fields||{}).address }); }); }
+    case 'bf_check_scan': { dNeed(T); const s = DEMO.scans[A.p_payment_id]; return s ? Object.assign({ paymentId:A.p_payment_id, earlier:0 }, s) : null; }
+    case 'bf_add_check_scan': { const a = dNeed(T,'payments'); const s = { id:Date.now(), mime:A.p_mime, data:A.p_data, width:A.p_width, height:A.p_height, addedBy:a.name, addedAt:new Date().toISOString() }; DEMO.scans[A.p_payment_id] = s; return { scan:{ id:s.id, addedBy:s.addedBy, addedAt:s.addedAt, width:s.width, height:s.height } }; }
+    case 'bf_admin_audit': dNeed(T,'admin'); return DEMO.audit.slice(0, A.p_limit||200);
+    case 'bf_update_my_profile': { const a = dNeed(T); DEMO.acc[a.key] = { name:String(A.p_name||'').trim()||a.name, title:String(A.p_title||'').trim() }; const r = dAccJson(a.key); return r; }
+    case 'bf_admin_set_title': { dNeed(T,'admin'); const k = String(A.p_id).replace(/^demo-/,''); if (!DEMO_ROLES[k]) throw new Error('Account not found.'); DEMO.acc[k] = Object.assign({}, DEMO.acc[k], { title:String(A.p_title||'').trim() }); return dAccJson(k); }
+    case 'bf_notice_get': dNeed(T,'admin'); return DEMO.notice || null;
+  }
+  throw new Error('This action is turned off in demo mode, so nothing real is changed.');
+}
+
+/* ---- sample data (all made up) ---- */
+function demoSeed(){
+  const D = { v:1, started:Date.now(), token:'demo-admin', docs:{ submissions:{}, attachments:{}, suggestions:{} }, payments:[], scans:{}, audit:[], prefs:{}, acc:{}, nextPay:0, notice:null,
+    fy:{ month:10, day:1, overrides:{}, updatedBy:'', updatedAt:null } };
+  const prev = DEMO; DEMO = D;
+  const now = Date.now(), H = 3600e3, day = 864e5, admin = dAccJson('admin'), clerk = Object.assign(dAccJson('clerk'));
+  const files = (slots, form) => slots.map(s => { const x = (FORMS[form].fields.find(f => f.id===s)||{}); return { name:'sample-'+s.replace(/^doc/,'').toLowerCase()+'.pdf', type:'application/pdf', size:1118, slot:s, docLabel:x.label }; });
+  const mk = (form, fields, o) => { o = o || {}; const id = dUuid(), at = new Date(now - (o.ago||0)).toISOString();
+    const f = Object.assign({ date:at.slice(0,10) }, fields), fees = computeFees(form, f, !!o.doubled);
+    const fl = o.slots ? files(o.slots, form) : [];
+    D.docs.submissions[id] = { created:at, data:{ app:APP_TAG, form, createdAt:at, read:!!o.read, starred:false, fields:f, fees, files:fl, agreements:[], staff:Object.assign({ permitNo:'', payment:'' }, o.staff||{}), linkedTo:o.linkedTo } };
+    fl.forEach((x, i) => { D.docs.attachments[dUuid()] = { created:at, data:Object.assign({ app:APP_TAG, submissionId:id, index:i, data:DEMO_PDF }, x) }; });
+    dPaySync(id); return id; };
+  const pay = (id, amt, method, checkNo, ago) => { const p = dAddPayment(clerk, { submissionId:id, amount:amt, method, checkNo:checkNo||'', recordedAt:new Date(now - (ago||0)).toISOString(), receivedOn:dIsoDay(now - (ago||0)) }); dPaySync(id); return p; };
+  const today = dIsoDay(now), dd = n => dIsoDay(now - n*day);
+  const C1docs = ['docBiz','docStateLic','docContract'], STdocs = ['docBiz','docTradeLic','docContract'];
+  // 1. under review, all documents
+  mk('building', { applicant:'Riverbend Builders LLC', email:'office@riverbend-example.com', phone:'(256) 555-0101', address:'1408 Maple Ridge Dr NE', lot:'14', zoning:'R1', owner:'Thomas & Ana Reyes', gcLicense:'HB-48213', contractor:'Sam Rivers', business:'Riverbend Builders LLC', cPhone:'(256) 555-0101', cEmail:'office@riverbend-example.com', buildType:'Residential', projectType:'New Build', heated:'2100', unheated:'480', description:'New single-family home, 3 bed / 2 bath with attached garage.', exempt:'No' }, { ago:2*H, slots:C1docs });
+  // 2. information needed
+  mk('building', { applicant:'Hollow Creek Homes', email:'permits@hollowcreek-example.com', phone:'(256) 555-0144', address:'22 Ridgeview Ln', lot:'7', zoning:'R2', owner:'Hollow Creek Homes', gcLicense:'HB-51022', contractor:'Dana Holloway', business:'Hollow Creek Homes Inc', cPhone:'(256) 555-0144', cEmail:'permits@hollowcreek-example.com', buildType:'Residential', projectType:'Addition', heated:'420', unheated:'0', description:'Rear bedroom addition.', exempt:'No' }, { ago:4*H, read:true, slots:C1docs, staff:{ infoNeeded:'Please send a site plan showing the setbacks from all property lines.' } });
+  // 3. approved, not paid yet
+  const A3 = mk('building', { applicant:'Summit Ridge Construction', email:'bids@summitridge-example.com', phone:'(256) 555-0177', address:'510 Guntersville Rd', lot:'3', zoning:'General Business', owner:'Lakeside Dental Group', gcLicense:'GC-77310', contractor:'Marcus Lee', business:'Summit Ridge Construction LLC', cPhone:'(256) 555-0177', cEmail:'bids@summitridge-example.com', buildType:'Commercial', comValue:'240000', description:'Interior build-out of a dental office suite.', exempt:'No' }, { ago:5*H, read:true, slots:C1docs, staff:{ approvedBy:'DB', approvedDate:today } });
+  // 4. sub trade linked to #3, approved and paid
+  const S4 = mk('subtrade', { applicant:'Bright Spark Electric', email:'service@brightspark-example.com', phone:'(256) 555-0123', address:'510 Guntersville Rd', owner:'Lakeside Dental Group', trade:'Electrical', tradeLicense:'EL-20419', subName:'Kevin Burke', business:'Bright Spark Electric', buildType:'Commercial', estCost:'18500', description:'Electrical rough-in and panel for dental suite.' }, { ago:4.5*H, read:true, slots:STdocs, linkedTo:A3, staff:{ approvedBy:'DB', approvedDate:today, permitNo:'26301E' } });
+  pay(S4, Number(D.docs.submissions[S4].data.fees.total), 'Check', '4417', 3*H);
+  // 5. homeowner, approved, partly paid
+  const H5 = mk('homeowner', { applicant:'Linda Carver', email:'linda.carver@example.com', phone:'(256) 555-0190', address:'93 Oak Hollow Rd', lot:'21', zoning:'R1', owner:'Linda Carver', buildType:'Residential', projectType:'Remodel or Single Trade', estCost:'38000', description:'Kitchen remodel and new back porch.', exempt:'Yes' }, { ago:6*H, read:true, staff:{ approvedBy:'DB', approvedDate:today, permitNo:'26298' } });
+  pay(H5, 100, 'Cash', '', 1*H);
+  // 6. older contractor permit: paid, inspections in progress (before reviews started)
+  const C6 = mk('building', { applicant:'Cedar Point Homes', email:'office@cedarpoint-example.com', phone:'(256) 555-0150', address:'1880 Brashers Chapel Rd', lot:'2', zoning:'AG', owner:'Mark & Jill Patton', gcLicense:'HB-30115', contractor:'Ray Cedar', business:'Cedar Point Homes', cPhone:'(256) 555-0150', cEmail:'office@cedarpoint-example.com', buildType:'Residential', projectType:'New Build', heated:'1850', unheated:'420', description:'New farmhouse-style home.', exempt:'No' },
+    { ago:40*day, read:true, staff:{ approvedBy:'DB', approvedDate:dd(39), permitNo:'26244', inspections:{ Footing:{ date:dd(30), by:'DB', recorded:dd(30), comment:'Rebar and depth OK.' }, Framing:{ date:dd(9), by:'', recorded:'', comment:'Re-inspect hurricane straps on rear wall.' } } } });
+  pay(C6, Number(D.docs.submissions[C6].data.fees.total), 'Check', '1088', 39*day);
+  // 7. finished: paid, all inspections, C of O given
+  const C7 = mk('building', { applicant:'Greystone Builders', email:'info@greystone-example.com', phone:'(256) 555-0166', address:'47 Lakeview Ct', lot:'9', zoning:'R1', owner:'Paul Greer', gcLicense:'HB-28840', contractor:'Ann Greystone', business:'Greystone Builders', cPhone:'(256) 555-0166', cEmail:'info@greystone-example.com', buildType:'Residential', projectType:'Addition', heated:'600', unheated:'200', description:'Two-car garage with bonus room.', exempt:'No' },
+    { ago:85*day, read:true, staff:{ approvedBy:'DB', approvedDate:dd(84), permitNo:'26190', co:'Given', coInit:'DB', inspections:Object.fromEntries(['Footing','Framing','Electrical','Plumbing','Final'].map((n, i) => [n, { date:dd(70-i*12), by:'DB', recorded:dd(70-i*12), comment:'' }])) } });
+  pay(C7, Number(D.docs.submissions[C7].data.fees.total), 'Check', '5521', 84*day);
+  // 8-11. other permits
+  const P8 = mk('pool', { applicant:'Jordan Ellis', email:'jordan.ellis@example.com', phone:'(256) 555-0112', address:'301 Shoreline Dr', owner:'Jordan Ellis', poolType:'In-ground', estCost:'52000', contractor:'Blue Lagoon Pools', description:'In-ground fiberglass pool with fence.' }, { ago:5*H });
+  const SG = mk('sign', { applicant:'Main Street Bakery', email:'hello@mainstreetbakery-example.com', phone:'(256) 555-0133', address:'812 N Main St', estCost:'4200', owner:'Downtown Holdings', contractor:'Signs Plus', description:'New illuminated wall sign.', signType:'Building sign', signFeature:'Illuminated', buildingType:'Channel letters on raceway', bldH:'18', bldW:'40', bldArea:'2400', newFace:'32', existingFace:'0' }, { ago:3*day, read:true, staff:{ approvedBy:'DB', approvedDate:dd(2) } });
+  pay(SG, Number(D.docs.submissions[SG].data.fees.total), 'Cash', '', 2*H);
+  mk('demo', { applicant:'Ridgeline Demolition', email:'jobs@ridgeline-example.com', phone:'(256) 555-0188', address:'15 Old Mill Rd', owner:'City Lumber Co', structure:'Detached storage building', contractor:'Ridgeline Demolition', description:'Remove fire-damaged storage building.' }, { ago:6*day, read:true, staff:{ permitNo:'26280D' } });
+  // last fiscal year (for the AR report)
+  const O1 = mk('building', { applicant:'Arbor Lane Homes', email:'office@arborlane-example.com', address:'6 Arbor Ln', buildType:'Residential', projectType:'Addition', heated:'300', unheated:'0', description:'Sunroom addition.', exempt:'No', gcLicense:'HB-11223', contractor:'Lee Arbor', business:'Arbor Lane Homes', cPhone:'(256) 555-0109', cEmail:'office@arborlane-example.com' }, { ago:95*day, read:true, staff:{ approvedBy:'DB', approvedDate:dd(94), permitNo:'26112' } });
+  pay(O1, Number(D.docs.submissions[O1].data.fees.total), 'Check', '3002', 94*day);
+  mk('subtrade', { applicant:'Valley HVAC', email:'office@valleyhvac-example.com', address:'6 Arbor Ln', trade:'HVAC', tradeLicense:'HV-5521', buildType:'Residential', estCost:'6500', description:'New mini-split for sunroom.' }, { ago:93*day, read:true, linkedTo:O1, staff:{ approvedBy:'DB', approvedDate:dd(92), permitNo:'26112H' } });
+  D.audit = [{ at:new Date().toISOString(), by:'System', action:'demo.started', target:'', details:{ note:'Sample data only' } }];
+  DEMO = prev; return D;
+}
+function demoSamples(){ if (!DEMO) return [];
+  const L = { pending:'Under review', info:'Information needed', approved:'Approved, ready to pay' };
+  return Object.entries(DEMO.docs.submissions).map(([id, d]) => { const x = Object.assign({ id }, d.data); let tag;
+      const rs = reviewState(Object.assign({}, x, { createdAt:d.created }));
+      if (rs!=='none' && rs!=='approved') tag = L[rs]; else if ((x.staff||{}).co==='Given') tag = 'Finished (C of O given)';
+      else if (x.pay && x.pay.status==='partial') tag = 'Partly paid'; else if (x.pay && x.pay.status==='paid' && x.staff && x.staff.inspections) tag = 'Paid, inspections under way';
+      else if (rs==='approved' && x.pay && x.pay.status==='unpaid') tag = L.approved; else tag = null;
+      return tag ? { tag, ref:dRef(id), email:x.fields.email, who:x.fields.applicant, form:(FORMS[x.form]||{}).short, at:x.createdAt } : null; }).filter(Boolean)
+    .sort((a,b) => String(b.at).localeCompare(String(a.at))).filter((x, i, all) => all.findIndex(y => y.tag===x.tag) === i)
+    .sort((a,b) => ['Under review','Information needed','Approved, ready to pay','Partly paid','Paid, inspections under way','Finished (C of O given)'].indexOf(a.tag) - ['Under review','Information needed','Approved, ready to pay','Partly paid','Paid, inspections under way','Finished (C of O given)'].indexOf(b.tag)); }
+
+/* ---- turning it on and off ---- */
+function openDemoDlg(){
+  if (!isAdmin() || DEMO) return;
+  const d = document.createElement('div'); d.id = 'demobox';
+  d.innerHTML = '<div class="veil" onclick="this.parentNode.remove()"></div><div class="bugdlg" role="dialog" aria-modal="true" aria-labelledby="dmT">'+
+    '<div class="row" style="justify-content:space-between"><h2 id="dmT" style="font:800 20px var(--f-disp)">Demo mode</h2><button type="button" class="btn sm ghost" aria-label="Close" onclick="document.getElementById(\'demobox\').remove()">'+ic('x')+'</button></div>'+
+    '<p style="margin:0;color:var(--ink2);font-size:14.5px">Show the portal to others without touching real applications. Demo mode loads made-up sample applications in <b>this browser tab only</b>. You can submit applications, check permit status, review and approve, take payments and run reports. <b>Nothing is sent to the real system</b> and staff will not see any of it.</p>'+
+    '<ul style="margin:0;padding-left:18px;color:var(--ink2);font-size:14px;line-height:1.6"><li>A yellow demo bar stays at the top of every page.</li><li>Switch between the Administrator, Building Department and City Clerk views from the bar.</li><li>Exit demo returns you to the real portal, still signed in.</li></ul>'+
+    '<span class="formerr" id="dmErr" role="alert"></span>'+
+    '<div class="row" style="justify-content:flex-end;gap:8px"><button type="button" class="btn" onclick="document.getElementById(\'demobox\').remove()">Cancel</button><button type="button" class="btn primary" id="dmGo" onclick="demoStart()">Start demo</button></div></div>';
+  document.body.appendChild(d); document.getElementById('dmGo').focus();
+}
+async function demoStart(){
+  const err = document.getElementById('dmErr'), b = document.getElementById('dmGo'); if (b) b.disabled = true;
+  try{ const me = await sbRpc('bf_me', { p_token:TOKEN });             // real server check: administrators only
+    if (!me || me.role !== 'admin') throw new Error('Only administrators can use demo mode.');
+    await prefFlush();
+    const D = demoSeed(); sessionStorage.setItem('bdDemo', JSON.stringify(D));
+    location.hash = '#staff'; location.reload();
+  }catch(e){ if (err) err.textContent = e.message || 'Could not start demo mode.'; if (b) b.disabled = false; }
+}
+function demoExit(){ window.__demoOff = true; try{ sessionStorage.removeItem('bdDemo'); sessionStorage.removeItem('bdStHandoff'); }catch(e){} location.hash = '#staff'; location.reload(); }
+function demoReset(){ window.__demoOff = true; const role = DEMO && DEMO.token; const D = demoSeed(); D.token = role || 'demo-admin'; try{ sessionStorage.setItem('bdDemo', JSON.stringify(D)); }catch(e){} location.reload(); }
+function demoAs(k){ if (!DEMO) return; DEMO.token = 'demo-'+k; demoSave(); window.__demoOff = true; location.hash = k==='clerk' ? '#clerk' : '#staff'; location.reload(); }
+function demoBarHtml(){
+  const k = String((DEMO&&DEMO.token)||'').replace('demo-',''), pubView = ['apps','form','pdf','status','privacy','accessibility'].includes(S.view);
+  return '<div class="demobar" role="region" aria-label="Demo mode"><b>'+ic('info')+'DEMO MODE</b><span class="dm-note">Sample data only. Nothing is saved to the real system.</span>'+
+    '<span class="dm-grp"><span class="dm-l">Show:</span><a href="#apps" class="'+(pubView?'on':'')+'" onclick="event.preventDefault();go(\'apps\')">Public site</a><a href="#staff" class="'+(!pubView?'on':'')+'" onclick="event.preventDefault();S.loaded=false;if(S.ck)S.ck.results=null;go(\''+(k==='clerk'?'clerk':'staff')+'\')">Staff portal</a></span>'+
+    '<span class="dm-grp"><span class="dm-l">View as:</span>'+[['admin','Administrator'],['staff','Building Dept'],['clerk','City Clerk']].map(([r,l]) => '<button type="button" class="'+(k===r?'on':'')+'" onclick="demoAs(\''+r+'\')"'+(k===r?' aria-pressed="true"':'')+'>'+l+'</button>').join('')+'</span>'+
+    '<span class="dm-grp"><button type="button" onclick="if(confirm(\'Start the demo over with fresh sample data?\'))demoReset()">Reset demo</button><button type="button" class="dm-exit" onclick="demoExit()">Exit demo</button></span></div>';
+}
+function demoPaintBar(){ if (!DEMO) return; let b = document.getElementById('demobarWrap'); if (!b){ b = document.createElement('div'); b.id = 'demobarWrap'; document.body.insertBefore(b, document.body.firstChild); document.documentElement.classList.add('demo-on'); } b.innerHTML = demoBarHtml(); }
+/* status page: one-click samples */
+function demoStatusHtml(){ if (!DEMO) return ''; const s = demoSamples(); if (!s.length) return '';
+  return '<div class="demo-samples"><b>Demo: try a sample application</b><div>'+s.map(x => '<button type="button" class="chip" onclick="S.st={ref:\''+x.ref+'\',email:\''+esc(x.email)+'\',auto:true};render()"><span>'+esc(x.tag)+'</span><small>'+esc(x.who)+' · '+esc(x.form||'')+'</small></button>').join('')+'</div><small>Or submit your own application in demo mode, then choose Check permit status on the confirmation screen.</small></div>'; }
+/* application forms: fill with sample answers + sample documents */
+function demoFillForm(){
+  const F = FORMS[S.form]; if (!F || !DEMO) return;
+  const sample = { applicant:'Pat Demo', email:'pat.demo@example.com', phone:'(256) 555-0100', address:'100 Demo Ave', lot:'12', zoning:'R1', owner:'Pat Demo', ownerPhone:'(256) 555-0100', ownerEmail:'pat.demo@example.com',
+    gcLicense:'HB-12345', contractor:'Pat Demo', business:'Demo Builders LLC', cPhone:'(256) 555-0100', cEmail:'pat.demo@example.com', heated:'1600', unheated:'400', estCost:'25000', comValue:'150000',
+    description:'Sample application for the demo.', trade:'Plumbing', tradeLicense:'PL-12345', subName:'Pat Demo', structure:'Old storage shed', toAddress:'200 New Site Rd', tenant:'', signH:'6', signW:'8', signFace:'48', renderBoard:'12', bldH:'18', bldW:'40', bldArea:'2400', newFace:'32', existingFace:'0', bizLicense:'BL-2026-001' };
+  for (let pass = 0; pass < 4; pass++){
+    F.fields.forEach(x => { if (!x.id || x.type==='section' || x.type==='note' || x.type==='file' || x.type==='doc' || x.legacy) return; if (x.show && !x.show(FVALS)) return; if (FVALS[x.id]) return;
+      if (x.type==='radio' || x.type==='select') FVALS[x.id] = x.id==='exempt' ? 'No' : x.id==='projectType' ? 'New Build' : x.opts[0];
+      else if (x.type==='date') FVALS[x.id] = todayISO();
+      else if (sample[x.id] != null) FVALS[x.id] = sample[x.id];
+      else if (x.req) FVALS[x.id] = x.type==='money' || x.type==='number' ? '10' : 'Sample'; });
+  }
+  formAgreements(F, FVALS).forEach(a => { FVALS['ag_'+a.id] = '1'; });
+  const bytes = dataUrlBytes(DEMO_PDF);
+  F.fields.filter(x => x.type==='doc' && (!x.show || x.show(FVALS))).forEach(x => { if (FILES.some(f => f._slot===x.id)) return;
+    const f = new File([bytes], 'sample-'+x.id.replace(/^doc/,'').toLowerCase()+'.pdf', { type:'application/pdf' }); f._slot = x.id; FILES.push(f); queueOptimize(f); });
+  FORM_T0 -= 60000;
+  const form = document.getElementById('pf'); if (form){ form.innerHTML = formFieldsHtml(); form.dataset.vis = visSig(F, FVALS); bindFiles(); paintFiles();
+    form.querySelectorAll('.agree input[type=checkbox]').forEach(c => { c.checked = true; }); }
+  toast('Sample answers filled in. Review them, then choose Submit application.');
 }
 </script>
 </body>
