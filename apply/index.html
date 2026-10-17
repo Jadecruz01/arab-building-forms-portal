@@ -1693,7 +1693,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.25.3';   // shown at the bottom of every page
+const APP_VERSION = '2.25.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2348,7 +2348,7 @@ function lbArt(){
 function viewPin(){
   const fld = (id,l,t,ac) => '<div class="fld" style="text-align:left"><label class="l" for="'+id+'">'+l+'</label><input id="'+id+'" type="'+t+'" autocomplete="'+ac+'" required style="letter-spacing:0;font-size:16px;text-align:left"></div>';
   return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Staff Portal</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Applications &amp; Fees</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
    '<label class="opt" style="border:0;padding:0;text-align:left;background:transparent"><input type="checkbox" id="lgRem"> <span>Keep me signed in for 7 days <span style="color:var(--muted)">(only on a computer that is yours)</span></span></label>'+
@@ -4442,7 +4442,7 @@ function loadQr(){
 // ---- sign-in step 2 ----
 function viewCode(){
   return '<div class="loginbg">'+lbArt()+'<div class="lb-shade" aria-hidden="true"></div>'+
-   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Staff Portal</em></h2></div>'+
+   '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Applications &amp; Fees</em></h2></div>'+
    '<form class="pin" id="codef"><h1 style="font:800 22px var(--f-disp)">2-step verification</h1>'+
    '<p style="margin:0;color:var(--muted)">Open the authenticator app on your phone and enter the 6-digit code for <b style="color:var(--ink)">Arab City Staff Portal</b>.</p>'+
    '<div class="fld" style="text-align:left"><label class="l" for="mfaCode">Code</label><input id="mfaCode" class="mfa-in" type="text" autocomplete="one-time-code" maxlength="11" required spellcheck="false"></div>'+
