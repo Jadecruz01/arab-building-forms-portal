@@ -223,15 +223,19 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .star svg{width:18px;height:18px}
 .star.on svg{fill:currentColor}
 
-.tb-head{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
-.tb-head .ttl{flex:1;text-align:center;min-width:0}
-.tb-head .ttl b{font-size:19px;font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tb-head .ttl small{color:var(--green);font-size:12.5px;font-weight:600}
+.tb-head{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:3px solid var(--gold,#c0a869);background:var(--surface);flex-wrap:wrap}
+.tb-head .tb-ic{width:40px;height:40px;border-radius:9px;display:grid;place-items:center;flex:none}
+.tb-head .ttl{flex:1;min-width:220px}
+.tb-head .ttl h1{margin:0;font:700 20px/1.25 var(--f-disp);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-head .ttl small{display:block;margin-top:2px;color:var(--ink2);font-size:13px}
+.tb-head .ttl small b{color:var(--ink)}
 .tabbar{background:var(--green);padding:8px 10px 0;display:flex;gap:8px;align-items:flex-end;overflow-x:auto}
 .tabbar .tab{background:var(--surface);color:var(--ink);border-radius:6px 6px 0 0;padding:9px 14px;font-weight:700;font-size:13.5px;display:flex;gap:8px;align-items:center;white-space:nowrap}
 .tabbar .newt{color:#fff;font-weight:600;font-size:13.5px;padding:9px 8px;opacity:.9;white-space:nowrap}
 .tb-tools{display:flex;gap:10px;padding:12px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
-.tb-tools .search{flex:1;min-width:200px;max-width:420px}
+.tb-tools .search{flex:1 1 260px;min-width:220px;max-width:460px}
+.tb-tools .tb-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tb-tools .dash-period select{min-width:150px}
 .tb-tools .search input{width:100%}
 .tb-tools .sp{flex:1}
 select.mini{border:1px solid var(--line);border-radius:4px;padding:8px 10px;background:var(--surface);font-size:14px}
@@ -269,7 +273,7 @@ input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer
 .flist li.ws-head:hover{background:transparent}
 .bulk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;background:var(--sel);border-bottom:1px solid var(--line);font-size:14px}
 .bulk b{margin-right:6px}
-.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:12px 12px 4px}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:12px 12px 0}
 .dtile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);text-align:left;cursor:pointer;display:grid;gap:2px}
 .dtile:hover{border-color:var(--blue)}
 .dtile.on{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
@@ -277,7 +281,9 @@ input.ck{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer
 .dtile .big{font:800 24px/1.15 var(--f-disp);color:var(--ink)}
 .dtile .sub{font-size:13px;color:var(--ink2)}
 .dtile.unpaid .big{color:var(--amber)} .dtile.paid .big{color:var(--ok)}
-.dash-period{display:flex;align-items:center;gap:8px;padding:10px 12px 0;font-size:14px;color:var(--ink2);flex-wrap:wrap}
+.dash-period{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);flex-wrap:wrap}
+.dash-period label{font-weight:700;color:var(--ink)}
+.dash-period .pr-range{color:var(--muted);font-size:12.5px}
 .card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px;display:grid;gap:12px}
 .card h2{font:700 16px var(--f-body)}
 .creds{background:var(--okbg);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:14px}
@@ -1687,7 +1693,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.25.2';   // shown at the bottom of every page
+const APP_VERSION = '2.25.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2433,14 +2439,15 @@ function viewTable(){
   const body = rows.map((s,i)=>'<tr class="'+(s.read?'':'unread')+(S.sel===s.id||S.rowSel[s.id]?' sel':'')+'" onclick="openSub(\''+s.id+'\')"><td class="rn pcol" style="left:0"><div class="rn-in"><input type="checkbox" class="ck" aria-label="Select '+esc(s.fields.applicant||'application')+'" '+(S.rowSel[s.id]?'checked':'')+' onclick="event.stopPropagation()" onchange="rowPick(\''+s.id+'\',this.checked)"><span class="num">'+(i+1)+'</span><button class="star'+(s.starred?' on':'')+'" aria-label="Star" onclick="event.stopPropagation();toggleStar(\''+s.id+'\')"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></button></div></td>'+
     cols.map(c=>'<td class="'+cellCls(c)+'"'+cellSty(c)+'><div class="cl">'+(c.fmt?c.fmt(s):esc(c.get(s)))+'</div></td>').join('')+'</tr>').join('');
   const sumT = rows.reduce((a,s)=>a+(s.fees?s.fees.total:0),0), sumC = rows.reduce((a,s)=>a+(s.fees?s.fees.cict:0),0);
+  const totalN = subsFor(k).length;
   return topBar()+'<div class="ws-main" style="min-height:calc(100% - 60px)"><div class="tb-head"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button>'+
-   '<div class="ttl"><b>'+esc(F.title)+'</b><small>'+(last?'Last submission '+fmtDT(last.createdAt):'No submissions yet')+'</small></div><span style="width:96px"></span></div>'+
-   '<div class="tabbar"><span class="tab">'+ic('grid')+esc(F.short)+'</span><span class="newt">'+subsFor(k).length+' total</span></div>'+
+   '<span class="ficon tb-ic" aria-hidden="true">'+ic(F.icon||'doc')+'</span>'+
+   '<div class="ttl"><h1>'+esc(F.title)+'</h1><small><b class="num">'+totalN+' application'+(totalN===1?'':'s')+'</b>'+(last?' · Last submission '+fmtDT(last.createdAt):' · No submissions yet')+'</small></div>'+fyBtn()+'</div>'+
    dashHtml(k)+
-   '<div class="tb-tools"><label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
+   '<div class="tb-tools">'+periodPickHtml()+'<label class="search">'+ic('search')+'<input id="tq" placeholder="Search name, address, permit #, reference #…" value="'+esc(S.q)+'" aria-label="Search submissions"></label>'+
    '<label for="tf" style="position:absolute;left:-9999px">Filter</label><select id="tf" class="mini" onchange="S.filter=this.value;prefSet(\'filter\',this.value);render()">'+[['all','All submissions'],['unread','Unread'],['starred','Starred'],['unpaid','Unpaid (incl. partly paid)'],['partial','Partially paid'],['paid','Paid']].concat(REVIEW_FORMS.includes(S.form) ? [['review','Needs review']] : []).map(o=>'<option value="'+o[0]+'"'+(S.filter===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
-   '<span class="sp"></span><div class="colmenu"><button class="btn sm" id="colsBtn" aria-expanded="'+!!S.colsOpen+'" onclick="event.stopPropagation();S.colsOpen=!S.colsOpen;S.colMenu=null;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?colPanelHtml(k):'')+'</div>'+
-'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div>'+
+   '<span class="sp"></span><div class="tb-acts"><div class="colmenu"><button class="btn sm" id="colsBtn" aria-expanded="'+!!S.colsOpen+'" onclick="event.stopPropagation();S.colsOpen=!S.colsOpen;S.colMenu=null;render()">'+ic('cols')+'Columns</button>'+(S.colsOpen?colPanelHtml(k):'')+'</div>'+
+'<button class="btn sm" onclick="loadSubs().then(()=>toast(\'Up to date\'))">Refresh</button><button class="btn sm primary" onclick="exportCsv()">'+ic('down')+'Download All</button></div></div>'+
    (selN?rowBulkHtml(rows):'')+
    '<div class="grid-wrap apptbl-wrap">'+(rows.length?'<table class="grid apptbl" style="width:'+tw+'px">'+colg+'<thead>'+head+'</thead><tbody>'+body+'</tbody></table>':'<div class="empty">'+(subsFor(k).length?'No submissions match this search or filter.':'No submissions yet. New applications appear here the moment they are submitted.')+'</div>')+'</div>'+
    '<div class="grid-foot num"><span>Total <b>'+rows.length+'</b></span><span>Fees <b>'+money(sumT)+'</b></span>'+((isBldg(k)||k==='subtrade')?'<span>CICT <b>'+money(sumC)+'</b></span>':'')+'<span>Unpaid <b>'+rows.filter(s=>!isPaid(s)).length+'</b></span></div></div>'+
@@ -4234,14 +4241,16 @@ function periodRange(p){
 function inPeriod(rows){ const p = S.period||'all', f = periodFy(p); if (f) return rows.filter(s => fyOf(s) === f);
   const r = periodRange(p); if (!r) return rows; return rows.filter(s=>{ const d = new Date(s.createdAt); return d>=r[0] && d<r[1]; }); }
 const HAS_CICT = k => isBldg(k) || k==='subtrade';
+/* "Showing" period picker (lives in the table toolbar since v2.25.3) */
+function periodPickHtml(){ const r = periodRange(S.period||'all');
+  return '<div class="dash-period"><label for="pSel">Showing</label><select id="pSel" class="mini" onchange="S.period=this.value;prefSet(\'period\',this.value);S.rowSel={};render()">'+periodOpts().map(o=>'<option value="'+o[0]+'"'+((S.period||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+    (r?'<span class="num pr-range" title="'+(periodFy(S.period)?'By date submitted, or moved by hand':'')+'">'+fmtDate(r[0].toISOString())+' – '+fmtDate(new Date(r[1]-1).toISOString())+(periodFy(S.period)?' · by date submitted, or moved by hand':'')+'</span>':'')+'</div>'; }
 function dashHtml(k){
   const all = inPeriod(subsFor(k)), paid = all.filter(isPaid), unpaid = all.filter(s=>!isPaid(s));
   const sum = (rows,f) => rows.reduce((a,s)=>a+((s.fees&&s.fees[f])||0),0);
   const tile = (cls,f,lbl,big,sub) => '<button class="dtile '+cls+(S.filter===f?' on':'')+'" onclick="S.filter=(S.filter===\''+f+'\'?\'all\':\''+f+'\');prefSet(\'filter\',S.filter);render()" aria-pressed="'+(S.filter===f)+'"><span class="lbl">'+lbl+'</span><span class="big num">'+big+'</span><span class="sub num">'+sub+'</span></button>';
   const r = periodRange(S.period||'all');
-  return '<div class="dash-period"><label for="pSel"><b>Showing</b></label><select id="pSel" class="mini" onchange="S.period=this.value;prefSet(\'period\',this.value);S.rowSel={};render()">'+periodOpts().map(o=>'<option value="'+o[0]+'"'+((S.period||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
-    (r?'<span class="num" style="color:var(--muted)">'+fmtDate(r[0].toISOString())+' – '+fmtDate(new Date(r[1]-1).toISOString())+(periodFy(S.period)?' · by date submitted, or moved by hand':'')+'</span>':'')+'<span style="flex:1"></span>'+fyBtn()+'</div>'+
-    '<div class="dash">'+
+  return '<div class="dash">'+
     tile('', 'all', 'Applications', all.length, all.filter(s=>!s.read).length+' unread · '+money(sum(all,'total'))+' in fees')+
     tile('unpaid','unpaid','Unpaid', unpaid.length, money(sum(unpaid,'total'))+' due')+
     tile('paid','paid','Paid', paid.length, money(sum(paid,'total'))+' collected')+
