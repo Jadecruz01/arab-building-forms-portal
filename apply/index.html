@@ -541,6 +541,7 @@ html:not(.embed) .app.pub .sheet.apps{max-width:1040px;padding:40px 44px 36px}
 .wsw{display:inline-flex;margin-left:14px;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
 .wsw button{border:0;background:transparent;color:inherit;font:600 13px var(--f-body);padding:6px 12px;border-radius:999px;cursor:pointer;opacity:.8}
 .wsw button.on{background:#fff;color:var(--navy);opacity:1}
+.wsw .wsw-pub{display:inline-flex;align-items:center;gap:6px;margin-left:9px;position:relative}.wsw .wsw-pub::before{content:'';position:absolute;left:-6px;top:7px;bottom:7px;width:1px;background:rgba(255,255,255,.25)}.wsw .wsw-pub .i{width:14px;height:14px}.wsw button:hover{opacity:1}
 .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .roles div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);display:grid;gap:3px;font-size:13.5px;color:var(--ink2)}
 .roles b{color:var(--ink);font-size:14px}
@@ -1693,7 +1694,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.25.5';   // shown at the bottom of every page
+const APP_VERSION = '2.26.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2222,7 +2223,7 @@ function visibleCols(k){
 }
 function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); prefSet('fyCol.'+st.form, true); prefSet('revCol.'+st.form, true); }
 function topBar(){
-  return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() && canPay() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button><button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button></nav>' : '')+'<span class="sp"></span>'+
+  return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+(canBuilding() ? '<nav class="wsw" aria-label="Workspace"><button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button>'+(canPay() ? '<button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button>' : '')+'<button class="wsw-pub" title="Building Department Portal: the public Applications &amp; Fees page ('+FORM_ORDER.length+' forms)" onclick="go(\'apps\')">'+ic('doc')+'Public site</button></nav>' : '')+'<span class="sp"></span>'+
    (canBuilding() ? bellHtml() : '')+profileMenuHtml()+'</header>'+storageBanner();
 }
 
@@ -2381,7 +2382,6 @@ function viewWorkspace(){
    '<main class="ws-main"><div class="ws-bar"><label class="sortsel">'+ic('filter')+'<span class="vh">Sort forms</span><select id="wsSort" onchange="setWsSort(this.value)">'+WS_SORTS.map(o=>'<option value="'+o[0]+'"'+(S.wsSort===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+(custom?'<span class="hint" style="align-self:center;color:var(--muted);font-size:13px">Drag forms or use the arrows to arrange them</span>':'')+'<span class="ws-fy" title="Fiscal year starts '+esc(fyStartText())+'">'+ic('cal')+'<span>This fiscal year: <b class="num">'+fyName(fyNow())+'</b></span></span>'+fyBtn('sm ws-fybtn')+'<label class="search">'+ic('search')+'<input id="wsq" placeholder="Search" value="'+esc(S.wsQ)+'" aria-label="Search forms"></label></div>'+
    '<ul class="flist">'+
     wsBulkHtml(rows)+
-    '<li onclick="go(\'apps\')"><span></span><span class="star">'+'<svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon app">'+ic('doc')+'</span><span><b>Building Department Portal</b><small>Public Applications &amp; Fees page · '+FORM_ORDER.length+' forms</small></span><span></span></li>'+
     rows.map(k=>{ const all = subsFor(k), un = all.filter(s=>!s.read).length;
       return '<li class="'+(S.wsSel&&S.wsSel[k]?'picked':'')+'" data-k="'+k+'"'+(custom?' draggable="true" ondragstart="wsDrag(event,\''+k+'\')" ondragover="event.preventDefault()" ondrop="wsDrop(event,\''+k+'\')"':'')+' onclick="go(\'table\',\''+k+'\')"><input type="checkbox" class="ck" aria-label="Select '+esc(FORMS[k].title)+'" '+(S.wsSel&&S.wsSel[k]?'checked':'')+' onclick="event.stopPropagation()" onchange="wsPick(\''+k+'\',this.checked)"><span class="star"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon tbl">'+ic(FORMS[k].icon)+(un?'<span class="badge num">'+un+'</span>':'')+'</span>'+
        '<span><b>'+esc(FORMS[k].title)+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+(all.length?' · '+all.filter(s=>!isPaid(s)).length+' unpaid':'')+'. Created on '+FORMS[k].created+'</small></span><span class="ord">'+(custom && !S.wsQ?'<button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' up" onclick="event.stopPropagation();wsMove(\''+k+'\',-1)">▲</button><button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' down" onclick="event.stopPropagation();wsMove(\''+k+'\',1)">▼</button>':'')+'</span></li>'; }).join('')+
