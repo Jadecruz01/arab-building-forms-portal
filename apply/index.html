@@ -11,6 +11,10 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f2a47'/%3E%3Cg fill='none' stroke='%23d6b062' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 15.5L16 6l11 9.5'/%3E%3Cpath d='M8.5 13v13h15V13'/%3E%3Cpath d='M14 26v-6h4v6'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Apps &amp; Fees">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Poppins:wght@500;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" integrity="sha384-weMABwrltA6jWR8DDe9Jp5blk+tZQh7ugpCsF3JwSA53WZM9/14PjS5LAJNHNjAI" crossorigin="anonymous"></script>
@@ -1216,6 +1220,91 @@ h1[tabindex="-1"]:focus,[role=main][tabindex="-1"]:focus,#sheet[tabindex="-1"]:f
 input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px rgba(192,168,105,.35)}
 .search:focus-within,.ck-money:focus-within{outline:2px solid var(--blue);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* v2.27.0: My permits (Beta) */
+.pacct{display:inline-flex;align-items:center;gap:7px;flex:none;font:500 14px/1 var(--f-disp);color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:4px;border:1px solid var(--line);background:var(--surface);margin-left:8px}
+.pacct:hover,.pacct.on{border-color:var(--gold);color:var(--golddk)}
+.pacct svg{width:15px;height:15px}
+.beta{display:inline-block;font:700 10px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:var(--amberbg);border:1px solid currentColor;border-radius:99px;padding:3px 6px;vertical-align:middle}
+.beta.lg{font-size:11px;padding:4px 8px;margin-left:6px;position:relative;top:-3px}
+.acct-link .ico{background:var(--amberbg);color:var(--amber)}
+.acct .ac-tabs{margin:18px 0 4px}
+.acct .ac-form{margin-top:16px}
+.acct .ac-go{justify-content:center;padding:12px 18px;font-size:15px;min-width:200px}
+.acct .ac-form .linkbtn{margin-left:14px;font-size:14px}
+.acct .ac-note{background:var(--surface2);border:1px solid var(--line);margin-top:16px}
+.acct .ac-note b{display:block;margin-bottom:4px}
+.acct .ac-small{color:var(--muted);font-size:13px;margin-top:18px}
+.acct .ac-who{color:var(--muted)}
+.ac-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 4px}
+.ac-bar .sp{flex:1}
+.ac-msg{background:var(--okbg);color:var(--ok);font-weight:600}
+.ac-box{border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:14px;background:var(--surface2)}
+.ac-box .hint{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.ac-h{font:700 18px var(--f-disp);margin:26px 0 8px;display:flex;align-items:center;gap:8px}
+.ac-h .num{font:700 12px var(--f-body);background:var(--sel);color:var(--city);border-radius:99px;padding:3px 9px}
+.ac-none{color:var(--muted);font-size:14px;margin:4px 0 0}
+.ac-item{margin-bottom:14px}
+.ac-item .st-card{margin-bottom:0}
+.ac-item-f{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);padding:6px 4px 0}
+.ac-item-f .linkbtn{font-size:12.5px}
+.ac-empty{display:grid;justify-items:center;text-align:center;gap:6px;padding:40px 20px;border:1px dashed var(--line);border-radius:12px;margin-top:22px;color:var(--ink2)}
+.ac-empty svg{width:30px;height:30px;color:var(--muted)}
+.ac-banner{display:flex;align-items:flex-start;gap:10px;background:var(--amberbg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:0 0 16px;font-size:14px}
+.ac-banner svg{width:18px;height:18px;flex:none;margin-top:1px;color:var(--amber)}
+.ac-saved{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--ok);font-weight:600;margin:6px 0 0}
+.ac-saved svg{width:16px;height:16px}
+@media (max-width:640px){
+  .pacct{padding:6px 9px;font-size:13px;margin-left:auto}
+  .pstaff span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .pstaff{padding:8px 9px}
+  .pacct .beta{display:none}
+  .ac-bar .sp{display:none}
+  .ac-bar .btn{flex:1 1 100%;justify-content:center}
+  .ac-bar .btn.sm{flex:1 1 40%}
+  .acct .ac-go{width:100%}
+  .acct .ac-form .linkbtn{display:block;margin:12px 0 0}
+}
+
+.appacc .appacc-q{max-width:420px;margin:16px 0 4px}
+.appacc .appacc-q input{width:100%}
+.appacc .aa{margin-top:12px;gap:8px}
+.appacc .aa.off{opacity:.75}
+.aa-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.aa-h > div:first-child{display:grid;gap:2px}
+.aa-h > div:first-child span:last-child{color:var(--ink2);font-size:14px}
+.aa-acts{display:flex;gap:6px;flex-wrap:wrap}
+.aa-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.aa-code{background:var(--amberbg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.aa-code b.num{font-size:18px;letter-spacing:.08em;margin-left:4px}
+.aa-code small{display:block;color:var(--ink2);margin-top:4px}
+.aa-apps{display:flex;gap:6px;flex-wrap:wrap}
+.aa-ref{display:inline-flex;align-items:center;gap:4px;background:var(--sel);color:var(--city);border-radius:99px;padding:3px 4px 3px 10px;font-size:13px;font-weight:600}
+.aa-ref button{border:0;background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;padding:0}
+.aa-ref button:hover{background:rgba(0,0,0,.08)}
+.aa-ref svg{width:12px;height:12px}
+.aa-none{color:var(--muted);font-size:13px}
+.navi .beta{margin-left:6px}
+
+/* v2.27.0: "Add app" pop-up */
+.inst{position:fixed;right:20px;bottom:20px;z-index:60;width:360px;max-width:calc(100vw - 32px);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:12px;box-shadow:0 18px 50px rgba(15,23,42,.28);padding:16px 16px 14px;transform:translateY(16px);opacity:0;transition:transform .25s ease,opacity .25s ease}
+.inst.on{transform:none;opacity:1}
+.inst-x{position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--muted);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.inst-x:hover{background:var(--surface2);color:var(--ink)}
+.inst-x svg{width:16px;height:16px}
+.inst-top{display:flex;gap:12px;align-items:flex-start;padding-right:24px}
+.inst-top img{width:52px;height:52px;border-radius:12px;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.inst-top b{display:block;font:700 16px var(--f-disp);margin-bottom:3px}
+.inst-top span{display:block;font-size:13.5px;color:var(--ink2);line-height:1.4}
+.inst-how{margin:12px 0 0;padding-left:20px;font-size:13.5px;color:var(--ink2);display:grid;gap:4px}
+.inst-share{display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid var(--line);border-radius:5px;vertical-align:-5px;margin:0 2px}
+.inst-share svg{width:12px;height:12px}
+.inst-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+@media (max-width:640px){
+  .inst{left:0;right:0;bottom:0;width:auto;max-width:none;border-radius:16px 16px 0 0;border-left:0;border-right:0;border-bottom:0;padding:18px 18px calc(16px + env(safe-area-inset-bottom));transform:translateY(100%)}
+  .inst-acts .btn{flex:1;justify-content:center;padding:12px}
+}
+@media (prefers-reduced-motion:reduce){.inst{transition:none}}
 </style>
 
 
@@ -1696,14 +1785,14 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.26.1';   // shown at the bottom of every page
+const APP_VERSION = '2.27.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a></nav>'+
-    '<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>'+
+    acctHeaderBtn()+'<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>'+
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
@@ -1726,7 +1815,7 @@ function privacyNote(){
 // ---- site notice (banner across the top of the page, or a pop-up), set by an administrator ----
 const NOTICE_LEGACY = 'Applications submitted before **October 10, 2026** are legacy applications and may not work properly with the Permit Status checker. For questions about the status of a legacy application, email buildingdept@arabcity.org, call 256-586-5968, or visit the Building Department at City Hall, 740 N Main St, Arab, AL 35016.';
 const noticeKey = n => 'bfNotice:'+[...String(n.body)].reduce((h, c) => (h*31 + c.charCodeAt(0))|0, 7)+':'+(n.updatedAt||'');
-function noticeHere(n){ return n && ['apps','form','pdf','status','privacy','accessibility'].includes(S.view) && (n.pages==='all' || S.view==='status'); }
+function noticeHere(n){ return n && ['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view) && (n.pages==='all' || S.view==='status'); }
 function noticeBannerHtml(n){
   return '<div class="sitenotice '+(n.tone==='warning'?'warn':'info')+'" role="region" aria-label="Notice from the Building Department">'+ic(n.tone==='warning'?'alert':'info')+'<div class="sn-body">'+mdLite(n.body)+'</div></div>';
 }
@@ -1867,6 +1956,7 @@ function viewApps(){
   '<div class="sheet apps" id="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
+   '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits <span class="beta">Beta</span></b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>'+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
@@ -1943,7 +2033,7 @@ function viewForm(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet" id="sheet">'+(DEMO ? '<div class="demo-samples"><b>Demo: fill this form with sample answers</b><div><button type="button" class="btn sm primary" onclick="demoFillForm()">'+ic('edit')+'Fill with sample answers</button></div><small>Sample documents are attached too. Submitting only adds it to the demo.</small></div>' : '')+'<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
-   '<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
+   acFormBanner()+'<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
 }
 function formFieldsHtml(){
   const F = FORMS[S.form];
@@ -2069,9 +2159,10 @@ async function submitForm(e){
       '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(REVIEW_FORMS.includes(S.form)
         ? '<div class="r t"><span>Estimated total</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> This is an estimate. The Building Department will review your application and confirm the final total when it is approved, then contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy. They will also contact you if anything else is needed.</small></div>'
         : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
-      '<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
+      (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+'<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
+    acAfterSubmit(subId, vals);   // v2.27.0: signed in to My permits -> add it to the account
     // v2.23.1: applicant feedback survey removed (Jade's request); maybeAskFeedback is no longer called.
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -2168,6 +2259,223 @@ async function sendFeedback(){
       p_text: String(FB.comment||'').trim().slice(0,1000), p_dismissed: false, p_version: APP_VERSION });
     FB.sent = true; FB.busy = false; fbPaint(); const c = document.getElementById('fbFirst'); if (c) c.focus();
   }catch(x){ FB.busy = false; fbPaint(); const e2 = document.getElementById('fbErr'); if (e2) e2.textContent = 'Could not send right now. You can close this; your application was received.'; }
+}
+
+/* ================= v2.27.0: My permits (Beta): applicant accounts =================
+   Email + password accounts for applicants. An account lists the applicant's applications: ones submitted
+   while signed in (added automatically) and older ones added with reference # + email used + applicant name.
+   Every check is on the server (bf_app_* functions); this page only shows what the server returns.
+   Applying without an account works exactly as before. Applicant sign-in is separate from staff sign-in. */
+var AC = { tab:'signin', me:null, busy:false, err:'', msg:'', addOpen:false, pwOpen:false, loading:false };
+var APP_TOK = null;
+try{ if (!DEMO) APP_TOK = localStorage.getItem('bdAppTok'); }catch(e){}
+function appTokSave(t){ APP_TOK = t || null; if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
+const ACCT_URL = () => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#account';
+const acctLinkAttrs = () => 'href="'+ACCT_URL()+'"'+(EMBED ? ' target="_top"' : ' onclick="event.preventDefault();go(\'account\')"');
+function acctHeaderBtn(){
+  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>';
+}
+function acctDone(r){ // a whole application is "past" when every step on its status card is done
+  return /<span class="pill paid">Complete<\/span>/.test(statusCard(r));
+}
+function viewAccount(){
+  const me = AC.me, head = '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>My permits <span class="beta lg">Beta</span></h1>';
+  let body;
+  if (APP_TOK && !me){
+    body = head+'</div><p class="empty" role="status">'+(AC.err ? esc(AC.err) : 'Loading your permits…')+'</p>';
+  } else if (!me){
+    const t = AC.tab;
+    body = head+'<span class="hint" style="color:var(--muted)">Keep all your applications in one place: pending permits and past ones. Accounts are new (Beta). You can still apply and check status without an account.</span></div>'+
+      '<div class="ck-tabs ac-tabs" role="tablist"><button type="button" role="tab" aria-selected="'+(t==='signin')+'" class="'+(t==='signin'?'on':'')+'" onclick="acTab(\'signin\')">Sign in</button>'+
+      '<button type="button" role="tab" aria-selected="'+(t==='signup')+'" class="'+(t==='signup'?'on':'')+'" onclick="acTab(\'signup\')">Create account</button>'+
+      (t==='reset' ? '<button type="button" role="tab" aria-selected="true" class="on">Reset password</button>' : '')+'</div>'+
+      (t==='signup'
+        ? '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acSignup()">'+
+            '<div class="fld full"><label class="l" for="acName">Your name</label><input id="acName" type="text" autocomplete="name" maxlength="120" required></div>'+
+            '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
+            '<div class="fld"><label class="l" for="acPass">Password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" minlength="10" required></div>'+
+            '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+            '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Creating…':'Create account')+'</button></div></form>'
+        : t==='reset'
+        ? '<div class="callout ac-note"><b>Forgot your password?</b>Contact the Building Department at <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a> or 256-586-5968 and ask for a password reset code for My permits. The code works once and expires after 24 hours.</div>'+
+          '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acReset()">'+
+            '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
+            '<div class="fld full"><label class="l" for="acCode">Reset code</label><input id="acCode" type="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="e.g. QYJC-32PE" required></div>'+
+            '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
+            '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+            '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Saving…':'Set new password and sign in')+'</button>'+
+            '<button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></div></form>'
+        : '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acSignin()">'+
+            '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
+            '<div class="fld full"><label class="l" for="acPass">Password</label><input id="acPass" type="password" autocomplete="current-password" required></div>'+
+            '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Signing in…':'Sign in')+'</button>'+
+            '<button type="button" class="linkbtn" onclick="acTab(\'reset\')">Forgot password?</button></div></form>')+
+      (AC.err ? '<p class="formerr" role="alert">'+esc(AC.err)+'</p>' : '')+
+      '<p class="ac-small">Your account keeps your name, email and the applications you add, so you can see them in one place. '+PRIV_LINK('How we use your information')+'</p>';
+  } else {
+    const apps = me.apps || [], pend = apps.filter(r => !acctDone(r)), past = apps.filter(acctDone);
+    const card = r => '<div class="ac-item">'+statusCard(r)+'<div class="ac-item-f"><span>'+(r.how==='submitted' ? 'Submitted while signed in' : 'Added to My permits')+' '+esc(r.linkedAt ? new Date(r.linkedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '')+'</span>'+
+      '<button type="button" class="linkbtn" onclick="acRemove(\''+esc(r.ref)+'\')">Remove from My permits</button></div></div>';
+    body = head+'<span class="hint ac-who">Signed in as <b>'+esc(me.user.name)+'</b> · '+esc(me.user.email)+'</span></div>'+
+      '<div class="ac-bar"><button type="button" class="btn primary" onclick="acToggleAdd()" aria-expanded="'+AC.addOpen+'">'+ic('doc')+'Add an application I already submitted</button>'+
+      '<a class="btn" '+HOME_LINK+'>'+ic('right')+'Apply for a permit</a><span class="sp"></span>'+
+      '<button type="button" class="btn sm ghost" onclick="acTogglePw()" aria-expanded="'+AC.pwOpen+'">'+ic('lock')+'Change password</button>'+
+      '<button type="button" class="btn sm ghost" onclick="acSignout()">Sign out</button></div>'+
+      (AC.msg ? '<div class="callout ok ac-msg" role="status">'+esc(AC.msg)+'</div>' : '')+
+      (AC.addOpen ? '<form id="acAdd" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acClaim()"><div class="fld full"><b>Add an application</b><span class="hint">Enter the reference # from the receipt, the email used on the application and the applicant name exactly as it was entered.</span></div>'+
+        '<div class="fld"><label class="l" for="acRef">Reference #</label><input id="acRef" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" required></div>'+
+        '<div class="fld"><label class="l" for="acAEmail">Email used</label><input id="acAEmail" type="email" inputmode="email" autocomplete="email" value="'+esc(me.user.email)+'" required></div>'+
+        '<div class="fld full"><label class="l" for="acAName">Applicant name</label><input id="acAName" type="text" autocomplete="off" required></div>'+
+        '<div class="fld full"><button class="btn primary" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Checking…':'Add to My permits')+'</button> <button type="button" class="btn" onclick="acToggleAdd()">Cancel</button></div>'+
+        (AC.err ? '<p class="formerr full" role="alert">'+esc(AC.err)+'</p>' : '')+'</form>' : '')+
+      (AC.pwOpen ? '<form id="acPw" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acChangePw()"><div class="fld full"><b>Change password</b></div>'+
+        '<div class="fld full"><label class="l" for="acOld">Current password</label><input id="acOld" type="password" autocomplete="current-password" required></div>'+
+        '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
+        '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+        '<div class="fld full"><button class="btn primary" type="submit"'+(AC.busy?' disabled':'')+'>Save new password</button> <button type="button" class="btn" onclick="acTogglePw()">Cancel</button></div>'+
+        (AC.err ? '<p class="formerr full" role="alert">'+esc(AC.err)+'</p>' : '')+'</form>' : '')+
+      (!AC.addOpen && !AC.pwOpen && AC.err ? '<p class="formerr" role="alert">'+esc(AC.err)+'</p>' : '')+
+      (!apps.length
+        ? '<div class="ac-empty">'+ic('doc')+'<b>No applications yet</b><span>Apply for a permit while signed in and it is saved here automatically. Already applied? Choose <b>Add an application I already submitted</b>.</span></div>'
+        : '<h2 class="ac-h">Pending <span class="num">'+pend.length+'</span></h2>'+(pend.length ? pend.map(card).join('') : '<p class="ac-none">Nothing pending.</p>')+
+          '<h2 class="ac-h">Past <span class="num">'+past.length+'</span></h2>'+(past.length ? past.map(card).join('') : '<p class="ac-none">Applications move here when every step is complete (approved, paid, and any inspections and Certificate of Occupancy).</p>'));
+  }
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet stat acct" id="sheet">'+body+'</div></main></div>';
+}
+function bindAccount(){ if (APP_TOK && !AC.me && !AC.loading && !AC.err) acLoad(); }
+const acVal = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+function acTab(t){ AC.tab = t; AC.err = ''; render(); const f = document.querySelector('#acf input'); if (f) f.focus(); }
+function acFocusErr(){ setTimeout(() => { const e = document.querySelector('.acct .formerr'); if (e && e.scrollIntoView) e.scrollIntoView({block:'center'}); }, 0); }
+async function acLoad(){
+  AC.loading = true;
+  try{ AC.me = await sbRpc('bf_app_me', { p_token:APP_TOK }); AC.err = ''; }
+  catch(x){ if (/sign in again/i.test(x.message||'')){ appTokSave(null); AC.me = null; AC.err = ''; } else AC.err = 'Could not load your permits right now. '+(x.message||''); }
+  AC.loading = false; if (S.view==='account') render();
+}
+async function acStart(fn, args, kept){
+  AC.busy = true; AC.err = ''; render();
+  try{ const r = await sbRpc(fn, args);
+    if (r && r.error){ AC.err = r.error; }
+    else if (r && r.token){ appTokSave(r.token); AC.me = null; AC.tab = 'signin'; AC.msg = kept || ''; AC.busy = false; await acLoad(); return; } }
+  catch(x){ AC.err = x.message || 'Please try again.'; }
+  AC.busy = false; render(); acFocusErr();
+}
+function acSignin(){
+  const em = acVal('acEmail').trim(), pw = acVal('acPass');
+  if (!em || !pw){ AC.err = 'Enter your email and password.'; render(); return; }
+  acStart('bf_app_signin', { p_email:em, p_pass:pw });
+}
+function acPwPair(){ const a = acVal('acPass'), b = acVal('acPass2');
+  if (a.length < 10) return 'Use a password of at least 10 characters.'; if (a !== b) return 'The two passwords do not match.'; return ''; }
+function acSignup(){
+  const nm = acVal('acName').trim(), em = acVal('acEmail').trim(), bad = acPwPair();
+  if (nm.length < 2){ AC.err = 'Enter your name.'; render(); return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ AC.err = 'Enter a valid email address.'; render(); return; }
+  if (bad){ AC.err = bad; render(); return; }
+  acStart('bf_app_signup', { p_email:em, p_name:nm, p_pass:acVal('acPass') }, 'Your account is ready. Add applications you already submitted, or apply for a permit and it is saved here automatically.');
+}
+function acReset(){
+  const em = acVal('acEmail').trim(), code = acVal('acCode').trim(), bad = acPwPair();
+  if (!em || !code){ AC.err = 'Enter your email and the reset code from the Building Department.'; render(); return; }
+  if (bad){ AC.err = bad; render(); return; }
+  acStart('bf_app_reset', { p_email:em, p_code:code, p_new:acVal('acPass') }, 'Your password was changed and you are signed in.');
+}
+async function acSignout(){
+  const t = APP_TOK; appTokSave(null); AC.me = null; AC.msg = ''; AC.err = ''; AC.addOpen = AC.pwOpen = false; AC.tab = 'signin'; render();
+  try{ await sbRpc('bf_app_signout', { p_token:t }); }catch(e){}
+  toast('Signed out of My permits.');
+}
+function acToggleAdd(){ AC.addOpen = !AC.addOpen; AC.pwOpen = false; AC.err = ''; AC.msg = ''; render(); if (AC.addOpen){ const f = document.getElementById('acRef'); if (f) f.focus(); } }
+function acTogglePw(){ AC.pwOpen = !AC.pwOpen; AC.addOpen = false; AC.err = ''; AC.msg = ''; render(); if (AC.pwOpen){ const f = document.getElementById('acOld'); if (f) f.focus(); } }
+async function acClaim(){
+  const ref = acVal('acRef').trim().replace(/^ref(erence)?\s*#?\s*/i,'').replace(/[\s#-]/g,'').toUpperCase(), em = acVal('acAEmail').trim(), nm = acVal('acAName').trim();
+  if (ref.length < 8 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em) || !nm){ AC.err = 'Enter the 8-character reference #, the email used on the application and the applicant name.'; render(); acFocusErr(); return; }
+  AC.busy = true; AC.err = ''; render();
+  try{ const r = await sbRpc('bf_app_claim', { p_token:APP_TOK, p_ref:ref, p_email:em, p_name:nm, p_submitted:false });
+    if (r && r.error){ if (r.signedOut){ appTokSave(null); AC.me = null; } AC.err = r.error; }
+    else { AC.addOpen = false; AC.msg = 'Added reference # '+(r.ref||ref)+' to My permits.'; AC.busy = false; await acLoad(); return; } }
+  catch(x){ AC.err = x.message || 'Please try again.'; }
+  AC.busy = false; render(); acFocusErr();
+}
+async function acRemove(ref){
+  if (!confirmBox('Remove reference # '+ref+' from My permits? The application itself is not changed. You can add it again later.')) return;
+  try{ await sbRpc('bf_app_remove', { p_token:APP_TOK, p_ref:ref }); AC.msg = 'Removed reference # '+ref+' from My permits.'; await acLoad(); }
+  catch(x){ AC.err = x.message; render(); }
+}
+function confirmBox(msg){ try{ return window.confirm(msg); }catch(e){ return true; } }
+async function acChangePw(){
+  const old = acVal('acOld'), bad = acPwPair();
+  if (!old){ AC.err = 'Enter your current password.'; render(); return; }
+  if (bad){ AC.err = bad; render(); return; }
+  AC.busy = true; AC.err = ''; render();
+  try{ await sbRpc('bf_app_change_password', { p_token:APP_TOK, p_old:old, p_new:acVal('acPass') }); AC.pwOpen = false; AC.msg = 'Your password was changed.'; }
+  catch(x){ AC.err = x.message || 'Please try again.'; }
+  AC.busy = false; render(); if (AC.err) acFocusErr();
+}
+/* After a successful submission while signed in: add it to the account (server checks ref + email + name). */
+async function acAfterSubmit(subId, vals){
+  if (!APP_TOK) return;
+  const box = document.getElementById('acSaved');
+  try{ const r = await sbRpc('bf_app_claim', { p_token:APP_TOK, p_ref:refNo(subId), p_email:vals.email||'', p_name:vals.applicant||'', p_submitted:true });
+    if (r && r.error) throw new Error(r.error);
+    AC.me = null;
+    if (box) box.innerHTML = ic('check')+'<span>Saved to <a '+acctLinkAttrs()+'>My permits</a>.</span>'; }
+  catch(x){ if (box) box.innerHTML = '<span>Could not save this to My permits automatically. You can add it there with reference # '+esc(refNo(subId))+'.</span>'; }
+}
+function acFormBanner(){
+  if (!APP_TOK) return '';
+  const nm = AC.me && AC.me.user ? AC.me.user.name : '';
+  return '<div class="ac-banner">'+ic('user')+'<span>Signed in to My permits'+(nm ? ' as <b>'+esc(nm)+'</b>' : '')+'. This application will be saved to your account when you submit it.</span></div>';
+}
+
+/* ================= v2.27.0: "Add app" pop-up (public site only) =================
+   Offers to add Apps & Fees to the home screen / dock. Computer and iPad: a small card in the bottom-right corner.
+   Phone: a panel along the bottom. Shown once, a few seconds after opening a public page (not while filling out a
+   form), and not again for 30 days after "Not now". Never shown inside the City website frame, in demo mode,
+   on staff pages, or when already opened as an installed app. Chrome/Edge/Android: the browser's own install
+   prompt. iPhone/iPad and Mac Safari: short instructions (those browsers have no install button pages can use). */
+var INST = { evt:null, timer:null, open:false };
+function instStandalone(){ try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }catch(e){ return false; } }
+function instKind(){
+  if (INST.evt) return 'prompt';
+  const ua = navigator.userAgent || '', ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) return 'ios';
+  if (/Macintosh/.test(ua) && /Safari\//.test(ua) && !/Chrome|Chromium|Edg|OPR|Firefox/.test(ua)) return 'macsafari';
+  return '';
+}
+function instCoarse(){ try{ return matchMedia('(pointer:coarse)').matches; }catch(e){ return false; } }
+function instSnoozed(){ try{ const t = Number(localStorage.getItem('bdInstallSeen')||0); return t && Date.now() - t < 30*864e5; }catch(e){ return false; } }
+function instSnooze(){ try{ localStorage.setItem('bdInstallSeen', String(Date.now())); }catch(e){} }
+function instEligible(){ return !EMBED && !DEMO && !instStandalone() && !instSnoozed() && ['apps','status','account','privacy','accessibility'].includes(S.view) && !!instKind(); }
+function instMaybe(){
+  if (INST.open || INST.timer || !instEligible()) return;
+  INST.timer = setTimeout(() => { INST.timer = null; if (instEligible() && !document.querySelector('.veil')) instShow(); }, 4000);
+}
+function instShow(){
+  const k = instKind(); if (!k || INST.open) return;
+  const how = k==='ios' ? '<ol class="inst-how"><li>Tap the <b>Share</b> button <span class="inst-share" aria-hidden="true">'+ic('upload')+'</span> in your browser.</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>'
+    : k==='macsafari' ? '<ol class="inst-how"><li>In the Safari menu bar, choose <b>File</b>.</li><li>Choose <b>Add to Dock</b>, then <b>Add</b>.</li></ol>' : '';
+  const box = document.createElement('div');
+  box.className = 'inst'; box.id = 'inst'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-labelledby', 'instT'); box.setAttribute('aria-describedby', 'instD');
+  box.innerHTML = '<button type="button" class="inst-x" aria-label="Close" onclick="instClose()">'+ic('x')+'</button>'+
+    '<div class="inst-top"><img src="icon-192.png" alt="" width="52" height="52" onerror="this.onerror=null;this.src=\'city-logo.jpg\'"><div><b id="instT">Add the app</b><span id="instD">Put Apps &amp; Fees on your '+(k==='macsafari' ? 'Dock' : k==='ios' || /Mobi|Android/.test(navigator.userAgent||'') || instCoarse() ? 'home screen' : 'computer')+' to apply for permits, check status and see My permits in one tap.</span></div></div>'+
+    how+'<div class="inst-acts">'+(k==='prompt' ? '<button type="button" class="btn primary" onclick="instAdd()">'+ic('down')+'Add app</button>' : '')+
+    '<button type="button" class="btn'+(k==='prompt' ? '' : ' primary')+'" onclick="instClose()">'+(k==='prompt' ? 'Not now' : 'Got it')+'</button></div>';
+  document.body.appendChild(box); INST.open = true;
+  requestAnimationFrame(() => box.classList.add('on'));
+}
+function instHide(){ const b = document.getElementById('inst'); if (b) b.remove(); INST.open = false; }
+function instClose(){ instSnooze(); instHide(); }
+async function instAdd(){
+  const e = INST.evt; if (!e){ instClose(); return; }
+  INST.evt = null;
+  try{ await e.prompt(); const c = await e.userChoice; instSnooze(); instHide(); if (c && c.outcome === 'accepted') toast('Adding Apps & Fees to your device…'); }
+  catch(x){ instClose(); }
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); INST.evt = e; instMaybe(); });
+window.addEventListener('appinstalled', () => { instSnooze(); instHide(); });
+if (!EMBED && 'serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
 
 /* ================= STAFF: shared bits ================= */
@@ -2372,6 +2680,7 @@ function viewWorkspace(){
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
    '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    '<a class="navi" href="#ar" onclick="event.preventDefault();go(\'ar\')">'+ic('cal')+'AR by fiscal year</a>'+
+   '<a class="navi" href="#app-accounts" onclick="event.preventDefault();go(\'app-accounts\')">'+ic('user')+'Applicant accounts <span class="beta">Beta</span></a>'+
    (canRecords()?'<a class="navi" href="#records" onclick="event.preventDefault();go(\'records\')">'+ic('db')+'Records &amp; storage</a>':'')+
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
@@ -2913,7 +3222,7 @@ function routeAllowed(v){
   if (v==='clerk') return canPay();
   if (['users','bugs','site-notice'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
-  if (v==='staff' || v==='table' || v==='cict' || v==='ar') return canBuilding();
+  if (v==='staff' || v==='table' || v==='cict' || v==='ar' || v==='app-accounts') return canBuilding();
   return false;
 }
 const ROLE_LABEL = { staff:'Building Department', clerk:'City Clerk', admin:'Administrator', citizen:'No access' };
@@ -3958,6 +4267,8 @@ function render(){
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
   else if (S.view==='status'){ root.innerHTML = viewStatus(); bindStatus(); }
+  else if (S.view==='account'){ const keep = [...root.querySelectorAll('.acct input[id]')].map(e => [e.id, e.value]); root.innerHTML = viewAccount();
+    keep.forEach(([id, v]) => { const e = document.getElementById(id); if (e && !e.value) e.value = v; }); bindAccount(); }
   else if (S.view==='privacy') root.innerHTML = viewPrivacy();
   else if (S.view==='accessibility') root.innerHTML = viewAccessibility();
   else if (EMBED) root.innerHTML = viewFramed();     // staff screens never load inside another site's frame
@@ -3983,23 +4294,25 @@ function render(){
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
   else if (S.view==='cict') root.innerHTML = viewCict();
   else if (S.view==='ar') root.innerHTML = viewAr();
+  else if (S.view==='app-accounts'){ root.innerHTML = viewAppAccounts(); if (!S.appAcc.list && !S.appAcc.err) appAccLoad(); }
   else if (S.view==='table' && S.form){
     const off = document.getElementById('offf'), keep = (off && S.tab==='office') ? { sel:S.sel, v:[...off.querySelectorAll('input,select,textarea')].filter(e => e.id).map(e => [e.id, e.type==='checkbox' ? e.checked : e.value]) } : null;
     root.innerHTML = viewTable(); bindLinkPick();
     if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
   a11yLandmarks();
-  if (['apps','form','pdf','status','privacy','accessibility'].includes(S.view)) paintNotice();
-  const isPub = ['apps','form','pdf','status','privacy','accessibility'].includes(S.view);
+  if (['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view)) paintNotice();
+  const isPub = ['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view);
   if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
   else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+' Application · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Apps & Fees · City of Arab';
+  document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='account' ? 'My Permits · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+' Application · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Apps & Fees · City of Arab';
   ensureViewData();
   if (DEMO) demoPaintBar();
+  if (INST.open && !['apps','status','account','privacy','accessibility'].includes(S.view)) instHide(); else instMaybe();   // v2.27.0 "Add app" pop-up
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
 /* Start loading what the current page needs, once, whichever way the user got there
@@ -4020,10 +4333,11 @@ function initRoute(){
   if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
+  else if (h==='account') S.view = 'account';
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','app-accounts'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -4913,7 +5227,7 @@ function staffFooter(){
 const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF forms (Annexation, Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
 const STAFF_URG = [['low','Minor'],['normal','Slows me down'],['high',"I can't do my work"]];
-const bugIsPublic = () => ['apps','form','pdf','status'].includes(S.view);
+const bugIsPublic = () => ['apps','form','pdf','status','account'].includes(S.view);
 function openBug(){
   closeBug();
   if (bugIsPublic()) return openPubBug();
@@ -5463,6 +5777,19 @@ function dClerkGet(id){ if (!dSub(id)) throw new Error('Application not found.')
 function dAddPayment(a, o){ const id = ++DEMO.nextPay; const p = Object.assign({ id, receiptNo:'D-'+String(id).padStart(6,'0'), kind:'payment', checkNo:'', note:'', reverses:null, reversedBy:null,
     recordedBy:a.name, recordedByEmail:a.email, recordedAt:new Date().toISOString(), receivedOn:dIsoDay(new Date()) }, o); DEMO.payments.push(p); return p; }
 
+function dStatusItem(id, d){ const x = d.data, st = x.staff || {}, ok = dApproved(x);
+        const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (!v || typeof v!=='object') return; const has = [v.date, v.by, v.recorded, v.comment].some(z => String(z||'').trim()); if (!has) return;
+          const done = String(v.by||'').trim() && String(v.recorded||'').trim(); ins[k] = { status:done?'complete':'pending', date:done ? (String(v.date||'').trim() || v.recorded) : '' }; });
+        return { ref:dRef(id), form:x.form, createdAt:x.createdAt, applicant:(x.fields||{}).applicant, address:(x.fields||{}).address, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', approved:!!(st.approvedBy||st.approvedDate),
+          reviewRequired:dReviewRequired(id, x), infoNeeded: ok ? '' : String(st.infoNeeded||'').trim().slice(0,1000), inspections:ins, co:st.co||'',
+          fees:{ permit:(x.fees||{}).permit, cict:(x.fees||{}).cict, total:(x.fees||{}).total, doubled:(x.fees||{}).doubled },
+          pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'' };
+}
+function dAppSession(em){ const u = DEMO.appUsers[em], t = 'demo-app-'+dUuid(); (DEMO.appSess || (DEMO.appSess = {}))[t] = em; u.lastLogin = new Date().toISOString(); return { token:t, user:{ email:u.email, name:u.name, createdAt:u.createdAt } }; }
+function dAppUser(t){ const em = (DEMO.appSess||{})[t], u = em && (DEMO.appUsers||{})[em]; return u && u.active ? u : null; }
+function dAppById(id){ const u = Object.values(DEMO.appUsers||{}).find(o => 'demo-app-'+o.email === id); if (!u) throw new Error('Account not found.'); return u; }
+function dNormName(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }
+
 async function demoRpc(fn, A){
   A = A || {}; await new Promise(r => setTimeout(r, 60));   // feel like a network call
   const out = demoCall(fn, A); demoSave(); return dClone(out);
@@ -5513,13 +5840,40 @@ function demoCall(fn, A){
     case 'bf_permit_status': {
       const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9-]/g,'').toUpperCase(), em = String(A.p_email||'').trim().toLowerCase();
       if (ref.length < 3 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) throw new Error('Enter your reference # and the email address on your application.');
-      return Object.entries(S2).filter(([id, d]) => dRef(id)===ref && String((d.data.fields||{}).email||'').trim().toLowerCase()===em).map(([id, d]) => { const x = d.data, st = x.staff || {}, ok = dApproved(x);
-        const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (!v || typeof v!=='object') return; const has = [v.date, v.by, v.recorded, v.comment].some(z => String(z||'').trim()); if (!has) return;
-          const done = String(v.by||'').trim() && String(v.recorded||'').trim(); ins[k] = { status:done?'complete':'pending', date:done ? (String(v.date||'').trim() || v.recorded) : '' }; });
-        return { ref:dRef(id), form:x.form, createdAt:x.createdAt, applicant:(x.fields||{}).applicant, address:(x.fields||{}).address, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', approved:!!(st.approvedBy||st.approvedDate),
-          reviewRequired:dReviewRequired(id, x), infoNeeded: ok ? '' : String(st.infoNeeded||'').trim().slice(0,1000), inspections:ins, co:st.co||'',
-          fees:{ permit:(x.fees||{}).permit, cict:(x.fees||{}).cict, total:(x.fees||{}).total, doubled:(x.fees||{}).doubled },
-          pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'' }; }); }
+      return Object.entries(S2).filter(([id, d]) => dRef(id)===ref && String((d.data.fields||{}).email||'').trim().toLowerCase()===em).map(([id, d]) => dStatusItem(id, d)); }
+    /* v2.27.0 My permits (Beta), demo: accounts live only in this tab's demo data */
+    case 'bf_app_signup': { const em = String(A.p_email||'').trim().toLowerCase(), U = DEMO.appUsers || (DEMO.appUsers = {});
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return { error:'Enter a valid email address.' };
+      if (String(A.p_name||'').trim().length < 2) return { error:'Enter your name.' };
+      if (String(A.p_pass||'').length < 10) return { error:'Use a password of at least 10 characters.' };
+      if (U[em]) return { error:'An account already uses this email. Sign in instead, or use Forgot password.' };
+      U[em] = { email:em, name:String(A.p_name).trim(), pw:A.p_pass, apps:{}, createdAt:new Date().toISOString(), active:true }; return dAppSession(em); }
+    case 'bf_app_signin': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em];
+      if (!u || u.pw !== A.p_pass) return { error:'Incorrect email or password.' }; if (!u.active) return { error:'This account has been turned off. Contact the Building Department.' }; return dAppSession(em); }
+    case 'bf_app_signout': { if (DEMO.appSess) delete DEMO.appSess[A.p_token]; return null; }
+    case 'bf_app_me': { const u = dAppUser(A.p_token); if (!u) throw new Error('Please sign in again.');
+      return { user:{ email:u.email, name:u.name, createdAt:u.createdAt }, apps:Object.entries(u.apps).filter(([id]) => S2[id]).map(([id, l]) => Object.assign(dStatusItem(id, S2[id]), l))
+        .sort((p, q) => String(q.createdAt).localeCompare(String(p.createdAt))) }; }
+    case 'bf_app_claim': { const u = dAppUser(A.p_token); if (!u) return { error:'Please sign in again.', signedOut:true };
+      const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), em = String(A.p_email||'').trim().toLowerCase(), nm = dNormName(A.p_name);
+      const hit = Object.keys(S2).filter(id => dRef(id)===ref && String((S2[id].data.fields||{}).email||'').trim().toLowerCase()===em && dNormName((S2[id].data.fields||{}).applicant)===nm && nm);
+      if (hit.length !== 1) return { error:'We could not find an application with that reference #, email and applicant name. Check all three (the name exactly as it was entered on the application) and try again.' };
+      const id = hit[0]; if (u.apps[id]) return { error:'This application is already in your account.' };
+      if (Object.values(DEMO.appUsers).some(o => o.apps[id])) return { error:'This application is already in a different account. If it is yours, contact the Building Department.' };
+      u.apps[id] = { how:A.p_submitted ? 'submitted' : 'added', linkedAt:new Date().toISOString() }; return dStatusItem(id, S2[id]); }
+    case 'bf_app_remove': { const u = dAppUser(A.p_token); if (!u) throw new Error('Please sign in again.'); Object.keys(u.apps).forEach(id => { if (dRef(id)===String(A.p_ref||'').toUpperCase()) delete u.apps[id]; }); return null; }
+    case 'bf_app_change_password': { const u = dAppUser(A.p_token); if (!u) throw new Error('Please sign in again.'); if (u.pw !== A.p_old) throw new Error('Your current password is not correct.');
+      if (String(A.p_new||'').length < 10) throw new Error('Use a password of at least 10 characters.'); u.pw = A.p_new; return null; }
+    case 'bf_app_reset': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em], code = String(A.p_code||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+      if (!u || !u.reset || u.reset !== code) return { error:'That reset code is not correct or has expired. Ask the Building Department for a new one.' };
+      if (String(A.p_new||'').length < 10) return { error:'Use a password of at least 10 characters.' }; u.pw = A.p_new; u.reset = null; return dAppSession(em); }
+    case 'bf_staff_app_accounts': { dNeed(T,'building'); return Object.values(DEMO.appUsers||{}).map(u => ({ id:'demo-app-'+u.email, email:u.email, name:u.name, active:u.active, createdAt:u.createdAt, lastLogin:u.lastLogin||null,
+        resetPending:!!u.reset, resetExpires:u.reset ? new Date(Date.now()+864e5).toISOString() : null, apps:Object.keys(u.apps).filter(id => S2[id]).map(dRef) })); }
+    case 'bf_staff_app_reset_code': { dNeed(T,'building'); const u = dAppById(A.p_id); const c = Array.from({length:8}, () => 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
+      u.reset = c; return { code:c.slice(0,4)+'-'+c.slice(4), email:u.email, expires:new Date(Date.now()+864e5).toISOString() }; }
+    case 'bf_staff_app_set_active': { dNeed(T,'building'); const u = dAppById(A.p_id); u.active = !!A.p_on; return null; }
+    case 'bf_staff_app_unlink': { dNeed(T,'building'); const u = dAppById(A.p_id), before = Object.keys(u.apps).length; Object.keys(u.apps).forEach(id => { if (dRef(id)===String(A.p_ref||'').toUpperCase()) delete u.apps[id]; });
+      if (Object.keys(u.apps).length === before) throw new Error('That application is not in this account.'); return null; }
     case 'bf_fy_get': { dNeed(T); return Object.assign({ updatedBy:'', updatedAt:null }, DEMO.fy); }
     case 'bf_fy_set_start': { const a = dNeed(T,'building'); if (!(A.p_month>=1 && A.p_month<=12)) throw new Error('Pick a month.'); if (!(A.p_day>=1 && A.p_day<=28)) throw new Error('Pick a day from 1 to 28.');
       Object.assign(DEMO.fy, { month:A.p_month, day:A.p_day, updatedBy:a.name, updatedAt:new Date().toISOString() }); dAudit(a, 'fiscal.start', '', { to:A.p_month+'/'+A.p_day }); return dClone(DEMO.fy); }
@@ -5615,6 +5969,12 @@ function demoSeed(){
   pay(O1, Number(D.docs.submissions[O1].data.fees.total), 'Check', '3002', 94*day);
   mk('subtrade', { applicant:'Valley HVAC', email:'office@valleyhvac-example.com', address:'6 Arbor Ln', trade:'HVAC', tradeLicense:'HV-5521', buildType:'Residential', estCost:'6500', description:'New mini-split for sunroom.' }, { ago:93*day, read:true, linkedTo:O1, staff:{ approvedBy:'DB', approvedDate:dd(92), permitNo:'26112H' } });
   D.audit = [{ at:new Date().toISOString(), by:'System', action:'demo.started', target:'', details:{ note:'Sample data only' } }];
+  { // v2.27.0: one sample applicant account (My permits, Beta) holding the first two sample applications
+    const ids = Object.keys(D.docs.submissions).sort((p, q) => String(D.docs.submissions[q].data.createdAt).localeCompare(String(D.docs.submissions[p].data.createdAt))).slice(0, 2);
+    const f0 = ids[0] ? (D.docs.submissions[ids[0]].data.fields||{}) : {}, em = String(f0.email||'applicant@example.com').toLowerCase();
+    D.appUsers = { [em]: { email:em, name:f0.applicant||'Sample Applicant', pw:'demo-password', active:true, createdAt:new Date(Date.now()-6*864e5).toISOString(), lastLogin:new Date(Date.now()-864e5).toISOString(),
+      apps:Object.fromEntries(ids.map((id, i) => [id, { how:i ? 'added' : 'submitted', linkedAt:new Date(Date.now()-(5-i)*864e5).toISOString() }])) } };
+    D.appSess = {}; }
   DEMO = prev; return D;
 }
 function demoSamples(){ if (!DEMO) return [];
@@ -5653,7 +6013,7 @@ function demoExit(){ window.__demoOff = true; try{ sessionStorage.removeItem('bd
 function demoReset(){ window.__demoOff = true; const role = DEMO && DEMO.token; const D = demoSeed(); D.token = role || 'demo-admin'; try{ sessionStorage.setItem('bdDemo', JSON.stringify(D)); }catch(e){} location.reload(); }
 function demoAs(k){ if (!DEMO) return; DEMO.token = 'demo-'+k; demoSave(); window.__demoOff = true; location.hash = k==='clerk' ? '#clerk' : '#staff'; location.reload(); }
 function demoBarHtml(){
-  const k = String((DEMO&&DEMO.token)||'').replace('demo-',''), pubView = ['apps','form','pdf','status','privacy','accessibility'].includes(S.view);
+  const k = String((DEMO&&DEMO.token)||'').replace('demo-',''), pubView = ['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view);
   return '<div class="demobar" role="region" aria-label="Demo mode"><b>'+ic('info')+'DEMO MODE</b><span class="dm-note">Sample data only. Nothing is saved to the real system.</span>'+
     '<span class="dm-grp"><span class="dm-l">Show:</span><a href="#apps" class="'+(pubView?'on':'')+'" onclick="event.preventDefault();go(\'apps\')">Public site</a><a href="#staff" class="'+(!pubView?'on':'')+'" onclick="event.preventDefault();S.loaded=false;if(S.ck)S.ck.results=null;go(\''+(k==='clerk'?'clerk':'staff')+'\')">Staff portal</a></span>'+
     '<span class="dm-grp"><span class="dm-l">View as:</span>'+[['admin','Administrator'],['staff','Building Dept'],['clerk','City Clerk']].map(([r,l]) => '<button type="button" class="'+(k===r?'on':'')+'" onclick="demoAs(\''+r+'\')"'+(k===r?' aria-pressed="true"':'')+'>'+l+'</button>').join('')+'</span>'+
@@ -5688,6 +6048,51 @@ function demoFillForm(){
   const form = document.getElementById('pf'); if (form){ form.innerHTML = formFieldsHtml(); form.dataset.vis = visSig(F, FVALS); bindFiles(); paintFiles();
     form.querySelectorAll('.agree input[type=checkbox]').forEach(c => { c.checked = true; }); }
   toast('Sample answers filled in. Review them, then choose Submit application.');
+}
+
+/* ================= v2.27.0: Applicant accounts (Beta), staff side =================
+   Building Department staff and administrators: see applicant accounts, make a one-time password reset code
+   (the portal has no email sender yet, so staff give the code to the applicant), turn an account off or on, and
+   take an application out of an account. Every action is checked on the server (bf_staff_app_*). */
+function viewAppAccounts(){
+  const A = S.appAcc || (S.appAcc = { list:null, err:'', codes:{}, q:'' });
+  const q = String(A.q||'').toLowerCase().trim();
+  const rows = (A.list||[]).filter(u => !q || (u.name+' '+u.email+' '+(u.apps||[]).join(' ')).toLowerCase().includes(q));
+  const when = d => d ? new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : 'Never';
+  return topBar()+'<div class="purge appacc"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span><button class="btn sm" onclick="S.appAcc.list=null;appAccLoad()">Refresh</button></div>'+
+    '<h1>Applicant accounts <span class="beta lg">Beta</span></h1><p style="margin:0;color:var(--ink2);max-width:76ch">Accounts applicants made on the public site under <b>My permits</b>. Each lists the applications the applicant submitted while signed in or added with the reference #, email and applicant name. If someone forgets their password, make a reset code and give it to them by phone or in person; it works once and expires after 24 hours.</p>'+
+    '<label class="search appacc-q">'+ic('search')+'<input id="aaq" placeholder="Search name, email or reference #" value="'+esc(A.q||'')+'" aria-label="Search applicant accounts" oninput="S.appAcc.q=this.value;appAccPaint()"></label>'+
+    '<div id="aaList">'+(A.err ? '<p class="formerr">'+esc(A.err)+'</p>' : !A.list ? '<p class="empty">Loading accounts…</p>' : !A.list.length ? '<p class="empty">No applicant accounts yet.</p>' : !rows.length ? '<p class="empty">No accounts match.</p>' :
+      rows.map(u => { const c = A.codes[u.id];
+        return '<article class="card aa'+(u.active?'':' off')+'"><div class="aa-h"><div><b>'+esc(u.name)+'</b>'+(u.active?'':' <span class="pill">Turned off</span>')+'<span>'+esc(u.email)+'</span></div>'+
+          '<div class="aa-acts"><button class="btn sm" onclick="appAccCode(\''+u.id+'\')">'+ic('lock')+'Make reset code</button><button class="btn sm ghost" onclick="appAccActive(\''+u.id+'\','+(!u.active)+')">'+(u.active?'Turn off':'Turn on')+'</button></div></div>'+
+          '<div class="aa-meta"><span>Created '+esc(when(u.createdAt))+'</span><span>Last sign-in '+esc(when(u.lastLogin))+'</span>'+(u.resetPending && !c ? '<span>Reset code waiting (expires '+esc(when(u.resetExpires))+')</span>' : '')+'</div>'+
+          (c ? '<div class="aa-code" role="status">Reset code for '+esc(u.email)+': <b class="num" style="user-select:all">'+esc(c.code)+'</b><small>Give this to the applicant. On My permits they choose <b>Forgot password?</b> and enter it. Works once, expires '+esc(when(c.expires))+'. It will not be shown again.</small></div>' : '')+
+          '<div class="aa-apps">'+((u.apps||[]).length ? (u.apps||[]).map(r => '<span class="aa-ref num">'+esc(r)+'<button type="button" aria-label="Take '+esc(r)+' out of this account" title="Take out of this account" onclick="appAccUnlink(\''+u.id+'\',\''+esc(r)+'\')">'+ic('x')+'</button></span>').join('') : '<span class="aa-none">No applications yet</span>')+'</div></article>'; }).join(''))+'</div></div>';
+}
+function appAccPaint(){ const el = document.getElementById('aaList'); if (!el) return; const tmp = document.createElement('div'); tmp.innerHTML = viewAppAccounts(); const n = tmp.querySelector('#aaList'); if (n) el.innerHTML = n.innerHTML; }
+async function appAccLoad(){
+  const A = S.appAcc || (S.appAcc = { list:null, err:'', codes:{}, q:'' }); if (A.loading) return; A.loading = true;
+  try{ A.list = await sbRpc('bf_staff_app_accounts', { p_token:TOKEN }) || []; A.err = ''; } catch(x){ A.err = x.message; }
+  A.loading = false; if (S.view==='app-accounts') render();
+}
+async function appAccCode(id){
+  const u = (S.appAcc.list||[]).find(x => x.id===id); if (!u) return;
+  if (!confirmBox('Make a new password reset code for '+u.email+'? Any earlier code for this account stops working.')) return;
+  try{ const r = await sbRpc('bf_staff_app_reset_code', { p_token:TOKEN, p_id:id }); S.appAcc.codes[id] = r; u.resetPending = true; render(); }
+  catch(x){ toast(x.message); }
+}
+async function appAccActive(id, on){
+  const u = (S.appAcc.list||[]).find(x => x.id===id); if (!u) return;
+  if (!on && !confirmBox('Turn off the account for '+u.email+'? They are signed out and cannot sign in until it is turned back on. Their applications are not changed.')) return;
+  try{ await sbRpc('bf_staff_app_set_active', { p_token:TOKEN, p_id:id, p_on:on }); u.active = on; render(); toast(on ? 'Account turned on.' : 'Account turned off.'); }
+  catch(x){ toast(x.message); }
+}
+async function appAccUnlink(id, ref){
+  const u = (S.appAcc.list||[]).find(x => x.id===id); if (!u) return;
+  if (!confirmBox('Take reference # '+ref+' out of the account for '+u.email+'? The application itself is not changed.')) return;
+  try{ await sbRpc('bf_staff_app_unlink', { p_token:TOKEN, p_id:id, p_ref:ref }); u.apps = (u.apps||[]).filter(r => r!==ref); render(); toast('Taken out of the account.'); }
+  catch(x){ toast(x.message); }
 }
 </script>
 </body>
