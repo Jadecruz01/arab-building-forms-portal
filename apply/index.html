@@ -1305,6 +1305,11 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
   .inst-acts .btn{flex:1;justify-content:center;padding:12px}
 }
 @media (prefers-reduced-motion:reduce){.inst{transition:none}}
+.aa-mail{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:14px;max-width:76ch}
+.aa-mail svg{width:18px;height:18px;flex:none;margin-top:1px}
+.aa-mail.on{background:var(--okbg)}.aa-mail.on svg{color:var(--ok)}
+.aa-mail.off{background:var(--surface2)}
+.aa-mail.warn{background:var(--redbg)}
 </style>
 
 
@@ -1785,7 +1790,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.27.0';   // shown at the bottom of every page
+const APP_VERSION = '2.28.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -1956,7 +1961,7 @@ function viewApps(){
   '<div class="sheet apps" id="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
-   '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits <span class="beta">Beta</span></b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>'+
+   (APP_TOK ? '' : '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits <span class="beta">Beta</span></b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>')+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
@@ -2297,14 +2302,7 @@ function viewAccount(){
             '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
             '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Creating…':'Create account')+'</button></div></form>'
         : t==='reset'
-        ? '<div class="callout ac-note"><b>Forgot your password?</b>Contact the Building Department at <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a> or 256-586-5968 and ask for a password reset code for My permits. The code works once and expires after 24 hours.</div>'+
-          '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acReset()">'+
-            '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
-            '<div class="fld full"><label class="l" for="acCode">Reset code</label><input id="acCode" type="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="e.g. QYJC-32PE" required></div>'+
-            '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
-            '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
-            '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Saving…':'Set new password and sign in')+'</button>'+
-            '<button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></div></form>'
+        ? acResetHtml()
         : '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acSignin()">'+
             '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
             '<div class="fld full"><label class="l" for="acPass">Password</label><input id="acPass" type="password" autocomplete="current-password" required></div>'+
@@ -2344,7 +2342,7 @@ function viewAccount(){
 }
 function bindAccount(){ if (APP_TOK && !AC.me && !AC.loading && !AC.err) acLoad(); }
 const acVal = id => { const e = document.getElementById(id); return e ? e.value : ''; };
-function acTab(t){ AC.tab = t; AC.err = ''; render(); const f = document.querySelector('#acf input'); if (f) f.focus(); }
+function acTab(t){ AC.tab = t; AC.err = ''; if (t==='reset'){ AC.sent = ''; if (AC.mailReady == null) acMailCheck(); } render(); const f = document.querySelector('#acf input'); if (f) f.focus(); }
 function acFocusErr(){ setTimeout(() => { const e = document.querySelector('.acct .formerr'); if (e && e.scrollIntoView) e.scrollIntoView({block:'center'}); }, 0); }
 async function acLoad(){
   AC.loading = true;
@@ -2374,9 +2372,42 @@ function acSignup(){
   if (bad){ AC.err = bad; render(); return; }
   acStart('bf_app_signup', { p_email:em, p_name:nm, p_pass:acVal('acPass') }, 'Your account is ready. Add applications you already submitted, or apply for a permit and it is saved here automatically.');
 }
+/* v2.28.0: reset by email (6-digit code from noreply@jadecruz.dev via Resend) when the server says it is set up;
+   otherwise (and as a backup) a code from the Building Department. */
+function acResetHtml(){
+  const mail = !!AC.mailReady, staffNote = 'Questions? Contact the Building Department at <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a> or 256-586-5968.';
+  const codeForm = '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acReset()">'+
+      '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
+      '<div class="fld full"><label class="l" for="acCode">'+(mail ? 'Code from the email' : 'Reset code')+'</label><input id="acCode" type="text" autocomplete="one-time-code" '+(mail ? 'inputmode="numeric" placeholder="6 digits"' : 'autocapitalize="characters" placeholder="e.g. QYJC-32PE"')+' spellcheck="false" required></div>'+
+      '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
+      '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+      '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Saving…':'Set new password and sign in')+'</button>'+
+      '<button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></div></form>';
+  if (AC.mailReady == null) return '<p class="empty" role="status">Loading…</p>';
+  if (!mail) return '<div class="callout ac-note"><b>Password reset is not available right now.</b>Please try again later. '+staffNote+'</div><p><button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></p>';
+  if (!AC.sent) return '<div class="callout ac-note"><b>Forgot your password?</b>Enter the email you signed up with and we will email you a 6-digit code.</div>'+
+      '<form id="acSend" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acForgot()">'+
+      '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
+      '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Sending…':'Email me a code')+'</button>'+
+      '<button type="button" class="linkbtn" onclick="AC.sent=\'skip\';AC.err=\'\';render()">I already have a code</button>'+
+      '<button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></div></form>'+
+      '<p class="ac-small">'+staffNote+'</p>';
+  return (AC.sent !== 'skip' ? '<div class="callout ok ac-msg" role="status">'+esc(AC.sent)+'</div>' : '')+codeForm+
+    '<p class="ac-small">Didn\'t get it? Check your spam folder, or <button type="button" class="linkbtn" onclick="AC.sent=\'\';AC.err=\'\';render()">send a new code</button>.</p>';
+}
+async function acMailCheck(){ try{ AC.mailReady = !!(await sbRpc('bf_app_mail_ready', {})); }catch(e){ AC.mailReady = false; } if (S.view==='account') render(); }
+async function acForgot(){
+  const em = acVal('acEmail').trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ AC.err = 'Enter the email you signed up with.'; render(); acFocusErr(); return; }
+  AC.busy = true; AC.err = ''; render();
+  try{ const r = await sbRpc('bf_app_forgot', { p_email:em }); if (r && r.error) AC.err = r.error; else { AC.sent = (r && r.msg) || 'Check your email for a 6-digit code.'; AC.lastEmail = em; } }
+  catch(x){ AC.err = x.message || 'Please try again.'; }
+  AC.busy = false; render();
+  if (!AC.err){ const e = document.getElementById('acEmail'), c = document.getElementById('acCode'); if (e && !e.value) e.value = AC.lastEmail || em; if (c) c.focus(); } else acFocusErr();
+}
 function acReset(){
   const em = acVal('acEmail').trim(), code = acVal('acCode').trim(), bad = acPwPair();
-  if (!em || !code){ AC.err = 'Enter your email and the reset code from the Building Department.'; render(); return; }
+  if (!em || !code){ AC.err = 'Enter your email and the 6-digit code from the email.'; render(); return; }
   if (bad){ AC.err = bad; render(); return; }
   acStart('bf_app_reset', { p_email:em, p_code:code, p_new:acVal('acPass') }, 'Your password was changed and you are signed in.');
 }
@@ -5865,8 +5896,13 @@ function demoCall(fn, A){
     case 'bf_app_change_password': { const u = dAppUser(A.p_token); if (!u) throw new Error('Please sign in again.'); if (u.pw !== A.p_old) throw new Error('Your current password is not correct.');
       if (String(A.p_new||'').length < 10) throw new Error('Use a password of at least 10 characters.'); u.pw = A.p_new; return null; }
     case 'bf_app_reset': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em], code = String(A.p_code||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();
-      if (!u || !u.reset || u.reset !== code) return { error:'That reset code is not correct or has expired. Ask the Building Department for a new one.' };
+      if (!u || !u.reset || u.reset !== code) return { error:'That code is not correct or has expired. Request a new code and try again.' };
       if (String(A.p_new||'').length < 10) return { error:'Use a password of at least 10 characters.' }; u.pw = A.p_new; u.reset = null; return dAppSession(em); }
+    case 'bf_app_mail_ready': return true;
+    case 'bf_app_forgot': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em];
+      if (u && u.active){ u.reset = String(Math.floor(Math.random()*1e6)).padStart(6,'0'); setTimeout(() => toast('Demo: no email is sent. The code would be '+u.reset+'.'), 300); }
+      return { ok:true, msg:'If an account uses that email, we sent it a 6-digit code. It expires in 15 minutes. Check your spam folder if you do not see it.' }; }
+    case 'bf_staff_app_mail_status': dNeed(T,'building'); return { ready:true, from:'noreply@jadecruz.dev', recent:[] };
     case 'bf_staff_app_accounts': { dNeed(T,'building'); return Object.values(DEMO.appUsers||{}).map(u => ({ id:'demo-app-'+u.email, email:u.email, name:u.name, active:u.active, createdAt:u.createdAt, lastLogin:u.lastLogin||null,
         resetPending:!!u.reset, resetExpires:u.reset ? new Date(Date.now()+864e5).toISOString() : null, apps:Object.keys(u.apps).filter(id => S2[id]).map(dRef) })); }
     case 'bf_staff_app_reset_code': { dNeed(T,'building'); const u = dAppById(A.p_id); const c = Array.from({length:8}, () => 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
@@ -6060,27 +6096,31 @@ function viewAppAccounts(){
   const rows = (A.list||[]).filter(u => !q || (u.name+' '+u.email+' '+(u.apps||[]).join(' ')).toLowerCase().includes(q));
   const when = d => d ? new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : 'Never';
   return topBar()+'<div class="purge appacc"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span><button class="btn sm" onclick="S.appAcc.list=null;appAccLoad()">Refresh</button></div>'+
-    '<h1>Applicant accounts <span class="beta lg">Beta</span></h1><p style="margin:0;color:var(--ink2);max-width:76ch">Accounts applicants made on the public site under <b>My permits</b>. Each lists the applications the applicant submitted while signed in or added with the reference #, email and applicant name. If someone forgets their password, make a reset code and give it to them by phone or in person; it works once and expires after 24 hours.</p>'+
+    '<h1>Applicant accounts <span class="beta lg">Beta</span></h1><p style="margin:0;color:var(--ink2);max-width:76ch">Accounts applicants made on the public site under <b>My permits</b>. Each lists the applications the applicant submitted while signed in or added with the reference #, email and applicant name. If someone forgets their password, they choose <b>Forgot password?</b> and get a code by email.</p>'+
+    appMailHtml()+
     '<label class="search appacc-q">'+ic('search')+'<input id="aaq" placeholder="Search name, email or reference #" value="'+esc(A.q||'')+'" aria-label="Search applicant accounts" oninput="S.appAcc.q=this.value;appAccPaint()"></label>'+
     '<div id="aaList">'+(A.err ? '<p class="formerr">'+esc(A.err)+'</p>' : !A.list ? '<p class="empty">Loading accounts…</p>' : !A.list.length ? '<p class="empty">No applicant accounts yet.</p>' : !rows.length ? '<p class="empty">No accounts match.</p>' :
-      rows.map(u => { const c = A.codes[u.id];
+      rows.map(u => {
         return '<article class="card aa'+(u.active?'':' off')+'"><div class="aa-h"><div><b>'+esc(u.name)+'</b>'+(u.active?'':' <span class="pill">Turned off</span>')+'<span>'+esc(u.email)+'</span></div>'+
-          '<div class="aa-acts"><button class="btn sm" onclick="appAccCode(\''+u.id+'\')">'+ic('lock')+'Make reset code</button><button class="btn sm ghost" onclick="appAccActive(\''+u.id+'\','+(!u.active)+')">'+(u.active?'Turn off':'Turn on')+'</button></div></div>'+
-          '<div class="aa-meta"><span>Created '+esc(when(u.createdAt))+'</span><span>Last sign-in '+esc(when(u.lastLogin))+'</span>'+(u.resetPending && !c ? '<span>Reset code waiting (expires '+esc(when(u.resetExpires))+')</span>' : '')+'</div>'+
-          (c ? '<div class="aa-code" role="status">Reset code for '+esc(u.email)+': <b class="num" style="user-select:all">'+esc(c.code)+'</b><small>Give this to the applicant. On My permits they choose <b>Forgot password?</b> and enter it. Works once, expires '+esc(when(c.expires))+'. It will not be shown again.</small></div>' : '')+
+          '<div class="aa-acts"><button class="btn sm ghost" onclick="appAccActive(\''+u.id+'\','+(!u.active)+')">'+(u.active?'Turn off':'Turn on')+'</button></div></div>'+
+          '<div class="aa-meta"><span>Created '+esc(when(u.createdAt))+'</span><span>Last sign-in '+esc(when(u.lastLogin))+'</span>'+''+'</div>'+
           '<div class="aa-apps">'+((u.apps||[]).length ? (u.apps||[]).map(r => '<span class="aa-ref num">'+esc(r)+'<button type="button" aria-label="Take '+esc(r)+' out of this account" title="Take out of this account" onclick="appAccUnlink(\''+u.id+'\',\''+esc(r)+'\')">'+ic('x')+'</button></span>').join('') : '<span class="aa-none">No applications yet</span>')+'</div></article>'; }).join(''))+'</div></div>';
+}
+function appMailHtml(){
+  const m = (S.appAcc||{}).mail; if (!m) return '';
+  const last = (m.recent||[])[0], ok = last && last.status >= 200 && last.status < 300;
+  return '<div class="aa-mail '+(m.ready ? (last && !ok ? 'warn' : 'on') : 'off')+'">'+ic(m.ready ? 'mail' : 'info')+'<span>'+
+    (m.ready ? '<b>Password reset by email is on.</b> Applicants who choose Forgot password? get a 6-digit code from '+esc(m.from)+'.'+
+        (last ? ' Last email sent '+esc(new Date(last.at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))+': '+(ok ? 'delivered to Resend' : 'failed ('+esc(String(last.status||''))+' '+esc(last.error||'')+')')+'.' : '')
+      : '<b>Password reset by email is off.</b> Applicants who forget their password cannot reset it yet. It turns on when the Resend key is saved in Supabase Vault as resend_api_key.')+
+    '</span></div>';
 }
 function appAccPaint(){ const el = document.getElementById('aaList'); if (!el) return; const tmp = document.createElement('div'); tmp.innerHTML = viewAppAccounts(); const n = tmp.querySelector('#aaList'); if (n) el.innerHTML = n.innerHTML; }
 async function appAccLoad(){
   const A = S.appAcc || (S.appAcc = { list:null, err:'', codes:{}, q:'' }); if (A.loading) return; A.loading = true;
-  try{ A.list = await sbRpc('bf_staff_app_accounts', { p_token:TOKEN }) || []; A.err = ''; } catch(x){ A.err = x.message; }
+  try{ const [l, m] = await Promise.all([sbRpc('bf_staff_app_accounts', { p_token:TOKEN }), sbRpc('bf_staff_app_mail_status', { p_token:TOKEN }).catch(() => null)]);
+    A.list = l || []; A.mail = m; A.err = ''; } catch(x){ A.err = x.message; }
   A.loading = false; if (S.view==='app-accounts') render();
-}
-async function appAccCode(id){
-  const u = (S.appAcc.list||[]).find(x => x.id===id); if (!u) return;
-  if (!confirmBox('Make a new password reset code for '+u.email+'? Any earlier code for this account stops working.')) return;
-  try{ const r = await sbRpc('bf_staff_app_reset_code', { p_token:TOKEN, p_id:id }); S.appAcc.codes[id] = r; u.resetPending = true; render(); }
-  catch(x){ toast(x.message); }
 }
 async function appAccActive(id, on){
   const u = (S.appAcc.list||[]).find(x => x.id===id); if (!u) return;
