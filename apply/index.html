@@ -1436,6 +1436,13 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
 .st-detail .st-insp li span:first-child{font-weight:600;color:var(--ink)}
 .st-detail .st-insp li span:last-child{font-size:13px;color:var(--ink2)}
 .st-detail .st-insp li.pend span:last-child{color:var(--amber);font-weight:600}
+/* v2.31.3: AR controls: buttons sit on the same line and height as the fiscal-year box */
+.ar-ctl .ar-ctl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.ar-ctl .ar-ctl-row select{flex:1 1 300px;max-width:460px;min-height:44px}
+.ar-ctl .ar-btns{display:flex;flex-wrap:wrap;gap:10px}
+.ar-ctl .ar-btns .btn{min-height:44px;padding-left:16px;padding-right:16px;white-space:nowrap}
+.ar-ctl .hint{margin-top:2px}
+@media (max-width:560px){.ar-ctl .ar-ctl-row select{max-width:none}.ar-ctl .ar-btns{width:100%}.ar-ctl .ar-btns .btn{flex:1 1 0;justify-content:center}}
 </style>
 
 
@@ -1989,7 +1996,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.2';   // shown at the bottom of every page
+const APP_VERSION = '2.31.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -5994,50 +6001,53 @@ function arTot(rs){ const t = rs.reduce((a, r) => ({ n:a.n+1, billed:a.billed+r.
   t.billed = r2(t.billed); t.paid = r2(t.paid); t.ar = r2(t.ar); return t; }
 function arState(){
   const years = fyYears(), A = S.ar || (S.ar = { fy: prefGet('arFy', null) });
-  if (!A.fy || !years.includes(+A.fy)) A.fy = fyNow(); A.fy = +A.fy;
-  const rows = (S.subs||[]).map(s => Object.assign({ s, fy:fyOf(s), moved:!!fyOv(s.id) }, arAmt(s))), inFy = rows.filter(r => r.fy === A.fy);
+  if (A.fy !== 'all'){ if (!A.fy || !years.includes(+A.fy)) A.fy = fyNow(); A.fy = +A.fy; }
+  const all = A.fy === 'all';
+  const rows = (S.subs||[]).map(s => Object.assign({ s, fy:fyOf(s), moved:!!fyOv(s.id) }, arAmt(s))), inFy = all ? rows : rows.filter(r => r.fy === A.fy);
   const keys = FORM_ORDER.concat([...new Set(inFy.map(r => r.s.form))].filter(k => !FORM_ORDER.includes(k)));
   const byForm = keys.map(k => Object.assign({ k }, arTot(inFy.filter(r => r.s.form === k)))).filter(x => x.n);
   const open = inFy.filter(r => r.bal > 0).sort((a, b) => String(a.s.createdAt).localeCompare(String(b.s.createdAt)));
-  return { A, years, T:arTot(inFy), byForm, open, moved:inFy.filter(r => r.moved).length, allYears: years.map(f => Object.assign({ fy:f }, arTot(rows.filter(r => r.fy === f)))) };
+  return { A, all, years, T:arTot(inFy), byForm, open, moved:all ? 0 : inFy.filter(r => r.moved).length, allYears: years.map(f => Object.assign({ fy:f }, arTot(rows.filter(r => r.fy === f)))) };
 }
-function arPick(f){ S.ar = { fy:+f }; prefSet('arFy', +f); render(); }
+function arPick(f){ f = f === 'all' ? 'all' : +f; S.ar = { fy:f }; prefSet('arFy', f); render(); }
+/* v2.31.3: "All time" = every application in every fiscal year */
+const arName = f => f === 'all' ? 'All time' : fyName(f);
+const arRange = f => { if (f !== 'all') return fyRangeText(f); const ys = fyYears(); return ys.length ? 'Every fiscal year · '+fyName(Math.min(...ys))+' to '+fyName(Math.max(...ys)) : 'Every fiscal year'; };
 function viewAr(){
-  const { A, years, T, byForm, open, moved, allYears } = arState(), cur = fyNow();
+  const { A, all, years, T, byForm, open, moved, allYears } = arState(), cur = fyNow();
   const yl = f => fyName(f)+(f===cur?' (this fiscal year)':'');
   return topBar()+'<div class="purge cict ar"><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span>'+fyBtn()+'</div>'+
     '<h1>AR by fiscal year</h1><p style="margin:0;color:var(--ink2);max-width:72ch">What was billed, collected and is still owed for the applications in each fiscal year. An application belongs to the fiscal year it was submitted in (the City’s fiscal year starts '+esc(fyStartText())+'), unless staff moved it. Balances are as of today.</p>'+
     (S.loaded ? '' : '<p class="empty">Loading applications…</p>')+
-    '<div class="card cict-ctl"><div class="fld"><label class="l" for="arFy">Fiscal year</label><select id="arFy" onchange="arPick(this.value)">'+years.map(f => '<option value="'+f+'"'+(f===A.fy?' selected':'')+'>'+yl(f)+'</option>').join('')+'</select><span class="hint num">'+esc(fyRangeText(A.fy))+'</span></div>'+
-      '<div class="row" style="gap:8px;align-self:end;flex-wrap:wrap"><button class="btn primary" onclick="arPdf()" '+(T.n?'':'disabled')+'>'+ic('down')+'Download PDF report</button><button class="btn" onclick="arCsv()" '+(T.n?'':'disabled')+'>'+ic('down')+'Download CSV</button></div></div>'+
-    '<div class="cict-tiles"><div><span>Billed · '+fyName(A.fy)+'</span><b class="num">'+money(T.billed)+'</b><small class="num">'+T.n+' application'+(T.n===1?'':'s')+'</small></div>'+
+    '<div class="card ar-ctl"><div class="fld"><label class="l" for="arFy">Fiscal year</label><div class="ar-ctl-row"><select id="arFy" onchange="arPick(this.value)"><option value="all"'+(all?' selected':'')+'>All time (every fiscal year)</option>'+years.map(f => '<option value="'+f+'"'+(f===A.fy?' selected':'')+'>'+yl(f)+'</option>').join('')+'</select><div class="ar-btns"><button class="btn primary" onclick="arPdf()" '+(T.n?'':'disabled')+'>'+ic('down')+'Download PDF report</button><button class="btn" onclick="arCsv()" '+(T.n?'':'disabled')+'>'+ic('down')+'Download CSV</button></div></div><span class="hint num">'+esc(arRange(A.fy))+'</span></div></div>'+
+    '<div class="cict-tiles"><div><span>Billed · '+arName(A.fy)+'</span><b class="num">'+money(T.billed)+'</b><small class="num">'+T.n+' application'+(T.n===1?'':'s')+'</small></div>'+
       '<div><span>Collected</span><b class="num">'+money(T.paid)+'</b><small class="num">'+(T.billed ? Math.round(T.paid/T.billed*100) : 0)+'% of billed</small></div>'+
       '<div class="ar-owed"><span>Still owed (AR)</span><b class="num">'+money(T.ar)+'</b><small class="num">'+T.open+' with a balance</small></div></div>'+
-    (moved ? '<p class="hint" style="margin:0">'+moved+' application'+(moved===1?' was':'s were')+' moved into '+fyName(A.fy)+' by hand.</p>' : '')+
+    (moved ? '<p class="hint" style="margin:0">'+moved+' application'+(moved===1?' was':'s were')+' moved into '+arName(A.fy)+' by hand.</p>' : '')+
     '<div class="dwrap">'+(byForm.length ? '<table class="grid"><thead><tr><th>Application</th><th style="text-align:right">Applications</th><th style="text-align:right">Billed</th><th style="text-align:right">Collected</th><th style="text-align:right">Still owed</th></tr></thead><tbody>'+
       byForm.map(x => '<tr><td>'+esc((FORMS[x.k]||{}).short||x.k)+'</td><td class="num" style="text-align:right">'+x.n+'</td><td class="num" style="text-align:right">'+money(x.billed)+'</td><td class="num" style="text-align:right">'+money(x.paid)+'</td><td class="num" style="text-align:right"><b>'+money(x.ar)+'</b></td></tr>').join('')+
       '</tbody><tfoot><tr><td><b>Total</b></td><td class="num" style="text-align:right"><b>'+T.n+'</b></td><td class="num" style="text-align:right"><b>'+money(T.billed)+'</b></td><td class="num" style="text-align:right"><b>'+money(T.paid)+'</b></td><td class="num" style="text-align:right"><b>'+money(T.ar)+'</b></td></tr></tfoot></table>'
-      : '<div class="empty">No applications in '+fyName(A.fy)+' yet.</div>')+'</div>'+
-    '<h2 style="margin:6px 0 0;font:700 18px var(--f-disp)">Applications with a balance · '+fyName(A.fy)+'</h2>'+
+      : '<div class="empty">No applications in '+arName(A.fy)+' yet.</div>')+'</div>'+
+    '<h2 style="margin:6px 0 0;font:700 18px var(--f-disp)">Applications with a balance · '+arName(A.fy)+'</h2>'+
     '<div class="dwrap">'+(open.length ? '<table class="grid"><thead><tr><th>Submitted</th><th>Permit #</th><th>Reference #</th><th>Application</th><th>Applicant</th><th>Property address</th><th style="text-align:right">Billed</th><th style="text-align:right">Paid</th><th style="text-align:right">Balance</th></tr></thead><tbody>'+
-      open.map(r => '<tr onclick="openLinked(\''+r.s.id+'\')" style="cursor:pointer"><td>'+esc(fmtDate(r.s.createdAt))+(r.moved?' <span class="pill src" title="Moved to this fiscal year by hand">moved</span>':'')+'</td><td>'+esc((r.s.staff&&r.s.staff.permitNo)||'—')+'</td><td class="num">'+refNo(r.s.id)+'</td><td>'+esc((FORMS[r.s.form]||{}).short||r.s.form)+'</td><td>'+esc(r.s.fields.applicant||'')+'</td><td>'+esc(r.s.fields.address||'')+'</td>'+
+      open.map(r => '<tr onclick="openLinked(\''+r.s.id+'\')" style="cursor:pointer"><td>'+esc(fmtDate(r.s.createdAt))+(all?' <span class="hint">· '+fyName(r.fy)+'</span>':'')+(r.moved?' <span class="pill src" title="Moved to this fiscal year by hand">moved</span>':'')+'</td><td>'+esc((r.s.staff&&r.s.staff.permitNo)||'—')+'</td><td class="num">'+refNo(r.s.id)+'</td><td>'+esc((FORMS[r.s.form]||{}).short||r.s.form)+'</td><td>'+esc(r.s.fields.applicant||'')+'</td><td>'+esc(r.s.fields.address||'')+'</td>'+
         '<td class="num" style="text-align:right">'+money(r.billed)+'</td><td class="num" style="text-align:right">'+money(r.paid)+'</td><td class="num" style="text-align:right"><b>'+money(r.bal)+'</b></td></tr>').join('')+
-      '</tbody><tfoot><tr><td colspan="8"><b>Still owed for '+fyName(A.fy)+'</b></td><td class="num" style="text-align:right"><b>'+money(T.ar)+'</b></td></tr></tfoot></table>'
-      : '<div class="empty">Nothing is owed for '+fyName(A.fy)+'.</div>')+'</div>'+
+      '</tbody><tfoot><tr><td colspan="8"><b>Still owed for '+arName(A.fy)+'</b></td><td class="num" style="text-align:right"><b>'+money(T.ar)+'</b></td></tr></tfoot></table>'
+      : '<div class="empty">Nothing is owed for '+arName(A.fy)+'.</div>')+'</div>'+
     '<details class="sched" open><summary>All fiscal years</summary><div class="sched-body"><table class="fees"><thead><tr><th>Fiscal year</th><th>Dates</th><th style="text-align:right">Applications</th><th style="text-align:right">Billed</th><th style="text-align:right">Collected</th><th style="text-align:right">Still owed</th></tr></thead><tbody>'+
-      allYears.map(y => '<tr><td><button class="linkbtn" onclick="arPick('+y.fy+');window.scrollTo(0,0)">'+fyName(y.fy)+'</button></td><td class="num">'+esc(fyRangeText(y.fy))+'</td><td class="num" style="text-align:right">'+y.n+'</td><td class="num" style="text-align:right">'+money(y.billed)+'</td><td class="num" style="text-align:right">'+money(y.paid)+'</td><td class="num" style="text-align:right"><b>'+money(y.ar)+'</b></td></tr>').join('')+
+      allYears.map(y => '<tr'+(y.fy===A.fy?' class="on"':'')+'><td><button class="linkbtn" onclick="arPick('+y.fy+');window.scrollTo(0,0)">'+fyName(y.fy)+'</button></td><td class="num">'+esc(fyRangeText(y.fy))+'</td><td class="num" style="text-align:right">'+y.n+'</td><td class="num" style="text-align:right">'+money(y.billed)+'</td><td class="num" style="text-align:right">'+money(y.paid)+'</td><td class="num" style="text-align:right"><b>'+money(y.ar)+'</b></td></tr>').join('')+
     '</tbody></table></div></details>'+
   '</div>';
 }
 function arCsv(){
-  const { A, T, byForm, open } = arState(), q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"', n2 = v => (Number(v)||0).toFixed(2);
-  const lines = [q('City of Arab Building Department - AR by fiscal year'), [fyName(A.fy), fyRangeText(A.fy), 'Balances as of '+fmtDate(new Date().toISOString())].map(q).join(','), '',
+  const { A, all, T, byForm, open } = arState(), q = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"', n2 = v => (Number(v)||0).toFixed(2);
+  const lines = [q('City of Arab Building Department - AR by fiscal year'), [arName(A.fy), arRange(A.fy), 'Balances as of '+fmtDate(new Date().toISOString())].map(q).join(','), '',
     ['Application','Applications','Billed','Collected','Still owed'].map(q).join(',')]
     .concat(byForm.map(x => [(FORMS[x.k]||{}).title||x.k, x.n, n2(x.billed), n2(x.paid), n2(x.ar)].map(q).join(',')))
     .concat([['TOTAL', T.n, n2(T.billed), n2(T.paid), n2(T.ar)].map(q).join(','), '', q('Applications with a balance'),
       ['Date submitted','Fiscal year','Moved by hand','Permit #','Reference #','Application','Applicant','Property address','Billed','Paid','Balance','Payment status'].map(q).join(',')])
     .concat(open.map(r => [String(r.s.createdAt||'').slice(0,10), fyName(r.fy), r.moved?'Yes':'', (r.s.staff&&r.s.staff.permitNo)||'', refNo(r.s.id), (FORMS[r.s.form]||{}).title||r.s.form, r.s.fields.applicant||'', r.s.fields.address||'', n2(r.billed), n2(r.paid), n2(r.bal), PAY_LABEL[r.st]||''].map(q).join(',')));
-  DL.save({ filename:'AR-'+fyName(A.fy).replace(' ','')+'.csv', data: lines.join('\r\n') });
+  DL.save({ filename:'AR-'+arName(A.fy).replace(' ','')+'.csv', data: lines.join('\r\n') });
 }
 async function arPdf(){
   if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
@@ -6055,7 +6065,7 @@ async function arPdf(){
     const head = () => { page = pdf.addPage([W, H]); pn++;
       page.drawRectangle({ x:0, y:H-58, width:W, height:58, color:navy });
       page.drawText('City of Arab Building Department', { x:M, y:H-26, size:14, font:bold, color:rgb(1,1,1) });
-      page.drawText(pdfSafe('AR by fiscal year · '+fyName(A.fy)+' ('+fyRangeText(A.fy)+') · balances as of '+fmtDate(new Date().toISOString())), { x:M, y:H-45, size:10.5, font:reg, color:rgb(0.95,0.8,0.45) });
+      page.drawText(pdfSafe('AR by fiscal year · '+arName(A.fy)+' ('+arRange(A.fy)+') · balances as of '+fmtDate(new Date().toISOString())), { x:M, y:H-45, size:10.5, font:reg, color:rgb(0.95,0.8,0.45) });
       y = H - 86; };
     head();
     [['Billed', money(T.billed)], ['Collected', money(T.paid)], ['Still owed (AR)', money(T.ar)], ['Applications', T.n+' ('+T.open+' with a balance)']].forEach(([l, v], i) => {
@@ -6073,7 +6083,7 @@ async function arPdf(){
       y -= 6; page.drawLine({ start:{x:M,y}, end:{x:W-M,y}, thickness:.8, color:line }); y -= 14; };
     if (y < 140){ head(); }
     txt('Applications with a balance', M, y, { size:11, font:bold }); y -= 20;
-    if (!open.length){ txt('Nothing is owed for '+fyName(A.fy)+'.', M, y, { color:grey }); y -= 20; }
+    if (!open.length){ txt('Nothing is owed for '+arName(A.fy)+'.', M, y, { color:grey }); y -= 20; }
     else { colHead();
       open.forEach(r => {
         if (y < 70){ head(); colHead(); }
@@ -6084,7 +6094,7 @@ async function arPdf(){
       });
       if (y < 110) head();
       y -= 4; page.drawLine({ start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.8, color:line });
-      txt('Still owed for '+fyName(A.fy), M, y-6, { size:11, font:bold }); rtxt(money(T.ar), W-M, y-6, bold, 12);
+      txt('Still owed for '+arName(A.fy), M, y-6, { size:11, font:bold }); rtxt(money(T.ar), W-M, y-6, bold, 12);
       y -= 30;
     }
     y -= 20;
@@ -6092,7 +6102,7 @@ async function arPdf(){
     page.drawLine({ start:{x:W-M-220,y:y-2}, end:{x:W-M,y:y-2}, thickness:.7, color:ink }); txt('Signature', W-M-220, y-14, { size:8, color:grey });
     if (open.some(r => r.moved)) txt('* Moved to this fiscal year by Building Department staff.', M, y-28, { size:8, color:grey });
     pdf.getPages().forEach((p, i) => p.drawText('Page '+(i+1)+' of '+pn, { x:W-M-50, y:22, size:8, font:reg, color:grey }));
-    await DL.save({ filename:'AR-report-'+fyName(A.fy).replace(' ','')+'.pdf', data: await pdf.save() });
+    await DL.save({ filename:'AR-report-'+arName(A.fy).replace(' ','')+'.pdf', data: await pdf.save() });
   }catch(e){ toast('Could not build the report: '+((e&&e.message)||'try again')); }
 }
 
