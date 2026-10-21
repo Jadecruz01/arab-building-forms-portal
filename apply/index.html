@@ -14,6 +14,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Apps &amp; Fees">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Poppins:wght@500;600;700&display=swap">
@@ -162,7 +163,7 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .fld label.l{font-weight:600;font-size:14px;color:var(--ink)}
 .fld .req{color:var(--red)}
 .fld .hint{color:var(--muted);font-size:12.5px}
-.fld input[type=text],.fld input[type=email],.fld input[type=tel],.fld input[type=date],.fld input[type=number],.fld select,.fld textarea{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--surface);width:100%;min-width:0}
+.fld input[type=text],.fld input[type=email],.fld input[type=password],.fld input[type=tel],.fld input[type=date],.fld input[type=number],.fld select,.fld textarea{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--surface);width:100%;min-width:0}
 .fld textarea{min-height:90px;resize:vertical}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--blue);outline-offset:0;border-color:transparent}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
@@ -1407,6 +1408,20 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 .lk-screen .spl-in{max-width:100%;min-width:0}
 .lk-screen .spl-sub{font-size:11px}
 @media (max-width:980px){.lk-grid{grid-template-columns:1fr}.lk-row{grid-template-columns:1fr 1fr}.lk-phone{position:static}}
+/* v2.31.1 installed app (iPhone): the strip behind the clock is part of the white header, header stays pinned */
+@media (display-mode: standalone){
+  html{background:var(--surface)}
+  .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-area-inset-top,0px)}
+}
+html.ios-app{background:var(--surface)}
+html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-area-inset-top,0px)}
+.pw-wrap{position:relative;display:block}
+.pw-wrap input{width:100%;padding-right:48px}
+.pw-wrap input::-ms-reveal,.pw-wrap input::-ms-clear{display:none}
+.pw-eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;padding:0}
+.pw-eye:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.pw-eye:focus-visible{outline:3px solid var(--gold,#c0a869);outline-offset:1px}
+.pw-eye svg{width:20px;height:20px}
 </style>
 
 
@@ -1448,7 +1463,21 @@ function splashHtml(L, preview){
     (L.anim === 'none' ? '' : '<div class="spl-track" aria-hidden="true">'+(L.anim === 'tools' ? '<div class="spl-tools">'+tools+'</div>' : '')+'<div class="spl-bar"><i></i>'+(L.anim === 'tools' ? '<b class="spl-ham"><svg viewBox="0 0 24 24">'+SPL_TOOLS[0]+'</svg></b>' : '')+'</div></div>')+
     '</div></div>';
 }
+/* Show/hide password (My permits sign up, sign in, change password, reset) */
+const PW_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const PW_EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.9 9.9 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function pwEyeBtn(){ return '<button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" title="Show password" onclick="pwToggle(this)">'+PW_EYE+'</button>'; }
+function pwToggle(b){
+  const i = b.parentNode.querySelector('input'); if (!i) return;
+  const show = i.type === 'password';
+  i.type = show ? 'text' : 'password';
+  b.setAttribute('aria-pressed', show ? 'true' : 'false');
+  b.setAttribute('aria-label', show ? 'Hide password' : 'Show password'); b.title = b.getAttribute('aria-label');
+  b.innerHTML = show ? PW_EYE_OFF : PW_EYE;
+  try{ const p = i.value.length; i.focus({preventScroll:true}); i.setSelectionRange(p, p); }catch(e){}
+}
 function esc0(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+try{ if (navigator.standalone === true) document.documentElement.classList.add('ios-app'); }catch(e){}
 var SPLASH = (() => {
   try{
     if (EMBED) return null;
@@ -1946,7 +1975,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.0';   // shown at the bottom of every page
+const APP_VERSION = '2.31.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2454,14 +2483,14 @@ function viewAccount(){
         ? '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acSignup()">'+
             '<div class="fld full"><label class="l" for="acName">Your name</label><input id="acName" type="text" autocomplete="name" maxlength="120" required></div>'+
             '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
-            '<div class="fld"><label class="l" for="acPass">Password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" minlength="10" required></div>'+
-            '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+            '<div class="fld"><label class="l" for="acPass">Password <span class="hint">(at least 10 characters)</span></label><span class="pw-wrap"><input id="acPass" type="password" autocomplete="new-password" minlength="10" required>'+pwEyeBtn()+'</span></div>'+
+            '<div class="fld"><label class="l" for="acPass2">Type it again</label><span class="pw-wrap"><input id="acPass2" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
             '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Creating…':'Create account')+'</button></div></form>'
         : t==='reset'
         ? acResetHtml()
         : '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acSignin()">'+
             '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
-            '<div class="fld full"><label class="l" for="acPass">Password</label><input id="acPass" type="password" autocomplete="current-password" required></div>'+
+            '<div class="fld full"><label class="l" for="acPass">Password</label><span class="pw-wrap"><input id="acPass" type="password" autocomplete="current-password" required>'+pwEyeBtn()+'</span></div>'+
             '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Signing in…':'Sign in')+'</button>'+
             '<button type="button" class="linkbtn" onclick="acTab(\'reset\')">Forgot password?</button></div></form>')+
       (AC.err ? '<p class="formerr" role="alert">'+esc(AC.err)+'</p>' : '')+
@@ -2484,9 +2513,9 @@ function viewAccount(){
         '<div class="fld full"><button class="btn primary" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Checking…':'Add to My permits')+'</button> <button type="button" class="btn" onclick="acToggleAdd()">Cancel</button></div>'+
         (AC.err ? '<p class="formerr full" role="alert">'+esc(AC.err)+'</p>' : '')+'</form>' : '')+
       (AC.pwOpen ? '<form id="acPw" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acChangePw()"><div class="fld full"><b>Change password</b></div>'+
-        '<div class="fld full"><label class="l" for="acOld">Current password</label><input id="acOld" type="password" autocomplete="current-password" required></div>'+
-        '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
-        '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+        '<div class="fld full"><label class="l" for="acOld">Current password</label><span class="pw-wrap"><input id="acOld" type="password" autocomplete="current-password" required>'+pwEyeBtn()+'</span></div>'+
+        '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><span class="pw-wrap"><input id="acPass" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
+        '<div class="fld"><label class="l" for="acPass2">Type it again</label><span class="pw-wrap"><input id="acPass2" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
         '<div class="fld full"><button class="btn primary" type="submit"'+(AC.busy?' disabled':'')+'>Save new password</button> <button type="button" class="btn" onclick="acTogglePw()">Cancel</button></div>'+
         (AC.err ? '<p class="formerr full" role="alert">'+esc(AC.err)+'</p>' : '')+'</form>' : '')+
       (!AC.addOpen && !AC.pwOpen && AC.err ? '<p class="formerr" role="alert">'+esc(AC.err)+'</p>' : '')+
@@ -2536,8 +2565,8 @@ function acResetHtml(){
   const codeForm = '<form id="acf" class="fgrid ac-form" novalidate onsubmit="event.preventDefault();acReset()">'+
       '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
       '<div class="fld full"><label class="l" for="acCode">'+(mail ? 'Code from the email' : 'Reset code')+'</label><input id="acCode" type="text" autocomplete="one-time-code" '+(mail ? 'inputmode="numeric" placeholder="6 digits"' : 'autocapitalize="characters" placeholder="e.g. QYJC-32PE"')+' spellcheck="false" required></div>'+
-      '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><input id="acPass" type="password" autocomplete="new-password" required></div>'+
-      '<div class="fld"><label class="l" for="acPass2">Type it again</label><input id="acPass2" type="password" autocomplete="new-password" required></div>'+
+      '<div class="fld"><label class="l" for="acPass">New password <span class="hint">(at least 10 characters)</span></label><span class="pw-wrap"><input id="acPass" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
+      '<div class="fld"><label class="l" for="acPass2">Type it again</label><span class="pw-wrap"><input id="acPass2" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
       '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Saving…':'Set new password and sign in')+'</button>'+
       '<button type="button" class="linkbtn" onclick="acTab(\'signin\')">Back to sign in</button></div></form>';
   if (AC.mailReady == null) return '<p class="empty" role="status">Loading…</p>';
