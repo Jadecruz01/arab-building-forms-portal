@@ -1422,6 +1422,20 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
 .pw-eye:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
 .pw-eye:focus-visible{outline:3px solid var(--gold,#c0a869);outline-offset:1px}
 .pw-eye svg{width:20px;height:20px}
+/* v2.31.2: status card: even tile row + full-width details */
+.steps.tiles > li > div{align-content:start}
+@media (min-width:1000px){.steps.tiles.n4{grid-template-columns:repeat(4,minmax(0,1fr))}.steps.tiles.n5{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.st-detail{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--surface)}
+.st-detail.part{background:var(--amberbg);border-color:transparent}
+.st-detail.ok{background:var(--okbg);border-color:transparent}
+.st-detail h3{margin:0 0 8px;font-size:15px;font-weight:700;color:var(--ink)}
+.st-detail h3 span{font-weight:500;color:var(--ink2);font-size:14px;margin-left:6px}
+.st-detail .st-info{margin-top:0}
+.st-detail .st-insp{max-width:none;margin:0;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.st-detail .st-insp li{flex-direction:column;justify-content:flex-start;gap:2px;padding:9px 12px;background:var(--surface)}
+.st-detail .st-insp li span:first-child{font-weight:600;color:var(--ink)}
+.st-detail .st-insp li span:last-child{font-size:13px;color:var(--ink2)}
+.st-detail .st-insp li.pend span:last-child{color:var(--amber);font-weight:600}
 </style>
 
 
@@ -1975,7 +1989,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.1';   // shown at the bottom of every page
+const APP_VERSION = '2.31.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -4317,7 +4331,9 @@ function statusCard(r){
   const complete = steps.every(x => x.st==='ok');
   return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · Permit # '+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
-    '<ol class="steps tiles">'+steps.map(x => '<li class="'+x.st+(x.wide?' wide':'')+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
+    /* v2.31.2: one even row of short tiles; details (what we need + upload, inspection list) go full width below */
+    '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
+    steps.filter(x => x.list).map(x => '<div class="st-detail '+x.st+'"><h3>'+x.t+(x.t==='Inspections' ? ' <span>'+esc(x.d)+'</span>' : '')+'</h3>'+x.list+'</div>').join('')+
     (holdPay && ps==='unpaid'
       ? '<div class="st-fees num"><div><span>Estimated total</span><b>'+money(total)+'</b></div></div>'
       : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
