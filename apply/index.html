@@ -5,7 +5,7 @@
 <title>Applications &amp; Fees · City of Arab</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com blob:; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://yighcuismepfmappcfui.supabase.co https://cdnjs.cloudflare.com data: blob:; media-src 'self' blob: data:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com blob:; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://yighcuismepfmappcfui.supabase.co; connect-src 'self' https://yighcuismepfmappcfui.supabase.co https://cdnjs.cloudflare.com data: blob:; media-src 'self' blob: data:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#212c46">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f2a47'/%3E%3Cg fill='none' stroke='%23d6b062' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 15.5L16 6l11 9.5'/%3E%3Cpath d='M8.5 13v13h15V13'/%3E%3Cpath d='M14 26v-6h4v6'/%3E%3C/g%3E%3C/svg%3E">
@@ -1340,6 +1340,73 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 .st-got svg{width:16px;height:16px;color:var(--ok);flex:none;margin-top:2px}
 .revgot{display:block;font-size:13.5px;color:var(--ok);font-weight:600;margin-top:4px}
 .revgot svg{width:15px;height:15px;vertical-align:-2px;margin-right:4px}
+
+/* v2.31.0: applicant bell + notifications card */
+.pbell-w{position:relative;flex:none}
+.pbell{position:relative;display:inline-grid;place-items:center;width:38px;height:36px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);cursor:pointer;margin-left:6px}
+.pbell:hover{border-color:var(--gold);color:var(--golddk)}
+.pbell svg{width:17px;height:17px}
+.pbell .nb-count{position:absolute;top:-6px;right:-6px}
+.pbell-menu{right:0;left:auto;top:calc(100% + 8px);color:var(--ink)}
+.nb-item.warn .nb-dot{background:var(--amber)}
+.pbell-tip{display:flex;gap:8px;align-items:flex-start;margin:0;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.pbell-tip svg{width:15px;height:15px;flex:none;margin-top:2px;color:var(--golddk)}
+.an-card{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:14px;background:var(--surface2);font-size:14px}
+.an-card > svg{width:20px;height:20px;flex:none;color:var(--golddk);margin-top:1px}
+.an-card > div{display:grid;gap:8px;min-width:0}
+.an-acts{display:flex;gap:8px;flex-wrap:wrap}
+.an-msg{margin:0;color:var(--ok);font-weight:600;font-size:13.5px}
+@media (max-width:440px){.pbrand small{display:none}.pacct .beta{display:none}}
+@media (max-width:640px){.pbell{width:34px;height:32px;margin-left:4px}.pbell-menu{position:fixed;left:12px;right:12px;top:64px;width:auto}}
+
+/* v2.31.0: app splash screen */
+#splash,#splashPrev{position:fixed;inset:0;z-index:10000}
+.spl{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 35%,var(--spl-hi,color-mix(in srgb,var(--spl-bg) 93%,#fff)) 0%,var(--spl-bg) 55%,var(--spl-lo,color-mix(in srgb,var(--spl-bg) 67%,#000)) 100%);color:var(--spl-fg);text-align:center;padding:24px;overflow:hidden;font-family:var(--f-body)}
+.spl-out{animation:splOut .45s ease forwards}
+.spl-glow{position:absolute;width:70vmax;height:70vmax;left:50%;top:38%;transform:translate(-50%,-50%);background:radial-gradient(circle,color-mix(in srgb,var(--spl-ac) 16%,transparent) 0%,transparent 60%);animation:hlGlow 3.2s ease-in-out infinite alternate}
+.spl-in{position:relative;display:grid;justify-items:center;gap:4px;max-width:560px;width:100%}
+.spl-seal{position:relative;width:112px;height:112px;margin-bottom:22px;animation:hlPop .7s cubic-bezier(.2,1.4,.4,1) both}
+.spl-seal img{width:100%;height:100%;object-fit:contain;display:block;border-radius:24px}
+.spl-ring{position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--spl-ac);opacity:.75;animation:hlRing 1.8s ease-out .5s infinite}
+.spl-title{margin:0;font:800 clamp(26px,6.4vw,40px)/1.12 var(--f-disp);letter-spacing:-.01em;animation:hlUp .6s ease .25s both}
+.spl-sub{margin:6px 0 0;font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--spl-ac);animation:hlUp .6s ease .4s both}
+.spl-track{position:relative;width:min(280px,80vw);margin-top:34px;padding:30px 0 40px;animation:hlUp .5s ease .5s both}
+.spl.spl-a-bar .spl-track{padding:0}
+.spl-bar{position:relative;height:6px;border-radius:6px;background:color-mix(in srgb,var(--spl-fg) 16%,transparent)}
+.spl-bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;background:linear-gradient(90deg,var(--spl-ac),color-mix(in srgb,var(--spl-ac) 60%,#fff));animation:splFill var(--spl-t) cubic-bezier(.4,0,.2,1) forwards}
+.spl-ham{position:absolute;top:-28px;left:0;width:24px;height:24px;margin-left:-6px;color:var(--spl-ac);animation:splRide var(--spl-t) cubic-bezier(.4,0,.2,1) forwards}
+.spl-ham svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform-origin:25% 85%;animation:splTap .3s ease-in-out infinite alternate}
+.spl-tools{position:absolute;left:0;right:0;bottom:0;height:26px}
+.spl-tool{position:absolute;top:0;width:24px;height:24px;margin-left:-12px;color:var(--spl-sub);opacity:.3;animation:splLit .45s cubic-bezier(.2,1.5,.4,1) both}
+.spl-tool svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@keyframes splFill{to{width:100%}}
+@keyframes splRide{to{left:100%}}
+@keyframes splTap{from{transform:rotate(-18deg)}to{transform:rotate(14deg)}}
+@keyframes splLit{0%{opacity:.25;transform:translateY(4px) scale(.85);color:var(--spl-sub)}60%{opacity:1;transform:translateY(-5px) scale(1.15);color:var(--spl-ac)}100%{opacity:1;transform:none;color:var(--spl-ac)}}
+@keyframes splOut{to{opacity:0;transform:scale(1.03);visibility:hidden}}
+#splashPrev{cursor:pointer}
+@media (prefers-reduced-motion:reduce){.spl *{animation:none!important}.spl-bar i{width:100%}.spl-tool{opacity:1;color:var(--spl-ac)}.spl-out{animation:none;opacity:0;transition:opacity .3s}}
+
+/* v2.31.0: App & splash screen admin */
+.lk-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;margin-top:16px;align-items:start}
+.lk-form h2{font:700 17px var(--f-disp);margin:0}
+.lk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.lk-form input[type=color]{width:100%;height:40px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.lk-icon{display:flex;gap:14px;align-items:flex-start}
+.lk-icon > img{width:88px;height:88px;border-radius:20px;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.18);flex:none;background:var(--surface2)}
+.lk-icon > div{display:grid;gap:8px}
+.lk-icon .hint{color:var(--muted);font-size:13px}
+.lk-fill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2)}
+.lk-fill input{width:44px!important;height:28px!important}
+.lk-phone{position:sticky;top:80px;display:grid;justify-items:center;gap:10px}
+.lk-screen{position:relative;width:270px;height:540px;border-radius:32px;overflow:hidden;border:8px solid #0e1320;box-shadow:0 20px 50px rgba(6,10,40,.3)}
+.lk-screen .spl{position:absolute;inset:0}
+.lk-screen .spl-title{font-size:24px}
+.lk-screen .spl-seal{width:84px;height:84px}
+.lk-screen .spl-track{width:190px}
+.lk-screen .spl-in{max-width:100%;min-width:0}
+.lk-screen .spl-sub{font-size:11px}
+@media (max-width:980px){.lk-grid{grid-template-columns:1fr}.lk-row{grid-template-columns:1fr 1fr}.lk-phone{position:static}}
 </style>
 
 
@@ -1354,6 +1421,65 @@ if (EMBED) document.documentElement.classList.add('embed');
 // City of Arab logo (from the city, Oct 10 2026), 256px WebP, round badge with transparent corners.
 const CITY_LOGO = 'data:image/webp;base64,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';
 const logoImg = (cls) => '<img class="'+cls+'" src="'+CITY_LOGO+'" alt="City of Arab, Alabama, established 1892" width="128" height="128" decoding="async">';
+/* ================= v2.31.0: app splash screen =================
+   Shown while the app loads: City seal (or the app icon), a title, and a loading bar with building tools riding along.
+   By default only in the installed app (home screen / dock); the web administrator can change the text, colors, logo,
+   animation, when it shows and how long (Staff portal > App & splash screen). Settings are cached in this browser so the
+   splash can paint before anything loads. Staff pages and the embedded forms never show it. */
+const SB_FN = 'https://yighcuismepfmappcfui.supabase.co/functions/v1/';
+const LOOK_DEF = { title:'Building Department Portal', subtitle:'City of Arab, Alabama', bg:'#212c46', accent:'#c0a869', logo:'seal', show:'app', anim:'tools', secs:2 };
+function lookCached(){ try{ return Object.assign({}, LOOK_DEF, JSON.parse(localStorage.getItem('bdLook')||'{}')); }catch(e){ return Object.assign({}, LOOK_DEF); } }
+const appIconUrl = (s, L) => SB_FN+'app-icon?s='+s+'&v='+((L||lookCached()).iconVer||0);
+const isLight = hex => { const h = String(hex||'').replace('#',''); if (h.length !== 6) return false; const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16); return (0.299*r + 0.587*g + 0.114*b) > 165; };
+const SPL_TOOLS = [ // simple line drawings: hammer, wrench, hard hat, level, crane hook
+  '<path d="M14 4l6 6-3 3-2-2-8 8-2-2 8-8-2-2z"/><path d="M14 4l-3 1"/>',
+  '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  '<path d="M4 17h16v-2a8 8 0 0 0-16 0z"/><path d="M10 7v5M14 7v5M3 19h18"/>',
+  '<rect x="3" y="9" width="18" height="6" rx="1"/><circle cx="12" cy="12" r="1.4"/><path d="M7 9v6M17 9v6"/>',
+  '<path d="M12 3v7"/><path d="M12 10a4 4 0 1 1-4 4"/><path d="M8 14l-1.5-1.5"/>' ];
+function splashHtml(L, preview){
+  const light = isLight(L.bg), fg = light ? '#1b2438' : '#ffffff', sub = light ? 'rgba(27,36,56,.7)' : 'rgba(255,255,255,.75)';
+  const secs = Math.min(5, Math.max(1, +L.secs || 2)), logo = L.logo === 'icon' ? appIconUrl(512, L) : CITY_LOGO;
+  const tools = SPL_TOOLS.map((p, i) => '<span class="spl-tool" style="left:'+(10 + i*20)+'%;animation-delay:'+(secs*(0.08 + i*0.2)).toFixed(2)+'s"><svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg></span>').join('');
+  return '<div class="spl'+(preview?' spl-prev':'')+' spl-a-'+(L.anim||'tools')+'" role="status" aria-label="Loading '+esc0(L.title||LOOK_DEF.title)+'" style="--spl-bg:'+L.bg+';'+(String(L.bg).toLowerCase()==='#212c46' ? '--spl-hi:#2c3958;--spl-lo:#161e31;' : '')+'--spl-ac:'+L.accent+';--spl-fg:'+fg+';--spl-sub:'+sub+';--spl-t:'+secs+'s">'+
+    '<div class="spl-glow" aria-hidden="true"></div><div class="spl-in">'+
+    '<div class="spl-seal"><img src="'+logo+'" alt="" onerror="this.onerror=null;this.src=CITY_LOGO"><span class="spl-ring" aria-hidden="true"></span></div>'+
+    '<h1 class="spl-title">'+esc0(L.title||LOOK_DEF.title)+'</h1>'+(L.subtitle ? '<p class="spl-sub">'+esc0(L.subtitle)+'</p>' : '')+
+    (L.anim === 'none' ? '' : '<div class="spl-track" aria-hidden="true">'+(L.anim === 'tools' ? '<div class="spl-tools">'+tools+'</div>' : '')+'<div class="spl-bar"><i></i>'+(L.anim === 'tools' ? '<b class="spl-ham"><svg viewBox="0 0 24 24">'+SPL_TOOLS[0]+'</svg></b>' : '')+'</div></div>')+
+    '</div></div>';
+}
+function esc0(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+var SPLASH = (() => {
+  try{
+    if (EMBED) return null;
+    const L = lookCached(), standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const staffHash = /^#(staff|table|records|users|me|bugs|clerk|cict|ar|privacy-statement|accessibility-statement|site-notice|app-accounts|app-look|purge|import)\b/.test(location.hash);
+    if (L.show === 'off' || (L.show !== 'always' && !standalone) || staffHash) return null;
+    if (sessionStorage.getItem('bdSplashSeen') && L.show === 'always') return null;   // once per visit on the website
+    const d = document.createElement('div'); d.id = 'splash'; d.innerHTML = splashHtml(L); document.body.appendChild(d);
+    try{ sessionStorage.setItem('bdSplashSeen', '1'); }catch(e){}
+    return { el:d, t0:Date.now(), min:Math.min(5, Math.max(1, +L.secs || 2))*1000 };
+  }catch(e){ return null; }
+})();
+function splashDone(){
+  if (!SPLASH || SPLASH.closing) return; SPLASH.closing = true;
+  const wait = Math.max(0, SPLASH.min - (Date.now() - SPLASH.t0)), el = SPLASH.el;
+  setTimeout(() => { el.classList.add('spl-out'); setTimeout(() => el.remove(), 500); }, wait);
+}
+function splashPreview(L){
+  const d = document.createElement('div'); d.id = 'splashPrev'; d.innerHTML = splashHtml(Object.assign({}, LOOK_DEF, L)); document.body.appendChild(d);
+  const close = () => { d.classList.add('spl-out'); setTimeout(() => d.remove(), 500); document.removeEventListener('keydown', k); };
+  const k = e => { if (e.key === 'Escape') close(); }; document.addEventListener('keydown', k); d.onclick = close;
+  setTimeout(close, Math.min(5, Math.max(1, +L.secs || 2))*1000 + 400);
+}
+/* load the current look in the background; cache it for next time; point the Apple icon at the custom icon */
+async function lookRefresh(){
+  try{ const r = await sbRpc('bf_look_get', {}); if (r && typeof r === 'object'){ try{ localStorage.setItem('bdLook', JSON.stringify(r)); }catch(e){} lookApply(r); } }catch(e){}
+}
+function lookApply(L){
+  L = Object.assign({}, LOOK_DEF, L||lookCached());
+  if (L.customIcon){ const a = document.querySelector('link[rel="apple-touch-icon"]'); if (a) a.href = appIconUrl(180, L); }
+}
 const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('clogo')+'<span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
@@ -1820,7 +1946,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.30.0';   // shown at the bottom of every page
+const APP_VERSION = '2.31.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2304,11 +2430,11 @@ async function sendFeedback(){
 var AC = { tab:'signin', me:null, busy:false, err:'', msg:'', addOpen:false, pwOpen:false, loading:false };
 var APP_TOK = null;
 try{ if (!DEMO) APP_TOK = localStorage.getItem('bdAppTok'); }catch(e){}
-function appTokSave(t){ APP_TOK = t || null; if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
+function appTokSave(t){ APP_TOK = t || null; if (typeof AN !== 'undefined'){ AN.items = null; AN.unread = 0; AN.at = 0; AN.open = false; AN.push = 0; } if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
 const ACCT_URL = () => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#account';
 const acctLinkAttrs = () => 'href="'+ACCT_URL()+'"'+(EMBED ? ' target="_top"' : ' onclick="event.preventDefault();go(\'account\')"');
 function acctHeaderBtn(){
-  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>';
+  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>'+anBellHtml();
 }
 function acctDone(r){ // a whole application is "past" when every step on its status card is done
   return /<span class="pill paid">Complete<\/span>/.test(statusCard(r));
@@ -2349,6 +2475,7 @@ function viewAccount(){
       '<a class="btn" '+HOME_LINK+'>'+ic('right')+'Apply for a permit</a><span class="sp"></span>'+
       '<button type="button" class="btn sm ghost" onclick="acTogglePw()" aria-expanded="'+AC.pwOpen+'">'+ic('lock')+'Change password</button>'+
       '<button type="button" class="btn sm ghost" onclick="acSignout()">Sign out</button></div>'+
+      anCardHtml()+
       (AC.msg ? '<div class="callout ok ac-msg" role="status">'+esc(AC.msg)+'</div>' : '')+
       (AC.addOpen ? '<form id="acAdd" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acClaim()"><div class="fld full"><b>Add an application</b><span class="hint">Enter the reference # from the receipt, the email used on the application and the applicant name exactly as it was entered.</span></div>'+
         '<div class="fld"><label class="l" for="acRef">Reference #</label><input id="acRef" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" required></div>'+
@@ -2519,7 +2646,7 @@ function instShow(){
   const box = document.createElement('div');
   box.className = 'inst'; box.id = 'inst'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-labelledby', 'instT'); box.setAttribute('aria-describedby', 'instD');
   box.innerHTML = '<button type="button" class="inst-x" aria-label="Close" onclick="instClose()">'+ic('x')+'</button>'+
-    '<div class="inst-top"><img src="icon-192.png" alt="" width="52" height="52" onerror="this.onerror=null;this.src=\'city-logo.jpg\'"><div><b id="instT">Add the app</b><span id="instD">Put Apps &amp; Fees on your '+(k==='macsafari' ? 'Dock' : k==='ios' || /Mobi|Android/.test(navigator.userAgent||'') || instCoarse() ? 'home screen' : 'computer')+' to apply for permits, check status and see My permits in one tap.</span></div></div>'+
+    '<div class="inst-top"><img src="'+(lookCached().customIcon ? appIconUrl(192) : 'icon-192.png')+'" alt="" width="52" height="52" onerror="this.onerror=null;this.src=\'city-logo.jpg\'"><div><b id="instT">Add the app</b><span id="instD">Put Apps &amp; Fees on your '+(k==='macsafari' ? 'Dock' : k==='ios' || /Mobi|Android/.test(navigator.userAgent||'') || instCoarse() ? 'home screen' : 'computer')+' to apply for permits, check status and see My permits in one tap.</span></div></div>'+
     how+'<div class="inst-acts">'+(k==='prompt' ? '<button type="button" class="btn primary" onclick="instAdd()">'+ic('down')+'Add app</button>' : '')+
     '<button type="button" class="btn'+(k==='prompt' ? '' : ' primary')+'" onclick="instClose()">'+(k==='prompt' ? 'Not now' : 'Got it')+'</button></div>';
   document.body.appendChild(box); INST.open = true;
@@ -2537,6 +2664,98 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); INST.e
 window.addEventListener('appinstalled', () => { instSnooze(); instHide(); });
 if (!EMBED && 'serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+
+
+/* ================= v2.31.0: My permits notifications =================
+   Bell (signed-in applicants, any device): recent updates on their applications, with an unread count.
+   Push (installed app or a browser that supports it): turned on per device from My permits. Messages are queued
+   by the database when staff move an application forward and sent by the Edge Function "push-send". */
+var AN = { items:null, unread:0, push:0, open:false, at:0, busy:false, dev:null, devChecked:false, msg:'', err:'' };
+const anSupported = () => { try{ return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && location.protocol === 'https:'; }catch(e){ return false; } };
+const anIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent||'') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function anAgo(iso){ const t = Date.parse(iso); if (isNaN(t)) return ''; const m = Math.round((Date.now()-t)/60000); if (m < 1) return 'Just now'; if (m < 60) return m+' min ago'; const h = Math.round(m/60); if (h < 24) return h+(h===1?' hour ago':' hours ago'); const d = Math.round(h/24); return d < 7 ? d+(d===1?' day ago':' days ago') : new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function anBellHtml(){
+  if (!APP_TOK) return '';
+  const n = AN.unread, open = AN.open;
+  return '<div class="pbell-w"><button type="button" class="pbell" id="anBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="anMenu" onclick="anToggle(event)" aria-label="My permits notifications'+(n?', '+n+' new':'')+'">'+ic('bell')+
+    (n ? '<span class="nb-count" aria-hidden="true">'+(n > 9 ? '9+' : n)+'</span>' : '')+'</button>'+
+    (open ? '<div class="nb-menu pbell-menu" id="anMenu" role="region" aria-label="My permits notifications"><div class="nb-h"><b>Updates on your permits</b><a href="'+ACCT_URL()+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();AN.open=false;go(\'account\')"')+' class="linkbtn">My permits</a></div>'+
+      (!AN.items ? '<p class="nb-empty">Loading…</p>' : !AN.items.length ? '<p class="nb-empty">'+ic('check')+'No updates yet. You will see them here when the Building Department moves your application forward.</p>' :
+        '<ul class="nb-list">'+AN.items.map(x => '<li><button type="button" class="nb-item'+(x.read?'':' new')+(x.kind==='info'?' warn':'')+'" onclick="anOpen()">'+
+          '<span class="nb-dot" aria-hidden="true"></span><span class="nb-tx"><b>'+esc(x.title)+'</b><span>'+esc(x.body)+'</span><small>'+esc(anAgo(x.at))+(x.ref?' · Ref '+esc(x.ref):'')+'</small></span></button></li>').join('')+'</ul>')+
+      (anSupported() && !AN.push ? '<p class="pbell-tip">'+ic('bell')+'<span>Get these on your phone or computer: <a href="'+ACCT_URL()+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();AN.open=false;go(\'account\')"')+'>turn on notifications</a> in My permits.</span></p>' : '')+
+    '</div>' : '')+'</div>';
+}
+async function anLoad(force){
+  if (!APP_TOK || AN.busy) return; if (!force && Date.now() - AN.at < 60000) return;
+  AN.busy = true;
+  try{ const r = await sbRpc('bf_app_events_list', { p_token:APP_TOK }); AN.items = r.items||[]; AN.unread = +r.unread||0; AN.push = +r.push||0; AN.at = Date.now(); }
+  catch(x){ if (/sign in again/i.test(x.message||'')){ appTokSave(null); AN.items = null; } }
+  AN.busy = false; if (PUB_VIEWS.includes(S.view)) render();
+}
+const PUB_VIEWS = ['apps','form','pdf','status','privacy','accessibility','account'];
+async function anToggle(e){
+  if (e) e.stopPropagation();
+  AN.open = !AN.open; render();
+  if (AN.open){ if (!AN.items || Date.now() - AN.at > 15000) await anLoad(true);
+    if (AN.unread){ AN.unread = 0; render(); try{ await sbRpc('bf_app_events_read', { p_token:APP_TOK }); }catch(x){} } }
+}
+function anOpen(){ AN.open = false; if (EMBED) location.href = ACCT_URL(); else go('account'); }
+document.addEventListener('click', e => { if (AN.open && !e.target.closest('.pbell-w')){ AN.open = false; render(); } });
+document.addEventListener('keydown', e => { if (AN.open && e.key === 'Escape'){ AN.open = false; render(); const b = document.getElementById('anBtn'); if (b) b.focus(); } });
+setInterval(() => { if (APP_TOK && document.visibilityState === 'visible' && PUB_VIEWS.includes(S.view)) anLoad(true); }, 120000);
+document.addEventListener('visibilitychange', () => { if (APP_TOK && document.visibilityState === 'visible' && PUB_VIEWS.includes(S.view)) anLoad(); });
+
+/* My permits: turn notifications on/off for this device */
+async function anDevCheck(){
+  AN.devChecked = true; AN.dev = null;
+  if (!anSupported()) return;
+  try{ const reg = await navigator.serviceWorker.getRegistration('sw.js') || await navigator.serviceWorker.getRegistration(); const sub = reg && await reg.pushManager.getSubscription(); AN.dev = sub ? sub.endpoint : null; }catch(e){}
+  if (S.view==='account') render();
+}
+function anCardHtml(){
+  if (!AN.devChecked) setTimeout(anDevCheck, 0);
+  const sup = anSupported(), standalone = (() => { try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }catch(e){ return false; } })();
+  let inner;
+  if (!sup && anIOS() && !standalone) inner = '<span>To get notifications on iPhone or iPad, add Apps &amp; Fees to your Home Screen (Share <span class="inst-share" aria-hidden="true">'+ic('upload')+'</span> › <b>Add to Home Screen</b>), open it from there, sign in, and turn notifications on here.</span>';
+  else if (!sup) inner = '<span>This browser cannot show notifications. You will still see updates in the bell at the top of the page.</span>';
+  else if (typeof Notification !== 'undefined' && Notification.permission === 'denied') inner = '<span>Notifications are blocked for this site in your browser or phone settings. Allow them there, then come back to turn them on.</span>';
+  else if (AN.dev) inner = '<span><b>Notifications are on for this device.</b> You will be notified when your permit moves forward, including when the Building Department needs more information.</span>'+
+      '<span class="an-acts"><button type="button" class="btn sm" onclick="anTest()"'+(AN.busy2?' disabled':'')+'>Send a test</button><button type="button" class="btn sm ghost" onclick="anOff()"'+(AN.busy2?' disabled':'')+'>Turn off</button></span>';
+  else inner = '<span><b>Get notified on this device</b> when your permit moves forward: permit # assigned, more information needed, approved, payment received, inspections and Certificate of Occupancy.</span>'+
+      '<span class="an-acts"><button type="button" class="btn sm primary" onclick="anOn()"'+(AN.busy2?' disabled':'')+'>'+ic('bell')+(AN.busy2?'Turning on…':'Turn on notifications')+'</button></span>';
+  return '<div class="an-card">'+ic('bell')+'<div>'+inner+(AN.msg ? '<p class="an-msg" role="status">'+esc(AN.msg)+'</p>' : '')+(AN.err ? '<p class="formerr" role="alert">'+esc(AN.err)+'</p>' : '')+'</div></div>';
+}
+function anKey(b64){ const s = String(b64).replace(/-/g,'+').replace(/_/g,'/'), p = s + '='.repeat((4 - s.length % 4) % 4), r = atob(p), u = new Uint8Array(r.length); for (let i = 0; i < r.length; i++) u[i] = r.charCodeAt(i); return u; }
+async function anOn(){
+  AN.err = ''; AN.msg = ''; AN.busy2 = true; render();
+  try{
+    const key = await sbRpc('bf_push_public_key', {});
+    if (!key) throw new Error('Notifications are not ready yet. Please try again in a few minutes.');
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') throw new Error(perm === 'denied' ? 'Notifications were blocked. You can allow them in your browser or phone settings.' : 'Notifications were not turned on.');
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:anKey(key) });
+    await sbRpc('bf_push_subscribe', { p_token:APP_TOK, p_sub:sub.toJSON(), p_ua:navigator.userAgent.slice(0,200) });
+    AN.dev = sub.endpoint; AN.push = Math.max(1, AN.push); AN.msg = 'Notifications are on. Choose "Send a test" to check.';
+  }catch(x){ AN.err = x.message || 'Could not turn on notifications.'; }
+  AN.busy2 = false; render();
+}
+async function anOff(){
+  AN.err = ''; AN.msg = ''; AN.busy2 = true; render();
+  try{ const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+    if (sub){ try{ await sbRpc('bf_push_unsubscribe', { p_token:APP_TOK, p_endpoint:sub.endpoint }); }catch(e){} await sub.unsubscribe(); }
+    AN.dev = null; AN.msg = 'Notifications are off for this device.'; }
+  catch(x){ AN.err = x.message || 'Could not turn off notifications.'; }
+  AN.busy2 = false; render();
+}
+async function anTest(){
+  AN.err = ''; AN.msg = ''; AN.busy2 = true; render();
+  try{ const r = await sbRpc('bf_push_test', { p_token:APP_TOK }); if (r && r.error) AN.err = r.error; else AN.msg = 'Test sent. It should arrive in a few seconds.'; anLoad(true); }
+  catch(x){ AN.err = x.message; }
+  AN.busy2 = false; render();
 }
 
 /* ================= STAFF: shared bits ================= */
@@ -2752,6 +2971,7 @@ function viewWorkspace(){
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
    (isAdmin()?'<a class="navi" href="#site-notice" onclick="event.preventDefault();go(\'site-notice\')">'+ic('info')+'Site notice</a>':'')+
+   (isAdmin()?'<a class="navi" href="#app-look" onclick="event.preventDefault();go(\'app-look\')">'+ic('star')+'App &amp; splash screen</a>':'')+
    (isAdmin()?'<a class="navi" href="#users" onclick="event.preventDefault();go(\'users\')">'+ic('user')+'Staff accounts</a>':'')+
    (isAdmin() && !DEMO ?'<a class="navi" href="#staff" onclick="event.preventDefault();openDemoDlg()">'+ic('star')+'Demo mode</a>':'')+
    '<h4>Totals</h4><div class="navi" style="justify-content:space-between"><span>Applications</span><b class="num">'+S.subs.length+'</b></div>'+
@@ -3285,7 +3505,7 @@ const hasPortal = acc => { const a = acc && acc.access; return a ? (a.building |
 function routeAllowed(v){
   if (v==='me' || v==='privacy-statement' || v==='accessibility-statement') return true;
   if (v==='clerk') return canPay();
-  if (['users','bugs','site-notice'].includes(v)) return isAdmin();
+  if (['users','bugs','site-notice','app-look'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
   if (v==='staff' || v==='table' || v==='cict' || v==='ar' || v==='app-accounts') return canBuilding();
   return false;
@@ -4400,6 +4620,7 @@ function render(){
   else if (S.view==='bugs' && isAdmin()){ root.innerHTML = viewBugs(); if (!S.bugs) loadBugs(); }
   else if (S.view==='cict') root.innerHTML = viewCict();
   else if (S.view==='ar') root.innerHTML = viewAr();
+  else if (S.view==='app-look' && isAdmin()){ root.innerHTML = viewLookAdmin(); }
   else if (S.view==='app-accounts'){ root.innerHTML = viewAppAccounts(); if (!S.appAcc.list && !S.appAcc.err) appAccLoad(); }
   else if (S.view==='table' && S.form){
     const off = document.getElementById('offf'), keep = (off && S.tab==='office') ? { sel:S.sel, v:[...off.querySelectorAll('input,select,textarea')].filter(e => e.id).map(e => [e.id, e.type==='checkbox' ? e.checked : e.value]) } : null;
@@ -4420,7 +4641,8 @@ function render(){
   document.title = S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='account' ? 'My Permits · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+' Application · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Apps & Fees · City of Arab';
   ensureViewData();
   if (DEMO) demoPaintBar();
-  if (INST.open && !['apps','status','account','privacy','accessibility'].includes(S.view)) instHide(); else instMaybe();   // v2.27.0 "Add app" pop-up
+  if (INST.open && !['apps','status','account','privacy','accessibility'].includes(S.view)) instHide(); else instMaybe();
+  if (APP_TOK && !AN.at && !AN.busy && PUB_VIEWS.includes(S.view)) setTimeout(anLoad, 0);   // v2.31.0 applicant bell   // v2.27.0 "Add app" pop-up
   if (aid && (aid==='wsq'||aid==='tq'||aid==='ckq')){ const el = document.getElementById(aid); if (el){ el.focus(); try{ el.setSelectionRange(selS,selS); }catch(e){} } }
 }
 /* Start loading what the current page needs, once, whichever way the user got there
@@ -4445,7 +4667,7 @@ function initRoute(){
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','app-accounts'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','app-accounts','app-look'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -4648,6 +4870,7 @@ async function finishSignIn(r, remember){
   await Promise.all([canBuilding() ? loadSubs().catch(()=>{}) : null, S.view==='clerk' ? clerkLoad().catch(()=>{}) : null, hello]); helloEnd();
 }
 initRoute();
+lookApply(); if (!EMBED) setTimeout(lookRefresh, 1500); splashDone();   // v2.31.0 splash + app look
 /* ================= periods + per-type dashboard ================= */
 const PERIODS_BASE = [['all','All time'],['month','This month'],['lastmonth','Last month']];
 /* fiscal years come from the City's fiscal year setting (S.fy, see "fiscal year" below);
@@ -6028,6 +6251,10 @@ function demoCall(fn, A){
       x.files = (x.files||[]).concat([meta]); DEMO.docs.attachments[dUuid()] = { data:Object.assign({}, meta, { submissionId:id, index:x.files.length-1, data:f.data }), created:now };
       x.infoReceivedAt = now; x.read = false;
       return { ok:true, name:f.name, infoReceived:{ at:now, count:x.files.filter(m => m && m.fromApplicant).length } }; }
+    case 'bf_app_events_list': return { unread:0, push:0, items:[] };
+    case 'bf_app_events_read': return null;
+    case 'bf_push_public_key': return null;
+    case 'bf_push_subscribe': case 'bf_push_unsubscribe': case 'bf_push_test': throw new Error('Notifications are not available in demo mode.');
     case 'bf_app_mail_ready': return true;
     case 'bf_app_forgot': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em];
       if (u && u.active){ u.reset = String(Math.floor(Math.random()*1e6)).padStart(6,'0'); setTimeout(() => toast('Demo: no email is sent. The code would be '+u.reset+'.'), 300); }
@@ -6263,6 +6490,84 @@ async function appAccUnlink(id, ref){
   if (!confirmBox('Take reference # '+ref+' out of the account for '+u.email+'? The application itself is not changed.')) return;
   try{ await sbRpc('bf_staff_app_unlink', { p_token:TOKEN, p_id:id, p_ref:ref }); u.apps = (u.apps||[]).filter(r => r!==ref); render(); toast('Taken out of the account.'); }
   catch(x){ toast(x.message); }
+}
+
+/* ================= v2.31.0: App & splash screen (web administrator only) =================
+   Change the splash screen (text, colors, logo, animation, when it shows, how long) and the app icon used on phones and
+   computers. Saved on the server (bf_look_save, administrators only); the icon is served by the app-icon function. */
+var LK = { st:null, err:'', draft:null, icon:null, busy:false, msg:'' };
+async function lookAdminLoad(){
+  try{ LK.st = await sbRpc('bf_look_admin_get', { p_token:TOKEN }); LK.draft = Object.assign({}, LOOK_DEF, LK.st||{}); delete LK.draft.icon512; LK.icon = null; LK.err = ''; }
+  catch(x){ LK.err = x.message; }
+  if (S.view==='app-look') render();
+}
+function lookDraft(){ const d = LK.draft || Object.assign({}, LOOK_DEF);
+  const g = id => { const e = document.getElementById(id); return e ? e.value : undefined; };
+  ['title','subtitle','bg','accent','logo','show','anim','secs'].forEach(k => { const v = g('lk_'+k); if (v !== undefined) d[k] = k==='secs' ? +v : v; });
+  LK.draft = d; return d; }
+function viewLookAdmin(){
+  if (!LK.st && !LK.err) setTimeout(lookAdminLoad, 0);
+  const d = LK.draft || Object.assign({}, LOOK_DEF), opt = (v, cur, label) => '<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+label+'</option>';
+  const curIcon = LK.icon ? LK.icon.i512 : (LK.st && LK.st.icon512) || 'icon-192.png';
+  const iconState = LK.icon === 'reset' ? 'reset' : LK.icon ? 'new' : (LK.st && LK.st.icon512) ? 'custom' : 'default';
+  const prevL = Object.assign({}, d, { logo:d.logo, iconVer:'p' });
+  let prevHtml = splashHtml(prevL, true);
+  if (d.logo === 'icon') prevHtml = prevHtml.replace(/src="[^"]*app-icon[^"]*"/, 'src="'+esc(LK.icon && LK.icon !== 'reset' ? LK.icon.i512 : (iconState==='custom' ? LK.st.icon512 : 'icon-192.png'))+'"');
+  return topBar()+'<div class="purge lookadm"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div>'+
+    '<h1>App &amp; splash screen</h1><p style="margin:0;color:var(--ink2);max-width:76ch">How the Applications &amp; Fees app looks when someone adds it to their phone or computer. Only web administrators can change this.</p>'+
+    (LK.err ? '<p class="formerr">'+esc(LK.err)+'</p>' : !LK.st ? '<p class="empty">Loading…</p>' :
+    '<div class="lk-grid"><form class="card lk-form" id="lkf" onsubmit="event.preventDefault();lookSave()" oninput="lookDraft();lookPrevPaint()" onchange="lookDraft();lookPrevPaint()">'+
+      '<h2>Splash screen</h2>'+
+      '<div class="fld"><label class="l" for="lk_title">Title</label><input id="lk_title" maxlength="60" value="'+esc(d.title)+'"></div>'+
+      '<div class="fld"><label class="l" for="lk_subtitle">Line under the title <span class="hint">(optional)</span></label><input id="lk_subtitle" maxlength="80" value="'+esc(d.subtitle||'')+'"></div>'+
+      '<div class="lk-row"><div class="fld"><label class="l" for="lk_bg">Background</label><input type="color" id="lk_bg" value="'+esc(d.bg)+'"></div>'+
+        '<div class="fld"><label class="l" for="lk_accent">Accent (bar, tools, line)</label><input type="color" id="lk_accent" value="'+esc(d.accent)+'"></div>'+
+        '<div class="fld"><label class="l" for="lk_logo">Picture</label><select id="lk_logo">'+opt('seal', d.logo, 'City of Arab seal')+opt('icon', d.logo, 'App icon')+'</select></div></div>'+
+      '<div class="lk-row"><div class="fld"><label class="l" for="lk_anim">Animation</label><select id="lk_anim">'+opt('tools', d.anim, 'Building tools + loading bar')+opt('bar', d.anim, 'Loading bar only')+opt('none', d.anim, 'None')+'</select></div>'+
+        '<div class="fld"><label class="l" for="lk_secs">How long</label><select id="lk_secs">'+[1,1.5,2,2.5,3,4].map(v => opt(v, d.secs, v+' seconds')).join('')+'</select></div>'+
+        '<div class="fld"><label class="l" for="lk_show">Show it</label><select id="lk_show">'+opt('app', d.show, 'Only in the installed app')+opt('always', d.show, 'Installed app and website (once per visit)')+opt('off', d.show, 'Never')+'</select></div></div>'+
+      '<h2 style="margin-top:8px">App icon</h2>'+
+      '<div class="lk-icon"><img src="'+esc(curIcon)+'" alt="Current app icon" width="88" height="88"><div><b>'+({default:'Built-in icon (house)', custom:'Custom icon', new:'New icon (not saved yet)', reset:'Built-in icon (house), not saved yet'})[iconState]+'</b>'+
+        '<span class="hint">Square picture, at least 512 × 512 pixels works best (PNG or JPG). It is cropped to a square and made into the sizes phones need. People who already added the app may see the new icon after their phone refreshes it; on iPhone they may need to add it again.</span>'+
+        '<div class="row" style="gap:8px;flex-wrap:wrap"><label class="btn sm">'+ic('upload')+'Choose picture<input type="file" accept="image/png,image/jpeg,image/webp" class="vh" onchange="lookIconPick(this)"></label>'+
+        (iconState==='custom'||iconState==='new' ? '<button type="button" class="btn sm ghost" onclick="LK.icon=\'reset\';render()">Use the built-in icon</button>' : '')+
+        (iconState==='new'||iconState==='reset' ? '<button type="button" class="btn sm ghost" onclick="LK.icon=null;render()">Undo</button>' : '')+'</div>'+
+        '<label class="lk-fill">Fill behind see-through parts: <input type="color" id="lk_fill" value="'+esc(LK.fill||'#212c46')+'"></label></div></div>'+
+      (LK.msg ? '<p class="an-msg" role="status">'+esc(LK.msg)+'</p>' : '')+'<span class="formerr" id="lkErr" role="alert"></span>'+
+      '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn primary"'+(LK.busy?' disabled':'')+'>'+ic('check')+(LK.busy?'Saving…':'Save')+'</button>'+
+        '<button type="button" class="btn" onclick="splashPreview(lookDraft())">Preview full screen</button>'+
+        '<button type="button" class="btn ghost" onclick="LK.draft=Object.assign({},LOOK_DEF);render()">Reset splash to default</button></div>'+
+      (LK.st.updatedBy ? '<p class="hint" style="margin:0">Last changed by '+esc(LK.st.updatedBy)+(LK.st.updatedAt?' on '+esc(fmtDT(LK.st.updatedAt)):'')+'.</p>' : '')+
+    '</form><div class="lk-phone" aria-label="Splash preview"><div class="lk-screen" id="lkPrev">'+prevHtml+'</div><button type="button" class="btn sm" onclick="lookPrevPaint(true)">Play again</button></div></div>')+
+  '</div>';
+}
+function lookPrevPaint(){ const el = document.getElementById('lkPrev'); if (!el) return; const d = LK.draft || LOOK_DEF;
+  let h = splashHtml(Object.assign({}, d, { iconVer:'p' }), true);
+  if (d.logo === 'icon') h = h.replace(/src="[^"]*app-icon[^"]*"/, 'src="'+esc(LK.icon && LK.icon !== 'reset' ? LK.icon.i512 : (LK.st && LK.st.icon512 && LK.icon !== 'reset' ? LK.st.icon512 : 'icon-192.png'))+'"');
+  el.innerHTML = h; }
+async function lookIconPick(input){
+  const f = input.files && input.files[0]; input.value = ''; if (!f) return;
+  const err = document.getElementById('lkErr'); if (err) err.textContent = '';
+  try{
+    const url = await readDataUrl(f), img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error('That picture could not be opened.')); i.src = url; });
+    const side = Math.min(img.naturalWidth, img.naturalHeight); if (side < 192) throw new Error('That picture is too small. Use one at least 512 × 512 pixels.');
+    const fill = (document.getElementById('lk_fill')||{}).value || '#212c46'; LK.fill = fill;
+    const mk = n => { const c = document.createElement('canvas'); c.width = c.height = n; const x = c.getContext('2d'); x.fillStyle = fill; x.fillRect(0, 0, n, n); x.imageSmoothingQuality = 'high';
+      x.drawImage(img, (img.naturalWidth - side)/2, (img.naturalHeight - side)/2, side, side, 0, 0, n, n); return c.toDataURL('image/png'); };
+    LK.icon = { i512:mk(512), i192:mk(192), i180:mk(180) };
+    if (LK.icon.i512.length > 590000) LK.icon.i512 = (() => { const c = document.createElement('canvas'); c.width = c.height = 448; const x = c.getContext('2d'); x.fillStyle = fill; x.fillRect(0,0,448,448); x.drawImage(img, (img.naturalWidth - side)/2, (img.naturalHeight - side)/2, side, side, 0, 0, 448, 448); return c.toDataURL('image/png'); })();
+    lookDraft(); render();
+  }catch(x){ if (err) err.textContent = x.message; }
+}
+async function lookSave(){
+  const d = lookDraft(), err = document.getElementById('lkErr'); LK.busy = true; LK.msg = ''; render();
+  try{
+    const icons = LK.icon === 'reset' ? { reset:true } : LK.icon ? LK.icon : null;
+    LK.st = await sbRpc('bf_look_save', { p_token:TOKEN, p_look:{ title:d.title, subtitle:d.subtitle, bg:d.bg, accent:d.accent, logo:d.logo, show:d.show, anim:d.anim, secs:d.secs }, p_icons:icons });
+    LK.icon = null; LK.draft = Object.assign({}, LOOK_DEF, LK.st); delete LK.draft.icon512; LK.msg = 'Saved. The app uses the new look the next time it opens.';
+    try{ localStorage.removeItem('bdLook'); }catch(e){} lookRefresh();
+  }catch(x){ LK.busy = false; render(); const e2 = document.getElementById('lkErr'); if (e2) e2.textContent = x.message || 'Could not save.'; return; }
+  LK.busy = false; render();
 }
 </script>
 </body>

@@ -10,8 +10,14 @@
   "theme_color": "#212c46",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://yighcuismepfmappcfui.supabase.co/functions/v1/app-icon?s=192",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://yighcuismepfmappcfui.supabase.co/functions/v1/app-icon?s=512",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }
