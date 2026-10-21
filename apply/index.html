@@ -1317,6 +1317,29 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 .deldlg{display:grid;gap:14px}
 .del-list{margin:0 0 12px;padding:0 0 0 18px;display:grid;gap:4px;font-size:14px;color:var(--ink2);max-height:180px;overflow:auto}
 .del-list b{color:var(--ink)}
+
+/* v2.30.0: status steps as tiles + send requested documents */
+.steps.tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.steps.tiles > li{grid-template-columns:28px minmax(0,1fr);border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
+.steps.tiles > li::before{display:none}
+.steps.tiles > li.ok{background:var(--okbg);border-color:transparent}
+.steps.tiles > li.part{background:var(--amberbg);border-color:transparent}
+.steps.tiles > li.wide{grid-column:1/-1}
+@media (max-width:860px){.steps.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.steps.tiles{grid-template-columns:1fr}}
+.st-up{margin-top:10px;display:grid;gap:8px}
+.st-up-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.st-upbtn{cursor:pointer;position:relative}
+.st-upbtn.busy{opacity:.6;pointer-events:none}
+.st-upbtn:focus-within{outline:2px solid var(--blue);outline-offset:2px}
+.st-up-or{font-size:13px;color:var(--ink2);flex:1 1 260px;min-width:0}
+.st-up-msg{font-size:14px;font-weight:600;color:var(--ink2)}
+.st-up-msg:empty{display:none}
+.st-up-msg.ok{color:var(--ok)}.st-up-msg.bad{color:var(--red)}
+.st-got{display:flex;gap:8px;align-items:flex-start;margin:0;font-size:14px;background:var(--okbg);border-radius:6px;padding:8px 10px;color:var(--ink)}
+.st-got svg{width:16px;height:16px;color:var(--ok);flex:none;margin-top:2px}
+.revgot{display:block;font-size:13.5px;color:var(--ok);font-weight:600;margin-top:4px}
+.revgot svg{width:15px;height:15px;vertical-align:-2px;margin-right:4px}
 </style>
 
 
@@ -1797,7 +1820,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.29.3';   // shown at the bottom of every page
+const APP_VERSION = '2.30.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2611,13 +2634,17 @@ function notifState(){
   return Object.assign({ opened: [] }, n);
 }
 const subTime = x => { const t = Date.parse(x.createdAt); return isNaN(t) ? 0 : t; };
+/* v2.30.0: an applicant sending requested documents is a notification too (its own entry, keyed by the time). */
+const docTime = x => { const t = Date.parse(x.infoReceivedAt||''); return isNaN(t) ? 0 : t; };
+const notifTime = x => Math.max(subTime(x), docTime(x));
+const notifKey = x => docTime(x) > subTime(x) ? x.id+'@'+x.infoReceivedAt : x.id;
 function notifList(){
   if (!canBuilding() || !S.loaded) return [];
   const n = notifState(), cut = Date.parse(n.clearedAt) || 0, opened = new Set(n.opened || []);
-  return S.subs.filter(x => !x.imported && !x.importedBy && FORMS[x.form] && subTime(x) > cut && !opened.has(x.id))
-    .sort((a, b) => subTime(b) - subTime(a)).slice(0, NOTIF_MAX);
+  return S.subs.filter(x => FORMS[x.form] && ((!x.imported && !x.importedBy) || docTime(x)) && notifTime(x) > cut && !opened.has(notifKey(x)))
+    .sort((a, b) => notifTime(b) - notifTime(a)).slice(0, NOTIF_MAX);
 }
-function notifUnread(){ const seen = Date.parse(notifState().seenAt) || 0; return notifList().filter(x => subTime(x) > seen).length; }
+function notifUnread(){ const seen = Date.parse(notifState().seenAt) || 0; return notifList().filter(x => notifTime(x) > seen).length; }
 function agoText(iso){
   const t = Date.parse(iso); if (isNaN(t)) return ''; const m = Math.round((Date.now() - t) / 60000);
   if (m < 1) return 'Just now'; if (m < 60) return m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
@@ -2629,11 +2656,12 @@ function bellHtml(){
       ic('bell')+(unread ? '<span class="nb-count" aria-hidden="true">'+(unread > 9 ? '9+' : unread)+'</span>' : '')+'</button>'+
     (open ? '<div class="nb-menu" id="nbMenu" role="region" aria-label="Notifications">'+
       '<div class="nb-h"><b>Notifications</b>'+(list.length ? '<button type="button" class="linkbtn" onclick="clearNotifs()">Clear all</button>' : '')+'</div>'+
-      (list.length ? '<ul class="nb-list">'+list.map(x => { const F = FORMS[x.form], f = x.fields || {}, isNew = subTime(x) > seen;
+      (list.length ? '<ul class="nb-list">'+list.map(x => { const F = FORMS[x.form], f = x.fields || {}, isNew = notifTime(x) > seen;
+          const isDoc = docTime(x) > subTime(x);
           return '<li><button type="button" class="nb-item'+(isNew?' new':'')+'" onclick="openNotif(\''+x.id+'\')">'+
-            '<span class="nb-dot" aria-hidden="true"></span><span class="nb-tx"><b>New '+esc(F.short)+' application</b>'+
+            '<span class="nb-dot" aria-hidden="true"></span><span class="nb-tx"><b>'+(isDoc ? 'Documents received: '+esc(F.short) : 'New '+esc(F.short)+' application')+'</b>'+
             '<span>'+esc([f.applicant || f.subName || 'Applicant', f.address].filter(Boolean).join(' · '))+'</span>'+
-            '<small>'+esc(agoText(x.createdAt))+(isNew?'<span class="vh"> (new)</span>':'')+'</small></span></button></li>'; }).join('')+'</ul>'
+            '<small>'+esc(agoText(isDoc ? x.infoReceivedAt : x.createdAt))+(isNew?'<span class="vh"> (new)</span>':'')+'</small></span></button></li>'; }).join('')+'</ul>'
         : '<p class="nb-empty">'+ic('check')+'You\'re all caught up. New applications will show here.</p>')+
     '</div>' : '')+'</div>';
 }
@@ -2646,9 +2674,10 @@ function clearNotifs(){ const now = new Date().toISOString(); prefSet('notif', {
   const b = document.getElementById('nbBtn'); if (b) b.focus(); }
 function openNotif(id){
   const n = notifState(), cut = Date.parse(n.clearedAt) || 0;
-  const opened = (n.opened || []).filter(x => { const s2 = subById(x); return s2 && subTime(s2) > cut; }).concat(id).slice(-200);
+  const x0 = subById(id), key = x0 ? notifKey(x0) : id;
+  const opened = (n.opened || []).filter(k => { const s2 = subById(String(k).split('@')[0]); return s2 && notifTime(s2) > cut; }).concat(key).slice(-200);
   prefSet('notif', Object.assign(n, { opened }));
-  S.nmenu = false; openSub(id);
+  S.nmenu = false; openSub(id); if (x0 && docTime(x0) > subTime(x0)){ S.tab = 'files'; render(); }
 }
 document.addEventListener('click', e => { if (S.nmenu && !e.target.closest('.nb')){ S.nmenu = false; render(); } });
 document.addEventListener('keydown', e => { if (S.nmenu && e.key==='Escape'){ S.nmenu = false; render(); const b = document.getElementById('nbBtn'); if (b) b.focus(); } });
@@ -4026,7 +4055,8 @@ function statusCard(r){
     { t:'Permit # assigned', d:permitNo ? 'Permit # '+permitNo : 'Not assigned yet', st:permitNo ? 'ok' : '' }].concat(revReq ? [{ t:'Building Department review',
     d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
     st: revOk ? 'ok' : info ? 'part' : '',
-    list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'<br><small>Email it to buildingdept@arabcity.org (include reference # '+esc(r.ref)+') or bring it to City Hall, 740 N Main St.</small></div>' : '' }] : []);
+    wide: !revOk && !!info,
+    list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'</div>'+stUploadHtml(r) : '' }] : []);
   if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
   steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? 'Estimated '+money(total)+'. The final total is confirmed when your application is approved.' : (revReq && revOk && ps==='unpaid') ? 'Confirmed total '+money(total)+' due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
   if (hasInsp) steps.push({ t:'Inspections',
@@ -4038,13 +4068,49 @@ function statusCard(r){
   const complete = steps.every(x => x.st==='ok');
   return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · Permit # '+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
-    '<ol class="steps">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
+    '<ol class="steps tiles">'+steps.map(x => '<li class="'+x.st+(x.wide?' wide':'')+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
     (holdPay && ps==='unpaid'
       ? '<div class="st-fees num"><div><span>Estimated total</span><b>'+money(total)+'</b></div></div>'
       : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
     ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy.</p>' : '')+
     ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
     '</section>';
+}
+/* v2.30.0: send the requested documents from Check permit status or My permits (server: bf_info_upload).
+   Files are compressed in the browser the same way as on the application form. Email / City Hall still work. */
+function stUploadHtml(r){
+  const rc = r.infoReceived, k = String(r.ref||'').replace(/[^A-Za-z0-9]/g,'');
+  return '<div class="st-up">'+
+    (rc && rc.count ? '<p class="st-got">'+ic('check')+'<span>We received <b>'+rc.count+' document'+(rc.count===1?'':'s')+'</b> from you'+(rc.at ? ' (last on '+esc(fmtDT(rc.at))+')' : '')+'. The Building Department will review '+(rc.count===1?'it':'them')+' and update this page. You can send more if needed.</span></p>' : '')+
+    '<div class="st-up-row"><label class="btn primary st-upbtn">'+ic('upload')+'Upload documents<input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="vh" onchange="stUpload(\''+esc(k)+'\', this)"></label>'+
+    '<span class="st-up-or">PDF, JPG or PNG. Or email them to <a href="mailto:buildingdept@arabcity.org?subject='+encodeURIComponent('Reference # '+k)+'">buildingdept@arabcity.org</a> (include reference # '+esc(k)+') or bring them to City Hall, 740 N Main St.</span></div>'+
+    '<div class="st-up-msg" id="stup_'+esc(k)+'" aria-live="polite"></div></div>';
+}
+async function stUpload(ref, input){
+  const files = [...(input.files||[])]; input.value = ''; if (!files.length) return;
+  const msg = document.getElementById('stup_'+ref), btn = input.closest('label');
+  const say = (t, bad) => { if (msg){ msg.className = 'st-up-msg'+(bad?' bad':''); msg.textContent = t; } };
+  const acct = S.view==='account' && APP_TOK, email = acct ? '' : String((S.st||{}).email||'').trim();
+  if (btn) btn.classList.add('busy');
+  let sent = 0, last = null, err = '';
+  for (let i = 0; i < files.length; i++){
+    const f = files[i];
+    if (!/\.(pdf|jpe?g|png)$/i.test(f.name) && !/^(application\/pdf|image\/(jpeg|png))$/.test(f.type)){ err = f.name+': only PDF, JPG and PNG documents can be uploaded.'; continue; }
+    try{
+      say('Preparing '+f.name+' ('+(i+1)+' of '+files.length+')…');
+      const o = await optimizeFile(f), data = await readDataUrl(o.blob);
+      say('Uploading '+f.name+' ('+(i+1)+' of '+files.length+')…');
+      const r = await sbRpc('bf_info_upload', { p_ref:ref, p_email:email, p_app_token:acct ? APP_TOK : null,
+        p_file:{ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed, data } });
+      if (r && r.error){ err = r.error; break; }
+      sent++; last = r && r.infoReceived;
+    }catch(x){ err = f.name+': '+(x.message||'could not upload.'); }
+  }
+  if (btn) btn.classList.remove('busy');
+  if (last){ const upd = list => (list||[]).forEach(a => { if (String(a.ref).replace(/[^A-Za-z0-9]/g,'') === ref) a.infoReceived = last; });
+    upd((S.st||{}).res); upd((AC.me||{}).apps); render(); }
+  const m2 = document.getElementById('stup_'+ref);
+  if (m2){ m2.className = 'st-up-msg'+(err?' bad':' ok'); m2.textContent = (sent ? 'Sent '+sent+' document'+(sent===1?'':'s')+'. Thank you.' : '')+(err ? (sent?' ':'')+err : ''); }
 }
 function bindStatus(){
   const f = document.getElementById('stf'); if (!f) return;
@@ -5795,7 +5861,8 @@ function reviewBoxHtml(s){
     none:'Submitted before reviews started (Oct 15, 2026). Payment is not held for this application.' }[r];
   return '<div class="sect">Building Department review</div>'+
     '<div class="fld full"><div class="revbox rv-'+r+'">'+(reviewPill(s)||'<span class="pill src">No review hold</span>')+'<span>'+msg+'</span>'+
-      (miss.length ? '<span class="revmiss">'+ic('alert')+'Missing documents: '+miss.map(x => esc(x.label)).join(', ')+'</span>' : '')+'</div></div>'+
+      (miss.length ? '<span class="revmiss">'+ic('alert')+'Missing documents: '+miss.map(x => esc(x.label)).join(', ')+'</span>' : '')+
+      (s.infoReceivedAt ? (() => { const n = (s.files||[]).filter(f => f && f.fromApplicant).length; return '<span class="revgot">'+ic('upload')+'The applicant sent '+n+' document'+(n===1?'':'s')+' from their status page (last on '+esc(fmtDT(s.infoReceivedAt))+'). <button type="button" class="linkbtn" onclick="S.tab=\'files\';render()">See Documents</button></span>'; })() : '')+'</div></div>'+
     '<div class="fld full"><label class="l" for="o_infoNeeded">Information needed from the applicant <span class="hint">(optional; shown on their permit status page until approved)</span></label><textarea id="o_infoNeeded" rows="2" maxlength="1000" placeholder="e.g. Please send a site plan showing the setbacks from all property lines.">'+esc(st.infoNeeded||'')+'</textarea></div>'+
     '<div class="fld"><label class="l" for="o_approvedBy">Approved by (initials)</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"><span class="hint">Entering your initials approves the application. Leave blank until it is ready.</span></div>'+
     '<div class="fld"><label class="l" for="o_approvedDate">Date approved</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"><span class="hint">Today\u2019s date is used if left blank.</span></div>'+
@@ -5856,7 +5923,8 @@ function dStatusItem(id, d){ const x = d.data, st = x.staff || {}, ok = dApprove
         return { ref:dRef(id), form:x.form, createdAt:x.createdAt, applicant:(x.fields||{}).applicant, address:(x.fields||{}).address, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', approved:!!(st.approvedBy||st.approvedDate),
           reviewRequired:dReviewRequired(id, x), infoNeeded: ok ? '' : String(st.infoNeeded||'').trim().slice(0,1000), inspections:ins, co:st.co||'',
           fees:{ permit:(x.fees||{}).permit, cict:(x.fees||{}).cict, total:(x.fees||{}).total, doubled:(x.fees||{}).doubled },
-          pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'' };
+          pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'',
+          infoReceived: x.infoReceivedAt ? { at:x.infoReceivedAt, count:(x.files||[]).filter(m => m && m.fromApplicant).length } : null };
 }
 function dAppSession(em){ const u = DEMO.appUsers[em], t = 'demo-app-'+dUuid(); (DEMO.appSess || (DEMO.appSess = {}))[t] = em; u.lastLogin = new Date().toISOString(); return { token:t, user:{ email:u.email, name:u.name, createdAt:u.createdAt } }; }
 function dAppUser(t){ const em = (DEMO.appSess||{})[t], u = em && (DEMO.appUsers||{})[em]; return u && u.active ? u : null; }
@@ -5949,6 +6017,17 @@ function demoCall(fn, A){
     case 'bf_app_reset': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em], code = String(A.p_code||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();
       if (!u || !u.reset || u.reset !== code) return { error:'That code is not correct or has expired. Request a new code and try again.' };
       if (String(A.p_new||'').length < 10) return { error:'Use a password of at least 10 characters.' }; u.pw = A.p_new; u.reset = null; return dAppSession(em); }
+    case 'bf_info_upload': { const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), em = String(A.p_email||'').trim().toLowerCase();
+      let id = null;
+      if (A.p_app_token){ const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits again.' }; id = Object.keys(u.apps).find(k => dRef(k)===ref && S2[k]); if (!id) return { error:'That application is not in your My permits account.' }; }
+      else id = Object.keys(S2).find(k => dRef(k)===ref && String((S2[k].data.fields||{}).email||'').trim().toLowerCase()===em);
+      if (!id) return { error:'We could not find that application. Check your reference # and email, then try again.' };
+      const x = S2[id].data, st = x.staff||{};
+      if (!dReviewRequired(id, x) || dApproved(x) || !String(st.infoNeeded||'').trim()) return { error:'The Building Department is not waiting on documents for this application. Questions? Email buildingdept@arabcity.org.' };
+      const f = A.p_file||{}, now = new Date().toISOString(), meta = { name:f.name, type:f.type, size:f.size, origName:f.origName, origType:f.origType, origSize:f.origSize, compressed:!!f.compressed, docLabel:'Sent by applicant (requested information)', fromApplicant:true, uploadedAt:now };
+      x.files = (x.files||[]).concat([meta]); DEMO.docs.attachments[dUuid()] = { data:Object.assign({}, meta, { submissionId:id, index:x.files.length-1, data:f.data }), created:now };
+      x.infoReceivedAt = now; x.read = false;
+      return { ok:true, name:f.name, infoReceived:{ at:now, count:x.files.filter(m => m && m.fromApplicant).length } }; }
     case 'bf_app_mail_ready': return true;
     case 'bf_app_forgot': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em];
       if (u && u.active){ u.reset = String(Math.floor(Math.random()*1e6)).padStart(6,'0'); setTimeout(() => toast('Demo: no email is sent. The code would be '+u.reset+'.'), 300); }
