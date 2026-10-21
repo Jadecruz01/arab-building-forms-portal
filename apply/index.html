@@ -1797,7 +1797,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.29.2';   // shown at the bottom of every page
+const APP_VERSION = '2.29.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2878,9 +2878,12 @@ async function openSub(id, opt){
   const x = subById(id);
   if (!(opt && opt.step)){
     NAV.push({ view:S.view, form:S.form, sel:S.sel, tab:S.tab, y:window.scrollY||0, cklTop:(document.querySelector('.apptbl-wrap')||{}).scrollTop||0 });
-    const to = x ? navHash('table', x.form) : location.hash;
+    /* v2.29.3: opened from somewhere other than a table (Workspace, notifications, reports): the record opens over
+       that page, not over a table of every application of that type (Back returns to the same page anyway). */
+    const overPage = S.view !== 'table';
+    const to = x && !overPage ? navHash('table', x.form) : location.hash;
     try{ history.pushState({ bdNav: NAV.length }, '', to); }catch(e){}
-    if (x && (S.view!=='table' || S.form!==x.form)){ S.view='table'; S.form=x.form; S.rowSel={}; S.bulkDel=false; S.colsOpen=false; S.q=''; window.scrollTo(0,0); }
+    if (x && !overPage && S.form!==x.form){ S.view='table'; S.form=x.form; S.rowSel={}; S.bulkDel=false; S.colsOpen=false; S.q=''; window.scrollTo(0,0); }
   }
   S.sel=id; S.tab='app'; S.editing=false; S.confirmDel=false; render();
   loadAtt(id).then(()=>{ if (S.sel===id) render(); }).catch(e=>{ ATT[id] = {err:e.message}; if (S.sel===id) render(); });
@@ -2984,7 +2987,7 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+'<span class="sp"></span>'+(canBuilding()?'<button class="btn danger" onclick="openDelDlg([\''+s.id+'\'])">'+ic('trash')+'Delete</button>':'')+'');
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
-   '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+'<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
+   '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+(S.view==='table' ? '<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>' : '')+''+
    '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+fyName(fyOf(s))+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src">'+ic('link')+'Linked</span>':'')+'</small></div>'+
    '<button class="btn sm" id="fullBtn" onclick="togglePanelFull()" title="'+(S.panelFull?'Exit full screen':'Full screen')+'">'+ic(S.panelFull?'shrink':'expand')+'<span class="hide-sm">'+(S.panelFull?'Exit full screen':'Full screen')+'</span></button>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
@@ -4299,6 +4302,7 @@ function focusMain(scroll){
 }
 function render(){
   const active = document.activeElement, aid = active && active.id, selS = active && active.selectionStart;
+  const offKeep = (S.view!=='table' && S.sel && S.tab==='office') ? (() => { const off = document.getElementById('offf'); return off ? { sel:S.sel, v:[...off.querySelectorAll('input,select,textarea')].filter(e => e.id).map(e => [e.id, e.type==='checkbox' ? e.checked : e.value]) } : null; })() : null;
   if (S.view==='apps') root.innerHTML = viewApps();
   else if (S.view==='form'){ root.innerHTML = viewForm(); bindForm(); }
   else if (S.view==='pdf' && PDF_FORMS[S.form]){ root.innerHTML = viewPdfForm(); if (S.form==='subdivision') subFee(); }
@@ -4336,6 +4340,8 @@ function render(){
     root.innerHTML = viewTable(); bindLinkPick();
     if (keep && keep.sel===S.sel && S.tab==='office'){ keep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); coChange(); } }
   else root.innerHTML = viewWorkspace();
+  if (S.sel && S.staff && S.view!=='table' && canBuilding() && !['apps','form','pdf','status','privacy','accessibility','account','clerk'].includes(S.view) && root.querySelector('.jt-top')) { root.insertAdjacentHTML('beforeend', panelHtml());   // v2.29.3: record over the current page
+    if (offKeep && offKeep.sel===S.sel && S.tab==='office'){ offKeep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); if (typeof coChange==='function') coChange(); } }
   a11yLandmarks();
   if (['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view)) paintNotice();
   const isPub = ['apps','form','pdf','status','privacy','accessibility','account'].includes(S.view);
