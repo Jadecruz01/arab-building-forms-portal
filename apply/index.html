@@ -1797,7 +1797,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.29.0';   // shown at the bottom of every page
+const APP_VERSION = '2.29.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2946,7 +2946,7 @@ function panelHtml(){
     const ins = st.inspections||{};
     const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
     body = '<form id="offf" class="fgrid">'+(REVIEW_FORMS.includes(s.form) ? reviewBoxHtml(s).replace('<div class="sect">', '<div class="sect" style="margin-top:0">') : '')+
-      '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
+      '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210">'+(reviewRequired(s) && !reviewApproved(s) ? '<span class="hint">The applicant sees the permit # on Check permit status after this application is approved.</span>' : '')+'</div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
       '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> Work started without a permit (double the permit fee)</label></div>'+
       (REVIEW_FORMS.includes(s.form) ? '' :
@@ -4016,11 +4016,14 @@ function statusCard(r){
       return (v.status==='complete' || v.status==='pending') ? { n, st:v.status, date:v.date||'' } : null; }).filter(Boolean);
   const doneN = insL.filter(x => x.st==='complete').length, pendN = insL.length - doneN, finalDone = insL.some(x => x.n==='Final' && x.st==='complete');
   const revReq = r.reviewRequired != null ? !!r.reviewRequired : reviewRequired(r), revOk = !!r.approved, info = String(r.infoNeeded||'').trim(), holdPay = revReq && !revOk;
+  /* v2.29.1: on applications that need Building Department review, the permit # is shown to the applicant only
+     once the application is approved, even if staff have already written one down (it is not final until then). */
+  const permitNo = (revReq && !revOk) ? '' : (r.permitNo||'');
   const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' }].concat(revReq ? [{ t:'Building Department review',
     d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
     st: revOk ? 'ok' : info ? 'part' : '',
     list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'<br><small>Email it to buildingdept@arabcity.org (include reference # '+esc(r.ref)+') or bring it to City Hall, 740 N Main St.</small></div>' : '' }] : []).concat([
-    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : (revReq && revOk) ? 'Not assigned yet' : 'Waiting for Building Department review', st:r.permitNo ? 'ok' : '' }]);
+    { t:'Permit # assigned', d:permitNo ? 'Permit # '+permitNo : (revReq && !revOk) ? (info ? 'Assigned after the information above is received and your application is approved' : 'Assigned when your application is approved') : r.permitNo ? '' : 'Not assigned yet', st:permitNo ? 'ok' : '' }]);
   if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
   steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? 'Estimated '+money(total)+'. The final total is confirmed when your application is approved.' : (revReq && revOk && ps==='unpaid') ? 'Confirmed total '+money(total)+' due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
   if (hasInsp) steps.push({ t:'Inspections',
@@ -4030,7 +4033,7 @@ function statusCard(r){
       (x.st==='complete' ? 'Complete'+(x.date ? ' · '+esc(fmtDay(x.date)) : '') : 'Pending')+'</span></li>').join('')+'</ul>' : '' });
   if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
   const complete = steps.every(x => x.st==='ok');
-  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(r.permitNo?' · Permit # '+esc(r.permitNo):'')+'</span></div>'+
+  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · Permit # '+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     '<ol class="steps">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span>'+(x.list||'')+'</div></li>').join('')+'</ol>'+
     (holdPay && ps==='unpaid'
