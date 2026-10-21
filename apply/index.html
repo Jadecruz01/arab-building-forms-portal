@@ -1443,6 +1443,33 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
 .ar-ctl .ar-btns .btn{min-height:44px;padding-left:16px;padding-right:16px;white-space:nowrap}
 .ar-ctl .hint{margin-top:2px}
 @media (max-width:560px){.ar-ctl .ar-ctl-row select{max-width:none}.ar-ctl .ar-btns{width:100%}.ar-ctl .ar-btns .btn{flex:1 1 0;justify-content:center}}
+/* v2.31.4: signed-in My permits chip ("Hi, name" + avatar) holds the updates; staff sign-in lives in the footer */
+.pme{display:inline-flex;align-items:center;gap:10px;flex:none;margin-left:8px;padding:4px 4px 4px 12px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--ink);font:500 14px/1 var(--f-disp);cursor:pointer}
+.pme:hover,.pme.on,.pme[aria-expanded="true"]{border-color:var(--line);background:var(--surface2)}
+.pme:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.pme-hi{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pme-av{position:relative;display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;border:2px solid var(--gold);font:700 13px/1 var(--f-disp);letter-spacing:.02em}
+.pme-av svg{width:18px;height:18px}
+.pme-av .nb-count{position:absolute;top:-6px;right:-7px}
+.pme-av.lg{width:46px;height:46px;font-size:15px}
+.pme-menu{width:340px}
+.pme-head{display:flex;align-items:center;gap:12px;padding:14px 14px 12px;border-bottom:1px solid var(--line)}
+.pme-head b{display:block;font:700 15px/1.25 var(--f-disp);color:var(--ink)}
+.pme-head small{display:block;font-size:13px;color:var(--ink2);overflow-wrap:anywhere}
+.pme-links{display:flex;border-bottom:1px solid var(--line)}
+.pme-links a,.pme-links button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 10px;border:0;background:none;color:var(--ink);font:600 14px/1 var(--f-body);text-decoration:none;cursor:pointer}
+.pme-links > * + *{border-left:1px solid var(--line)}
+.pme-links a:hover,.pme-links button:hover{background:var(--surface2)}
+.pme-links svg{width:16px;height:16px}
+.pme-new{font-size:12px;font-weight:600;color:var(--golddk)}
+.pf-staff{display:inline-flex;align-items:center;gap:6px}
+.pf-staff svg{width:14px;height:14px}
+@media (max-width:440px){
+  .pme{gap:7px;padding:3px 3px 3px 9px;font-size:13px;margin-left:auto}
+  .pme-hi{max-width:96px}
+  .pme-av{width:34px;height:34px;font-size:12px}
+}
+@media (max-width:640px){.pme-menu.pbell-menu{top:calc(64px + env(safe-area-inset-top,0px))}}
 </style>
 
 
@@ -1996,21 +2023,21 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.3';   // shown at the bottom of every page
+const APP_VERSION = '2.31.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a></nav>'+
-    acctHeaderBtn()+'<a class="pstaff" href="#staff">'+ic('lock')+'<span>Staff</span></a></div></header>'+
+    acctHeaderBtn()+'</div></header>'+
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
   return '<footer class="pfoot"><div class="pfoot-in">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a></nav>'+
+    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></nav>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
 }
 function sideNav(){ return ''; }
@@ -2480,12 +2507,16 @@ async function sendFeedback(){
 var AC = { tab:'signin', me:null, busy:false, err:'', msg:'', addOpen:false, pwOpen:false, loading:false };
 var APP_TOK = null;
 try{ if (!DEMO) APP_TOK = localStorage.getItem('bdAppTok'); }catch(e){}
-function appTokSave(t){ APP_TOK = t || null; if (typeof AN !== 'undefined'){ AN.items = null; AN.unread = 0; AN.at = 0; AN.open = false; AN.push = 0; } if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
+function appTokSave(t){ APP_TOK = t || null; if (typeof AC !== 'undefined'){ AC.nm = ''; AC.em = ''; } if (!t){ try{ localStorage.removeItem('bdAppName'); }catch(e){} } if (typeof AN !== 'undefined'){ AN.items = null; AN.unread = 0; AN.at = 0; AN.open = false; AN.push = 0; } if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
 const ACCT_URL = () => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#account';
 const acctLinkAttrs = () => 'href="'+ACCT_URL()+'"'+(EMBED ? ' target="_top"' : ' onclick="event.preventDefault();go(\'account\')"');
 function acctHeaderBtn(){
-  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>'+anBellHtml();
+  if (APP_TOK) return anBellHtml();   // v2.31.4: signed in = "Hi, name" + avatar; updates live in its menu
+  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>';
 }
+/* name shown in the header: from My permits (bf_app_me), remembered on this device so it shows at once */
+function acName(){ const n = (AC.me && AC.me.user && AC.me.user.name) || AC.nm || (() => { try{ return localStorage.getItem('bdAppName') || ''; }catch(e){ return ''; } })(); return String(n||'').trim(); }
+function acInitials(n){ const p = String(n||'').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
 function acctDone(r){ // a whole application is "past" when every step on its status card is done
   return /<span class="pill paid">Complete<\/span>/.test(statusCard(r));
 }
@@ -2553,7 +2584,7 @@ function acTab(t){ AC.tab = t; AC.err = ''; if (t==='reset'){ AC.sent = ''; if (
 function acFocusErr(){ setTimeout(() => { const e = document.querySelector('.acct .formerr'); if (e && e.scrollIntoView) e.scrollIntoView({block:'center'}); }, 0); }
 async function acLoad(){
   AC.loading = true;
-  try{ AC.me = await sbRpc('bf_app_me', { p_token:APP_TOK }); AC.err = ''; }
+  try{ AC.me = await sbRpc('bf_app_me', { p_token:APP_TOK }); AC.err = ''; try{ if (!DEMO && AC.me && AC.me.user) localStorage.setItem('bdAppName', AC.me.user.name||''); }catch(e){} }
   catch(x){ if (/sign in again/i.test(x.message||'')){ appTokSave(null); AC.me = null; AC.err = ''; } else AC.err = 'Could not load your permits right now. '+(x.message||''); }
   AC.loading = false; if (S.view==='account') render();
 }
@@ -2727,14 +2758,19 @@ const anIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent||'') || (navigat
 function anAgo(iso){ const t = Date.parse(iso); if (isNaN(t)) return ''; const m = Math.round((Date.now()-t)/60000); if (m < 1) return 'Just now'; if (m < 60) return m+' min ago'; const h = Math.round(m/60); if (h < 24) return h+(h===1?' hour ago':' hours ago'); const d = Math.round(h/24); return d < 7 ? d+(d===1?' day ago':' days ago') : new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
 function anBellHtml(){
   if (!APP_TOK) return '';
-  const n = AN.unread, open = AN.open;
-  return '<div class="pbell-w"><button type="button" class="pbell" id="anBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="anMenu" onclick="anToggle(event)" aria-label="My permits notifications'+(n?', '+n+' new':'')+'">'+ic('bell')+
-    (n ? '<span class="nb-count" aria-hidden="true">'+(n > 9 ? '9+' : n)+'</span>' : '')+'</button>'+
-    (open ? '<div class="nb-menu pbell-menu" id="anMenu" role="region" aria-label="My permits notifications"><div class="nb-h"><b>Updates on your permits</b><a href="'+ACCT_URL()+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();AN.open=false;go(\'account\')"')+' class="linkbtn">My permits</a></div>'+
+  const n = AN.unread, open = AN.open, nm = acName(), first = nm ? nm.split(/\s+/)[0] : '', em = (AC.me && AC.me.user && AC.me.user.email) || AC.em || '';
+  const toAcct = (EMBED?' target="_top"':' onclick="event.preventDefault();AN.open=false;go(\'account\')"');
+  return '<div class="pbell-w pme-w"><button type="button" class="pme'+(S.view==='account'?' on':'')+'" id="anBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="anMenu" onclick="anToggle(event)" aria-label="My permits account'+(nm?' for '+esc(nm):'')+(n?', '+n+' new update'+(n===1?'':'s'):'')+'">'+
+    '<span class="pme-hi">Hi'+(first ? ', '+esc(first) : ' there')+'</span><span class="pme-av" aria-hidden="true">'+esc(nm ? acInitials(nm) : '')+(nm ? '' : ic('user'))+
+    (n ? '<span class="nb-count">'+(n > 9 ? '9+' : n)+'</span>' : '')+'</span></button>'+
+    (open ? '<div class="nb-menu pbell-menu pme-menu" id="anMenu" role="region" aria-label="My permits account">'+
+      '<div class="pme-head"><span class="pme-av lg" aria-hidden="true">'+esc(nm ? acInitials(nm) : '')+(nm ? '' : ic('user'))+'</span><span><b>'+esc(nm || 'My permits')+'</b>'+(em ? '<small>'+esc(em)+'</small>' : '')+'</span></div>'+
+      '<div class="pme-links"><a href="'+ACCT_URL()+'"'+toAcct+'>'+ic('doc')+'My permits</a><button type="button" onclick="AN.open=false;acSignout().then(()=>{ if (S.view!==\'account\') render(); })">'+ic('lock')+'Sign out</button></div>'+
+      '<div class="nb-h"><b>Updates on your permits</b>'+(n ? '<span class="pme-new">'+n+' new</span>' : '')+'</div>'+
       (!AN.items ? '<p class="nb-empty">Loading…</p>' : !AN.items.length ? '<p class="nb-empty">'+ic('check')+'No updates yet. You will see them here when the Building Department moves your application forward.</p>' :
         '<ul class="nb-list">'+AN.items.map(x => '<li><button type="button" class="nb-item'+(x.read?'':' new')+(x.kind==='info'?' warn':'')+'" onclick="anOpen()">'+
           '<span class="nb-dot" aria-hidden="true"></span><span class="nb-tx"><b>'+esc(x.title)+'</b><span>'+esc(x.body)+'</span><small>'+esc(anAgo(x.at))+(x.ref?' · Ref '+esc(x.ref):'')+'</small></span></button></li>').join('')+'</ul>')+
-      (anSupported() && !AN.push ? '<p class="pbell-tip">'+ic('bell')+'<span>Get these on your phone or computer: <a href="'+ACCT_URL()+'"'+(EMBED?' target="_top"':' onclick="event.preventDefault();AN.open=false;go(\'account\')"')+'>turn on notifications</a> in My permits.</span></p>' : '')+
+      (anSupported() && !AN.push ? '<p class="pbell-tip">'+ic('bell')+'<span>Get these on your phone or computer: <a href="'+ACCT_URL()+'"'+toAcct+'>turn on notifications</a> in My permits.</span></p>' : '')+
     '</div>' : '')+'</div>';
 }
 async function anLoad(force){
@@ -2742,6 +2778,8 @@ async function anLoad(force){
   AN.busy = true;
   try{ const r = await sbRpc('bf_app_events_list', { p_token:APP_TOK }); AN.items = r.items||[]; AN.unread = +r.unread||0; AN.push = +r.push||0; AN.at = Date.now(); }
   catch(x){ if (/sign in again/i.test(x.message||'')){ appTokSave(null); AN.items = null; } }
+  if (APP_TOK && !AC.me && !AC.nm && S.view !== 'account'){   // name for the header only; My permits always loads its own fresh copy
+    try{ const m = await sbRpc('bf_app_me', { p_token:APP_TOK }); AC.nm = (m && m.user && m.user.name) || ''; AC.em = (m && m.user && m.user.email) || ''; try{ if (!DEMO) localStorage.setItem('bdAppName', AC.nm); }catch(e){} }catch(x){} }
   AN.busy = false; if (PUB_VIEWS.includes(S.view)) render();
 }
 const PUB_VIEWS = ['apps','form','pdf','status','privacy','accessibility','account'];
