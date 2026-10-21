@@ -1310,6 +1310,13 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 .aa-mail.on{background:var(--okbg)}.aa-mail.on svg{color:var(--ok)}
 .aa-mail.off{background:var(--surface2)}
 .aa-mail.warn{background:var(--redbg)}
+
+/* v2.29.0: delete pop-up */
+#delbox .veil{z-index:49}
+#delbox .bugdlg{z-index:50}
+.deldlg{display:grid;gap:14px}
+.del-list{margin:0 0 12px;padding:0 0 0 18px;display:grid;gap:4px;font-size:14px;color:var(--ink2);max-height:180px;overflow:auto}
+.del-list b{color:var(--ink)}
 </style>
 
 
@@ -1790,7 +1797,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.28.0';   // shown at the bottom of every page
+const APP_VERSION = '2.29.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2974,7 +2981,7 @@ function panelHtml(){
       ? '<button class="btn primary" onclick="saveEdit()">'+ic('check')+'Save changes</button><button class="btn" onclick="S.editing=false;render()">Cancel</button><span class="sp"></span><span class="hint" style="color:var(--muted);font-size:13px">Fees recalculate when you save.</span>'
       : S.tab==='office'
         ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span>'+jobCardBtn(s)+'<button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
-        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+'<span class="sp"></span>'+(isAdmin()?'<button class="btn danger" onclick="S.confirmDel=true;render()">'+ic('trash')+'Delete</button>':'')+'');
+        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+'<span class="sp"></span>'+(canBuilding()?'<button class="btn danger" onclick="openDelDlg([\''+s.id+'\'])">'+ic('trash')+'Delete</button>':'')+'');
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
    '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+'<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>'+
@@ -3020,12 +3027,7 @@ async function saveOffice(){
     if (st.coOverrideInit && prev.co!=='Given'){ try{ const fresh = await sbRpc('bf_get', {p_token:TOKEN, p_collection:'submissions', p_id:s.id}); if (fresh && fresh.staff){ s.staff = fresh.staff; render(); } }catch(e){} }
     toast(st.coOverrideInit && prev.co!=='Given' ? 'Saved. Certificate of Occupancy given by override ('+st.coOverrideInit+').' : 'Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
 }
-async function deleteSub(){
-  const s = curSub(); if (!s||!DB) return;
-  try{ await DB.doc('submissions/'+s.id).delete();
-    delete ATT[s.id]; S.sel=null; S.confirmDel=false; toast('Application deleted'); render();
-  }catch(e){ toast('Could not delete: '+(e.message||'try again')); }
-}
+function deleteSub(){ const s = curSub(); if (s) openDelDlg([s.id]); }
 async function saveFile(i){
   const s = curSub(), f = s && ATT[s.id] && ATT[s.id][i]; if (!f) return;
   await DL.save({ filename:f.name, data:new Blob([dataUrlBytes(f.data)], {type:f.type}) });
@@ -4634,7 +4636,7 @@ function rowBulkHtml(rows){
     '<button class="btn sm" onclick="markMany(pickedRows(),{read:true})">Mark read</button>'+
     '<button class="btn sm" onclick="markMany(pickedRows(),{read:false})">Mark unread</button>'+
     '<button class="btn sm" onclick="markMany(pickedRows(),{starred:!pickedRows().every(s=>s.starred)})">'+ic('star')+'Star</button>'+
-    (isAdmin()?'<button class="btn sm danger" onclick="S.bulkDel=true;render()">'+ic('trash')+'Delete</button>':'')+
+    (canBuilding()?'<button class="btn sm danger" onclick="openDelDlg(pickedRows().map(s=>s.id))">'+ic('trash')+'Delete</button>':'')+
     '<span style="flex:1"></span><button class="btn sm ghost" onclick="S.rowSel={};render()">Clear selection</button></div>';
 }
 async function markMany(rows, patch){
@@ -4644,14 +4646,45 @@ async function markMany(rows, patch){
     catch(e){ toast('Stopped: '+e.message); break; } }
   render(); toast('Updated '+done+' application'+(done===1?'':'s'));
 }
-async function bulkDelete(){
-  const ids = pickedRows().map(s=>s.id), b = document.getElementById('bulkDelGo'); let done = 0;
-  for (const id of ids){
-    if (b){ b.disabled = true; b.textContent = 'Deleting '+(done+1)+' of '+ids.length+'…'; }
-    try{ await sbRpc('bf_purge_submission', {p_token:TOKEN, p_id:id}); done++; delete ATT[id]; delete S.rowSel[id]; S.subs = S.subs.filter(x=>x.id!==id); }
-    catch(e){ toast('Stopped: '+e.message); break; }
-  }
-  S.bulkDel = false; await loadStorage(); render(); toast('Deleted '+done+' application'+(done===1?'':'s'));
+/* v2.29.0: delete applications (Building Department and administrators), confirmed with initials in a pop-up.
+   One server call for all selected (bf_delete_applications): all or nothing, logged with initials, and refused
+   for any application that has payment records (the payment ledger is never orphaned). */
+var DEL = { ids:[], busy:false };
+function openDelDlg(ids){
+  closeDelDlg(); if (!canBuilding()) return;
+  ids = (ids||[]).filter(Boolean); if (!ids.length){ toast('Select at least one application.'); return; }
+  DEL.ids = ids; DEL.busy = false;
+  const rows = ids.map(id => S.subs.find(x => x.id===id)).filter(Boolean), n = ids.length;
+  const docs = rows.reduce((a, s) => a + (s.files||[]).length, 0), paid = rows.filter(s => payStatus(s)==='paid' || payStatus(s)==='partial');
+  const list = rows.slice(0, 8).map(s => '<li><b class="num">'+refNo(s.id)+'</b> · '+esc((FORMS[s.form]||{}).short||s.form)+' · '+esc((s.fields||{}).applicant||'')+(s.fields&&s.fields.address?' · '+esc(s.fields.address):'')+'</li>').join('')+(n > 8 ? '<li>and '+(n-8)+' more</li>' : '');
+  const d = document.createElement('div'); d.id = 'delbox';
+  d.innerHTML = '<div class="veil" onclick="closeDelDlg()"></div><form class="bugdlg deldlg" id="delf" role="alertdialog" aria-modal="true" aria-labelledby="delT" aria-describedby="delD" novalidate>'+
+    '<div class="row" style="justify-content:space-between"><h2 id="delT" style="font:800 20px var(--f-disp)">Delete '+(n===1 ? 'this application' : n+' applications')+'?</h2><button type="button" class="btn sm ghost" aria-label="Close" onclick="closeDelDlg()">'+ic('x')+'</button></div>'+
+    '<div id="delD"><ul class="del-list">'+list+'</ul>'+
+    '<div class="callout warn" style="margin:0"><b>This cannot be undone.</b>'+(n===1 ? 'The application' : 'These applications')+(docs ? ' and '+docs+' document'+(docs===1?'':'s') : '')+' will be permanently removed. Your name, initials and the reference #'+(n===1?'':'s')+' are kept in the delete log.'+
+      (paid.length ? ' <br><b>'+paid.length+' of these show'+(paid.length===1?'s':'')+' a payment.</b> Applications with payment records cannot be deleted.' : '')+'</div></div>'+
+    '<div class="fld"><label class="l" for="delInit">Type your initials to confirm</label><input id="delInit" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase;max-width:140px" oninput="delCheck()"></div>'+
+    '<span class="formerr" id="delErr" role="alert"></span>'+
+    '<div class="row" style="justify-content:flex-end;gap:8px"><button type="button" class="btn" onclick="closeDelDlg()">Cancel</button><button class="btn danger" id="delGo" disabled>'+ic('trash')+'Delete'+(n===1 ? '' : ' '+n)+'</button></div></form>';
+  document.body.appendChild(d);
+  document.getElementById('delf').onsubmit = e => { e.preventDefault(); runDelete(); };
+  document.addEventListener('keydown', delEsc);
+  syncScrollLock(); document.getElementById('delInit').focus();
+}
+function delEsc(e){ if (e.key === 'Escape' && !DEL.busy) closeDelDlg(); }
+function closeDelDlg(){ const d = document.getElementById('delbox'); if (d) d.remove(); document.removeEventListener('keydown', delEsc); syncScrollLock(); }
+function delCheck(){ const v = (document.getElementById('delInit')||{}).value||'', b = document.getElementById('delGo'); if (b) b.disabled = DEL.busy || !/^[A-Za-z]{2,4}$/.test(v.trim()); }
+async function runDelete(){
+  const init = ((document.getElementById('delInit')||{}).value||'').trim().toUpperCase(), err = document.getElementById('delErr'), b = document.getElementById('delGo');
+  if (!/^[A-Z]{2,4}$/.test(init)){ err.textContent = 'Enter your initials (2 to 4 letters).'; return; }
+  DEL.busy = true; b.disabled = true; b.innerHTML = 'Deleting…'; err.textContent = '';
+  try{ const r = await sbRpc('bf_delete_applications', {p_token:TOKEN, p_ids:DEL.ids, p_initials:init});
+    const gone = new Set(DEL.ids); gone.forEach(id => { delete ATT[id]; delete S.rowSel[id]; });
+    S.subs = S.subs.filter(x => !gone.has(x.id)).map(x => x.linkedTo && gone.has(x.linkedTo) ? Object.assign({}, x, { linkedTo:undefined, linkedAt:undefined, linkedBy:undefined }) : x);
+    if (S.sel && gone.has(S.sel)){ S.sel = null; S.confirmDel = false; }
+    DEL.busy = false; closeDelDlg(); loadStorage(); render();
+    const c = (r && r.count) || gone.size; toast('Deleted '+c+' application'+(c===1?'':'s')+' ('+init+').');
+  }catch(x){ DEL.busy = false; err.textContent = x.message || 'Could not delete. Try again.'; b.innerHTML = ic('trash')+'Delete'+(DEL.ids.length===1?'':' '+DEL.ids.length); delCheck(); }
 }
 async function bulkPdf(){
   if (!window.PDFLib){ toast('The PDF tool did not load. Check your connection and try again.'); return; }
@@ -5867,6 +5900,15 @@ function demoCall(fn, A){
         else if (!String(st.coOverrideInit||'').trim()){ d.data = old; throw new Error('The Certificate of Occupancy cannot be given until this permit is paid in full. To give it anyway, enter your initials in the override box.'); }
         else { Object.assign(st, { coOverrideInit:String(st.coOverrideInit).trim(), coOverrideBy:a.name, coOverrideAt:new Date().toISOString(), coOverrideBalance:d.data.pay.balance }); dAudit(a, 'co.override', A.p_id, { initials:st.coOverrideInit }); } }
       return null; }
+    case 'bf_delete_applications': { const a = dNeed(T,'building'), init = String(A.p_initials||'').trim().toUpperCase(), ids = A.p_ids||[];
+      if (!/^[A-Z]{2,4}$/.test(init)) throw new Error('Enter your initials (2 to 4 letters) to delete.');
+      if (!ids.length) throw new Error('Select at least one application.');
+      ids.forEach(id => { if (!S2[id]) throw new Error('Reference '+dRef(id)+' is no longer on file. Refresh and try again.');
+        if (DEMO.payments.some(p => p.submissionId===id)) throw new Error('Reference '+dRef(id)+' has payment records, so it cannot be deleted (payment records are always kept). Nothing was deleted.'); });
+      ids.forEach(id => { delete S2[id]; Object.keys(DEMO.docs.attachments).forEach(k => { if ((DEMO.docs.attachments[k].data||{}).submissionId===id) delete DEMO.docs.attachments[k]; });
+        Object.values(S2).forEach(d => { if (d.data.linkedTo===id){ delete d.data.linkedTo; delete d.data.linkedAt; delete d.data.linkedBy; } });
+        Object.values(DEMO.appUsers||{}).forEach(u => { delete u.apps[id]; }); delete DEMO.fy.overrides[id]; });
+      dAudit(a, 'application.delete', '', { initials:init, count:ids.length }); return { count:ids.length, refs:ids.map(dRef) }; }
     case 'bf_delete': case 'bf_purge_submission': { dNeed(T,'admin'); const c = fn==='bf_delete' ? A.p_collection : 'submissions'; if (DEMO.docs[c]) delete DEMO.docs[c][A.p_id]; return null; }
     case 'bf_permit_status': {
       const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9-]/g,'').toUpperCase(), em = String(A.p_email||'').trim().toLowerCase();
