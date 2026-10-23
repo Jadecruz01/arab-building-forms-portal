@@ -1391,7 +1391,7 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 /* v2.31.0: App & splash screen admin */
 .lk-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;margin-top:16px;align-items:start}
 .lk-form h2{font:700 17px var(--f-disp);margin:0}
-.lk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.lkf-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .lk-form input[type=color]{width:100%;height:40px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
 .lk-icon{display:flex;gap:14px;align-items:flex-start}
 .lk-icon > img{width:88px;height:88px;border-radius:20px;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.18);flex:none;background:var(--surface2)}
@@ -1407,7 +1407,7 @@ input[type=date]:focus-within{outline:2px solid var(--blue);box-shadow:0 0 0 4px
 .lk-screen .spl-track{width:190px}
 .lk-screen .spl-in{max-width:100%;min-width:0}
 .lk-screen .spl-sub{font-size:11px}
-@media (max-width:980px){.lk-grid{grid-template-columns:1fr}.lk-row{grid-template-columns:1fr 1fr}.lk-phone{position:static}}
+@media (max-width:980px){.lk-grid{grid-template-columns:1fr}.lkf-row{grid-template-columns:1fr 1fr}.lk-phone{position:static}}
 /* v2.31.1 installed app (iPhone): the strip behind the clock is part of the white header, header stays pinned */
 @media (display-mode: standalone){
   html{background:var(--surface)}
@@ -1470,6 +1470,12 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
   .pme-av{width:34px;height:34px;font-size:12px}
 }
 @media (max-width:640px){.pme-menu.pbell-menu{top:calc(64px + env(safe-area-inset-top,0px))}}
+/* v2.31.6: linked-permit line in the record header (own line, not a pill) */
+.p-head .who .lk-pill{display:flex;align-items:flex-start;gap:6px;margin-top:4px;font-size:13px;font-weight:600;line-height:1.35;color:var(--golddk)}
+.p-head .who .lk-pill .i,.p-head .who .lk-pill svg{width:14px;height:14px;flex:none;margin-top:2px}
+.p-head .who .lk-pill span{min-width:0;overflow-wrap:anywhere}
+.p-arrows{display:flex;gap:2px;flex:none}
+.p-arrows .btn{width:34px;height:34px;min-width:0;padding:0;justify-content:center}
 </style>
 
 
@@ -2023,7 +2029,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.5';   // shown at the bottom of every page
+const APP_VERSION = '2.31.6';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3324,8 +3330,8 @@ function panelHtml(){
         : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+'<span class="sp"></span>'+(canBuilding()?'<button class="btn danger" onclick="openDelDlg([\''+s.id+'\'])">'+ic('trash')+'Delete</button>':'')+'');
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
-   '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+(S.view==='table' ? '<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>' : '')+''+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+fyName(fyOf(s))+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src lk-pill">'+ic('link')+esc(linkNote(s) || 'Linked')+'</span>':'')+'</small></div>'+
+   '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+(S.view==='table' ? '<span class="p-arrows"><button class="btn sm ghost" aria-label="Previous" title="Previous application" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" title="Next application" onclick="stepSub(1)">'+ic('right')+'</button></span>' : '')+''+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+fyName(fyOf(s))+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+'</small>'+(isLinked(s)?'<span class="lk-pill">'+ic('link')+'<span>'+esc(linkNote(s) || 'Linked')+'</span></span>':'')+'</div>'+
    '<button class="btn sm" id="fullBtn" onclick="togglePanelFull()" title="'+(S.panelFull?'Exit full screen':'Full screen')+'">'+ic(S.panelFull?'shrink':'expand')+'<span class="hide-sm">'+(S.panelFull?'Exit full screen':'Full screen')+'</span></button>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
@@ -5588,8 +5594,13 @@ async function buildReceipt(r){
   page.drawText('made payable to "City of Arab." Show this receipt (printed or on your phone) when you pay', {x:M+14, y:y-45, size:10.5, font:reg, color:ink});
   page.drawText('so your payment is matched to reference # '+ref+'. The Building Department will contact you.', {x:M+14, y:y-60, size:10.5, font:reg, color:ink});
   }
-  page.drawText(pdfSafe('Check your permit status anytime at arabcityapplications.jadecruz.dev/apply/#status with reference # '+ref+' and your email.'), {x:M, y:56, size:9, font:bold, color:ink});
-  page.drawText(pdfSafe('This receipt confirms your application was received. It is not proof of payment or an issued permit.  ·  Reference '+ref), {x:M, y:40, size:8.5, font:reg, color:grey});
+  { // v2.31.6: footer lines centered and kept inside the margins (shrink a little if a line is still too wide)
+    const pw = page.getWidth(), maxW = pw - 2*M;
+    const cline = (t, yy, f, s, c) => { t = pdfSafe(t); while (s > 6.5 && f.widthOfTextAtSize(t, s) > maxW) s -= 0.25; page.drawText(t, {x:(pw - f.widthOfTextAtSize(t, s))/2, y:yy, size:s, font:f, color:c}); };
+    page.drawLine({start:{x:M, y:84}, end:{x:pw-M, y:84}, thickness:.6, color:rgb(0.85,0.87,0.92)});
+    cline('Check your permit status anytime at arabcityapplications.jadecruz.dev/apply/#status', 68, bold, 9.5, ink);
+    cline('Use reference # '+ref+' and the email on this application.', 55, reg, 9, ink);
+    cline('This receipt confirms your application was received. It is not proof of payment or an issued permit.', 38, reg, 8, grey); }
   return pdf.save();
 }
 async function downloadReceipt(sid){
@@ -6628,10 +6639,10 @@ function viewLookAdmin(){
       '<h2>Splash screen</h2>'+
       '<div class="fld"><label class="l" for="lk_title">Title</label><input id="lk_title" maxlength="60" value="'+esc(d.title)+'"></div>'+
       '<div class="fld"><label class="l" for="lk_subtitle">Line under the title <span class="hint">(optional)</span></label><input id="lk_subtitle" maxlength="80" value="'+esc(d.subtitle||'')+'"></div>'+
-      '<div class="lk-row"><div class="fld"><label class="l" for="lk_bg">Background</label><input type="color" id="lk_bg" value="'+esc(d.bg)+'"></div>'+
+      '<div class="lkf-row"><div class="fld"><label class="l" for="lk_bg">Background</label><input type="color" id="lk_bg" value="'+esc(d.bg)+'"></div>'+
         '<div class="fld"><label class="l" for="lk_accent">Accent (bar, tools, line)</label><input type="color" id="lk_accent" value="'+esc(d.accent)+'"></div>'+
         '<div class="fld"><label class="l" for="lk_logo">Picture</label><select id="lk_logo">'+opt('seal', d.logo, 'City of Arab seal')+opt('icon', d.logo, 'App icon')+'</select></div></div>'+
-      '<div class="lk-row"><div class="fld"><label class="l" for="lk_anim">Animation</label><select id="lk_anim">'+opt('tools', d.anim, 'Building tools + loading bar')+opt('bar', d.anim, 'Loading bar only')+opt('none', d.anim, 'None')+'</select></div>'+
+      '<div class="lkf-row"><div class="fld"><label class="l" for="lk_anim">Animation</label><select id="lk_anim">'+opt('tools', d.anim, 'Building tools + loading bar')+opt('bar', d.anim, 'Loading bar only')+opt('none', d.anim, 'None')+'</select></div>'+
         '<div class="fld"><label class="l" for="lk_secs">How long</label><select id="lk_secs">'+[1,1.5,2,2.5,3,4].map(v => opt(v, d.secs, v+' seconds')).join('')+'</select></div>'+
         '<div class="fld"><label class="l" for="lk_show">Show it</label><select id="lk_show">'+opt('app', d.show, 'Only in the installed app')+opt('always', d.show, 'Installed app and website (once per visit)')+opt('off', d.show, 'Never')+'</select></div></div>'+
       '<h2 style="margin-top:8px">App icon</h2>'+
