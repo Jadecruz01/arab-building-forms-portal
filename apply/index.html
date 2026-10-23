@@ -2023,7 +2023,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.4';   // shown at the bottom of every page
+const APP_VERSION = '2.31.5';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3325,7 +3325,7 @@ function panelHtml(){
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
    '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+(S.view==='table' ? '<button class="btn sm ghost" aria-label="Previous" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" onclick="stepSub(1)">'+ic('right')+'</button>' : '')+''+
-   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+fyName(fyOf(s))+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src">'+ic('link')+'Linked</span>':'')+'</small></div>'+
+   '<div class="who"><b>'+esc(s.fields.applicant||'Applicant')+'</b><small>'+(s.imported?'<span class="pill src">Imported</span> ':'')+fmtDT(s.createdAt)+' · Ref '+refNo(s.id)+' · '+fyName(fyOf(s))+' · '+(st.permitNo?'Permit #'+esc(st.permitNo):'No permit # yet')+' · '+payPill(s)+(isLinked(s)?' <span class="pill src lk-pill">'+ic('link')+esc(linkNote(s) || 'Linked')+'</span>':'')+'</small></div>'+
    '<button class="btn sm" id="fullBtn" onclick="togglePanelFull()" title="'+(S.panelFull?'Exit full screen':'Full screen')+'">'+ic(S.panelFull?'shrink':'expand')+'<span class="hide-sm">'+(S.panelFull?'Exit full screen':'Full screen')+'</span></button>'+
    '<button class="btn sm ghost" aria-label="Close" onclick="closeSub()">'+ic('x')+'</button></div>'+
    '<div class="p-tabs"><button class="'+(S.tab==='app'?'on':'')+'" onclick="S.tab=\'app\';render()">Application</button><button class="'+(S.tab==='office'?'on':'')+'" onclick="S.tab=\'office\';S.editing=false;render()">Office use</button><button class="'+(S.tab==='files'?'on':'')+'" onclick="S.tab=\'files\';S.editing=false;render()">Documents ('+(s.files||[]).length+')</button></div>'+
@@ -3390,7 +3390,7 @@ async function buildPdf(s){
   const { PDFDocument, StandardFonts, rgb } = PDFLib;
   const pdf = await PDFDocument.create();
   const reg = await pdf.embedFont(StandardFonts.Helvetica), bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const F = FORMS[s.form], st = s.staff||{}, W=612, H=792, M=46;
+  const F = FORMS[s.form], st = s.staff||{}, W=612, H=792, M=46, lkNote = linkNote(s);
   const navy = rgb(0.06,0.2,0.45), grey = rgb(0.42,0.45,0.6), line = rgb(0.86,0.88,0.92);
   let page, y;
   const wrap = (t, font, size, width) => { const out=[]; pdfSafe(t).split('\n').forEach(par=>{ let cur=''; par.split(/\s+/).forEach(w=>{ const tryL = cur?cur+' '+w:w; if (font.widthOfTextAtSize(tryL,size) > width && cur){ out.push(cur); cur=w; } else cur=tryL; }); out.push(cur); }); return out; };
@@ -3399,6 +3399,11 @@ async function buildPdf(s){
     page.drawText('City of Arab Building Department', {x:M,y:H-32,size:15,font:bold,color:rgb(1,1,1)});
     page.drawText(pdfSafe(F.title), {x:M,y:H-52,size:10.5,font:reg,color:rgb(0.95,0.76,0.19)});
     page.drawText(pdfSafe('Permit # '+(st.permitNo||'not assigned')), {x:W-M-bold.widthOfTextAtSize('Permit # '+(st.permitNo||'not assigned'),10.5),y:H-32,size:10.5,font:bold,color:rgb(1,1,1)});
+    if (lkNote){   // v2.31.5: "Linked to Master Permit # 26190" / "Linked Sub Trade Permits # 26301E, # 26302P" under the permit #
+      const maxW = W - M - (M + reg.widthOfTextAtSize(pdfSafe(F.title), 10.5) + 24); let t = pdfSafe(lkNote), sz = 9.5;
+      while (sz > 7 && bold.widthOfTextAtSize(t, sz) > maxW) sz -= 0.5;
+      while (t.length > 4 && bold.widthOfTextAtSize(t, sz) > maxW) t = t.slice(0, -2).replace(/[,\s]+$/, '') + '…';
+      t = pdfSafe(t); page.drawText(t, {x:W-M-bold.widthOfTextAtSize(t,sz), y:H-52, size:sz, font:bold, color:rgb(0.95,0.76,0.19)}); }
     y = H-96; };
   const head = t => { if (y<90) newPage(); y-=6; page.drawText(pdfSafe(t.toUpperCase()), {x:M,y,size:9,font:bold,color:grey}); y-=6; page.drawLine({start:{x:M,y},end:{x:W-M,y},thickness:.7,color:line}); y-=14; };
   const row = (l, v) => { const ll = wrap(l,bold,9.5,170), vl = wrap(v,reg,10,W-2*M-185); const h = Math.max(ll.length, vl.length)*13+5;
@@ -3414,9 +3419,9 @@ async function buildPdf(s){
     row(x.label, x.type==='money'?money(num(v)):v); });
   if (Array.isArray(s.agreements) && s.agreements.length){ head('Terms & agreements'); s.agreements.forEach(a => row(a.title||a.id, 'Agreed '+fmtDT(a.at))); }
   { const lm = linkedMain(s), ls = linkedSubs(s);
-    if (lm || ls.length){ head(s.form==='subtrade' ? 'Linked building permit' : 'Linked sub trade applications');
-      (lm ? [lm] : ls).forEach(x => x.missing ? row('Building permit', 'Linked application is no longer on file') :
-        row((FORMS[x.form]||{}).short||x.form, [x.fields.applicant||'Applicant', x.fields.address, (x.staff&&x.staff.permitNo)?'Permit # '+x.staff.permitNo:'', 'Ref '+refNo(x.id)].filter(Boolean).join('  ·  '))); } }
+    if (lm || ls.length){ head(s.form==='subtrade' ? 'Linked master permit (building permit)' : 'Linked sub trade permits');
+      (lm ? [lm] : ls).forEach(x => x.missing ? row('Master permit', 'Linked application is no longer on file') :
+        row((lm ? 'Master permit: ' : '')+((FORMS[x.form]||{}).short||x.form), [x.fields.applicant||'Applicant', x.fields.address, (x.staff&&x.staff.permitNo)?'Permit # '+x.staff.permitNo:'', 'Ref '+refNo(x.id)].filter(Boolean).join('  ·  '))); } }
   const fe = s.fees||{}; head('Fees');
   if (isBldg(s.form)||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
   row('Permit fee', money(fe.permit)+(fe.doubled?'  (doubled - work started without permit)':''));
@@ -4146,6 +4151,16 @@ function autoCropCheck(src){
 const subById = id => S.subs.find(x => x.id === id);
 const linkedMain = s => s && s.form === 'subtrade' && s.linkedTo ? (subById(s.linkedTo) || { missing:true, id:s.linkedTo }) : null;
 const linkedSubs = s => s && isBldg(s.form) ? S.subs.filter(x => x.form === 'subtrade' && x.linkedTo === s.id) : [];
+/* v2.31.5 (Kim Johnson): say what a permit is linked to, for the PDF header and the record header.
+   Sub trade -> its master (building) permit #; building permit -> the permit #s of its linked sub trades. */
+function linkNote(s, short){
+  const lm = linkedMain(s);
+  if (lm){ if (lm.missing) return short ? 'Master permit not on file' : 'Linked master permit is no longer on file';
+    const pn = (lm.staff||{}).permitNo; return pn ? (short ? 'Master Permit # ' : 'Linked to Master Permit # ')+pn : (short ? 'Master permit (Ref ' : 'Linked to Master Permit (Ref ')+refNo(lm.id)+', no permit # yet)'; }
+  const ls = linkedSubs(s); if (!ls.length) return '';
+  const ids = ls.map(x => (x.staff||{}).permitNo ? '# '+x.staff.permitNo : 'Ref '+refNo(x.id));
+  return (ls.length === 1 ? 'Linked Sub Trade Permit ' : 'Linked Sub Trade Permits ')+ids.join(', ');
+}
 const isLinked = s => !!(linkedMain(s) || linkedSubs(s).length);
 const normAddr = a => String(a||'').toLowerCase().replace(/[.,#]/g,' ').replace(/\b(road|rd|street|st|avenue|ave|drive|dr|lane|ln|trail|trl|circle|cir|court|ct|parkway|pkwy|highway|hwy|boulevard|blvd|northeast|northwest|southeast|southwest|ne|nw|se|sw|n|s|e|w)\b/g,' ').replace(/\s+/g,' ').trim();
 const appLine = x => esc(x.fields.applicant || 'Applicant')+' · '+esc(x.fields.address || 'no address')+((x.staff&&x.staff.permitNo) ? ' · Permit # '+esc(x.staff.permitNo) : '')+' · Ref '+refNo(x.id);
@@ -4188,7 +4203,7 @@ function linkBoxHtml(s){
         : '<p class="hint" style="margin:0">No matching applications.</p>')+
       '<div class="row"><button class="btn sm ghost" onclick="S.linkPick=null;render()">Cancel</button></div></div>';
   }
-  return '<div class="lk-box"><div class="lk-head">'+ic('link')+'<b>'+(s.form==='subtrade'?'Linked building permit':'Linked sub trade applications')+'</b>'+
+  return '<div class="lk-box"><div class="lk-head">'+ic('link')+'<b>'+(s.form==='subtrade'?'Master permit (linked building permit)':'Linked sub trade permits')+'</b>'+
     (canAdd && !P ? '<button class="btn sm" style="margin-left:auto" onclick="S.linkPick={id:\''+s.id+'\',q:\'\'};render()">'+ic('link')+(s.form==='subtrade'?'Link to a building permit':'Link a sub trade')+'</button>' : '')+'</div>'+body+pick+'</div>';
 }
 function bindLinkPick(){ const q = document.getElementById('lkq'); if (q && !q.dataset.b){ q.dataset.b = '1'; q.oninput = () => { S.linkPick.q = q.value; const pos = q.selectionStart; render(); const n = document.getElementById('lkq'); if (n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }; } }
