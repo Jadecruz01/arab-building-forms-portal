@@ -1680,9 +1680,11 @@ const OTHER_UPLOAD = T('files','Other documents (optional)',{type:'file',req:fal
 const isUpField = x => x.type==='file' || x.type==='doc';
 /* Building Department review: these applications are reviewed and approved before payment is taken
    (enforced on the server in bf_record_payment for applications submitted from REVIEW_FROM on). */
-const REVIEW_FORMS = ['building','homeowner','subtrade'];
+const REVIEW_FORMS = ['building','homeowner','subtrade','sign'];   // v2.31.9: sign permits too
 const REVIEW_FROM = '2026-10-15T05:00:00Z';
-const reviewRequired = s => !!s && REVIEW_FORMS.includes(s.form) && String(s.createdAt||'') >= REVIEW_FROM;
+const REVIEW_FROM_FORM = { sign:'2026-10-28T17:00:00Z' };          // sign permits submitted from Oct 28, 2026 12:00 PM Central
+const reviewFrom = k => REVIEW_FROM_FORM[k] || REVIEW_FROM;
+const reviewRequired = s => !!s && REVIEW_FORMS.includes(s.form) && String(s.createdAt||'') >= reviewFrom(s.form);
 const reviewApproved = s => { const st = (s && s.staff) || {}; return !!(String(st.approvedBy||'').trim() || String(st.approvedDate||'').trim()); };
 const reviewState = s => reviewApproved(s) ? 'approved' : !reviewRequired(s) ? 'none' : String(((s.staff||{}).infoNeeded)||'').trim() ? 'info' : 'pending';
 const REVIEW_LABEL = { pending:'Under review', info:'Information needed', approved:'Approved', none:'' };
@@ -1752,7 +1754,7 @@ const FORMS = {
       T('bldH','Height of Building/Suite (ft.)',{type:'number',req:true,show:f=>f.signType==='Building sign'}), T('bldW','Width of Building/Suite (ft.)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
       T('bldArea','Total Area of Building/Suite (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}), T('newFace','New Sign Face (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
       T('existingFace','Existing and Remaining Sign (sq ft)',{type:'number',req:true,show:f=>f.signType==='Building sign'}),
-      Object.assign({},UPLOAD,{label:'Upload the required documents for your sign type, including the plot plan or building suite drawing'}) ] },
+      Object.assign({},UPLOAD,{label:'Upload the required documents for your sign type, including the plot plan or building suite drawing', req:false}) ] },
   pool:{ key:'pool', title:'Swimming Pool Permit Application', short:'Swimming Pool Permit', icon:'pool', group:'Other Permits', feeLabel:'$50 flat fee', created:'Oct 6, 2026',
     fields:[ ...APPLICANT, {type:'section',label:'Property'}, ...PROPERTY, {type:'section',label:'Pool'},
       T('poolType','Pool type',{type:'radio',req:true,opts:['In-ground','Above-ground'],full:true}),
@@ -2037,7 +2039,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.8';   // shown at the bottom of every page
+const APP_VERSION = '2.31.9';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -4397,7 +4399,7 @@ function statusCard(r){
     st: revOk ? 'ok' : info ? 'part' : '',
     wide: !revOk && !!info,
     list: !revOk && info ? '<div class="st-info"><b>What we need:</b> '+esc(info)+'</div>'+stUploadHtml(r) : '' }] : []);
-  if (!hasInsp) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
+  if (!hasInsp && !revReq) steps.push({ t:'Approved', d:r.approved ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : 'Not yet', st:r.approved ? 'ok' : '' });
   steps.push({ t:'Fees paid', d:ps==='paid' ? 'Paid in full' : ps==='none' ? 'No fee' : ps==='partial' ? 'Partly paid · '+money(bal)+' still due' : holdPay ? 'Estimated '+money(total)+'. The final total is confirmed when your application is approved.' : (revReq && revOk && ps==='unpaid') ? 'Confirmed total '+money(total)+' due' : money(total)+' due', st:(ps==='paid'||ps==='none') ? 'ok' : ps==='partial' ? 'part' : '' });
   if (hasInsp) steps.push({ t:'Inspections',
     d: !insL.length ? 'None complete' : [doneN ? doneN+' complete' : 'None complete', pendN ? pendN+' pending' : ''].filter(Boolean).join(' · '),
@@ -6211,7 +6213,7 @@ function reviewBoxHtml(s){
   const msg = { pending:'Not approved yet. The applicant was told not to pay until you approve; the City Clerk cannot take payment until then.',
     info:'Waiting on the applicant for the information below. They see it on their permit status page. Payment stays on hold until you approve.',
     approved:'Approved'+(st.approvedBy?' by '+esc(st.approvedBy):'')+(st.approvedDate?' on '+esc(fmtDay(st.approvedDate)):'')+'. The City Clerk can take payment.',
-    none:'Submitted before reviews started (Oct 15, 2026). Payment is not held for this application.' }[r];
+    none:'Submitted before reviews started ('+(s.form==='sign'?'Oct 28, 2026':'Oct 15, 2026')+'). Payment is not held for this application.' }[r];
   return '<div class="sect">Building Department review</div>'+
     '<div class="fld full"><div class="revbox rv-'+r+'">'+(reviewPill(s)||'<span class="pill src">No review hold</span>')+'<span>'+msg+'</span>'+
       (miss.length ? '<span class="revmiss">'+ic('alert')+'Missing documents: '+miss.map(x => esc(x.label)).join(', ')+'</span>' : '')+
@@ -6252,7 +6254,7 @@ function dNeed(token, what){ const a = dAcc(token); if (!a) throw new Error('Sig
   return a; }
 function dAudit(a, action, target, details){ DEMO.audit.unshift({ at:new Date().toISOString(), by:(a&&a.name)||'System', action, target:target||'', details:details||{} }); DEMO.audit = DEMO.audit.slice(0, 300); }
 function dSub(id){ const d = DEMO.docs.submissions[id]; return d || null; }
-function dReviewRequired(id, data){ const d = DEMO.docs.submissions[id]; return REVIEW_FORMS.includes(data.form) && String((d && d.created) || new Date().toISOString()) >= REVIEW_FROM; }
+function dReviewRequired(id, data){ const d = DEMO.docs.submissions[id]; return REVIEW_FORMS.includes(data.form) && String((d && d.created) || new Date().toISOString()) >= reviewFrom(data.form); }
 const dApproved = data => !!(String(((data.staff||{}).approvedBy)||'').trim() || String(((data.staff||{}).approvedDate)||'').trim());
 function dPayJson(p){ const s = DEMO.scans[p.id]; return Object.assign({}, p, { scan: s ? { id:s.id, addedBy:s.addedBy, addedAt:s.addedAt, width:s.width, height:s.height } : null }); }
 function dPaySync(id){ const d = dSub(id); if (!d) return null;
