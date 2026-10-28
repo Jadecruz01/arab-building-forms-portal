@@ -1637,6 +1637,7 @@ function permitFeeFor(value){
   if (v <= 500000) return 460  + Math.ceil((v - 100000) / 1000) * 3;
   return 1660 + Math.ceil((v - 500000) / 1000) * 2;
 }
+const SHOWS_CICT = k => k === 'building' || k === 'subtrade';   // forms that charge the CICT fee (not Homeowner since v2.31.8)
 const cictFor = (value, commercial) => commercial ? Math.round(num(value) / 1000 * 100) / 100 : 0;
 const SIGN_FEE = { 'Illuminated':75, 'Electronic Message Display (Changing Message)':75, 'Non-illuminated':50 };
 
@@ -1650,7 +1651,7 @@ function computeFees(form, f, doubled){
       value = num(f.heated) * 75 + num(f.unheated) * 50;
       basis = num(f.heated).toLocaleString()+' heated sq ft × $75 + '+num(f.unheated).toLocaleString()+' unheated sq ft × $50';
     } else { value = num(f.estCost); basis = 'Estimated cost'; }
-    permit = permitFeeFor(value); cict = cictFor(value, com);
+    permit = permitFeeFor(value); cict = form === 'homeowner' ? 0 : cictFor(value, com);   // v2.31.8: no CICT fee on homeowner permits
   } else if (form === 'subtrade'){
     value = num(f.estCost); basis = 'Estimated project cost';
     permit = permitFeeFor(value); cict = cictFor(value, f.buildType === 'Commercial');
@@ -2036,7 +2037,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.7';   // shown at the bottom of every page
+const APP_VERSION = '2.31.8';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2274,7 +2275,7 @@ function feeBoxHtml(key){
   const showVal = isBldg(key)||key==='subtrade';
   return (showVal?'<div class="r"><span>Construction value <small>('+esc(fe.basis||'enter project details')+')</small></span><b class="num">'+money(fe.value)+'</b></div>':'')+
     '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
-    (showVal?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
+    (SHOWS_CICT(key)?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
     '<div class="r t"><span>'+(REVIEW_FORMS.includes(key) ? 'Estimated total' : 'Grand total')+'</span><span class="num">'+money(fe.total)+'</span></div>'+
     (REVIEW_FORMS.includes(key) ? '<small><b>This is an estimate.</b> The final total is confirmed when the Building Department approves your application. They will contact you then to pay in person by cash or check at 740 N Main St, and the permit moves on to inspections and the Certificate of Occupancy. If work started before this permit, staff will double the permit fee.</small>'
       : '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>');
@@ -3293,7 +3294,7 @@ function panelHtml(){
       body = linkBoxHtml(s)+'<div class="qa">'+clean.join('')+'<div class="h">Fees</div><div class="h" style="display:none"></div>'+
         ((isBldg(s.form)||s.form==='subtrade')?'<div>Construction value</div><div class="num">'+money(fe.value)+'</div>':'')+
         '<div>Permit fee</div><div class="num">'+money(fe.permit)+(fe.doubled?' (doubled)':'')+'</div>'+
-        ((isBldg(s.form)||s.form==='subtrade')?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
+        ((SHOWS_CICT(s.form)||fe.cict)?'<div>CICT fee</div><div class="num">'+money(fe.cict)+'</div>':'')+
         '<div>Grand total</div><div class="num"><b>'+money(fe.total)+'</b></div></div>'+
         (s.editedAt?'<p class="hint" style="color:var(--muted);font-size:13px">Edited by staff '+fmtDT(s.editedAt)+'</p>':'');
     }
@@ -3303,7 +3304,8 @@ function panelHtml(){
     body = '<form id="offf" class="fgrid">'+(REVIEW_FORMS.includes(s.form) ? reviewBoxHtml(s).replace('<div class="sect">', '<div class="sect" style="margin-top:0">') : '')+
       '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
-      '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> Work started without a permit (double the permit fee)</label></div>'+
+      '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> '+(s.form==='sign' ? 'Sign put up without a permit' : 'Work started without a permit')+' (double the permit fee)'+
+        (s.imported ? '' : (() => { const b = computeFees(s.form, s.fields, false).permit; return b ? '<small class="hint" style="display:block">Permit fee '+money(b)+' → '+money(b*2)+' when doubled</small>' : ''; })())+'</label></div>'+
       (REVIEW_FORMS.includes(s.form) ? '' :
       '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
       '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>')+
@@ -3440,7 +3442,7 @@ async function buildPdf(s){
   const fe = s.fees||{}; head('Fees');
   if (isBldg(s.form)||s.form==='subtrade'){ row('Construction value', money(fe.value)+(fe.basis?'  ('+fe.basis+')':'')); }
   row('Permit fee', money(fe.permit)+(fe.doubled?'  (doubled - work started without permit)':''));
-  if (isBldg(s.form)||s.form==='subtrade') row('CICT fee', money(fe.cict));
+  if (SHOWS_CICT(s.form)||fe.cict) row('CICT fee', money(fe.cict));
   row('Grand total', money(fe.total));
   head('Office use');
   row('Payment', payText(s)+(s.pay&&s.pay.lastReceipt?'  ·  receipt '+s.pay.lastReceipt:''));
@@ -4252,7 +4254,7 @@ function viewCict(){
   const unpaid = C.basis === 'submitted' ? list.filter(r => payStatus(r.s) !== 'paid').length : 0;
   const est = list.filter(r => r.d.est).length;
   return topBar()+'<div class="purge cict"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button></div>'+
-    '<h1>CICT fee report</h1><p style="margin:0;color:var(--ink2);max-width:72ch">CICT fees from every application that charges one (Contractor and Homeowner building permits and Sub Trade permits, commercial work only). Pick a month to see the total and the permits that make it up, then download it for the county and state report.</p>'+
+    '<h1>CICT fee report</h1><p style="margin:0;color:var(--ink2);max-width:72ch">CICT fees from every application that charges one (Contractor building permits and Sub Trade permits, commercial work only; older Homeowner permits that were charged one are included). Pick a month to see the total and the permits that make it up, then download it for the county and state report.</p>'+
     '<div class="card cict-ctl"><div class="fld"><label class="l" for="ciM">Month</label><select id="ciM" onchange="S.cict.ym=this.value;prefSet(\'cict\',Object.assign({},S.cict));render()">'+opts.map(m => '<option value="'+m+'"'+(m===C.ym?' selected':'')+'>'+monthLabel(m)+'</option>').join('')+'</select></div>'+
       '<div class="fld"><label class="l" for="ciB">Count fees by</label><select id="ciB" onchange="S.cict.basis=this.value;prefSet(\'cict\',Object.assign({},S.cict));render()"><option value="paid"'+(C.basis==='paid'?' selected':'')+'>Date paid (fees collected)</option><option value="submitted"'+(C.basis==='submitted'?' selected':'')+'>Date submitted (fees charged)</option></select></div>'+
       '<div class="row" style="gap:8px;align-self:end;flex-wrap:wrap"><button class="btn primary" onclick="cictPdf()" '+(list.length?'':'disabled')+'>'+ic('down')+'Download PDF report</button><button class="btn" onclick="cictCsv()" '+(list.length?'':'disabled')+'>'+ic('down')+'Download CSV</button></div></div>'+
@@ -5007,7 +5009,7 @@ function periodRange(p){
 }
 function inPeriod(rows){ const p = S.period||'all', f = periodFy(p); if (f) return rows.filter(s => fyOf(s) === f);
   const r = periodRange(p); if (!r) return rows; return rows.filter(s=>{ const d = new Date(s.createdAt); return d>=r[0] && d<r[1]; }); }
-const HAS_CICT = k => isBldg(k) || k==='subtrade';
+const HAS_CICT = k => SHOWS_CICT(k) || (S.subs||[]).some(s => s.form === k && s.fees && s.fees.cict);
 /* "Showing" period picker (lives in the table toolbar since v2.25.3) */
 function periodPickHtml(){ const r = periodRange(S.period||'all');
   return '<div class="dash-period"><label for="pSel">Showing</label><select id="pSel" class="mini" onchange="S.period=this.value;prefSet(\'period\',this.value);S.rowSel={};render()">'+periodOpts().map(o=>'<option value="'+o[0]+'"'+((S.period||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
@@ -5586,7 +5588,7 @@ async function buildReceipt(r){
   const fee = (l, v, b) => { page.drawText(l, {x:M, y, size:11.5, font:b?bold:reg, color:ink}); const t = money(v); page.drawText(t, {x:W-M-(b?bold:reg).widthOfTextAtSize(t, b?14:11.5), y, size:b?14:11.5, font:b?bold:reg, color:ink}); y -= b ? 26 : 18; };
   if (fe.value) fee('Construction value', fe.value);
   fee('Permit fee'+(fe.doubled?' (doubled)':''), fe.permit||0);
-  if (isBldg(r.form) || r.form==='subtrade') fee('CICT fee (commercial only)', fe.cict||0);
+  if (SHOWS_CICT(r.form) || fe.cict) fee('CICT fee (commercial only)', fe.cict||0);
   page.drawLine({start:{x:M,y:y+10}, end:{x:W-M,y:y+10}, thickness:.7, color:line}); y -= 4;
   const holdR = reviewRequired(r) && !reviewApproved(r);
   fee(holdR ? 'Estimated total' : 'Amount due', fe.total||0, true);
