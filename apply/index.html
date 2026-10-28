@@ -1483,6 +1483,31 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
   .pme-menu.pbell-menu{position:fixed;left:12px;right:12px;width:auto;margin:0 auto;max-width:520px;top:calc(72px + env(safe-area-inset-top,0px));
     max-height:calc(100dvh - 88px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;z-index:60}
 }
+/* v2.31.10: footer lined up with the page card; grouped links; tidy credit line */
+.pfoot .pfoot-in{display:block;max-width:none;box-sizing:border-box;padding:30px 16px calc(22px + env(safe-area-inset-bottom,0px))}
+.pfoot.pf-apps .pfoot-in{max-width:calc(1040px + 32px)}
+.pfoot.pf-pv .pfoot-in{max-width:calc(860px + 32px)}
+.pf-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px 48px;flex-wrap:wrap}
+.pf-cols{display:flex;gap:22px 64px;flex-wrap:wrap}
+.pf-col{display:flex;flex-direction:column;gap:9px;min-width:0}
+.pf-col .priv-link,.pf-col .a11y-wrap{display:contents}
+.pf-col .priv-link[hidden],.pf-col .a11y-wrap[hidden]{display:none}
+.pf-h{font:700 11.5px/1.2 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.pf-col a{color:var(--cream);text-decoration:none;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.pf-col a:hover{color:var(--gold);text-decoration:underline}
+.pf-col a .i,.pf-col a svg{width:14px;height:14px}
+.pfoot .pf-credit{display:flex;justify-content:space-between;align-items:center;gap:8px 24px;flex-wrap:wrap;margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,.14);font-size:12.5px;color:#b7bfcd;text-align:left}
+.pf-meta{display:inline-flex;align-items:center;gap:18px;flex-wrap:wrap}
+@media (max-width:640px){
+  .pf-top{flex-direction:column;gap:22px}
+  .pf-cols{gap:22px 40px}
+  .pfoot .pf-credit{flex-direction:column;align-items:flex-start;gap:8px}
+}
+/* v2.31.10: staff workspace switcher does not move between workspaces; even spacing around the divider */
+@media (min-width:1024px){.jt-top > .brandbar{flex:0 0 auto;min-width:var(--brandw,268px)}}
+.wsw{gap:2px;align-items:center}
+.wsw .wsw-pub{margin-right:13px}
+.wsw .wsw-pub::after{right:-8px;top:8px;bottom:8px}
 </style>
 
 
@@ -2039,7 +2064,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.9';   // shown at the bottom of every page
+const APP_VERSION = '2.31.10';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2051,10 +2076,16 @@ function pubHeader(){
 }
 function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
-  return '<footer class="pfoot"><div class="pfoot-in">'+
+  /* v2.31.10: footer edges line up with the page card above (apps 1040px, statements 860px, other pages full width);
+     links grouped under Contact / Links; credit line on the left, Report a problem + version on the right */
+  const fw = S.view === 'apps' ? ' pf-apps' : ['privacy','accessibility'].includes(S.view) ? ' pf-pv' : '';
+  return '<footer class="pfoot'+fw+'"><div class="pfoot-in"><div class="pf-top">'+
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
-    '<nav class="pf-links" aria-label="Footer"><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a '+HOME_LINK+'>Applications &amp; Fees</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></nav>'+
-    '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span aria-hidden="true">·</span><span class="pf-ver">Version '+APP_VERSION+'</span></div></div></footer>';
+    '<nav class="pf-cols" aria-label="Footer">'+
+      '<div class="pf-col"><span class="pf-h">Contact</span><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="tel:+12565865968">256-586-5968</a></div>'+
+      '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
+    '</nav></div>'+
+    '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span class="pf-meta"><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span class="pf-ver">Version '+APP_VERSION+'</span></span></div></div></footer>';
 }
 function sideNav(){ return ''; }
 
