@@ -5,7 +5,7 @@
 <title>Applications &amp; Fees · City of Arab</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com blob:; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://yighcuismepfmappcfui.supabase.co; connect-src 'self' https://yighcuismepfmappcfui.supabase.co https://cdnjs.cloudflare.com data: blob:; media-src 'self' blob: data:; frame-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://challenges.cloudflare.com blob:; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://yighcuismepfmappcfui.supabase.co; connect-src 'self' https://yighcuismepfmappcfui.supabase.co https://cdnjs.cloudflare.com https://challenges.cloudflare.com data: blob:; media-src 'self' blob: data:; frame-src 'self' blob: data: https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#212c46">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f2a47'/%3E%3Cg fill='none' stroke='%23d6b062' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 15.5L16 6l11 9.5'/%3E%3Cpath d='M8.5 13v13h15V13'/%3E%3Cpath d='M14 26v-6h4v6'/%3E%3C/g%3E%3C/svg%3E">
@@ -1527,6 +1527,12 @@ html:not(.embed) .app.pub .sheet.stat,html:not(.embed) .app.pub .sheet:not(.apps
 .callout.beta-note b,.callout.beta-lock b{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .callout.beta-lock .i{width:16px;height:16px}
 .callout.beta-note{margin:0 0 16px}
+/* v2.34.1: Turnstile security check on Create account */
+.cap-box{min-height:65px}
+/* v2.34.1: footer credit links to collinsalexander.com */
+.credit-link{color:inherit;text-decoration:underline;text-decoration-color:rgba(192,168,105,.6);text-underline-offset:2px}
+.credit-link:hover{color:var(--gold)}
+.sfoot .credit-link:hover,.verfoot .credit-link:hover{color:inherit;text-decoration-color:currentColor}
 /* v2.31.10: staff workspace switcher does not move between workspaces; even spacing around the divider */
 @media (min-width:1024px){.jt-top > .brandbar{flex:0 0 auto;min-width:var(--brandw,268px)}}
 .wsw{gap:2px;align-items:center}
@@ -2193,7 +2199,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.34.0';   // shown at the bottom of every page
+const APP_VERSION = '2.34.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2204,7 +2210,7 @@ function pubHeader(){
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
 function pubFooter(){
-  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
+  if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by <a class="credit-link" href="https://collinsalexander.com" target="_blank" rel="noopener">Jade Cruz</a>, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
   /* v2.31.10: footer edges line up with the page card above (apps 1040px, statements 860px, other pages full width);
      links grouped under Contact / Links; credit line on the left, Report a problem + version on the right */
   const fw = S.view === 'apps' ? ' pf-apps' : ['privacy','accessibility'].includes(S.view) ? ' pf-pv' : '';
@@ -2214,7 +2220,7 @@ function pubFooter(){
       '<div class="pf-col"><span class="pf-h">Contact</span><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="tel:+12565865968">256-586-5968</a></div>'+
       '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
     '</nav></div>'+
-    '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span class="pf-meta"><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span class="pf-ver">Version '+APP_VERSION+'</span></span></div></div></footer>';
+    '<div class="pf-credit"><span>Website designed by <a class="credit-link" href="https://collinsalexander.com" target="_blank" rel="noopener">Jade Cruz</a>, Managed by The City of Arab Building Department</span><span class="pf-meta"><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span class="pf-ver">Version '+APP_VERSION+'</span></span></div></div></footer>';
 }
 function sideNav(){ return ''; }
 
@@ -2736,6 +2742,7 @@ function viewAccount(){
             '<div class="fld full"><label class="l" for="acEmail">Email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" required></div>'+
             '<div class="fld"><label class="l" for="acPass">Password <span class="hint">(at least 10 characters)</span></label><span class="pw-wrap"><input id="acPass" type="password" autocomplete="new-password" minlength="10" required>'+pwEyeBtn()+'</span></div>'+
             '<div class="fld"><label class="l" for="acPass2">Type it again</label><span class="pw-wrap"><input id="acPass2" type="password" autocomplete="new-password" required>'+pwEyeBtn()+'</span></div>'+
+            (CAP.siteKey ? '<div class="fld full ac-cap"><span class="l">Security check</span><div id="acCap" class="cap-box" aria-label="I am not a robot check"></div><span class="hint">This helps us block automated sign-ups.</span></div>' : '')+
             '<div class="fld full"><button class="btn primary ac-go" type="submit"'+(AC.busy?' disabled':'')+'>'+(AC.busy?'Creating…':'Create account')+'</button></div></form>'
         : t==='reset'
         ? acResetHtml()
@@ -2782,7 +2789,32 @@ function viewAccount(){
   }
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet stat acct" id="sheet">'+body+'</div></main></div>';
 }
-function bindAccount(){ if (APP_TOK && !AC.me && !AC.loading && !AC.err) acLoad(); }
+function bindAccount(){ if (APP_TOK && !AC.me && !AC.loading && !AC.err) acLoad(); capMount(); }
+/* v2.34.1 (Jade): "I'm not a robot" check (Cloudflare Turnstile) on Create account. The site key comes from the server
+   (bf_captcha_config). The token is checked by the captcha-verify Edge Function (secret key kept in Supabase), which
+   hands back a one-time pass; bf_app_signup2 refuses a sign-up without a valid, unused pass once the check is required. */
+const CAP = { siteKey:'', required:false, loaded:false, token:'', wid:null, el:null };
+async function capConfig(){ try{ const c = await sbRpc('bf_captcha_config', {}); CAP.siteKey = (c && c.siteKey) || ''; CAP.required = !!(c && c.required); }catch(e){} CAP.loaded = true; if (S.view==='account') render(); }
+function capScript(){ return new Promise((ok, bad) => { if (window.turnstile) return ok();
+  let sc = document.getElementById('cfTs'); if (!sc){ sc = document.createElement('script'); sc.id = 'cfTs'; sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; document.head.appendChild(sc); }
+  sc.addEventListener('load', () => ok()); sc.addEventListener('error', () => bad(new Error('The security check could not load. Check your connection and try again.'))); }); }
+async function capMount(){
+  const el = document.getElementById('acCap'); if (!el || !CAP.siteKey || el === CAP.el) return;
+  if (CAP.wid != null){ try{ turnstile.remove(CAP.wid); }catch(e){} CAP.wid = null; }
+  CAP.el = el; CAP.token = '';
+  try{ await capScript(); if (!document.body.contains(el)) return;
+    CAP.wid = turnstile.render(el, { sitekey:CAP.siteKey, action:'signup', theme:'light', size:'flexible',
+      callback: t => { CAP.token = t; }, 'expired-callback': () => { CAP.token = ''; }, 'error-callback': () => { CAP.token = ''; } }); }
+  catch(x){ el.textContent = x.message; }
+}
+function capReset(){ CAP.token = ''; try{ if (window.turnstile && CAP.wid != null) turnstile.reset(CAP.wid); }catch(e){} }
+async function capPass(){
+  if (!CAP.token) throw new Error('Please complete the security check ("I am not a robot") above the button.');
+  const r = await fetch(SB_FN+'captcha-verify', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ token:CAP.token }) });
+  let j = {}; try{ j = await r.json(); }catch(e){}
+  if (!r.ok || !j.pass) throw new Error(j.error || 'The security check did not go through. Please try it again.');
+  return j.pass;
+}
 const acVal = id => { const e = document.getElementById(id); return e ? e.value : ''; };
 function acTab(t){ AC.tab = t; AC.err = ''; if (t==='reset'){ AC.sent = ''; if (AC.mailReady == null) acMailCheck(); } render(); const f = document.querySelector('#acf input'); if (f) f.focus(); }
 function acFocusErr(){ setTimeout(() => { const e = document.querySelector('.acct .formerr'); if (e && e.scrollIntoView) e.scrollIntoView({block:'center'}); }, 0); }
@@ -2812,8 +2844,16 @@ function acSignup(){
   if (nm.length < 2){ AC.err = 'Enter your name.'; render(); return; }
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ AC.err = 'Enter a valid email address.'; render(); return; }
   if (bad){ AC.err = bad; render(); return; }
-  acStart('bf_app_signup', { p_email:em, p_name:nm, p_pass:acVal('acPass') }, 'Your account is ready. Add applications you already submitted, or apply for a permit and it is saved here automatically.');
+  const kept = 'Your account is ready. Add applications you already submitted, or apply for a permit and it is saved here automatically.';
+  if (!CAP.siteKey || DEMO){ acStart('bf_app_signup', { p_email:em, p_name:nm, p_pass:acVal('acPass') }, kept); return; }
+  const pw = acVal('acPass');
+  (async () => { let pass;
+    try{ pass = await capPass(); }catch(x){ AC.err = x.message; capReset(); render(); acKeep(nm, em, pw); acFocusErr(); return; }
+    await acStart('bf_app_signup2', { p_email:em, p_name:nm, p_pass:pw, p_captcha:pass }, kept);
+    if (AC.err){ acKeep(nm, em, pw); } })();
 }
+// keep what the person typed when the form re-renders with a message (the check itself must be done again)
+function acKeep(nm, em, pw){ const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; }; set('acName', nm); set('acEmail', em); set('acPass', pw); set('acPass2', pw); }
 /* v2.28.0: reset by email (6-digit code from noreply@jadecruz.dev via Resend) when the server says it is set up;
    otherwise (and as a backup) a code from the Building Department. */
 function acResetHtml(){
@@ -6014,7 +6054,7 @@ async function runZipAttach(){
 const BUG_EMAIL = 'jade.cruz@collinsalexander.com';
 const AREAS = [['clerk','Payments (City Clerk)'],['staff','Building Department workspace'],['table','Application table / dashboard'],['panel','Application details (Application, Office use, Documents)'],['pdf','PDF or receipt download'],['users','Staff accounts or passwords'],['other','Something else']];
 function staffFooter(){
-  return '<footer class="sfoot"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
+  return '<footer class="sfoot"><span>Website designed by <a class="credit-link" href="https://collinsalexander.com" target="_blank" rel="noopener">Jade Cruz</a>, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
 const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF forms (Annexation, Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
@@ -6121,7 +6161,7 @@ async function delBug(id){
 }
 (async function boot(){
   if (SB_KEY.indexOf('PASTE_')===0) return;
-  loadPublicPrivacy();
+  loadPublicPrivacy(); if (!DEMO) capConfig();
   sbRpc('bf_storage_status', {}).then(st => { S.storage = st; if (st && st.full){ S.pubFull = true; if (S.view==='form'){ const k = S.form; render(); } } }).catch(()=>{});
   if (TOKEN){
     try{ const me = await sbRpc('bf_me', {p_token:TOKEN});
