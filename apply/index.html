@@ -1508,6 +1508,33 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
 .wsw{gap:2px;align-items:center}
 .wsw .wsw-pub{margin-right:13px}
 .wsw .wsw-pub::after{right:-8px;top:8px;bottom:8px}
+/* v2.32.0: My permits account page refresh (same order: profile, main buttons, notifications, permits) */
+.ac-prof{display:flex;align-items:center;gap:14px 16px;flex-wrap:wrap;margin:14px 0 4px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.ac-prof .pme-av.lg{width:52px;height:52px;font-size:17px}
+.ac-prof-t{flex:1 1 240px;min-width:0;display:grid;gap:3px}
+.ac-prof-t > b{font:700 19px/1.2 var(--f-disp);color:var(--ink)}
+.ac-prof-t .ac-who{margin:0;overflow-wrap:anywhere}
+.ac-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.ac-stat{display:inline-flex;align-items:baseline;gap:5px;padding:3px 10px;border-radius:999px;background:var(--surface2);font-size:13px;color:var(--ink2)}
+.ac-stat b{color:var(--ink);font-size:14px}
+.ac-prof-a{display:flex;gap:8px;flex-wrap:wrap}
+.acct .ac-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.acct .ac-bar .btn{justify-content:center;min-height:46px}
+.ac-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ac-h .ac-count{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 7px;border-radius:999px;background:var(--surface2);font-size:13px;color:var(--ink)}
+.ac-h small{font:400 13px var(--f-body);color:var(--muted);flex-basis:100%}
+@media (max-width:640px){
+  .acct .ac-bar{grid-template-columns:1fr}
+  .ac-prof{padding:14px}
+  .ac-prof-a{width:100%}
+  .ac-prof-a .btn{flex:1 1 0;justify-content:center}
+}
+/* v2.33.0: print the approved application / job site card from the status card */
+.st-print{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:grid;gap:10px}
+.st-print-t{display:grid;gap:2px}.st-print-t b{font-size:15px}.st-print-t span{font-size:13.5px;color:var(--ink2)}
+.st-print-b{display:flex;gap:10px;flex-wrap:wrap}
+.st-print .st-up-msg{margin:0}
+@media (max-width:560px){.st-print-b .btn{flex:1 1 100%;justify-content:center}}
 </style>
 
 
@@ -1546,7 +1573,7 @@ function splashHtml(L, preview){
     '<div class="spl-glow" aria-hidden="true"></div><div class="spl-in">'+
     '<div class="spl-seal"><img src="'+logo+'" alt="" onerror="this.onerror=null;this.src=CITY_LOGO"><span class="spl-ring" aria-hidden="true"></span></div>'+
     '<h1 class="spl-title">'+esc0(L.title||LOOK_DEF.title)+'</h1>'+(L.subtitle ? '<p class="spl-sub">'+esc0(L.subtitle)+'</p>' : '')+
-    (L.anim === 'none' ? '' : '<div class="spl-track" aria-hidden="true">'+(L.anim === 'tools' ? '<div class="spl-tools">'+tools+'</div>' : '')+'<div class="spl-bar"><i></i>'+(L.anim === 'tools' ? '<b class="spl-ham"><svg viewBox="0 0 24 24">'+SPL_TOOLS[0]+'</svg></b>' : '')+'</div></div>')+
+    (L.anim === 'none' ? '' : '<div class="spl-track" aria-hidden="true">'+(L.anim === 'tools' ? '<div class="spl-tools">'+tools+'</div>' : '')+'<div class="spl-bar"><i></i></div></div>')+
     '</div></div>';
 }
 /* Show/hide password (My permits sign up, sign in, change password, reset) */
@@ -2064,7 +2091,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.31.10';   // shown at the bottom of every page
+const APP_VERSION = '2.33.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2241,7 +2268,7 @@ function viewApps(){
   '<div class="sheet apps" id="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
    '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
-   (APP_TOK ? '' : '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits <span class="beta">Beta</span></b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>')+
+   (APP_TOK ? '' : '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits</b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>')+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
@@ -2559,7 +2586,7 @@ const ACCT_URL = () => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply
 const acctLinkAttrs = () => 'href="'+ACCT_URL()+'"'+(EMBED ? ' target="_top"' : ' onclick="event.preventDefault();go(\'account\')"');
 function acctHeaderBtn(){
   if (APP_TOK) return anBellHtml();   // v2.31.4: signed in = "Hi, name" + avatar; updates live in its menu
-  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span><span class="beta">Beta</span></a>';
+  return '<a class="pacct'+(S.view==='account'?' on':'')+'" '+acctLinkAttrs()+'>'+ic('user')+'<span>My permits</span></a>';
 }
 /* name shown in the header: from My permits (bf_app_me), remembered on this device so it shows at once */
 function acName(){ const n = (AC.me && AC.me.user && AC.me.user.name) || AC.nm || (() => { try{ return localStorage.getItem('bdAppName') || ''; }catch(e){ return ''; } })(); return String(n||'').trim(); }
@@ -2568,13 +2595,13 @@ function acctDone(r){ // a whole application is "past" when every step on its st
   return /<span class="pill paid">Complete<\/span>/.test(statusCard(r));
 }
 function viewAccount(){
-  const me = AC.me, head = '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>My permits <span class="beta lg">Beta</span></h1>';
+  const me = AC.me, head = '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>My permits</h1>';
   let body;
   if (APP_TOK && !me){
     body = head+'</div><p class="empty" role="status">'+(AC.err ? esc(AC.err) : 'Loading your permits…')+'</p>';
   } else if (!me){
     const t = AC.tab;
-    body = head+'<span class="hint" style="color:var(--muted)">Keep all your applications in one place: pending permits and past ones. Accounts are new (Beta). You can still apply and check status without an account.</span></div>'+
+    body = head+'<span class="hint" style="color:var(--muted)">Keep all your applications in one place: pending permits and past ones. You can still apply and check status without an account.</span></div>'+
       '<div class="ck-tabs ac-tabs" role="tablist"><button type="button" role="tab" aria-selected="'+(t==='signin')+'" class="'+(t==='signin'?'on':'')+'" onclick="acTab(\'signin\')">Sign in</button>'+
       '<button type="button" role="tab" aria-selected="'+(t==='signup')+'" class="'+(t==='signup'?'on':'')+'" onclick="acTab(\'signup\')">Create account</button>'+
       (t==='reset' ? '<button type="button" role="tab" aria-selected="true" class="on">Reset password</button>' : '')+'</div>'+
@@ -2598,11 +2625,16 @@ function viewAccount(){
     const apps = me.apps || [], pend = apps.filter(r => !acctDone(r)), past = apps.filter(acctDone);
     const card = r => '<div class="ac-item">'+statusCard(r)+'<div class="ac-item-f"><span>'+(r.how==='submitted' ? 'Submitted while signed in' : 'Added to My permits')+' '+esc(r.linkedAt ? new Date(r.linkedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '')+'</span>'+
       '<button type="button" class="linkbtn" onclick="acRemove(\''+esc(r.ref)+'\')">Remove from My permits</button></div></div>';
-    body = head+'<span class="hint ac-who">Signed in as <b>'+esc(me.user.name)+'</b> · '+esc(me.user.email)+'</span></div>'+
+    /* v2.32.0: profile card in place of the "Signed in as" line; Change password / Sign out live in it; the two main buttons stay first */
+    const first = String(me.user.name||'').trim().split(/\s+/)[0] || 'there';
+    body = head+'</div>'+
+      '<section class="ac-prof" aria-label="Your account"><span class="pme-av lg" aria-hidden="true">'+esc(acInitials(me.user.name||'?'))+'</span>'+
+        '<div class="ac-prof-t"><b>Hi, '+esc(first)+'</b><span class="hint ac-who">Signed in as <b>'+esc(me.user.name)+'</b> · '+esc(me.user.email)+'</span>'+
+        '<span class="ac-stats"><span class="ac-stat"><b class="num">'+pend.length+'</b> pending</span><span class="ac-stat"><b class="num">'+past.length+'</b> complete</span></span></div>'+
+        '<div class="ac-prof-a"><button type="button" class="btn sm" onclick="acTogglePw()" aria-expanded="'+AC.pwOpen+'">'+ic('lock')+'Change password</button>'+
+        '<button type="button" class="btn sm ghost" onclick="acSignout()">Sign out</button></div></section>'+
       '<div class="ac-bar"><button type="button" class="btn primary" onclick="acToggleAdd()" aria-expanded="'+AC.addOpen+'">'+ic('doc')+'Add an application I already submitted</button>'+
-      '<a class="btn" '+HOME_LINK+'>'+ic('right')+'Apply for a permit</a><span class="sp"></span>'+
-      '<button type="button" class="btn sm ghost" onclick="acTogglePw()" aria-expanded="'+AC.pwOpen+'">'+ic('lock')+'Change password</button>'+
-      '<button type="button" class="btn sm ghost" onclick="acSignout()">Sign out</button></div>'+
+      '<a class="btn" '+HOME_LINK+'>'+ic('right')+'Apply for a permit</a></div>'+
       anCardHtml()+
       (AC.msg ? '<div class="callout ok ac-msg" role="status">'+esc(AC.msg)+'</div>' : '')+
       (AC.addOpen ? '<form id="acAdd" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acClaim()"><div class="fld full"><b>Add an application</b><span class="hint">Enter the reference # from the receipt, the email used on the application and the applicant name exactly as it was entered.</span></div>'+
@@ -2620,8 +2652,8 @@ function viewAccount(){
       (!AC.addOpen && !AC.pwOpen && AC.err ? '<p class="formerr" role="alert">'+esc(AC.err)+'</p>' : '')+
       (!apps.length
         ? '<div class="ac-empty">'+ic('doc')+'<b>No applications yet</b><span>Apply for a permit while signed in and it is saved here automatically. Already applied? Choose <b>Add an application I already submitted</b>.</span></div>'
-        : '<h2 class="ac-h">Pending <span class="num">'+pend.length+'</span></h2>'+(pend.length ? pend.map(card).join('') : '<p class="ac-none">Nothing pending.</p>')+
-          '<h2 class="ac-h">Past <span class="num">'+past.length+'</span></h2>'+(past.length ? past.map(card).join('') : '<p class="ac-none">Applications move here when every step is complete (approved, paid, and any inspections and Certificate of Occupancy).</p>'));
+        : '<h2 class="ac-h">Pending <span class="num ac-count">'+pend.length+'</span><small>In review, waiting on payment, or in inspections</small></h2>'+(pend.length ? pend.map(card).join('') : '<p class="ac-none">Nothing pending.</p>')+
+          '<h2 class="ac-h">Past <span class="num ac-count">'+past.length+'</span><small>Every step complete</small></h2>'+(past.length ? past.map(card).join('') : '<p class="ac-none">Applications move here when every step is complete (approved, paid, and any inspections and Certificate of Occupancy).</p>'));
   }
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet stat acct" id="sheet">'+body+'</div></main></div>';
 }
@@ -3103,7 +3135,7 @@ function viewWorkspace(){
    '<h4>My Workspace</h4><a class="navi on" href="#staff" onclick="event.preventDefault()">'+ic('grid')+'All</a>'+
    '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    '<a class="navi" href="#ar" onclick="event.preventDefault();go(\'ar\')">'+ic('cal')+'AR by fiscal year</a>'+
-   '<a class="navi" href="#app-accounts" onclick="event.preventDefault();go(\'app-accounts\')">'+ic('user')+'Applicant accounts <span class="beta">Beta</span></a>'+
+   '<a class="navi" href="#app-accounts" onclick="event.preventDefault();go(\'app-accounts\')">'+ic('user')+'Applicant accounts</a>'+
    (canRecords()?'<a class="navi" href="#records" onclick="event.preventDefault();go(\'records\')">'+ic('db')+'Records &amp; storage</a>':'')+
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
@@ -3516,7 +3548,7 @@ async function downloadPdf(sid){
   finally{ render(); }
 }
 
-const PDF_FORMS = {"annexation":{"title":"Annexation Application","src":"forms/DepartmentBuilding_form_files_Annexation-Application.6a603f61a9c7b4.45103884_1.pdf","file":"Annexation-Application-City-of-Arab.pdf","fields":[[0,0,371.2,697.2,168.6,13,"p1 ID"],[0,0,393.7,669.2,146.3,13,"p1 RECOMMENDATION"],[0,0,138.1,373.2,162.1,13,"p1 First Name"],[0,0,366.8,373.2,162.1,13,"p1 Last Name"],[0,0,155.9,334.3,223.8,13,"p1 Email Address"],[0,0,217.4,295.7,316.4,13,"p1 Contact Phone Number s"],[2,0,153.1,277.0,61.7,13,"p3 B Acreage"],[2,0,337.2,262.1,200.6,13,"p3 reet address of properties to be annexed"],[2,0,287.0,247.5,246.9,13,"p3 D Name of subdivision if applicable"],[2,0,178.5,130.1,355.0,13,"p3 Name"],[2,0,189.8,107.5,339.6,13,"p3 Address"],[2,0,171.1,84.7,84.9,13,"p3 City"],[2,0,288.6,84.7,30.9,13,"p3 State"],[2,0,342.8,84.7,77.2,13,"p3 Zip"],[2,0,459.5,84.7,69.5,13,"p3 Phone"],[3,0,178.5,706.3,355.0,13,"p4 Name"],[3,0,189.8,683.5,347.2,13,"p4 Address"],[3,0,170.6,661.0,92.6,13,"p4 City"],[3,0,292.8,661.0,30.9,13,"p4 State"],[3,0,346.6,661.0,77.2,13,"p4 Zip"],[3,0,462.8,661.0,77.2,13,"p4 Phone"],[3,0,108.0,409.0,208.4,13,"p4 Field"],[3,0,360.0,409.0,162.1,13,"p4 Field 2"],[3,0,108.0,237.4,208.4,13,"p4 Field 3"],[3,0,360.0,237.4,169.8,13,"p4 Field 4"],[3,0,178.5,159.1,355.0,13,"p4 Name 2"],[3,0,189.8,136.6,339.6,13,"p4 Address 2"],[3,0,168.2,113.8,100.3,13,"p4 City 2"],[3,0,301.1,113.8,30.9,13,"p4 State 2"],[3,0,355.4,113.8,61.7,13,"p4 Zip 2"],[3,0,456.6,113.8,77.2,13,"p4 Phone 2"],[4,0,156.2,650.2,378.1,13,"p5 for annexation"],[4,0,221.6,629.5,308.7,13,"p5 Total Persons of Voting Age"],[4,0,168.9,608.7,362.7,13,"p5 Registered Voters"],[4,0,212.1,588.0,316.4,13,"p5 Number of Housing Units"],[4,0,199.2,573.4,331.8,13,"p5 Street Addresses"],[4,0,108.0,558.7,424.4,13,"p5 Field"],[4,0,176.4,537.9,355.0,13,"p5 Number of Trailers"],[4,0,199.2,523.2,331.8,13,"p5 Street Addresses 2"],[4,0,108.0,508.6,424.4,13,"p5 Field 2"],[4,0,326.6,481.7,208.4,13,"p5 ing Names and Address of all Businesses"],[4,0,108.0,467.1,424.4,13,"p5 Field 3"],[4,0,108.0,452.4,424.4,13,"p5 Field 4"],[4,0,408.9,437.5,123.5,13,"p5 Manager Mailing Address and Phone Number"],[4,0,108.0,422.9,424.4,13,"p5 Field 5"],[4,0,229.3,408.3,301.0,13,"p5 Signs Billboards on Property"],[4,0,481.7,387.4,54.0,13,"p5 tion business in use on this property"],[4,0,98.5,346.1,439.9,13,"p5 use"],[4,0,417.7,325.5,38.6,13,"p5 sides cats dogs kept on the property"],[4,0,158.4,310.6,378.1,13,"p5 and how many"],[4,0,102.8,275.3,432.2,13,"p5 plan"],[4,1,114.1,234.8,11,11,"p5 Check box"],[4,1,222.1,234.8,11,11,"p5 Agriculture"],[4,1,330.1,234.8,11,11,"p5 Residential"],[4,1,438.1,234.8,11,11,"p5 Commercial"],[4,0,432.0,207.1,108.0,13,"p5 ainage issues that affect this property"],[4,0,108.0,186.3,424.4,13,"p5 Field 6"],[4,0,509.1,165.6,30.9,13,"p5 he property the city should be aware of"],[4,0,72.0,145.0,463.0,13,"p5 Field 7"],[4,0,300.8,118.1,239.2,13,"p5 Schools Ages and Grades of all Children"],[4,0,108.0,103.5,424.4,13,"p5 Field 8"],[4,0,108.0,88.8,424.4,13,"p5 Field 9"],[4,0,231.4,74.2,301.0,13,"p5 Will you require bus pick up"],[5,0,258.9,706.3,270.1,13,"p6 Reason for Requesting Annexation"],[5,0,108.0,685.7,424.4,13,"p6 Field"],[5,0,108.0,662.9,424.4,13,"p6 Field 2"],[5,0,173.4,147.4,194.1,13,"p6 Petitioner"],[5,0,405.3,147.4,118.1,13,"p6 Date"],[5,0,173.4,124.6,194.1,13,"p6 Petitioner 2"],[5,0,405.3,124.6,118.1,13,"p6 Date 2"],[6,0,84.3,590.4,210.9,13,"p7 I"],[6,0,72.0,553.0,278.4,13,"p7 Field"],[6,0,463.3,448.6,42.2,13,"p7 y hand and official seal of office this"],[6,0,159.4,433.9,101.2,13,"p7 of"],[6,0,286.5,433.9,33.7,13,"p7 20"],[6,0,288.0,365.8,185.6,13,"p7 Field 2"],[6,0,445.0,297.6,92.8,13,"p7 My Commission Expires"],[2,1,452.5,295.5,11,11,"p3 Deeds attached"],[2,1,305.5,234.5,11,11,"p3 Tax parcel map attached"],[2,1,391,217.5,11,11,"p3 Survey available Yes"],[2,1,451,217.5,11,11,"p3 Survey available No"],[3,2,78,522,468,84,"p4 Additional information"]]},"subdivision":{"title":"Application for Subdivision Consideration","src":"forms/DepartmentBuilding_form_files_Application-for-Subdivision-Consideration.6a60473b3915f5.95904627_1.pdf","file":"Subdivision-Application-City-of-Arab.pdf","fields":[[1,0,253.7,629.1,189.6,13,"p2 Office Use Only Application No"],[1,0,242.1,610.6,202.1,13,"p2 Minor Plat Date Submitted"],[1,0,244.1,592.1,201.9,13,"p2 Major Plat Date of Meeting"],[1,0,252.6,547.9,269.3,13,"p2 Subdivision Development Name"],[1,0,181.1,523.4,342.5,13,"p2 Property Owner s"],[1,0,166.6,504.6,360.9,13,"p2 Mailing Address"],[1,0,123.0,486.1,73.5,13,"p2 Phone"],[1,0,224.5,486.1,79.5,13,"p2 Cell"],[1,0,343.9,486.1,183.6,13,"p2 Email"],[1,0,192.8,461.3,330.0,13,"p2 Registered Surveyor"],[1,0,110.2,442.6,238.6,13,"p2 Firm"],[1,0,381.4,442.6,146.8,13,"p2 Lic"],[1,0,166.6,424.1,360.6,13,"p2 Mailing Address 2"],[1,0,123.0,405.3,152.9,13,"p2 Phone 2"],[1,0,312.9,405.3,214.1,13,"p2 Email 2"],[1,0,158.6,380.8,366.6,13,"p2 Civil Engineer"],[1,0,110.2,362.1,415.8,13,"p2 Firm 2"],[1,0,166.4,343.3,360.9,13,"p2 Mailing Address 3"],[1,0,123.0,324.8,152.9,13,"p2 Phone 3"],[1,0,309.6,324.8,214.2,13,"p2 Email 3"],[1,0,162.5,299.1,73.5,13,"p2 Phase if any"],[1,0,451.7,299.1,73.5,13,"p2 Date of SKETCH PLAT approval if any"],[1,0,392.2,279.3,86.9,13,"p2 of Property to be Subdivided or Combined"],[1,0,227.1,260.0,66.8,13,"p2 If Subdivided Total of Lots"],[1,0,362.6,260.0,61.3,13,"p2 Avg Lot Size"],[1,0,451.1,260.0,50.0,13,"p2 ft by"],[1,0,159.0,239.8,86.9,13,"p2 Avg Lot Size 2"],[1,0,341.3,239.8,73.4,13,"p2 sq ft Zoning"],[1,0,390.1,200.0,133.5,13,"p2 adjoining the parcel s being reviewed"],[1,0,328.7,180.3,193.5,13,"p2 ill adjoining lands be subdivided later"],[1,1,266.3,667.9,11,11,"p2 Sketch Prelim"],[1,1,338.4,667.9,11,11,"p2 Preliminary"],[1,1,425.4,667.9,11,11,"p2 Final"],[1,1,86.2,611.1,11,11,"p2 Minor Plat Dat"],[1,1,86.2,592.6,11,11,"p2 Major Plat Dat"],[1,1,146.8,220.6,11,11,"p2 City Sewer Ci"],[1,1,230.8,220.6,11,11,"p2 City Water Lines"],[1,1,352.0,220.6,11,11,"p2 Electric Power Lin"],[2,0,161.5,455.6,234.0,13,"p3 SIGNATURE"],[2,0,437.3,455.6,86.9,13,"p3 DATE"],[2,0,161.5,429.9,234.0,13,"p3 SIGNATURE 2"],[2,0,437.3,429.9,86.9,13,"p3 DATE 2"],[2,0,85.0,276.8,147.0,13,"p3 Field"],[2,0,258.4,276.8,93.7,13,"p3 Field 2"],[2,0,378.4,276.8,147.1,13,"p3 Field 3"],[2,0,85.0,116.8,147.0,13,"p3 Field 4"],[2,0,258.4,116.8,87.0,13,"p3 Field 5"],[2,0,371.6,116.8,154.0,13,"p3 Field 6"],[3,0,273.8,497.1,246.2,13,"p4 Email"],[3,0,273.8,414.3,246.2,13,"p4 Email 2"],[3,0,129.3,331.5,108.0,13,"p4 Phone"],[3,0,275.0,331.5,246.2,13,"p4 Email 3"],[3,1,99.5,236.4,11,11,"p4 check"],[3,1,99.5,222.6,11,11,"p4 check 2"],[3,1,99.5,208.8,11,11,"p4 check 3"],[3,1,99.5,195.0,11,11,"p4 check 4"],[3,1,99.5,181.2,11,11,"p4 check 5"],[3,1,99.5,167.4,11,11,"p4 check 6"],[3,1,99.5,153.6,11,11,"p4 check 7"],[3,1,99.5,139.8,11,11,"p4 check 8"],[3,1,99.5,126.0,11,11,"p4 check 9"],[3,1,99.5,112.2,11,11,"p4 check 10"],[3,0,247.1,609.0,271.6,13,"p4 Subdivison Development Name"],[3,0,132.6,581.2,389.7,13,"p4 Location"],[3,0,128.1,553.7,393.2,13,"p4 Owner"],[3,0,132.6,526.2,383.7,13,"p4 Address"],[3,0,123.8,470.9,394.4,13,"p4 Agent"],[3,0,132.6,443.1,383.7,13,"p4 Address 2"],[3,0,140.3,388.1,379.9,13,"p4 Surveyor"],[3,0,132.6,360.4,383.7,13,"p4 Address 3"],[3,0,286.6,305.4,233.6,13,"p4 Date submitted for preliminary approval"],[4,1,100.0,527.8,11,11,"p5 Check box"],[4,0,85.0,398.9,442.5,13,"p5 Field"],[4,0,85.0,361.6,442.5,13,"p5 Field 2"],[4,0,182.6,328.5,342.2,13,"p5 Variances granted"],[4,0,85.0,300.8,438.0,13,"p5 Field 3"],[4,0,153.6,273.2,90.0,13,"p5 Disapproved"],[4,0,413.0,273.2,114.0,13,"p5 DATE for the following reasons"],[4,0,85.0,245.7,438.0,13,"p5 Field 4"],[4,0,85.0,218.0,438.0,13,"p5 Field 5"],[4,0,157.1,176.7,198.0,13,"p5 Field 6"],[4,1,99.5,707.6,11,11,"p5 check"],[4,1,99.5,666.2,11,11,"p5 check 2"],[4,1,99.5,652.5,11,11,"p5 check 3"],[4,1,99.5,638.6,11,11,"p5 check 4"],[4,1,99.5,611.0,11,11,"p5 check 5"],[4,1,99.5,597.2,11,11,"p5 check 6"],[4,1,99.5,583.5,11,11,"p5 check 7"],[4,1,99.5,569.6,11,11,"p5 check 8"],[4,1,99.5,555.9,11,11,"p5 check 9"],[4,1,99.5,500.6,11,11,"p5 check 10"],[4,1,99.5,473.1,11,11,"p5 check 11"],[4,1,99.5,459.2,11,11,"p5 check 12"],[4,0,141.0,430.6,54.0,13,"p5 Approved"],[3,0,127,500,108,13,"p4 Owner phone"],[3,0,127,417,108,13,"p4 Agent phone"]]}};
+const PDF_FORMS = {"annexation":{"title":"Annexation Application","src":"forms/DepartmentBuilding_form_files_Annexation-Application.6a603f61a9c7b4.45103884_1.pdf","file":"Annexation-Application-City-of-Arab.pdf","fields":[[0,0,371.2,697.2,168.6,13,"p1 ID"],[0,0,393.7,669.2,146.3,13,"p1 RECOMMENDATION"],[0,0,138.1,373.2,162.1,13,"p1 First Name"],[0,0,366.8,373.2,162.1,13,"p1 Last Name"],[0,0,155.9,334.3,223.8,13,"p1 Email Address"],[0,0,217.4,295.7,316.4,13,"p1 Contact Phone Number s"],[2,0,153.1,277.0,61.7,13,"p3 B Acreage"],[2,0,337.2,262.1,200.6,13,"p3 reet address of properties to be annexed"],[2,0,287.0,247.5,246.9,13,"p3 D Name of subdivision if applicable"],[2,0,178.5,130.1,355.0,13,"p3 Name"],[2,0,189.8,107.5,339.6,13,"p3 Address"],[2,0,171.1,84.7,84.9,13,"p3 City"],[2,0,288.6,84.7,30.9,13,"p3 State"],[2,0,342.8,84.7,77.2,13,"p3 Zip"],[2,0,459.5,84.7,69.5,13,"p3 Phone"],[3,0,178.5,706.3,355.0,13,"p4 Name"],[3,0,189.8,683.5,347.2,13,"p4 Address"],[3,0,170.6,661.0,92.6,13,"p4 City"],[3,0,292.8,661.0,30.9,13,"p4 State"],[3,0,346.6,661.0,77.2,13,"p4 Zip"],[3,0,462.8,661.0,77.2,13,"p4 Phone"],[3,0,108.0,409.0,208.4,13,"p4 Field"],[3,0,360.0,409.0,162.1,13,"p4 Field 2"],[3,0,108.0,237.4,208.4,13,"p4 Field 3"],[3,0,360.0,237.4,169.8,13,"p4 Field 4"],[3,0,178.5,159.1,355.0,13,"p4 Name 2"],[3,0,189.8,136.6,339.6,13,"p4 Address 2"],[3,0,168.2,113.8,100.3,13,"p4 City 2"],[3,0,301.1,113.8,30.9,13,"p4 State 2"],[3,0,355.4,113.8,61.7,13,"p4 Zip 2"],[3,0,456.6,113.8,77.2,13,"p4 Phone 2"],[4,0,156.2,650.2,378.1,13,"p5 for annexation"],[4,0,221.6,629.5,308.7,13,"p5 Total Persons of Voting Age"],[4,0,168.9,608.7,362.7,13,"p5 Registered Voters"],[4,0,212.1,588.0,316.4,13,"p5 Number of Housing Units"],[4,0,199.2,573.4,331.8,13,"p5 Street Addresses"],[4,0,108.0,558.7,424.4,13,"p5 Field"],[4,0,176.4,537.9,355.0,13,"p5 Number of Trailers"],[4,0,199.2,523.2,331.8,13,"p5 Street Addresses 2"],[4,0,108.0,508.6,424.4,13,"p5 Field 2"],[4,0,326.6,481.7,208.4,13,"p5 ing Names and Address of all Businesses"],[4,0,108.0,467.1,424.4,13,"p5 Field 3"],[4,0,108.0,452.4,424.4,13,"p5 Field 4"],[4,0,408.9,437.5,123.5,13,"p5 Manager Mailing Address and Phone Number"],[4,0,108.0,422.9,424.4,13,"p5 Field 5"],[4,0,229.3,408.3,301.0,13,"p5 Signs Billboards on Property"],[4,0,481.7,387.4,54.0,13,"p5 tion business in use on this property"],[4,0,98.5,346.1,439.9,13,"p5 use"],[4,0,417.7,325.5,38.6,13,"p5 sides cats dogs kept on the property"],[4,0,158.4,310.6,378.1,13,"p5 and how many"],[4,0,102.8,275.3,432.2,13,"p5 plan"],[4,1,114.1,234.8,11,11,"p5 Check box"],[4,1,222.1,234.8,11,11,"p5 Agriculture"],[4,1,330.1,234.8,11,11,"p5 Residential"],[4,1,438.1,234.8,11,11,"p5 Commercial"],[4,0,432.0,207.1,108.0,13,"p5 ainage issues that affect this property"],[4,0,108.0,186.3,424.4,13,"p5 Field 6"],[4,0,509.1,165.6,30.9,13,"p5 he property the city should be aware of"],[4,0,72.0,145.0,463.0,13,"p5 Field 7"],[4,0,300.8,118.1,239.2,13,"p5 Schools Ages and Grades of all Children"],[4,0,108.0,103.5,424.4,13,"p5 Field 8"],[4,0,108.0,88.8,424.4,13,"p5 Field 9"],[4,0,231.4,74.2,301.0,13,"p5 Will you require bus pick up"],[5,0,258.9,706.3,270.1,13,"p6 Reason for Requesting Annexation"],[5,0,108.0,685.7,424.4,13,"p6 Field"],[5,0,108.0,662.9,424.4,13,"p6 Field 2"],[5,0,173.4,147.4,194.1,13,"p6 Petitioner"],[5,0,405.3,147.4,118.1,13,"p6 Date"],[5,0,173.4,124.6,194.1,13,"p6 Petitioner 2"],[5,0,405.3,124.6,118.1,13,"p6 Date 2"],[6,0,84.3,590.4,210.9,13,"p7 I"],[6,0,72.0,553.0,278.4,13,"p7 Field"],[6,0,463.3,448.6,42.2,13,"p7 y hand and official seal of office this"],[6,0,159.4,433.9,101.2,13,"p7 of"],[6,0,286.5,433.9,33.7,13,"p7 20"],[6,0,288.0,365.8,185.6,13,"p7 Field 2"],[6,0,445.0,297.6,92.8,13,"p7 My Commission Expires"],[2,1,452.5,295.5,11,11,"p3 Deeds attached"],[2,1,305.5,234.5,11,11,"p3 Tax parcel map attached"],[2,1,391,217.5,11,11,"p3 Survey available Yes"],[2,1,451,217.5,11,11,"p3 Survey available No"],[3,2,78,522,468,84,"p4 Additional information"]]},"subdivision":{"title":"Application for Subdivision Consideration","src":"forms/DepartmentBuilding_form_files_Application-for-Subdivision-Consideration.6a60473b3915f5.95904627_1.pdf","file":"Subdivision-Application-City-of-Arab.pdf","fields":[[1,0,253.7,629.1,189.6,13,"p2 Office Use Only Application No"],[1,0,242.1,610.6,202.1,13,"p2 Minor Plat Date Submitted"],[1,0,244.1,592.1,201.9,13,"p2 Major Plat Date of Meeting"],[1,0,252.6,547.9,269.3,13,"p2 Subdivision Development Name"],[1,0,181.1,523.4,342.5,13,"p2 Property Owner s"],[1,0,166.6,504.6,360.9,13,"p2 Mailing Address"],[1,0,123.0,486.1,73.5,13,"p2 Phone"],[1,0,224.5,486.1,79.5,13,"p2 Cell"],[1,0,343.9,486.1,183.6,13,"p2 Email"],[1,0,192.8,461.3,330.0,13,"p2 Registered Surveyor"],[1,0,110.2,442.6,238.6,13,"p2 Firm"],[1,0,381.4,442.6,146.8,13,"p2 Lic"],[1,0,166.6,424.1,360.6,13,"p2 Mailing Address 2"],[1,0,123.0,405.3,152.9,13,"p2 Phone 2"],[1,0,312.9,405.3,214.1,13,"p2 Email 2"],[1,0,158.6,380.8,366.6,13,"p2 Civil Engineer"],[1,0,110.2,362.1,415.8,13,"p2 Firm 2"],[1,0,166.4,343.3,360.9,13,"p2 Mailing Address 3"],[1,0,123.0,324.8,152.9,13,"p2 Phone 3"],[1,0,309.6,324.8,214.2,13,"p2 Email 3"],[1,0,162.5,299.1,73.5,13,"p2 Phase if any"],[1,0,451.7,299.1,73.5,13,"p2 Date of SKETCH PLAT approval if any"],[1,0,392.2,279.3,86.9,13,"p2 of Property to be Subdivided or Combined"],[1,0,227.1,260.0,66.8,13,"p2 If Subdivided Total of Lots"],[1,0,362.6,260.0,61.3,13,"p2 Avg Lot Size"],[1,0,451.1,260.0,50.0,13,"p2 ft by"],[1,0,159.0,239.8,86.9,13,"p2 Avg Lot Size 2"],[1,0,341.3,239.8,73.4,13,"p2 sq ft Zoning"],[1,0,390.1,200.0,133.5,13,"p2 adjoining the parcel s being reviewed"],[1,0,328.7,180.3,193.5,13,"p2 ill adjoining lands be subdivided later"],[1,3,267.5,668.0,9.0,9.0,"p2 Type of Approval|Sketch"],[1,3,339.5,668.0,9.0,9.0,"p2 Type of Approval|Preliminary"],[1,3,426.5,668.0,9.0,9.0,"p2 Type of Approval|Final"],[1,3,87.3,611.4,9.0,9.0,"p2 Office Use Plat Type|Minor Plat"],[1,3,87.3,592.8,9.0,9.0,"p2 Office Use Plat Type|Major Plat"],[1,1,147.9,221.2,9.0,9.0,"p2 City Sewer"],[1,1,232.0,221.2,9.0,9.0,"p2 City Water Lines"],[1,1,353.2,221.2,9.0,9.0,"p2 Electric Power Lines"],[2,0,161.5,455.6,234.0,13,"p3 SIGNATURE"],[2,0,437.3,455.6,86.9,13,"p3 DATE"],[2,0,161.5,429.9,234.0,13,"p3 SIGNATURE 2"],[2,0,437.3,429.9,86.9,13,"p3 DATE 2"],[2,0,85.0,276.8,147.0,13,"p3 Field"],[2,0,258.4,276.8,93.7,13,"p3 Field 2"],[2,0,378.4,276.8,147.1,13,"p3 Field 3"],[2,0,85.0,116.8,147.0,13,"p3 Field 4"],[2,0,258.4,116.8,87.0,13,"p3 Field 5"],[2,0,371.6,116.8,154.0,13,"p3 Field 6"],[3,0,273.8,497.1,246.2,13,"p4 Email"],[3,0,273.8,414.3,246.2,13,"p4 Email 2"],[3,0,129.3,331.5,108.0,13,"p4 Phone"],[3,0,275.0,331.5,246.2,13,"p4 Email 3"],[3,1,100.5,237.0,9.0,9.0,"p4 Checklist: Deed book and page"],[3,1,100.5,223.2,9.0,9.0,"p4 Checklist: Date, north point, scale"],[3,1,100.5,209.1,9.0,9.0,"p4 Checklist: Caption (location)"],[3,1,100.5,195.5,9.0,9.0,"p4 Checklist: Acreage subdivided/combined"],[3,1,100.5,181.5,9.0,9.0,"p4 Checklist: Vicinity map"],[3,1,100.5,168.0,9.0,9.0,"p4 Checklist: Exterior boundaries"],[3,1,100.5,154.2,9.0,9.0,"p4 Checklist: Existing physical features"],[3,1,100.5,140.1,9.0,9.0,"p4 Checklist: Names of adjacent subdivisions"],[3,1,100.5,126.3,9.0,9.0,"p4 Checklist: Adjoining record owners"],[3,1,100.5,112.7,9.0,9.0,"p4 Checklist: Minimum building setback lines"],[3,0,247.1,609.0,271.6,13,"p4 Subdivison Development Name"],[3,0,132.6,581.2,389.7,13,"p4 Location"],[3,0,128.1,553.7,393.2,13,"p4 Owner"],[3,0,132.6,526.2,383.7,13,"p4 Address"],[3,0,123.8,470.9,394.4,13,"p4 Agent"],[3,0,132.6,443.1,383.7,13,"p4 Address 2"],[3,0,140.3,388.1,379.9,13,"p4 Surveyor"],[3,0,132.6,360.4,383.7,13,"p4 Address 3"],[3,0,286.6,305.4,233.6,13,"p4 Date submitted for preliminary approval"],[4,1,100.5,528.8,9.0,9.0,"p5 Checklist: Utilities sign Final plat"],[4,0,85.0,398.9,442.5,13,"p5 Field"],[4,0,85.0,361.6,442.5,13,"p5 Field 2"],[4,0,182.6,328.5,342.2,13,"p5 Variances granted"],[4,0,85.0,300.8,438.0,13,"p5 Field 3"],[4,0,153.6,273.2,90.0,13,"p5 Disapproved"],[4,0,413.0,273.2,114.0,13,"p5 DATE for the following reasons"],[4,0,85.0,245.7,438.0,13,"p5 Field 4"],[4,0,85.0,218.0,438.0,13,"p5 Field 5"],[4,0,157.1,176.7,198.0,13,"p5 Field 6"],[4,1,100.5,708.2,9.0,9.0,"p5 Checklist: Streets, alleys, easements, parks, lot and building lines"],[4,1,100.5,666.9,9.0,9.0,"p5 Checklist: Lot dimensions and area"],[4,1,100.5,653.1,9.0,9.0,"p5 Checklist: Lot and block numbers"],[4,1,100.5,639.4,9.0,9.0,"p5 Checklist: Dimensions to 1/100 foot"],[4,1,100.5,611.6,9.0,9.0,"p5 Checklist: Street profiles"],[4,1,100.5,597.9,9.0,9.0,"p5 Checklist: ADEM permit"],[4,1,100.5,583.9,9.0,9.0,"p5 Checklist: Contours"],[4,1,100.5,570.3,9.0,9.0,"p5 Checklist: Zoning classifications"],[4,1,100.5,556.4,9.0,9.0,"p5 Checklist: Utility construction plans"],[4,1,100.5,501.1,9.0,9.0,"p5 Checklist: Sponsor transmits construction plans"],[4,1,100.5,473.4,9.0,9.0,"p5 Checklist: Conforms to design standards"],[4,1,100.5,459.6,9.0,9.0,"p5 Checklist: Preliminary plat copy retained"],[4,0,141.0,430.6,54.0,13,"p5 Approved"],[3,0,127,500,108,13,"p4 Owner phone"],[3,0,127,417,108,13,"p4 Agent phone"]]}};
 /* ================= fillable PDF forms (Annexation, Subdivision) =================
    The original City PDFs live in /apply/forms/. When an applicant opens one here,
    pdf-lib adds a typeable field over every blank and a checkbox over every box,
@@ -3541,6 +3573,9 @@ async function buildFillable(key){
   D.fields.forEach(([p, k, x, y, w, h, name]) => {
     const page = pages[p]; if (!page) return;
     if (k === 1){ const cb = form.createCheckBox(name); cb.addToPage(page, { x, y, width:w, height:h, backgroundColor:bg, borderColor:border, borderWidth:0.6 }); }
+    else if (k === 3){   // v2.31.11: "check one" choices are one radio group ("group|option"), so only one can be picked
+      const [g, opt] = name.split('|'); let rg; try{ rg = form.getRadioGroup(g); }catch(e){ rg = form.createRadioGroup(g); }
+      rg.addOptionToPage(opt, page, { x, y, width:w, height:h, backgroundColor:bg, borderColor:border, borderWidth:0.6 }); }
     else { const tf = form.createTextField(name); if (k === 2) tf.enableMultiline();
       tf.addToPage(page, { x, y, width:w, height:h, font, backgroundColor:bg, borderWidth:0 }); tf.setFontSize(k === 2 ? 10 : (h < 12 ? 8 : 9)); }
   });
@@ -3552,6 +3587,16 @@ async function buildFillable(key){
   if (!(dr instanceof PDFDict)){ dr = pdf.context.obj({}); af.set(PDFName.of('DR'), dr); }
   let dfont = dr.lookup(PDFName.of('Font')); if (!(dfont instanceof PDFDict)){ dfont = pdf.context.obj({}); dr.set(PDFName.of('Font'), dfont); }
   dfont.set(PDFName.of('ZaDb'), zadb.ref);
+  // v2.31.11: Apple's PDF viewers want a form-level default font and real
+  // check-mark fonts on every box; the one-choice groups get a filled-circle mark.
+  const helv = await pdf.embedFont(StandardFonts.Helvetica);
+  dfont.set(PDFName.of('Helv'), helv.ref);
+  af.set(PDFName.of('DA'), PDFString.of('/Helv 0 Tf 0 g'));
+  form.getFields().forEach(fl => { if (!(fl instanceof PDFLib.PDFRadioGroup)) return;
+    fl.acroField.dict.set(PDFName.of('DA'), PDFString.of('/ZaDb 0 Tf 0 g'));
+    fl.acroField.dict.set(PDFName.of('V'), PDFName.of('Off'));
+    fl.acroField.getWidgets().forEach(w => { w.getOrCreateAppearanceCharacteristics().setCaptions({ normal:'l' }); w.dict.set(PDFName.of('AS'), PDFName.of('Off')); });
+  });
   form.getFields().forEach(fl => { if (!(fl instanceof PDFCheckBox)) return;
     fl.acroField.dict.set(PDFName.of('DA'), PDFString.of('/ZaDb 0 Tf 0 g'));
     fl.acroField.dict.set(PDFName.of('V'), PDFName.of('Off'));
@@ -4449,6 +4494,7 @@ function statusCard(r){
       : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
     ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy.</p>' : '')+
     ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
+    stPrintHtml(r)+
     '</section>';
 }
 /* v2.30.0: send the requested documents from Check permit status or My permits (server: bf_info_upload).
@@ -4460,6 +4506,79 @@ function stUploadHtml(r){
     '<div class="st-up-row"><label class="btn primary st-upbtn">'+ic('upload')+'Upload documents<input type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="vh" onchange="stUpload(\''+esc(k)+'\', this)"></label>'+
     '<span class="st-up-or">PDF, JPG or PNG. Or email them to <a href="mailto:buildingdept@arabcity.org?subject='+encodeURIComponent('Reference # '+k)+'">buildingdept@arabcity.org</a> (include reference # '+esc(k)+') or bring them to City Hall, 740 N Main St.</span></div>'+
     '<div class="st-up-msg" id="stup_'+esc(k)+'" aria-live="polite"></div></div>';
+}
+/* v2.33.0 (Kim Johnson): once approved, applicants can print their application and (building permits) the job site
+   card. Each print asks the server for the current record (bf_permit_print), so a reprint always shows the latest
+   permit #, approval, inspections and payment. */
+function stPrintHtml(r){
+  if (!r || !r.approved) return '';
+  const k = String(r.ref||'').replace(/[^A-Za-z0-9]/g,''), card = isBldg(r.form);
+  return '<div class="st-print"><div class="st-print-t"><b>Print</b><span>Approved. These always print the latest information from the Building Department, so print again any time something changes.</span></div>'+
+    '<div class="st-print-b"><button type="button" class="btn" onclick="stPrint(\''+esc(k)+'\', \'app\', this)">'+ic('printer')+'Print application</button>'+
+    (card ? '<button type="button" class="btn" onclick="stPrint(\''+esc(k)+'\', \'card\', this)">'+ic('printer')+'Print job site card</button>' : '')+'</div>'+
+    '<p class="st-up-msg" id="stpr_'+esc(k)+'" aria-live="polite"></p></div>';
+}
+const printTouch = () => { try{ return matchMedia('(pointer:coarse)').matches; }catch(e){ return false; } };
+async function stPrint(ref, kind, btn){
+  const msg = document.getElementById('stpr_'+ref), say = (t, bad) => { if (msg){ msg.className = 'st-up-msg'+(bad?' bad':''); msg.textContent = t; } };
+  const acct = S.view==='account' && APP_TOK, email = acct ? '' : String((S.st||{}).email||'').trim();
+  // phones and tablets print best from their own tab: open it now (inside the tap) and fill it in when the data arrives
+  const w = printTouch() ? window.open('', '_blank') : null;
+  if (w){ try{ w.document.write('<p style="font:16px sans-serif;padding:20px">Getting the latest information…</p>'); }catch(e){} }
+  if (btn) btn.disabled = true; say('Getting the latest information…');
+  try{
+    const r = await sbRpc('bf_permit_print', { p_ref:ref, p_email:email, p_app_token:acct ? APP_TOK : null });
+    if (!r || r.error){ say((r && r.error) || 'Could not get your application. Try again.', true); if (w) w.close(); return; }
+    const html = kind === 'card' ? jobCardHtml(jobCardDataPub(r)) : appPrintHtml(r);
+    if (w){ w.document.open(); w.document.write(html.replace('</body>', '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},300)})<\/script></body>')); w.document.close(); }
+    else await printHtml(html);
+    say('');
+  }catch(x){ say(x.message || 'Could not print. Try again.', true); if (w) w.close(); }
+  finally{ if (btn) btn.disabled = false; }
+}
+function jobCardDataPub(r){
+  const f = r.fields || {}, usd = d => { if (!d) return ''; const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? (+m[2])+'/'+(+m[3])+'/'+m[1].slice(2) : String(d); };
+  const type = [f.buildType, f.buildType==='Residential' ? f.projectType : ''].filter(Boolean).join(' · ');
+  const contractor = r.form === 'homeowner' ? 'Same (homeowner)' : ([f.business, f.contractor].filter(Boolean).filter((v,i,a) => a.indexOf(v)===i).join(' · '));
+  const subs = r.linkedSubs || [], subName = re => { const x = subs.find(t => re.test(t.trade||'')); return x ? [x.name, x.permitNo ? 'Permit '+x.permitNo : ''].filter(Boolean).join(' · ') : ''; };
+  const ins = r.inspections || {}, insp = n => { const v = ins[n] || {}; return { done: !!v.date, date: usd(v.date), by: v.by || '' }; };
+  return { permitNo: r.permitNo || '', owner: f.owner || f.applicant || '', date: usd(r.approvedDate), address: f.address || '', type, contractor,
+    lot: f.lot || '', block: '', zone: f.zoning || '', subdivision: '',
+    plumbing: subName(/plumb/i), electrical: subName(/elec/i), hvac: subName(/hvac|mech|heat|air|duct/i),
+    footing: insp('Footing'), framing: insp('Framing'), final: insp('Final'), roughPlumbing: insp('Plumbing'), roughElectrical: insp('Electrical') };
+}
+function appPrintHtml(r){
+  const F = FORMS[r.form] || { title:r.form, fields:[] }, f = r.fields || {}, fe = r.fees || {}, p = r.pay || {};
+  const rows = []; let sec = null;
+  (F.fields||[]).forEach(x => { if (x.type==='section'){ sec = x.label; return; } if (!x.id || x.type==='file' || x.type==='doc' || x.type==='note') return;
+    const v = f[x.id]; if (v == null || v === '') return; if (sec){ rows.push('<tr class="h"><th colspan="2">'+esc(sec)+'</th></tr>'); sec = null; }
+    rows.push('<tr><th>'+esc(x.label)+'</th><td>'+esc(x.type==='money' ? money(num(v)) : String(v))+'</td></tr>'); });
+  const pay = p.status==='paid' ? 'Paid in full' : p.status==='partial' ? 'Partly paid · '+money(p.balance)+' still due' : p.status==='none' ? 'No fee' : 'Not paid yet · '+money(p.total!=null ? p.total : fe.total)+' due';
+  const insL = Object.entries(r.inspections||{});
+  const sect = (t, body) => '<h2>'+esc(t)+'</h2>'+body;
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(F.title)+' · Permit '+esc(r.permitNo||r.ref)+'</title><style>'+
+    '@page{size:8.5in 11in;margin:0.5in}*{box-sizing:border-box}body{margin:0;font:10.5pt/1.4 Helvetica,Arial,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    '.top{display:flex;justify-content:space-between;gap:16pt;align-items:flex-start;background:#212c46;color:#fff;padding:12pt 16pt;border-radius:4pt}'+
+    '.top b{display:block;font-size:14pt}.top span{color:#e6d6a8}.top .r{text-align:right}.top .r b{font-size:13pt}'+
+    '.st{display:flex;flex-wrap:wrap;gap:6pt 18pt;margin:10pt 0 4pt;padding:8pt 12pt;border:1pt solid #c9cdd6;border-radius:4pt}.st div{min-width:0}.st small{display:block;color:#555;font-size:8.5pt;text-transform:uppercase;letter-spacing:.06em}'+
+    'h2{font-size:9pt;text-transform:uppercase;letter-spacing:.1em;color:#5b6274;margin:14pt 0 4pt;border-bottom:1pt solid #d8dbe2;padding-bottom:3pt}'+
+    'table{width:100%;border-collapse:collapse}th,td{text-align:left;vertical-align:top;padding:3pt 6pt 3pt 0}th{width:38%;color:#2b3350;font-weight:bold}td{white-space:pre-wrap;overflow-wrap:anywhere}'+
+    'tr.h th{padding-top:9pt;color:#7d6528;font-size:9pt;text-transform:uppercase;letter-spacing:.08em}'+
+    '.foot{margin-top:16pt;padding-top:6pt;border-top:1pt solid #d8dbe2;color:#555;font-size:8.5pt}'+
+    '</style></head><body>'+
+    '<div class="top"><div><b>City of Arab Building Department</b><span>'+esc(F.title)+'</span></div><div class="r"><b>Permit # '+esc(r.permitNo||'not assigned')+'</b><span>Reference # '+esc(r.ref)+'</span>'+
+      (r.master ? '<span style="display:block">Linked to Master Permit # '+esc(r.master.permitNo || '(Ref '+r.master.ref+')')+'</span>' : '')+'</div></div>'+
+    '<div class="st"><div><small>Status</small><b>Approved'+(r.approvedDate ? ' '+esc(fmtDay(r.approvedDate)) : '')+'</b></div><div><small>Submitted</small>'+esc(fmtDT(r.createdAt))+'</div><div><small>Fees</small>'+esc(pay)+'</div>'+
+      (r.co ? '<div><small>Certificate of Occupancy</small>'+esc(r.co==='Given' ? 'Issued' : r.co)+'</div>' : '')+'</div>'+
+    sect('Application', '<table>'+rows.join('')+'</table>')+
+    (Array.isArray(r.agreements) && r.agreements.length ? sect('Terms & agreements', '<table>'+r.agreements.map(a => '<tr><th>'+esc(a.title||a.id)+'</th><td>Agreed '+esc(fmtDT(a.at))+'</td></tr>').join('')+'</table>') : '')+
+    sect('Fees', '<table>'+((isBldg(r.form)||r.form==='subtrade') ? '<tr><th>Construction value</th><td>'+esc(money(fe.value))+(fe.basis?' ('+esc(fe.basis)+')':'')+'</td></tr>' : '')+
+      '<tr><th>Permit fee</th><td>'+esc(money(fe.permit))+(fe.doubled?' (doubled: work started without a permit)':'')+'</td></tr>'+
+      ((SHOWS_CICT(r.form)||fe.cict) ? '<tr><th>CICT fee</th><td>'+esc(money(fe.cict))+'</td></tr>' : '')+
+      '<tr><th>Total</th><td><b>'+esc(money(fe.total))+'</b></td></tr><tr><th>Payment</th><td>'+esc(pay)+'</td></tr></table>')+
+    (insL.length ? sect('Inspections', '<table>'+insL.map(([n, v]) => '<tr><th>'+esc(n)+'</th><td>'+(v.complete ? 'Complete' : 'Pending')+(v.date ? ' · '+esc(fmtDay(v.date)) : '')+(v.by ? ' · Inspector '+esc(v.by) : '')+'</td></tr>').join('')+'</table>') : '')+
+    '<div class="foot">Printed '+esc(fmtDT(new Date().toISOString()))+' from arabcityapplications.jadecruz.dev. This copy shows the latest information the Building Department has on file. Print again any time to see updates. Questions: buildingdept@arabcity.org · 256-586-5968.</div>'+
+    '</body></html>';
 }
 async function stUpload(ref, input){
   const files = [...(input.files||[])]; input.value = ''; if (!files.length) return;
@@ -6403,6 +6522,17 @@ function demoCall(fn, A){
     case 'bf_app_reset': { const em = String(A.p_email||'').trim().toLowerCase(), u = (DEMO.appUsers||{})[em], code = String(A.p_code||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase();
       if (!u || !u.reset || u.reset !== code) return { error:'That code is not correct or has expired. Request a new code and try again.' };
       if (String(A.p_new||'').length < 10) return { error:'Use a password of at least 10 characters.' }; u.pw = A.p_new; u.reset = null; return dAppSession(em); }
+    case 'bf_permit_print': { const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), em = String(A.p_email||'').trim().toLowerCase();
+      let id = null;
+      if (A.p_app_token){ const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits again.' }; id = Object.keys(u.apps).find(k => dRef(k)===ref && S2[k]); if (!id) return { error:'That application is not in your My permits account.' }; }
+      else id = Object.keys(S2).find(k => dRef(k)===ref && String((S2[k].data.fields||{}).email||'').trim().toLowerCase()===em);
+      if (!id) return { error:'We could not find that application. Check your reference # and email, then try again.' };
+      const x = S2[id].data, st = x.staff||{};
+      if (!dApproved(x)) return { error:'Printing opens once the Building Department approves your application.' };
+      const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (v && (v.date || v.by)) ins[k] = { date:v.date||'', by:v.by||'', complete:!!(v.by && v.recorded) }; });
+      const subs = ['building','homeowner'].includes(x.form) ? Object.entries(S2).filter(([k, d]) => d.data.linkedTo===id).map(([k, d]) => ({ trade:(d.data.fields||{}).trade||'', name:(d.data.fields||{}).business||(d.data.fields||{}).subName||(d.data.fields||{}).applicant||'', permitNo:(d.data.staff||{}).permitNo||'' })) : [];
+      const m = x.form==='subtrade' && x.linkedTo && S2[x.linkedTo] ? { permitNo:(S2[x.linkedTo].data.staff||{}).permitNo||'', ref:dRef(x.linkedTo) } : null;
+      return { ref:dRef(id), form:x.form, createdAt:x.createdAt||S2[id].created, fields:x.fields||{}, agreements:x.agreements||[], fees:x.fees||{}, pay:x.pay||{}, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', co:st.co||'', inspections:ins, linkedSubs:subs, master:m, printedAt:new Date().toISOString() }; }
     case 'bf_info_upload': { const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), em = String(A.p_email||'').trim().toLowerCase();
       let id = null;
       if (A.p_app_token){ const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits again.' }; id = Object.keys(u.apps).find(k => dRef(k)===ref && S2[k]); if (!id) return { error:'That application is not in your My permits account.' }; }
@@ -6616,7 +6746,7 @@ function viewAppAccounts(){
   const rows = (A.list||[]).filter(u => !q || (u.name+' '+u.email+' '+(u.apps||[]).join(' ')).toLowerCase().includes(q));
   const when = d => d ? new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : 'Never';
   return topBar()+'<div class="purge appacc"><div class="row"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span><button class="btn sm" onclick="S.appAcc.list=null;appAccLoad()">Refresh</button></div>'+
-    '<h1>Applicant accounts <span class="beta lg">Beta</span></h1><p style="margin:0;color:var(--ink2);max-width:76ch">Accounts applicants made on the public site under <b>My permits</b>. Each lists the applications the applicant submitted while signed in or added with the reference #, email and applicant name. If someone forgets their password, they choose <b>Forgot password?</b> and get a code by email.</p>'+
+    '<h1>Applicant accounts</h1><p style="margin:0;color:var(--ink2);max-width:76ch">Accounts applicants made on the public site under <b>My permits</b>. Each lists the applications the applicant submitted while signed in or added with the reference #, email and applicant name. If someone forgets their password, they choose <b>Forgot password?</b> and get a code by email.</p>'+
     appMailHtml()+
     '<label class="search appacc-q">'+ic('search')+'<input id="aaq" placeholder="Search name, email or reference #" value="'+esc(A.q||'')+'" aria-label="Search applicant accounts" oninput="S.appAcc.q=this.value;appAccPaint()"></label>'+
     '<div id="aaList">'+(A.err ? '<p class="formerr">'+esc(A.err)+'</p>' : !A.list ? '<p class="empty">Loading accounts…</p>' : !A.list.length ? '<p class="empty">No applicant accounts yet.</p>' : !rows.length ? '<p class="empty">No accounts match.</p>' :
