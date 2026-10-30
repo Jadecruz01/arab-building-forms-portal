@@ -1533,6 +1533,43 @@ html:not(.embed) .app.pub .sheet.stat,html:not(.embed) .app.pub .sheet:not(.apps
 .credit-link{color:inherit;text-decoration:underline;text-decoration-color:rgba(192,168,105,.6);text-underline-offset:2px}
 .credit-link:hover{color:var(--gold)}
 .sfoot .credit-link:hover,.verfoot .credit-link:hover{color:inherit;text-decoration-color:currentColor}
+/* v2.35.0: Saved Licenses (My permits) */
+.lic-card{margin:14px 0 4px;padding:16px 18px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);position:relative}
+.lic-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lic-h h2{font:700 18px/1.25 var(--f-disp);margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill.new-pill{background:#c0a869;color:#1f2a44;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;font-weight:800}
+.lic-info{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--city);cursor:pointer;flex:none}
+.lic-info:hover,.lic-info:focus-visible{border-color:var(--city);background:var(--sel)}
+.lic-info .i{width:18px;height:18px}
+.lic-sub{margin:6px 0 10px;color:var(--ink2);font-size:14px}
+.lic-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lic-row{display:grid;grid-template-columns:auto 1fr auto;gap:6px 12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2,#fafaf7)}
+.lic-row.ok{border-color:#bcd9c3;background:#f2f9f4}.lic-row.exp{border-color:#e9c98a;background:#fff8ea}
+.lic-ico{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.lic-row.ok .lic-ico{color:#1d6b3a;border-color:#bcd9c3}
+.lic-ico .i{width:16px;height:16px}
+.lic-t{display:grid;gap:2px;min-width:0}.lic-t b{font-size:14.5px}
+.lic-meta{font-size:13px;color:var(--ink2);overflow-wrap:anywhere}.lic-exp{color:#9a5b00}
+.lic-a{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.lic-confirm{grid-column:1 / -1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+.lic-confirm span{flex:1 1 220px}
+.lic-form{grid-column:1 / -1;margin-top:6px;padding-top:10px;border-top:1px dashed var(--line)}
+.lic-pick{display:inline-flex;align-items:center;gap:8px;cursor:pointer;max-width:100%}
+.lic-pick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+.lic-fa{display:flex;gap:8px;flex-wrap:wrap}
+.lic-ok{display:flex;align-items:center;gap:6px;color:#1d6b3a;font-size:14px;margin:10px 0 0}.lic-ok .i{width:16px;height:16px}
+.lic-dh{display:flex;justify-content:space-between;align-items:center;gap:12px}.lic-dh h2{margin:0;font:700 19px var(--f-body);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lic-df{display:flex;justify-content:flex-end}
+.lic-dlg ul{margin:4px 0 10px;padding-left:20px}.lic-dlg li{margin:2px 0}
+.docslot.lic-use{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap}
+.lic-chip{display:inline-flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #bcd9c3;background:#f2f9f4;border-radius:9px;color:var(--ink)}
+.lic-chip .i{width:18px;height:18px;color:#1d6b3a;flex:none}.lic-chip span{display:grid;gap:1px}.lic-chip small{color:var(--ink2);font-size:12.5px;overflow-wrap:anywhere}
+.lic-note{display:block;margin-top:4px}
+@media (max-width:560px){
+  .lic-row{grid-template-columns:auto 1fr}
+  .lic-a{grid-column:1 / -1;justify-content:flex-start}
+  .lic-a .btn{flex:1 1 0;justify-content:center}
+}
 /* v2.31.10: staff workspace switcher does not move between workspaces; even spacing around the divider */
 @media (min-width:1024px){.jt-top > .brandbar{flex:0 0 auto;min-width:var(--brandw,268px)}}
 .wsw{gap:2px;align-items:center}
@@ -2047,7 +2084,13 @@ const ATT = {};   // submissionId -> [{id,name,type,size,data(dataURL)}]
 async function loadAtt(subId){
   if (ATT[subId] && !ATT[subId].err) return ATT[subId];
   const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'attachments', p_where_field:'submissionId', p_where_value:subId, p_order_field:'index', p_order_dir:'asc', p_limit:50});
-  ATT[subId] = (r||[]).map(x => Object.assign({}, x.data, {id:x.id})); return ATT[subId];
+  const list = (r||[]).map(x => Object.assign({}, x.data, {id:x.id}));
+  const sub = (S.subs||[]).find(x => x.id===subId);
+  if (sub && (sub.files||[]).some(f => f.licenseId)){   // v2.35.0: licenses linked from the applicant's account
+    const lic = await sbRpc('bf_license_files', { p_token:TOKEN, p_submission_id:subId }).catch(() => []);
+    (lic||[]).forEach(f => { const m = (sub.files||[]).find(y => y.slot===f.slot) || {};
+      list.push(Object.assign({}, f, { docLabel:(m.docLabel || LIC_KINDS[f.slot] || 'License')+' · from the applicant’s saved licenses'+(f.number ? ' · # '+f.number : '')+(f.expires ? ' · expires '+licDay(f.expires) : '') })); }); }
+  ATT[subId] = list; return ATT[subId];
 }
 const dataUrlBytes = d => { const b = atob(String(d).split(',')[1]||''); const u = new Uint8Array(b.length); for (let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; };
 const readDataUrl = f => new Promise((ok,no)=>{ const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('Could not read '+f.name)); r.readAsDataURL(f); });
@@ -2199,7 +2242,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.34.1';   // shown at the bottom of every page
+const APP_VERSION = '2.35.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2429,6 +2472,7 @@ function fieldHtml(x, f){
   if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup" aria-labelledby="l_'+id+'"'+(x.req?' aria-required="true"':'')+dby+'>'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
   else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+dby+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
   else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+dby+'>'+esc(v)+'</textarea>';
+  else if (x.type==='doc' && licUse(x.id)) inner = licSlotHtml(x, licUse(x.id));
   else if (x.type==='doc'){ const n = FILES.filter(f => f._slot===x.id).length;
     inner = '<div class="docslot" data-slot="'+x.id+'"><button type="button" class="btn docbtn" id="'+id+'" aria-labelledby="l_'+id+' '+id+'" onclick="document.getElementById(\'docIn_'+x.id+'\').click()"'+dby+'>'+ic('upload')+'<span class="dbt">'+(n?'Add another file':'Choose file')+'</span></button>'+
       '<input type="file" id="docIn_'+x.id+'" multiple accept="application/pdf,image/*,.heic,.heif" hidden onchange="addFiles(this.files,\''+x.id+'\');this.value=\'\'"><div class="filelist" id="flist_'+x.id+'"></div></div>'; }
@@ -2436,7 +2480,7 @@ function fieldHtml(x, f){
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
     inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+ac+dby+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
   const lab = (x.type==='radio'||isUpField(x)) ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
-  return '<div class="fld'+(x.full?' full':'')+'"'+(x.type==='radio'?' data-group="'+id+'"':'')+'>'+lab+inner+(x.hint?'<span class="hint" id="'+hid+'">'+esc(x.hint)+'</span>':'')+
+  return '<div class="fld'+(x.full?' full':'')+'"'+(x.type==='radio'?' data-group="'+id+'"':'')+'>'+lab+inner+(x.hint?'<span class="hint" id="'+hid+'">'+esc(x.hint)+'</span>':'')+(x.type==='doc' ? licSlotNote(x) : '')+
     (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
@@ -2484,6 +2528,7 @@ function formFieldsHtml(){
 }
 function bindForm(){
   const form = document.getElementById('pf'); if (!form) return;
+  if (APP_TOK && LIC.items == null && !LIC.loading && FORMS[S.form] && FORMS[S.form].fields.some(x => x.type==='doc' && LIC_KINDS[x.id])) licLoad();
   form.oninput = form.onchange = e => {
     const k = e.target.dataset && e.target.dataset.k; if (!k) return;
     FVALS[k] = e.target.value; clearFieldError(e.target);
@@ -2562,7 +2607,7 @@ async function submitForm(e){
   { // required documents, one slot each (v2.24): drop files from slots that are no longer shown, then name what is missing
     const F0 = FORMS[S.form], shown = x => !x.show || x.show(FVALS);
     FILES = FILES.filter(f => !f._slot || F0.fields.some(x => x.type==='doc' && x.id===f._slot && shown(x))); paintFiles();
-    const miss = F0.fields.filter(x => x.type==='doc' && x.req && shown(x) && !FILES.some(f => f._slot===x.id));
+    const miss = F0.fields.filter(x => x.type==='doc' && x.req && shown(x) && !FILES.some(f => f._slot===x.id) && !licUse(x.id));
     if (miss.length){
       miss.forEach(x => { const d = document.querySelector('.docslot[data-slot="'+x.id+'"]'), fld = d && d.closest('.fld'), b = d && d.querySelector('.docbtn');
         if (fld && !fld.querySelector('.ferr-f')) fld.insertAdjacentHTML('beforeend', '<span class="ferr-f" id="ve_doc_'+x.id+'">Attach this document to continue.</span>');
@@ -2581,6 +2626,9 @@ async function submitForm(e){
   const slotLabel = id => { const x = F.fields.find(y => y.type==='doc' && y.id===id); return x ? x.label : ''; };
   const files = opt.map((o, i) => Object.assign({ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed },
     FILES[i] && FILES[i]._slot ? { slot:FILES[i]._slot, docLabel:slotLabel(FILES[i]._slot) } : {}));
+  // v2.35.0: required license slots filled from My permits > Saved Licenses (linked, not uploaded again)
+  const licLinks = F.fields.filter(x => x.type==='doc' && (!x.show || x.show(FVALS)) && licUse(x.id)).map(x => ({ slot:x.id, L:licUse(x.id) }));
+  licLinks.forEach(({slot, L}) => files.push({ name:L.name, type:L.type, size:L.size, slot, docLabel:slotLabel(slot), licenseId:L.id, fromAccount:true }));
   try{
     btn.textContent = 'Submitting…';
     const fees = computeFees(S.form, vals, false);
@@ -2605,7 +2653,7 @@ async function submitForm(e){
       (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+'<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
     FILES = []; FVALS = {};
-    acAfterSubmit(subId, vals);   // v2.27.0: signed in to My permits -> add it to the account
+    acAfterSubmit(subId, vals, licLinks.map(({slot, L}) => ({ slot, licenseId:L.id })));   // v2.35.0: then link saved licenses   // v2.27.0: signed in to My permits -> add it to the account
     // v2.23.1: applicant feedback survey removed (Jade's request); maybeAskFeedback is no longer called.
   }catch(x){ err.textContent = 'Could not submit: '+((x&&x.message)||'please try again.'); btn.disabled=false; btn.textContent='Submit application'; }
 }
@@ -2712,7 +2760,7 @@ async function sendFeedback(){
 var AC = { tab:'signin', me:null, busy:false, err:'', msg:'', addOpen:false, pwOpen:false, loading:false };
 var APP_TOK = null;
 try{ if (!DEMO) APP_TOK = localStorage.getItem('bdAppTok'); }catch(e){}
-function appTokSave(t){ APP_TOK = t || null; if (typeof AC !== 'undefined'){ AC.nm = ''; AC.em = ''; } if (!t){ try{ localStorage.removeItem('bdAppName'); }catch(e){} } if (typeof AN !== 'undefined'){ AN.items = null; AN.unread = 0; AN.at = 0; AN.open = false; AN.push = 0; } if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
+function appTokSave(t){ APP_TOK = t || null; if (typeof LIC !== 'undefined'){ LIC.items = null; LIC.skip = {}; LIC.edit = ''; LIC.err = ''; LIC.msg = ''; } if (typeof AC !== 'undefined'){ AC.nm = ''; AC.em = ''; } if (!t){ try{ localStorage.removeItem('bdAppName'); }catch(e){} } if (typeof AN !== 'undefined'){ AN.items = null; AN.unread = 0; AN.at = 0; AN.open = false; AN.push = 0; } if (DEMO) return; try{ if (t) localStorage.setItem('bdAppTok', t); else localStorage.removeItem('bdAppTok'); }catch(e){} }
 const ACCT_URL = () => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#account';
 const acctLinkAttrs = () => 'href="'+ACCT_URL()+'"'+(EMBED ? ' target="_top"' : ' onclick="event.preventDefault();go(\'account\')"');
 function acctHeaderBtn(){
@@ -2768,6 +2816,7 @@ function viewAccount(){
       '<div class="ac-bar"><button type="button" class="btn primary" onclick="acToggleAdd()" aria-expanded="'+AC.addOpen+'">'+ic('doc')+'Add an application I already submitted</button>'+
       '<a class="btn" '+HOME_LINK+'>'+ic('right')+'Apply for a permit</a></div>'+
       anCardHtml()+
+      licSectionHtml()+
       (AC.msg ? '<div class="callout ok ac-msg" role="status">'+esc(AC.msg)+'</div>' : '')+
       (AC.addOpen ? '<form id="acAdd" class="ac-box fgrid" novalidate onsubmit="event.preventDefault();acClaim()"><div class="fld full"><b>Add an application</b><span class="hint">Enter the reference # from the receipt, the email used on the application and the applicant name exactly as it was entered.</span></div>'+
         '<div class="fld"><label class="l" for="acRef">Reference #</label><input id="acRef" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" required></div>'+
@@ -2794,7 +2843,7 @@ function bindAccount(){ if (APP_TOK && !AC.me && !AC.loading && !AC.err) acLoad(
    (bf_captcha_config). The token is checked by the captcha-verify Edge Function (secret key kept in Supabase), which
    hands back a one-time pass; bf_app_signup2 refuses a sign-up without a valid, unused pass once the check is required. */
 const CAP = { siteKey:'', required:false, loaded:false, token:'', wid:null, el:null };
-async function capConfig(){ try{ const c = await sbRpc('bf_captcha_config', {}); CAP.siteKey = (c && c.siteKey) || ''; CAP.required = !!(c && c.required); }catch(e){} CAP.loaded = true; if (S.view==='account') render(); }
+async function capConfig(){ try{ const c = await sbRpc('bf_captcha_config', {}); CAP.siteKey = (c && c.siteKey) || ''; CAP.required = !!(c && c.required); }catch(e){} CAP.loaded = true; if (S.view==='account' && CAP.siteKey) render(); }   // re-draw only when the check is shown
 function capScript(){ return new Promise((ok, bad) => { if (window.turnstile) return ok();
   let sc = document.getElementById('cfTs'); if (!sc){ sc = document.createElement('script'); sc.id = 'cfTs'; sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; document.head.appendChild(sc); }
   sc.addEventListener('load', () => ok()); sc.addEventListener('error', () => bad(new Error('The security check could not load. Check your connection and try again.'))); }); }
@@ -2926,14 +2975,117 @@ async function acChangePw(){
   AC.busy = false; render(); if (AC.err) acFocusErr();
 }
 /* After a successful submission while signed in: add it to the account (server checks ref + email + name). */
-async function acAfterSubmit(subId, vals){
+async function acAfterSubmit(subId, vals, licLinks){
   if (!APP_TOK) return;
   const box = document.getElementById('acSaved');
   try{ const r = await sbRpc('bf_app_claim', { p_token:APP_TOK, p_ref:refNo(subId), p_email:vals.email||'', p_name:vals.applicant||'', p_submitted:true });
     if (r && r.error) throw new Error(r.error);
     AC.me = null;
+    if (licLinks && licLinks.length){
+      const a = await sbRpc('bf_app_license_attach', { p_token:APP_TOK, p_ref:refNo(subId), p_links:licLinks }).catch(e => ({ error:e.message }));
+      if (a && a.error){ if (box) box.innerHTML = '<span>Saved to My permits, but your saved license could not be attached: '+esc(a.error)+' Please email it to buildingdept@arabcity.org with reference # '+esc(refNo(subId))+'.</span>'; return; }
+      LIC.items = null; }
     if (box) box.innerHTML = ic('check')+'<span>Saved to <a '+acctLinkAttrs()+'>My permits</a>.</span>'; }
   catch(x){ if (box) box.innerHTML = '<span>Could not save this to My permits automatically. You can add it there with reference # '+esc(refNo(subId))+'.</span>'; }
+}
+/* ================= v2.35.0 (Jade): Saved Licenses in My permits =================
+   Contractors save each professional license once; when they apply while signed in, the matching required-document
+   slot uses the saved copy and the application links to that one stored file (server: bf_app_license_*). Only these
+   reusable credentials can be saved; invoices, contracts, plans and other project documents are uploaded each time. */
+const LIC_KINDS = { docBiz:'City of Arab business license', docStateLic:"State of Alabama home builder's license", docTradeLic:'State of Alabama trade license' };
+const LIC = { items:null, loading:false, err:'', edit:'', confirm:'', busy:false, skip:{}, file:null, msg:'' };
+const licExpired = x => !!(x && x.expires && x.expires < todayISO());
+const licFor = k => (LIC.items||[]).find(x => x.kind===k) || null;
+async function licLoad(){
+  if (!APP_TOK || LIC.loading) return; LIC.loading = true;
+  try{ const r = await sbRpc('bf_app_license_list', { p_token:APP_TOK }); if (r && r.error) throw new Error(r.error); LIC.items = (r && r.items) || []; LIC.err = ''; }
+  catch(x){ LIC.items = LIC.items || []; LIC.err = x.message || 'Could not load your saved licenses.'; }
+  LIC.loading = false; if (S.view==='account' || S.view==='form') render();
+}
+const licDay = d => { if (!d) return ''; const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : String(d); };
+function licSectionHtml(){
+  if (!APP_TOK) return '';
+  if (LIC.items == null && !LIC.loading) setTimeout(licLoad, 0);
+  const row = k => { const x = licFor(k), ed = LIC.edit===k;
+    const info = x ? '<span class="lic-meta">'+esc(x.name||'license')+(x.number ? ' · License # '+esc(x.number) : '')+(x.expires ? ' · '+(licExpired(x) ? '<b class="lic-exp">Expired '+esc(licDay(x.expires))+'</b>' : 'Expires '+esc(licDay(x.expires))) : '')+
+        (x.uses ? ' · Used on '+x.uses+' application'+(x.uses===1?'':'s') : '')+'</span>' : '<span class="lic-meta">Not saved yet</span>';
+    const acts = LIC.confirm===k && x
+      ? '<div class="lic-confirm"><span>Remove this license from your account? Applications you already sent keep their copy.</span><button type="button" class="btn sm danger" onclick="licRemove(\''+k+'\')"'+(LIC.busy?' disabled':'')+'>Remove</button><button type="button" class="btn sm" onclick="LIC.confirm=\'\';render()">Cancel</button></div>'
+      : x ? '<div class="lic-a"><button type="button" class="btn sm" onclick="licView(\''+k+'\')">'+ic('ext')+'View</button><button type="button" class="btn sm" onclick="licEdit(\''+k+'\')">'+ic('upload')+'Replace</button><button type="button" class="btn sm ghost" onclick="LIC.confirm=\''+k+'\';LIC.edit=\'\';render()" aria-label="Remove '+esc(LIC_KINDS[k])+'">'+ic('trash')+'Remove</button></div>'
+          : (ed ? '' : '<div class="lic-a"><button type="button" class="btn sm primary" onclick="licEdit(\''+k+'\')">'+ic('upload')+'Add license</button></div>');
+    const form = ed ? '<form class="lic-form fgrid" novalidate onsubmit="event.preventDefault();licSave(\''+k+'\')">'+
+        '<div class="fld full"><span class="l" id="licFl">'+(x ? 'Renewed copy: ' : 'File: ')+esc(LIC_KINDS[k])+'</span>'+
+          '<label class="btn lic-pick">'+ic('upload')+'<span id="licPickT">'+(LIC.file ? esc(LIC.file.name) : 'Choose file')+'</span><input type="file" class="vh" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onchange="LIC.file=this.files[0]||null;document.getElementById(\'licPickT\').textContent=LIC.file?LIC.file.name:\'Choose file\'"></label><span class="hint">PDF, JPG or PNG. A phone photo works too.</span></div>'+
+        '<div class="fld"><label class="l" for="licNo">License # <span class="hint">(optional)</span></label><input id="licNo" type="text" maxlength="60" autocomplete="off" value="'+esc(x ? x.number||'' : '')+'"></div>'+
+        '<div class="fld"><label class="l" for="licExp">Expiration date <span class="hint">(optional)</span></label><input id="licExp" type="date" value=""></div>'+
+        '<div class="fld full lic-fa"><button class="btn primary" type="submit"'+(LIC.busy?' disabled':'')+'>'+(LIC.busy ? 'Saving…' : 'Save license')+'</button><button type="button" class="btn" onclick="LIC.edit=\'\';LIC.file=null;LIC.err=\'\';render()">Cancel</button></div></form>' : '';
+    return '<li class="lic-row'+(x ? (licExpired(x) ? ' exp' : ' ok') : '')+'"><span class="lic-ico" aria-hidden="true">'+ic(x ? 'check' : 'doc')+'</span><div class="lic-t"><b>'+esc(LIC_KINDS[k])+'</b>'+info+'</div>'+acts+form+'</li>'; };
+  return '<section class="lic-card" aria-labelledby="licH"><div class="lic-h"><h2 id="licH">Saved Licenses <span class="pill new-pill">New</span></h2>'+
+      '<button type="button" class="lic-info" onclick="licInfo()" aria-label="How Saved Licenses works" title="How Saved Licenses works">'+ic('info')+'</button></div>'+
+    '<p class="lic-sub">Save your licenses once and they are attached for you every time you apply while signed in. Invoices, contracts and plans are still uploaded with each application.</p>'+
+    (LIC.items == null ? '<p class="hint">Loading your saved licenses…</p>' : '<ul class="lic-list">'+Object.keys(LIC_KINDS).map(row).join('')+'</ul>')+
+    (LIC.err ? '<p class="formerr" role="alert">'+esc(LIC.err)+'</p>' : '')+(LIC.msg ? '<p class="lic-ok" role="status">'+ic('check')+esc(LIC.msg)+'</p>' : '')+'</section>';
+}
+function licEdit(k){ LIC.edit = k; LIC.confirm = ''; LIC.file = null; LIC.err = ''; LIC.msg = ''; render(); const b = document.querySelector('.lic-pick'); if (b) b.focus(); }
+async function licSave(k){
+  const f = LIC.file; if (!f){ LIC.err = 'Choose the license file to save.'; render(); return; }
+  if (!/\.(pdf|jpe?g|png)$/i.test(f.name) && !/^(application\/pdf|image\/(jpeg|png))$/.test(f.type)){ LIC.err = 'Only PDF, JPG and PNG files can be saved.'; render(); return; }
+  const no = (document.getElementById('licNo')||{}).value||'', exp = (document.getElementById('licExp')||{}).value||'';
+  LIC.busy = true; LIC.err = ''; render();
+  try{ const o = await optimizeFile(f), data = await readDataUrl(o.blob);
+    const r = await sbRpc('bf_app_license_save', { p_token:APP_TOK, p_kind:k, p_number:no.trim(), p_expires:exp || null,
+      p_file:{ name:o.name, type:o.type, size:o.size, origName:o.origName, origType:o.origType, origSize:o.origSize, compressed:o.compressed, data } });
+    if (r && r.error) throw new Error(r.error);
+    LIC.items = (LIC.items||[]).filter(x => x.kind!==k).concat([r]); LIC.edit = ''; LIC.file = null; LIC.msg = LIC_KINDS[k]+' saved. It will be attached when you apply while signed in.'; }
+  catch(x){ LIC.err = x.message || 'Could not save the license. Please try again.'; }
+  LIC.busy = false; render();
+}
+async function licRemove(k){
+  const x = licFor(k); if (!x) return; LIC.busy = true; render();
+  try{ const r = await sbRpc('bf_app_license_remove', { p_token:APP_TOK, p_id:x.id }); if (r && r.error) throw new Error(r.error);
+    LIC.items = LIC.items.filter(y => y.id!==x.id); LIC.confirm = ''; LIC.msg = LIC_KINDS[k]+' removed from your account.'; }
+  catch(e){ LIC.err = e.message || 'Could not remove it.'; }
+  LIC.busy = false; render();
+}
+async function licView(k){
+  const x = licFor(k); if (!x) return; const w = window.open('', '_blank');
+  try{ const r = await sbRpc('bf_app_license_get', { p_token:APP_TOK, p_id:x.id }); if (!r || r.error) throw new Error((r && r.error) || 'Could not open it.');
+    const u = URL.createObjectURL(new Blob([dataUrlBytes(r.data)], { type:r.type || 'application/pdf' }));
+    if (w) w.location.href = u; else DL.save({ filename:r.name || 'license.pdf', data:new Blob([dataUrlBytes(r.data)], { type:r.type }) }); }
+  catch(e){ if (w) w.close(); LIC.err = e.message; render(); }
+}
+function licInfo(){
+  const old = document.getElementById('licbox'); if (old) old.remove();
+  const d = document.createElement('div'); d.id = 'licbox';
+  const li = t => '<li>'+t+'</li>';
+  d.innerHTML = '<div class="veil" onclick="licInfoClose()"></div><div class="scandlg agdlg lic-dlg" role="dialog" aria-modal="true" aria-labelledby="licIT">'+
+    '<div class="lic-dh"><h2 id="licIT">How Saved Licenses works <span class="pill new-pill">New</span></h2><button type="button" class="btn sm ghost" aria-label="Close" onclick="licInfoClose()">'+ic('x')+'</button></div>'+
+    '<div class="agtext">'+
+    '<h3>Save once, use on every application</h3><p>Upload your professional licenses to My permits one time. When you apply for a permit while signed in, every required license is attached for you, so you do not upload the same documents again.</p>'+
+    '<h3>What you can save</h3><ul>'+li('City of Arab business license')+li("State of Alabama home builder's license")+li('State of Alabama trade license (electrical, plumbing, HVAC, gas, roofing, pool)')+'</ul>'+
+    '<h3>What you still upload each time</h3><p>Documents that are different for every permit are never saved to your account:</p><ul>'+li('Invoices and contracts for the job')+li('Plot plans, site plans and construction plans')+li('Any other project-specific or supporting documents')+'</ul>'+
+    '<h3>One copy, less storage</h3><p>Your application links to the license saved in your account instead of storing another copy of the file.</p>'+
+    '<h3>Keep them current</h3><p>When a license is renewed, choose <b>Replace</b> and add the expiration date. Applications you already sent keep the copy that was attached to them. Expired licenses are not attached automatically.</p>'+
+    '<h3>Who can see them</h3><p>Only you, and Building Department staff reviewing an application they are attached to. You can remove a license at any time.</p>'+
+    '<h3>Choosing a different file</h3><p>On the application, choose <b>Use a different file</b> next to a saved license to upload another copy for that application only.</p></div>'+
+    '<div class="lic-df"><button type="button" class="btn primary" onclick="licInfoClose()">Got it</button></div></div>';
+  document.body.appendChild(d); document.addEventListener('keydown', licInfoKey); syncScrollLock(); d.querySelector('.btn.primary').focus();
+}
+function licInfoKey(e){ if (e.key==='Escape') licInfoClose(); }
+function licInfoClose(){ const d = document.getElementById('licbox'); if (d) d.remove(); document.removeEventListener('keydown', licInfoKey); syncScrollLock(); const b = document.querySelector('.lic-info'); if (b) b.focus(); }
+/* application form: a required license slot uses the saved copy (not expired, not switched off for this application) */
+const licUse = id => (APP_TOK && LIC_KINDS[id] && !LIC.skip[id] && !FILES.some(f => f._slot===id)) ? (x => x && !licExpired(x) ? x : null)(licFor(id)) : null;
+function licSlotHtml(x, L){
+  return '<div class="docslot lic-use" data-slot="'+x.id+'"><span class="lic-chip">'+ic('check')+'<span><b>Using your saved license</b><small>'+esc(L.name||'license')+(L.number ? ' · License # '+esc(L.number) : '')+(L.expires ? ' · Expires '+esc(licDay(L.expires)) : '')+'</small></span></span>'+
+    '<button type="button" class="linkbtn" onclick="LIC.skip[\''+x.id+'\']=1;render()">Use a different file</button></div>';
+}
+function licSlotNote(x){
+  if (!APP_TOK || !LIC_KINDS[x.id] || LIC.items == null) return '';
+  const L = licFor(x.id);
+  if (L && licExpired(L)) return '<span class="hint lic-note">Your saved copy expired '+esc(licDay(L.expires))+'. Upload the renewed license here, and replace it in <a '+acctLinkAttrs()+'>My permits</a>.</span>';
+  if (L && LIC.skip[x.id]) return '<span class="hint lic-note"><button type="button" class="linkbtn" onclick="delete LIC.skip[\''+x.id+'\'];render()">Use my saved license instead</button></span>';
+  if (!L) return '<span class="hint lic-note">Tip: save this license in <a '+acctLinkAttrs()+'>My permits</a> so it is attached for you next time.</span>';
+  return '';
 }
 function acFormBanner(){
   if (!APP_TOK) return '';
@@ -6703,6 +6855,7 @@ function dStatusItem(id, d){ const x = d.data, st = x.staff || {}, ok = dApprove
           pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'',
           infoReceived: x.infoReceivedAt ? { at:x.infoReceivedAt, count:(x.files||[]).filter(m => m && m.fromApplicant).length } : null, annex:annexPublic(x) };
 }
+function dLicRow(x){ return { id:x.id, kind:x.kind, number:x.number||'', expires:x.expires||'', name:x.name, type:x.type, size:x.size, savedAt:x.savedAt }; }
 function dAppSession(em){ const u = DEMO.appUsers[em], t = 'demo-app-'+dUuid(); (DEMO.appSess || (DEMO.appSess = {}))[t] = em; u.lastLogin = new Date().toISOString(); return { token:t, user:{ email:u.email, name:u.name, createdAt:u.createdAt } }; }
 function dAppUser(t){ const em = (DEMO.appSess||{})[t], u = em && (DEMO.appUsers||{})[em]; return u && u.active ? u : null; }
 function dAppById(id){ const u = Object.values(DEMO.appUsers||{}).find(o => 'demo-app-'+o.email === id); if (!u) throw new Error('Account not found.'); return u; }
@@ -6825,6 +6978,23 @@ function demoCall(fn, A){
       if (u && u.active){ u.reset = String(Math.floor(Math.random()*1e6)).padStart(6,'0'); setTimeout(() => toast('Demo: no email is sent. The code would be '+u.reset+'.'), 300); }
       return { ok:true, msg:'If an account uses that email, we sent it a 6-digit code. It expires in 15 minutes. Check your spam folder if you do not see it.' }; }
     case 'bf_staff_app_mail_status': dNeed(T,'building'); return { ready:true, from:'noreply@jadecruz.dev', recent:[] };
+    /* v2.35.0 demo: Saved Licenses (this tab only) */
+    case 'bf_app_license_list': { const u = dAppUser(A.p_token); if (!u) return { error:'Please sign in to My permits again.', signedOut:true };
+      const L = (DEMO.lic || (DEMO.lic = {})); return { items: Object.values(L).filter(x => x.email===u.email && !x.archived).map(x => Object.assign(dLicRow(x), { uses:(DEMO.licLinks||[]).filter(l => l.licenseId===x.id).length })) }; }
+    case 'bf_app_license_get': { const u = dAppUser(A.p_token), x = (DEMO.lic||{})[A.p_id]; if (!u || !x || x.email!==u.email || x.archived) return { error:'That license is no longer saved.' }; return Object.assign(dLicRow(x), { data:x.data }); }
+    case 'bf_app_license_save': { const u = dAppUser(A.p_token); if (!u) return { error:'Please sign in to My permits again.', signedOut:true };
+      if (!['docBiz','docStateLic','docTradeLic'].includes(A.p_kind)) return { error:'Only professional licenses can be saved to your account.' };
+      const L = (DEMO.lic || (DEMO.lic = {})); Object.values(L).forEach(x => { if (x.email===u.email && x.kind===A.p_kind) x.archived = true; });
+      const f = A.p_file||{}, id = dUuid(); L[id] = { id, email:u.email, kind:A.p_kind, number:String(A.p_number||'').slice(0,60), expires:A.p_expires||'', name:f.name, type:f.type, size:f.size, data:f.data, savedAt:new Date().toISOString() };
+      return Object.assign(dLicRow(L[id]), { uses:0 }); }
+    case 'bf_app_license_remove': { const u = dAppUser(A.p_token), x = (DEMO.lic||{})[A.p_id]; if (!u || !x || x.email!==u.email || x.archived) return { error:'That license is no longer saved.' }; x.archived = true; return { ok:true }; }
+    case 'bf_app_license_attach': { const u = dAppUser(A.p_token); if (!u) return { error:'Please sign in to My permits again.' };
+      const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), id = Object.keys(u.apps).find(k => dRef(k)===ref && S2[k]); if (!id) return { error:'That application is not in your My permits account.' };
+      const links = DEMO.licLinks || (DEMO.licLinks = []); let n = 0;
+      (A.p_links||[]).forEach(e => { const x = (DEMO.lic||{})[e.licenseId]; if (x && x.email===u.email && !x.archived && x.kind===e.slot && (S2[id].data.files||[]).some(f => f.slot===e.slot && f.licenseId===e.licenseId)){ links.push({ submissionId:id, slot:e.slot, licenseId:x.id }); n++; } });
+      return { ok:true, linked:n }; }
+    case 'bf_license_files': { dNeed(T,'building'); return (DEMO.licLinks||[]).filter(l => l.submissionId===A.p_submission_id).map(l => { const x = DEMO.lic[l.licenseId];
+      return { id:'lic-'+x.id, slot:l.slot, licenseId:x.id, fromAccount:true, name:x.name, type:x.type, size:x.size, number:x.number, expires:x.expires, savedAt:x.savedAt, data:x.data }; }); }
     case 'bf_staff_status_view': { dNeed(T,'building'); const d = S2[A.p_id]; if (!d) throw new Error('That application is no longer on file. Refresh and try again.'); return dStatusItem(A.p_id, d); }
     case 'bf_staff_app_accounts': { dNeed(T,'building'); return Object.values(DEMO.appUsers||{}).map(u => ({ id:'demo-app-'+u.email, email:u.email, name:u.name, active:u.active, createdAt:u.createdAt, lastLogin:u.lastLogin||null,
         resetPending:!!u.reset, resetExpires:u.reset ? new Date(Date.now()+864e5).toISOString() : null, apps:Object.keys(u.apps).filter(id => S2[id]).map(dRef) })); }
