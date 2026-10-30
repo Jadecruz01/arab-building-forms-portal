@@ -1521,6 +1521,12 @@ html:not(.embed) .app.pub .sheet.stat,html:not(.embed) .app.pub .sheet:not(.apps
   .sheet.stat > .form-h h1{font-size:27px}
   #stf{margin-top:4px}
 }
+/* v2.34.0: beta forms (online Annexation Application, staff preview) */
+.pill.beta-pill{background:#f6e7bf;color:#6b4e00;border:1px solid #e0c169;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:1px 8px;vertical-align:middle}
+.tile.beta-tile{border-style:dashed}
+.callout.beta-note b,.callout.beta-lock b{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.callout.beta-lock .i{width:16px;height:16px}
+.callout.beta-note{margin:0 0 16px}
 /* v2.31.10: staff workspace switcher does not move between workspaces; even spacing around the divider */
 @media (min-width:1024px){.jt-top > .brandbar{flex:0 0 auto;min-width:var(--brandw,268px)}}
 .wsw{gap:2px;align-items:center}
@@ -1862,8 +1868,67 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
     if (inC) return Object.assign({}, x, {req:false, legacy:true, show:()=>false});
     return x === OTHER_UPLOAD ? PLANS_UPLOAD : x; }).filter(Boolean); })(),
   agreements:[{id:'appAgree'},{id:'occupancy'}] });
+/* v2.34.0 (Jade): online Annexation Application, in BETA. The fillable PDF stays available in parallel.
+   Locked for applicants: only signed-in Building Department staff can open the form, and the server refuses annexation
+   submissions from anyone else (bf_form_locks + trigger). The process: Planning Department review -> signed, notarized
+   Petition for Annexation -> Planning Commission recommendation -> City Council decision -> notification letter. */
+const BETA_FORMS = ['annexation'];
+const formBeta = k => BETA_FORMS.includes(k);
+const formLocked = k => formBeta(k) && !(typeof canBuilding === 'function' && canBuilding());
+const isRep = f => f.applyAs === 'Legally authorized representative of the owner';
+FORMS.annexation = { key:'annexation', title:'Annexation Application', short:'Annexation Application', icon:'pin', beta:true, planning:true, group:'Planning Commission', feeLabel:'No fee', created:'Oct 30, 2026',
+  agreements:[{id:'annexServices'},{id:'annexCertify'}],
+  fields:[
+    {type:'note', text:'Annexation into the City of Arab is reviewed by the Planning Department, then the Planning Commission, then the City Council, and usually takes 1 to 2 months. A property must touch (or be directly across from) the current city limits to be annexed. There is no fee.'},
+    {type:'section', label:'Submitted by'},
+    T('applicant','Your name',{req:true}), T('email','Email',{type:'email',req:true,hint:'Used with your reference # to check your application status online.'}),
+    T('phone','Contact phone number',{type:'tel',req:true,hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true}),
+    T('applyAs','I am the',{type:'radio',req:true,opts:['Property owner','Legally authorized representative of the owner'],full:true}),
+    T('repAddress','Representative full mailing address',{req:true,full:true,show:isRep,hint:'Street, city, state and ZIP'}),
+    {type:'section', label:'I. Description of property'},
+    T('address','Street address of the properties to be annexed',{req:true,full:true}),
+    T('acreage','Acreage',{type:'number',req:true}), T('subdivision','Name of subdivision (if applicable)'),
+    T('survey','Is a survey of the properties available?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
+    {type:'section', label:'II. Property owner information'},
+    T('owner','Property owner name',{req:true}), T('ownerPhone','Property owner phone',{type:'tel',req:true}),
+    T('ownerAddress','Property owner full mailing address',{req:true,full:true,hint:'Street, city, state and ZIP'}),
+    T('ownerEmail','Property owner email',{type:'email'}),
+    T('owner2','Second property owner name (if any)'), T('owner2Phone','Second owner phone',{type:'tel',show:f=>!!String(f.owner2||'').trim()}),
+    T('owner2Address','Second owner full mailing address',{full:true,show:f=>!!String(f.owner2||'').trim()}),
+    T('moreOwners','Other property owners (name, mailing address and phone for each)',{type:'textarea',full:true,hint:'Only if there are more than two owners.'}),
+    {type:'section', label:'III. Additional information'},
+    T('additional','Additional information',{type:'textarea',full:true}),
+    {type:'section', label:'Demographic questionnaire'},
+    T('household','Total members in household, including children and tenants of the area',{type:'number',req:true}),
+    T('votingAge','Total persons of voting age',{type:'number',req:true}), T('voters','Registered voters',{type:'number',req:true}),
+    T('housingUnits','Number of housing units',{type:'number',req:true}),
+    T('housingAddr','Street addresses of the housing units',{type:'textarea',full:true,show:f=>num(f.housingUnits)>0}),
+    T('trailers','Number of trailers',{type:'number',req:true}),
+    T('trailerAddr','Street addresses of the trailers',{type:'textarea',full:true,show:f=>num(f.trailers)>0}),
+    T('businesses','Names and addresses of all businesses on the property',{type:'textarea',full:true,hint:'Leave blank if there are none.'}),
+    T('bizOwner','Business owner or manager mailing address and phone',{type:'textarea',full:true,show:f=>!!String(f.businesses||'').trim()}),
+    T('signs','Signs or billboards on the property',{full:true,hint:'Leave blank if there are none.'}),
+    T('homeOcc','If residential, is there a home occupation (business) on this property?',{type:'radio',opts:['Yes','No','Not residential'],full:true}),
+    T('accessory','How many accessory structures are on the property, and what are they used for?',{type:'textarea',full:true}),
+    T('animals','Are any animals (besides cats and dogs) kept on the property?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
+    T('animalsWhat','What kind, and how many?',{req:true,full:true,show:f=>f.animals==='Yes'}),
+    T('animalPens','Where are the animal enclosures, including fencing?',{type:'textarea',full:true,show:f=>f.animals==='Yes',hint:'Please also mark them on your site plan or survey.'}),
+    T('zoningWanted','Zoning classification wanted for the area',{type:'radio',req:true,opts:['Agriculture','Residential','Commercial','Industrial'],full:true}),
+    T('drainage','Are there any drainage issues that affect this property?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
+    T('drainageWhat','Describe the drainage issues',{type:'textarea',req:true,full:true,show:f=>f.drainage==='Yes'}),
+    T('features','Any other significant features on the property the City should know about?',{type:'textarea',full:true}),
+    T('children','Ages and grades of all children',{type:'textarea',full:true,hint:'Leave blank if there are no school-age children.'}),
+    T('bus','Will you need school bus pick-up?',{type:'radio',opts:['Yes','No'],full:true}),
+    T('reason','Reason for requesting annexation',{type:'textarea',req:true,full:true}),
+    ...DOCS_HEAD,
+    DOC('docDeed','Current recorded deeds for the properties'),
+    DOC('docTaxMap','Current tax parcel map'),
+    DOC('docSurvey','Survey of the properties',{show:f=>f.survey==='Yes'}),
+    DOC('docAuth','Written authorization from the property owner',{show:isRep,hint:'Required when a representative applies for the owner.'}),
+    T('files','Other documents (optional)',{type:'file',req:false,full:true,hint:'For example, a site plan. PDF, JPG or PNG. Up to 10 files in total, 30 MB each.'}),
+    {type:'note', text:'Next steps: if the property qualifies, the Planning Department will prepare the official Petition for Annexation. Every property owner (or their legally authorized representative) signs it in front of a notary. You will receive a letter when the annexation is complete.'} ] };
 const isBldg = k => k==='building' || k==='homeowner';
-const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving'];
+const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving','annexation'];
 
 /* ================= terms & agreements (required on the forms that list them) ================= */
 const AGREEMENTS = {
@@ -1887,6 +1952,19 @@ const AGREEMENTS = {
   occupancy: { title:'Occupancy & Final Inspection Responsibilities', label:'I agree to the', link:'Occupancy & Final Inspection Responsibilities', text:[
     'I understand that it is my responsibility to notify the building inspector when an inspection is needed. I also understand that under any circumstances no one shall occupy any building or portion of any building until a final inspection has been made and the building inspector has issued a certificate of occupancy.',
     'Upon issuance of a building permit, the building inspector may visit the building site, or call the owner, or contractor if he feels that a significant amount of time has passed and no inspections have been called for.' ] },
+  annexServices: { title:'Statement Regarding Provision of City Services to Newly Annexed Lands', label:'I have read and agree to the', link:'Statement Regarding Provision of City Services', text:[
+    'City services will be provided to all newly annexed lands according to the same policies that already govern in Arab. This means that Arab police and fire departments will respond to calls; garbage and trash will be collected by Republic Services; and school children may attend city rather than county schools. All applicable city ordinances will be enforced including the implementation of zoning regulations. Please note that the National agency that established the rating schedule for fire insurance premiums (ISO) assigns a higher rate to property that is over 5 road miles from their responding fire station and/or over 1000 feet from a fire hydrant.',
+    'It has long been the Sewer Board policy to expand sanitary sewer service on a cost benefit basis. This policy applies to all land within the city regardless of its annexation date. In addition, the city has adopted a capital improvement plan to guide investment in infrastructure. In order for an area to be considered for road maintenance, drainage improvements, recreational or community facilities, new fire stations, or sanitary sewer extension, the area must be in the city and then must be prioritized according to need. Newly annexed land will be accorded the same consideration as other city lands.',
+    'Lastly, it is important to understand that those autonomous boards, agencies and utilities that have authority over the delivery of specific public services set their own policies, procedures, and fees. Property, regardless of its annexation date, will be required to connect to these services once they are available in their area, at the property owner’s expense.',
+    '#Agreement',
+    'I have read the above statement governing the delivery of city services to lands annexed into the city of Arab, and I agree to these conditions as they may pertain to any of my lands that are annexed.' ] },
+  annexCertify: { title:'Owner / Representative Certification', label:'I certify the', link:'Owner / Representative Certification', text:[
+    '#Property owner',
+    'I certify that I am the Property owner and I have read this application and that all information contained herein is true and correct.',
+    '#Legally authorized representative of the property owner',
+    'I certify that if I am NOT the owner, I have proper legal authorization from the owner to act as a representative on his/her behalf and that I will be required to provide written documentation of such authorization to the City of Arab. I certify that I have read this application and that all information contained herein is true and correct.',
+    '#Petition for Annexation',
+    'If the property qualifies, the official Petition for Annexation must be signed by the property owners or their legally authorized representative and notarized. Agreeing here does not replace that signed, notarized petition.' ] },
   signAgree: { title:'Sign Permit Agreement', label:'I agree to the', link:'Sign Permit Agreement', text:[
     'I certify and acknowledge that I have read this application and that all information provided is true and correct; that all work performed in association with the issued permit shall conform to the plans and specifications submitted and will comply with all City Codes and Ordinances. By signing this application as a contractor, I certify that I will meet all applicable laws of the State of Alabama, including any exemptions as the law provides. I certify and agree to protect all public improvements and public utilities adjacent to or serving the property on which the proposed structure(s) are located, whether or not the said improvements, or utilities, are the property of the City of Arab. I further agree to make, or cause to have made, all necessary repairs resulting from my actions, misuse or lack of care, or on the part of any of my employees, agents, subcontractors, or suppliers of materials. I further attest that I am authorized by the property owner to execute this document as his or her agent.' ] }
 };
@@ -2115,7 +2193,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.33.1';   // shown at the bottom of every page
+const APP_VERSION = '2.34.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2297,6 +2375,7 @@ function viewApps(){
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
+     (!EMBED && !formLocked('annexation') ? '<button class="tile beta-tile" onclick="go(\'form\',\'annexation\')"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application <span class="pill beta-pill">Beta</span></b><small>Online form · staff preview only. Applicants still see the fillable PDF.</small><span class="fee">No fee</span></span></button>' : '')+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span><span class="soon">Online form coming soon</span></span></a>'+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost. Fill in and email the form</small><span class="fee">Fillable PDF · no fee</span><span class="soon">Online form coming soon</span></span></a>'+
    '</div></section>'+
@@ -2355,6 +2434,7 @@ function fieldHtml(x, f){
     (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
+  if (key === 'annexation') return '<div class="r t"><span>Application fee</span><span class="num">No fee</span></div><small>There is no fee to apply for annexation.</small>';
   const fe = computeFees(key, FVALS, false);
   const showVal = isBldg(key)||key==='subtrade';
   return (showVal?'<div class="r"><span>Construction value <small>('+esc(fe.basis||'enter project details')+')</small></span><b class="num">'+money(fe.value)+'</b></div>':'')+
@@ -2366,10 +2446,27 @@ function feeBoxHtml(key){
 }
 function viewForm(){
   const F = FORMS[S.form];
+  if (formLocked(S.form)) return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet" id="sheet">'+betaLockedHtml(S.form)+'</div></main></div>';
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet" id="sheet">'+(DEMO ? '<div class="demo-samples"><b>Demo: fill this form with sample answers</b><div><button type="button" class="btn sm primary" onclick="demoFillForm()">'+ic('edit')+'Fill with sample answers</button></div><small>Sample documents are attached too. Submitting only adds it to the demo.</small></div>' : '')+'<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1><span class="hint" style="color:var(--muted)">Fields marked with <span class="req" style="color:var(--red)">*</span> are required.</span></div>'+
    (S.pubFull?'<div class="callout warn" style="margin:0 0 16px"><b>This form is not accepting online applications right now</b>The Building Department has reached its online storage limit. Please contact the Building Department at <span style="user-select:all">buildingdept@arabcity.org</span> or visit 740 N Main St.</div>':'')+
-   acFormBanner()+'<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
+   betaBannerHtml(S.form)+acFormBanner()+'<form id="pf" class="fgrid" novalidate>'+formFieldsHtml()+'</form></div></main></div>';
+}
+/* v2.34.0: beta forms. Applicants see this page instead of the form; the fillable PDF keeps working. */
+function betaLockedHtml(k){
+  const F = FORMS[k], pdf = k === 'annexation' ? '#pdf-annexation' : '#apps';
+  return '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1></div>'+
+    '<div class="callout pay beta-lock"><b>The online '+esc(F.short.toLowerCase())+' is not open yet</b>'+
+    'The Building Department is still testing it. Please use the fillable PDF for now: fill it in on your computer, then email it to <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a> or bring it to City Hall, 740 N Main St.'+
+    '<div style="margin-top:12px"><a class="btn primary" href="'+pdf+'">'+ic('down')+'Open the fillable PDF</a></div></div>'+
+    (S.booting ? '' : '<p class="hint" style="color:var(--muted);margin-top:14px">Building Department staff: sign in to the staff portal to preview this form.</p>');
+}
+function betaBannerHtml(k){
+  if (!formBeta(k)) return '';
+  return '<div class="callout warn beta-note"><b><span class="pill beta-pill">Beta</span> Staff preview: applicants cannot open this form yet</b>'+
+    'Applicants still use the fillable PDF. Check the questions, wording and required documents against Building Department standards. '+
+    (DEMO ? 'In demo mode you can submit it and follow it through Planning Department review, Planning Commission and City Council.'
+          : 'If you submit it, it is saved as a beta test application under your staff sign-in (only staff can submit while it is in beta). Delete test applications when you are done.')+'</div>';
 }
 function formFieldsHtml(){
   const F = FORMS[S.form];
@@ -2483,16 +2580,20 @@ async function submitForm(e){
     const fees = computeFees(S.form, vals, false);
     const createdAt = new Date().toISOString();
     const agreements = formAgreements(F, FVALS).map(a => ({ id:a.id, title:AGREEMENTS[a.id].title, at:createdAt }));
-    const subId = await sbRpc('bf_add', { p_token:null, p_collection:'submissions', p_data:{ hp:(document.getElementById('hpWebsite')||{}).value||'', fillMs:Date.now()-FORM_T0, app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' } } });
+    const betaTok = formBeta(S.form) ? TOKEN : null;   // v2.34.0: beta forms are submitted with the staff sign-in (server-checked)
+    if (formLocked(S.form)) throw new Error('This form is not open to applicants yet. Please use the fillable PDF.');
+    const subId = await sbRpc('bf_add', { p_token:betaTok, p_collection:'submissions', p_data:{ hp:(document.getElementById('hpWebsite')||{}).value||'', fillMs:Date.now()-FORM_T0, app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' }, beta:formBeta(S.form) || undefined } });
     for (let i=0;i<opt.length;i++){
       btn.textContent = 'Uploading document '+(i+1)+' of '+opt.length+'…';
       const data = await readDataUrl(opt[i].blob);
-      await sbRpc('bf_add', { p_token:null, p_collection:'attachments', p_data:Object.assign({ app:APP_TAG, submissionId:subId, index:i, data }, files[i]) });
+      await sbRpc('bf_add', { p_token:betaTok, p_collection:'attachments', p_data:Object.assign({ app:APP_TAG, submissionId:subId, index:i, data }, files[i]) });
     }
     LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, agreements, files };
     const done = document.getElementById('sheet');
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
-      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(REVIEW_FORMS.includes(S.form)
+      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(S.form==='annexation'
+        ? '<div class="r t"><span>Application fee</span><span class="num">No fee</span></div><small>The Planning Department will review your application. If the property qualifies, they will send you the official Petition for Annexation to sign in front of a notary. It then goes to the Planning Commission and the City Council. You will receive a letter when the annexation is complete.</small>'
+        : REVIEW_FORMS.includes(S.form)
         ? '<div class="r t"><span>Estimated total</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> This is an estimate. The Building Department will review your application and confirm the final total when it is approved, then contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy. They will also contact you if anything else is needed.</small></div>'
         : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
       (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+'<p class="done-note">Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+'.</p>'+
@@ -2967,13 +3068,15 @@ const COLS = [
   {k:'fy', l:'Fiscal Year', t:'T', get:s=>fyOf(s)||0, fmt:s=>'<span class="num">'+fyName(fyOf(s))+'</span>'+(fyOv(s.id)?' <span class="pill src" title="Moved to this fiscal year by hand">moved</span>':'')},
   {k:'permitNo', l:'Permit #', t:'T', get:s=>(s.staff&&s.staff.permitNo)||'', fmt:s=>esc((s.staff&&s.staff.permitNo)||'')||'<span style="color:var(--muted)">—</span>'},
   {k:'address', l:'Address', t:'T', get:s=>s.fields.address||''},
-  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign']},
+  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign','annexation']},
+  {k:'annexStage', l:'Stage', t:'T', only:['annexation'], get:s=>annexStage(s), fmt:s=>'<span class="pill src">'+esc(annexStage(s))+'</span>'+(s.beta?' <span class="pill beta-pill">Beta test</span>':'')},
+  {k:'acreage', l:'Acreage', t:'T', only:['annexation'], get:s=>s.fields.acreage||''},
   {k:'files', l:'Uploads', t:'F', get:s=>(s.files||[]).length, fmt:s=>'<span class="pdfs">'+(s.files||[]).slice(0,5).map(f=>'<span class="pdfi'+(/^image/.test(f.type)?' img':'')+'">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span>').join('')+((s.files||[]).length>5?'<small>+'+((s.files.length)-5)+'</small>':'')+'</span>'},
-  {k:'total', l:'Grand Total Fee', t:'$', get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
-  {k:'permitFee', l:'Permit Fee', t:'$', hide:true, get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
+  {k:'total', l:'Grand Total Fee', t:'$', not:['annexation'], get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
+  {k:'permitFee', l:'Permit Fee', t:'$', hide:true, not:['annexation'], get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
   {k:'cict', l:'CICT Fee', t:'$', hide:true, only:['building','homeowner','subtrade'], get:s=>s.fees?s.fees.cict:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.cict:0)+'</span>'},
   {k:'review', l:'Review', t:'S', only:REVIEW_FORMS, get:s=>({pending:0, info:1, approved:2, none:3})[reviewState(s)], fmt:s=>reviewPill(s)||'<span style="color:var(--muted)">—</span>'},
-  {k:'payment', l:'Payment', t:'S', get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
+  {k:'payment', l:'Payment', t:'S', not:['annexation'], get:s=>({unpaid:0, partial:1, paid:2, none:3})[payStatus(s)], fmt:s=>payPill(s)},
   {k:'buildType', l:'Build Type', t:'T', only:['building','homeowner','subtrade'], get:s=>s.fields.buildType||''},
   {k:'signFeature', l:'Sign Feature', t:'T', only:['sign'], get:s=>s.fields.signFeature||''},
   {k:'applicant', l:'Applicant Name', t:'T', get:s=>s.fields.applicant||'', fmt:s=>esc(s.fields.applicant||'')+(isLinked(s)?' <span class="lk-tag" title="Linked to '+(s.form==='subtrade'?'a building permit':linkedSubs(s).length+' sub trade application'+(linkedSubs(s).length===1?'':'s'))+'">'+ic('link')+'Linked</span>':'')},
@@ -3175,7 +3278,7 @@ function viewWorkspace(){
     wsBulkHtml(rows)+
     rows.map(k=>{ const all = subsFor(k), un = all.filter(s=>!s.read).length;
       return '<li class="'+(S.wsSel&&S.wsSel[k]?'picked':'')+'" data-k="'+k+'"'+(custom?' draggable="true" ondragstart="wsDrag(event,\''+k+'\')" ondragover="event.preventDefault()" ondrop="wsDrop(event,\''+k+'\')"':'')+' onclick="go(\'table\',\''+k+'\')"><input type="checkbox" class="ck" aria-label="Select '+esc(FORMS[k].title)+'" '+(S.wsSel&&S.wsSel[k]?'checked':'')+' onclick="event.stopPropagation()" onchange="wsPick(\''+k+'\',this.checked)"><span class="star"><svg viewBox="0 0 24 24" class="i">'+IC.star+'</svg></span><span class="ficon tbl">'+ic(FORMS[k].icon)+(un?'<span class="badge num">'+un+'</span>':'')+'</span>'+
-       '<span><b>'+esc(FORMS[k].title)+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+(all.length?' · '+all.filter(s=>!isPaid(s)).length+' unpaid':'')+'. Created on '+FORMS[k].created+'</small></span><span class="ord">'+(custom && !S.wsQ?'<button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' up" onclick="event.stopPropagation();wsMove(\''+k+'\',-1)">▲</button><button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' down" onclick="event.stopPropagation();wsMove(\''+k+'\',1)">▼</button>':'')+'</span></li>'; }).join('')+
+       '<span><b>'+esc(FORMS[k].title)+(formBeta(k)?' <span class="pill beta-pill">Beta</span>':'')+'</b><small class="num">'+all.length+' Submission'+(all.length===1?'':'s')+(all.length?' · '+all.filter(s=>!isPaid(s)).length+' unpaid':'')+'. Created on '+FORMS[k].created+'</small></span><span class="ord">'+(custom && !S.wsQ?'<button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' up" onclick="event.stopPropagation();wsMove(\''+k+'\',-1)">▲</button><button class="btn sm ghost" aria-label="Move '+esc(FORMS[k].title)+' down" onclick="event.stopPropagation();wsMove(\''+k+'\',1)">▼</button>':'')+'</span></li>'; }).join('')+
    '</ul>'+(S.loaded?'':'<p class="empty">Loading applications…</p>')+(S.loadErr?'<p class="empty">Could not load applications: '+esc(S.loadErr)+'</p>':'')+'</main></div>';
 }
 
@@ -3387,6 +3490,8 @@ function panelHtml(){
         '<div>Grand total</div><div class="num"><b>'+money(fe.total)+'</b></div></div>'+
         (s.editedAt?'<p class="hint" style="color:var(--muted);font-size:13px">Edited by staff '+fmtDT(s.editedAt)+'</p>':'');
     }
+  } else if (S.tab==='office' && s.form==='annexation'){
+    body = annexOfficeHtml(s)+'<div class="fgrid" style="margin-top:14px">'+fyBoxHtml(s)+'</div>';
   } else if (S.tab==='office'){
     const ins = st.inspections||{};
     const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
@@ -3454,6 +3559,7 @@ async function saveEdit(){
 }
 async function saveOffice(){
   const s = curSub(); if (!s||!DB) return;
+  if (s.form === 'annexation') return saveAnnexOffice(s);
   const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
   const prev = s.staff||{};
   const st = Object.assign({}, prev, { permitNo:g('o_permitNo')||'', payment:prev.payment||'', checkNo:prev.checkNo||'', approvedBy:g('o_approvedBy')||'', approvedDate:g('o_approvedDate')||'', comments:g('o_comments')||'' });
@@ -4507,7 +4613,13 @@ function statusCard(r){
     list: insL.length ? '<ul class="st-insp">'+insL.map(x => '<li class="'+(x.st==='complete'?'ok':'pend')+'"><span>'+esc(x.n)+'</span><span>'+
       (x.st==='complete' ? 'Complete'+(x.date ? ' · '+esc(fmtDay(x.date)) : '') : 'Pending')+'</span></li>').join('')+'</ul>' : '' });
   if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
+  let annexClosed = false, annexed = false;
+  if (r.form === 'annexation'){ const A = annexStatusSteps(r); steps.length = 0; A.steps.forEach(x => steps.push(x)); annexClosed = A.closed; annexed = A.annexed; }
   const complete = steps.every(x => x.st==='ok');
+  if (r.form === 'annexation') return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · ID # '+esc(permitNo):'')+'</span></div>'+
+    '<span class="pill '+(annexed?'paid':annexClosed?'unpaid':'partial')+'">'+(annexed?'Annexed':annexClosed?'Closed':'In progress')+'</span></div>'+
+    '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
+    '<p class="st-note">There is no fee for annexation. Questions? Contact the Planning Department at 256-586-5968 or kjohnson@arabcity.org.</p></section>';
   return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · Permit # '+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     /* v2.31.2: one even row of short tiles; details (what we need + upload, inspection list) go full width below */
@@ -6141,6 +6253,68 @@ function jobCardHtml(d){
   '<script>(function(){function fit(){var b=document.body;b.style.zoom=1;var a=96*10.2,h=b.getBoundingClientRect().height;if(h>a)b.style.zoom=(a/h).toFixed(3);}fit();window.addEventListener("load",fit);document.fonts&&document.fonts.ready.then(fit);})();<\/script>'+
   '</body></html>';
 }
+/* ================= v2.34.0: Annexation (beta) — Planning Department / Planning Commission / City Council =================
+   Staff record each stage in staff.annex. The applicant sees the stages on Check permit status / My permits
+   (server: bf_annex_status, which returns only these stage fields, never staff comments). */
+const ANNEX_REVIEW = ['Qualifies','More information needed','Does not qualify'];
+const ANNEX_PC = ['Recommend approval','Recommend denial','Tabled'];
+const ANNEX_CC = ['Approved','Denied','Tabled'];
+const annexPublic = x => { if (!x || x.form !== 'annexation') return null; const a = ((x.staff||{}).annex) || {};
+  const k = ['review','reviewDate','petitionDate','pcDate','pcRec','ccDate','ccDecision','ordinance','letterDate'], o = {}; k.forEach(n => { o[n] = String(a[n]||''); }); return o; };
+function annexStage(s){ const a = ((s.staff||{}).annex) || {};
+  if (a.ccDecision==='Approved') return a.letterDate ? 'Annexed' : 'Approved by City Council';
+  if (a.ccDecision==='Denied') return 'Denied by City Council';
+  if (a.review==='Does not qualify') return 'Does not qualify';
+  if (a.pcRec==='Recommend approval' || a.pcRec==='Recommend denial') return a.ccDate ? 'City Council '+fmtDay(a.ccDate) : 'Waiting for City Council';
+  if (a.pcDate) return 'Planning Commission '+fmtDay(a.pcDate);
+  if (a.petitionDate) return 'Petition received';
+  if (a.review==='Qualifies') return 'Qualifies · petition next';
+  if (a.review==='More information needed') return 'Information needed';
+  return 'Planning Department review'; }
+function annexOfficeHtml(s){
+  const st = s.staff||{}, a = st.annex||{}, sel = (id, list, v) => '<select id="'+id+'"><option value="">—</option>'+list.map(o => '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+  const dt = (id, v, lab) => '<div class="fld"><label class="l" for="'+id+'">'+lab+'</label><input type="date" id="'+id+'" value="'+esc(v||'')+'"></div>';
+  return '<form id="offf" class="fgrid">'+
+    '<div class="fld full"><div class="callout warn beta-note" style="margin:0"><b><span class="pill beta-pill">Beta</span> Annexation process</b>Record each stage as it happens. The applicant sees the stage names, dates and decisions on Check permit status (never your comments). The Petition for Annexation is still signed and notarized on paper.</div></div>'+
+    '<div class="fld"><label class="l" for="o_permitNo">Annexation ID #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="ID #"></div><div class="fld"></div>'+
+    '<div class="sect">1. Planning Department review</div>'+
+    '<div class="fld"><label class="l" for="a_review">Does the property qualify?</label>'+sel('a_review', ANNEX_REVIEW, a.review)+'<span class="hint">Contiguous to city limits, ability to serve the area, benefit to the city, impact on city schools.</span></div>'+
+    '<div class="fld"><label class="l" for="a_reviewBy">Reviewed by (initials)</label><input type="text" id="a_reviewBy" value="'+esc(a.reviewBy||'')+'" placeholder="Initials"></div>'+
+    dt('a_reviewDate', a.reviewDate, 'Review date')+'<div class="fld"></div>'+
+    '<div class="sect">2. Petition for Annexation (signed &amp; notarized)</div>'+
+    dt('a_petitionDate', a.petitionDate, 'Signed, notarized petition received')+'<div class="fld"></div>'+
+    '<div class="sect">3. Planning Commission</div>'+
+    dt('a_pcDate', a.pcDate, 'Meeting date')+
+    '<div class="fld"><label class="l" for="a_pcRec">Recommendation</label>'+sel('a_pcRec', ANNEX_PC, a.pcRec)+'</div>'+
+    '<div class="sect">4. City Council</div>'+
+    dt('a_ccDate', a.ccDate, 'Meeting date')+
+    '<div class="fld"><label class="l" for="a_ccDecision">Decision</label>'+sel('a_ccDecision', ANNEX_CC, a.ccDecision)+'</div>'+
+    '<div class="fld"><label class="l" for="a_ordinance">Ordinance or resolution #</label><input type="text" id="a_ordinance" value="'+esc(a.ordinance||'')+'"></div><div class="fld"></div>'+
+    '<div class="sect">5. Notification</div>'+
+    dt('a_letterDate', a.letterDate, 'Notification letter sent to owners')+'<div class="fld"></div>'+
+    '<div class="fld full"><label class="l" for="o_comments">Staff comments</label><textarea id="o_comments">'+esc(st.comments||'')+'</textarea></div></form>';
+}
+async function saveAnnexOffice(s){
+  const g = id => { const el = document.getElementById(id); return el ? String(el.value||'').trim() : ''; }, prev = s.staff||{};
+  const a = { review:g('a_review'), reviewBy:g('a_reviewBy'), reviewDate:g('a_reviewDate'), petitionDate:g('a_petitionDate'), pcDate:g('a_pcDate'), pcRec:g('a_pcRec'),
+              ccDate:g('a_ccDate'), ccDecision:g('a_ccDecision'), ordinance:g('a_ordinance').slice(0,60), letterDate:g('a_letterDate') };
+  if (a.review && !a.reviewDate){ a.reviewDate = todayISO(); const de = document.getElementById('a_reviewDate'); if (de) de.value = a.reviewDate; }
+  if (a.ccDecision && !a.ccDate){ toast('Enter the City Council meeting date for this decision.'); const de = document.getElementById('a_ccDate'); if (de) de.focus(); return; }
+  if (a.pcRec && !a.pcDate){ toast('Enter the Planning Commission meeting date for this recommendation.'); const de = document.getElementById('a_pcDate'); if (de) de.focus(); return; }
+  const st = Object.assign({}, prev, { permitNo:g('o_permitNo'), payment:prev.payment||'', comments:g('o_comments'), annex:a });
+  try{ await DB.doc('submissions/'+s.id).update({ staff:st }); toast('Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
+}
+function annexStatusSteps(r){
+  const a = r.annex || {}, d = v => v ? fmtDay(v) : '', no = a.review==='Does not qualify';
+  const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
+    { t:'Planning Department review', d: a.review==='Qualifies' ? 'Qualifies'+(a.reviewDate ? ' · '+d(a.reviewDate) : '') : a.review==='More information needed' ? 'More information needed. The Planning Department will contact you.' : no ? 'Does not qualify for annexation' : 'Under review',
+      st: a.review==='Qualifies' ? 'ok' : a.review ? 'part' : '' },
+    { t:'Petition for Annexation', d: a.petitionDate ? 'Signed, notarized petition received '+d(a.petitionDate) : a.review==='Qualifies' ? 'The Planning Department will send you the petition to sign in front of a notary' : 'Prepared if the property qualifies', st: a.petitionDate ? 'ok' : '' },
+    { t:'Planning Commission', d: a.pcRec ? a.pcRec+(a.pcDate ? ' · '+d(a.pcDate) : '') : a.pcDate ? 'Meeting '+d(a.pcDate) : 'Not scheduled yet', st: (a.pcRec==='Recommend approval'||a.pcRec==='Recommend denial') ? 'ok' : a.pcDate ? 'part' : '' },
+    { t:'City Council', d: a.ccDecision ? a.ccDecision+(a.ccDate ? ' · '+d(a.ccDate) : '')+(a.ordinance ? ' · Ordinance '+a.ordinance : '') : a.ccDate ? 'Meeting '+d(a.ccDate) : 'Not scheduled yet', st: a.ccDecision==='Approved' ? 'ok' : a.ccDecision || a.ccDate ? 'part' : '' },
+    { t:'Notification letter', d: a.letterDate ? 'Sent '+d(a.letterDate) : a.ccDecision==='Approved' ? 'The annexation is official. Your notification letter is on the way.' : a.ccDecision==='Denied' ? 'Not annexed' : 'Sent when the annexation is complete', st: a.letterDate ? 'ok' : a.ccDecision==='Approved' ? 'part' : '' }];
+  return { steps, closed: no || a.ccDecision==='Denied', annexed: a.ccDecision==='Approved' };
+}
 /* v2.33.1 (Jade): open the application exactly as the applicant sees it on Check permit status / My permits.
    The server (bf_staff_status_view, Building Department only) returns the same item My permits gets. */
 function stViewBtn(s){ return canBuilding() ? '<button class="btn" onclick="openStatusView(\''+s.id+'\')" title="See this permit the way the applicant sees it">'+ic('search')+'View in status checker</button>' : ''; }
@@ -6487,7 +6661,7 @@ function dStatusItem(id, d){ const x = d.data, st = x.staff || {}, ok = dApprove
           reviewRequired:dReviewRequired(id, x), infoNeeded: ok ? '' : String(st.infoNeeded||'').trim().slice(0,1000), inspections:ins, co:st.co||'',
           fees:{ permit:(x.fees||{}).permit, cict:(x.fees||{}).cict, total:(x.fees||{}).total, doubled:(x.fees||{}).doubled },
           pay:{ status:(x.pay||{}).status, total:(x.pay||{}).total, paid:(x.pay||{}).paid, balance:(x.pay||{}).balance, lastPaidOn:(x.pay||{}).lastPaidOn }, payment:st.payment||'',
-          infoReceived: x.infoReceivedAt ? { at:x.infoReceivedAt, count:(x.files||[]).filter(m => m && m.fromApplicant).length } : null };
+          infoReceived: x.infoReceivedAt ? { at:x.infoReceivedAt, count:(x.files||[]).filter(m => m && m.fromApplicant).length } : null, annex:annexPublic(x) };
 }
 function dAppSession(em){ const u = DEMO.appUsers[em], t = 'demo-app-'+dUuid(); (DEMO.appSess || (DEMO.appSess = {}))[t] = em; u.lastLogin = new Date().toISOString(); return { token:t, user:{ email:u.email, name:u.name, createdAt:u.createdAt } }; }
 function dAppUser(t){ const em = (DEMO.appSess||{})[t], u = em && (DEMO.appUsers||{})[em]; return u && u.active ? u : null; }
