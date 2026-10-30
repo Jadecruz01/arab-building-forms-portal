@@ -1484,7 +1484,7 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
     max-height:calc(100dvh - 88px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;z-index:60}
 }
 /* v2.31.10: footer lined up with the page card; grouped links; tidy credit line */
-.pfoot .pfoot-in{display:block;max-width:none;box-sizing:border-box;padding:30px 16px calc(22px + env(safe-area-inset-bottom,0px))}
+.pfoot .pfoot-in{display:block;max-width:calc(1040px + 32px);box-sizing:border-box;padding:30px 16px calc(22px + env(safe-area-inset-bottom,0px))}
 .pfoot.pf-apps .pfoot-in{max-width:calc(1040px + 32px)}
 .pfoot.pf-pv .pfoot-in{max-width:calc(860px + 32px)}
 .pf-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px 48px;flex-wrap:wrap}
@@ -1502,6 +1502,24 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
   .pf-top{flex-direction:column;gap:22px}
   .pf-cols{gap:22px 40px}
   .pfoot .pf-credit{flex-direction:column;align-items:flex-start;gap:8px}
+}
+/* v2.33.1 (Jade): every public page uses the Applications & Fees "page in page" card (1040px, centered), so the
+   status checker, My permits and the forms match, and the footer lines up with the card on every page. */
+html:not(.embed) .app.pub .sheet:not(.pv):not(.phone-block){max-width:1040px;margin-left:auto;margin-right:auto}
+html:not(.embed) .app.pub .sheet.stat,html:not(.embed) .app.pub .sheet:not(.apps):not(.pv):not(.phone-block){padding:36px 44px 34px}
+.sheet.stat > .form-h{align-items:center;text-align:center;border-bottom:0;padding-bottom:4px}
+.sheet.stat > .form-h .back{align-self:flex-start;margin-bottom:6px}
+.sheet.stat > .form-h h1{font-size:34px}
+.sheet.stat > .form-h .hint{max-width:62ch;font-size:15.5px}
+/* the search is sized to what it holds instead of stretching across the page */
+#stf{max-width:640px;margin:8px auto 0;width:100%}
+.acct .ac-tabs,.acct .ac-form,.acct .ac-small{max-width:640px;margin-left:auto;margin-right:auto}
+#stOut{max-width:100%}
+@media (max-width:640px){
+  html:not(.embed) .app.pub .sheet.stat,html:not(.embed) .app.pub .sheet:not(.apps):not(.pv):not(.phone-block){padding:22px 16px 28px}
+  .sheet.stat > .form-h{align-items:flex-start;text-align:left}
+  .sheet.stat > .form-h h1{font-size:27px}
+  #stf{margin-top:4px}
 }
 /* v2.31.10: staff workspace switcher does not move between workspaces; even spacing around the divider */
 @media (min-width:1024px){.jt-top > .brandbar{flex:0 0 auto;min-width:var(--brandw,268px)}}
@@ -1533,6 +1551,12 @@ html.ios-app .phead-wrap{position:sticky;top:0;z-index:25;padding-top:env(safe-a
 .st-print{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:grid;gap:10px}
 .st-print-t{display:grid;gap:2px}.st-print-t b{font-size:15px}.st-print-t span{font-size:13.5px;color:var(--ink2)}
 .st-print-b{display:flex;gap:10px;flex-wrap:wrap}
+/* v2.33.1: staff "View in status checker" (applicant view) */
+#stvbox .scandlg{z-index:60}#stvbox .veil{z-index:59}
+.stvdlg{width:min(980px,calc(100% - 24px))}
+.stv-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 18px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
+.stv-h h2{font:800 20px var(--f-disp);margin:0}.stv-h p{margin:4px 0 0;font-size:13.5px;color:var(--ink2)}
+.stv-b{padding:4px 18px 18px}.stv-card .st-card{margin-top:12px}
 .st-print .st-up-msg{margin:0}
 @media (max-width:560px){.st-print-b .btn{flex:1 1 100%;justify-content:center}}
 </style>
@@ -2091,7 +2115,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.33.0';   // shown at the bottom of every page
+const APP_VERSION = '2.33.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3402,8 +3426,8 @@ function panelHtml(){
     : (S.tab==='app' && S.editing
       ? '<button class="btn primary" onclick="saveEdit()">'+ic('check')+'Save changes</button><button class="btn" onclick="S.editing=false;render()">Cancel</button><span class="sp"></span><span class="hint" style="color:var(--muted);font-size:13px">Fees recalculate when you save.</span>'
       : S.tab==='office'
-        ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span>'+jobCardBtn(s)+'<button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
-        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+'<span class="sp"></span>'+(canBuilding()?'<button class="btn danger" onclick="openDelDlg([\''+s.id+'\'])">'+ic('trash')+'Delete</button>':'')+'');
+        ? '<button class="btn primary" onclick="saveOffice()">'+ic('check')+'Save office use</button><span class="sp"></span>'+jobCardBtn(s)+stViewBtn(s)+'<button class="btn" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button>'
+        : '<button class="btn" onclick="S.editing=true;S.tab=\'app\';render()">'+ic('edit')+'Edit</button><button class="btn primary" id="pdfBtn" onclick="downloadPdf()">'+ic('down')+'PDF with documents</button><button class="btn" onclick="downloadReceipt(\''+s.id+'\')">Receipt</button>'+jobCardBtn(s)+stViewBtn(s)+'<span class="sp"></span>'+(canBuilding()?'<button class="btn danger" onclick="openDelDlg([\''+s.id+'\'])">'+ic('trash')+'Delete</button>':'')+'');
   if (S.panelFull === undefined) S.panelFull = !!prefGet('panelFull');
   return '<div class="veil" onclick="closeSub()"></div><aside class="panel'+(S.panelFull?' full':'')+'" role="dialog" aria-label="Submission">'+
    '<div class="p-head">'+(navOriginLabel(NAV[NAV.length-1]) ? '<button type="button" class="btn sm p-back" onclick="closeSub()" title="Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'">'+ic('left')+'<span>Back to '+esc(navOriginLabel(NAV[NAV.length-1]))+'</span></button><span class="p-brk" aria-hidden="true"></span>' : '')+(S.view==='table' ? '<span class="p-arrows"><button class="btn sm ghost" aria-label="Previous" title="Previous application" onclick="stepSub(-1)">'+ic('left')+'</button><button class="btn sm ghost" aria-label="Next" title="Next application" onclick="stepSub(1)">'+ic('right')+'</button></span>' : '')+''+
@@ -4541,7 +4565,7 @@ function jobCardDataPub(r){
   const type = [f.buildType, f.buildType==='Residential' ? f.projectType : ''].filter(Boolean).join(' · ');
   const contractor = r.form === 'homeowner' ? 'Same (homeowner)' : ([f.business, f.contractor].filter(Boolean).filter((v,i,a) => a.indexOf(v)===i).join(' · '));
   const subs = r.linkedSubs || [], subName = re => { const x = subs.find(t => re.test(t.trade||'')); return x ? [x.name, x.permitNo ? 'Permit '+x.permitNo : ''].filter(Boolean).join(' · ') : ''; };
-  const ins = r.inspections || {}, insp = n => { const v = ins[n] || {}; return { done: !!v.date, date: usd(v.date), by: v.by || '' }; };
+  const ins = r.inspections || {}, insp = n => { const v = ins[n] || {}; return { done: !!v.complete, date: usd(v.date), by: v.by || '' }; };
   return { permitNo: r.permitNo || '', owner: f.owner || f.applicant || '', date: usd(r.approvedDate), address: f.address || '', type, contractor,
     lot: f.lot || '', block: '', zone: f.zoning || '', subdivision: '',
     plumbing: subName(/plumb/i), electrical: subName(/elec/i), hvac: subName(/hvac|mech|heat|air|duct/i),
@@ -4553,8 +4577,19 @@ function appPrintHtml(r){
   (F.fields||[]).forEach(x => { if (x.type==='section'){ sec = x.label; return; } if (!x.id || x.type==='file' || x.type==='doc' || x.type==='note') return;
     const v = f[x.id]; if (v == null || v === '') return; if (sec){ rows.push('<tr class="h"><th colspan="2">'+esc(sec)+'</th></tr>'); sec = null; }
     rows.push('<tr><th>'+esc(x.label)+'</th><td>'+esc(x.type==='money' ? money(num(v)) : String(v))+'</td></tr>'); });
-  const pay = p.status==='paid' ? 'Paid in full' : p.status==='partial' ? 'Partly paid · '+money(p.balance)+' still due' : p.status==='none' ? 'No fee' : 'Not paid yet · '+money(p.total!=null ? p.total : fe.total)+' due';
-  const insL = Object.entries(r.inspections||{});
+  const ps = payStatus({ pay:p.status ? p : null, staff:{ payment:r.payment||'' }, fees:fe }), total = p.total!=null ? p.total : fe.total;
+  const pay = ps==='paid' ? 'Paid in full' : ps==='partial' ? 'Partly paid · '+money(p.balance)+' still due' : ps==='none' ? 'No fee' : 'Not paid yet · '+money(total)+' due';
+  /* v2.33.1 (Jade): the printout shows the same steps as the status page, each marked Complete or Pending, so the
+     applicant can see what is still open. Every print reads the current record, so finished steps show as complete. */
+  const insRaw = r.inspections || {}, insL = INSPECT.concat(Object.keys(insRaw).filter(k => !INSPECT.includes(k))).filter(n => insRaw[n]).map(n => [n, insRaw[n]]);
+  const doneN = insL.filter(x => x[1].complete).length, pendN = insL.length - doneN, finalDone = insL.some(x => x[0]==='Final' && x[1].complete);
+  const steps = [{ t:'Application received', d:fmtDay(r.createdAt), ok:true },
+    { t:'Permit # assigned', d:r.permitNo ? 'Permit # '+r.permitNo : 'Not assigned yet', ok:!!r.permitNo },
+    { t:'Building Department approval', d:'Approved'+(r.approvedDate ? ' '+fmtDay(r.approvedDate) : ''), ok:true },
+    { t:'Fees paid', d:pay, ok:ps==='paid' || ps==='none' }];
+  if (inspForm(r.form)) steps.push({ t:'Inspections', d:!insL.length ? 'None complete yet' : [doneN ? doneN+' complete' : 'None complete', pendN ? pendN+' pending' : ''].filter(Boolean).join(' · ')+(finalDone ? '' : ' · Final inspection not complete'), ok:finalDone });
+  if (isBldg(r.form) || r.form==='subtrade') steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Issued' : 'Not issued yet', ok:r.co==='Given' });
+  const nOk = steps.filter(x => x.ok).length, allOk = nOk === steps.length, mark = ok => '<span class="mk '+(ok?'ok':'pd')+'">'+(ok?'&#10003; Complete':'Pending')+'</span>';
   const sect = (t, body) => '<h2>'+esc(t)+'</h2>'+body;
   return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(F.title)+' · Permit '+esc(r.permitNo||r.ref)+'</title><style>'+
     '@page{size:8.5in 11in;margin:0.5in}*{box-sizing:border-box}body{margin:0;font:10.5pt/1.4 Helvetica,Arial,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
@@ -4564,19 +4599,23 @@ function appPrintHtml(r){
     'h2{font-size:9pt;text-transform:uppercase;letter-spacing:.1em;color:#5b6274;margin:14pt 0 4pt;border-bottom:1pt solid #d8dbe2;padding-bottom:3pt}'+
     'table{width:100%;border-collapse:collapse}th,td{text-align:left;vertical-align:top;padding:3pt 6pt 3pt 0}th{width:38%;color:#2b3350;font-weight:bold}td{white-space:pre-wrap;overflow-wrap:anywhere}'+
     'tr.h th{padding-top:9pt;color:#7d6528;font-size:9pt;text-transform:uppercase;letter-spacing:.08em}'+
+    '.note{margin:4pt 0 0;color:#555;font-size:9pt}.prog td.m{width:1%;white-space:nowrap;padding-right:10pt}.mk{display:inline-block;font-size:8.5pt;font-weight:bold;padding:1pt 6pt;border-radius:8pt;border:1pt solid}'+
+    '.prog th{width:34%}.mk.ok{color:#1d6b3a;border-color:#7cb98f;background:#eaf6ee}.mk.pd{color:#8a5a00;border-color:#e0b862;background:#fff6e0}.prog tr.pd th,.prog tr.pd td{font-weight:bold}'+
     '.foot{margin-top:16pt;padding-top:6pt;border-top:1pt solid #d8dbe2;color:#555;font-size:8.5pt}'+
     '</style></head><body>'+
     '<div class="top"><div><b>City of Arab Building Department</b><span>'+esc(F.title)+'</span></div><div class="r"><b>Permit # '+esc(r.permitNo||'not assigned')+'</b><span>Reference # '+esc(r.ref)+'</span>'+
       (r.master ? '<span style="display:block">Linked to Master Permit # '+esc(r.master.permitNo || '(Ref '+r.master.ref+')')+'</span>' : '')+'</div></div>'+
-    '<div class="st"><div><small>Status</small><b>Approved'+(r.approvedDate ? ' '+esc(fmtDay(r.approvedDate)) : '')+'</b></div><div><small>Submitted</small>'+esc(fmtDT(r.createdAt))+'</div><div><small>Fees</small>'+esc(pay)+'</div>'+
+    '<div class="st"><div><small>Status</small><b>'+(allOk ? 'Complete' : 'In progress · '+nOk+' of '+steps.length+' steps complete')+'</b></div><div><small>Approved</small>'+esc(r.approvedDate ? fmtDay(r.approvedDate) : 'Yes')+'</div><div><small>Submitted</small>'+esc(fmtDT(r.createdAt))+'</div><div><small>Fees</small>'+esc(pay)+'</div>'+
       (r.co ? '<div><small>Certificate of Occupancy</small>'+esc(r.co==='Given' ? 'Issued' : r.co)+'</div>' : '')+'</div>'+
+    sect('Progress', '<table class="prog">'+steps.map(x => '<tr class="'+(x.ok?'ok':'pd')+'"><td class="m">'+mark(x.ok)+'</td><th>'+esc(x.t)+'</th><td>'+esc(x.d)+'</td></tr>').join('')+'</table>'+
+      (allOk ? '' : '<p class="note">Pending steps are still open with the Building Department. Print again any time to see the latest.</p>'))+
     sect('Application', '<table>'+rows.join('')+'</table>')+
     (Array.isArray(r.agreements) && r.agreements.length ? sect('Terms & agreements', '<table>'+r.agreements.map(a => '<tr><th>'+esc(a.title||a.id)+'</th><td>Agreed '+esc(fmtDT(a.at))+'</td></tr>').join('')+'</table>') : '')+
     sect('Fees', '<table>'+((isBldg(r.form)||r.form==='subtrade') ? '<tr><th>Construction value</th><td>'+esc(money(fe.value))+(fe.basis?' ('+esc(fe.basis)+')':'')+'</td></tr>' : '')+
       '<tr><th>Permit fee</th><td>'+esc(money(fe.permit))+(fe.doubled?' (doubled: work started without a permit)':'')+'</td></tr>'+
       ((SHOWS_CICT(r.form)||fe.cict) ? '<tr><th>CICT fee</th><td>'+esc(money(fe.cict))+'</td></tr>' : '')+
       '<tr><th>Total</th><td><b>'+esc(money(fe.total))+'</b></td></tr><tr><th>Payment</th><td>'+esc(pay)+'</td></tr></table>')+
-    (insL.length ? sect('Inspections', '<table>'+insL.map(([n, v]) => '<tr><th>'+esc(n)+'</th><td>'+(v.complete ? 'Complete' : 'Pending')+(v.date ? ' · '+esc(fmtDay(v.date)) : '')+(v.by ? ' · Inspector '+esc(v.by) : '')+'</td></tr>').join('')+'</table>') : '')+
+    (insL.length ? sect('Inspections', '<table class="prog">'+insL.map(([n, v]) => '<tr class="'+(v.complete?'ok':'pd')+'"><td class="m">'+mark(v.complete)+'</td><th>'+esc(n)+'</th><td>'+(v.complete ? (v.date ? esc(fmtDay(v.date)) : '')+(v.by ? (v.date ? ' · ' : '')+'Inspector '+esc(v.by) : '') : 'Not complete yet')+'</td></tr>').join('')+'</table>') : '')+
     '<div class="foot">Printed '+esc(fmtDT(new Date().toISOString()))+' from arabcityapplications.jadecruz.dev. This copy shows the latest information the Building Department has on file. Print again any time to see updates. Questions: buildingdept@arabcity.org · 256-586-5968.</div>'+
     '</body></html>';
 }
@@ -6102,6 +6141,25 @@ function jobCardHtml(d){
   '<script>(function(){function fit(){var b=document.body;b.style.zoom=1;var a=96*10.2,h=b.getBoundingClientRect().height;if(h>a)b.style.zoom=(a/h).toFixed(3);}fit();window.addEventListener("load",fit);document.fonts&&document.fonts.ready.then(fit);})();<\/script>'+
   '</body></html>';
 }
+/* v2.33.1 (Jade): open the application exactly as the applicant sees it on Check permit status / My permits.
+   The server (bf_staff_status_view, Building Department only) returns the same item My permits gets. */
+function stViewBtn(s){ return canBuilding() ? '<button class="btn" onclick="openStatusView(\''+s.id+'\')" title="See this permit the way the applicant sees it">'+ic('search')+'View in status checker</button>' : ''; }
+async function openStatusView(id){
+  closeStatusView();
+  const s = S.subs.find(x => x.id===id), d = document.createElement('div'); d.id = 'stvbox';
+  d.innerHTML = '<div class="veil" onclick="closeStatusView()"></div><div class="scandlg wide stvdlg" role="dialog" aria-modal="true" aria-labelledby="stvT">'+
+    '<div class="stv-h"><div><h2 id="stvT">Applicant view</h2><p>What the applicant sees for reference # '+esc(refNo(id))+' on Check permit status and My permits. Buttons are turned off here.</p></div>'+
+    '<button type="button" class="btn sm ghost" aria-label="Close" onclick="closeStatusView()">'+ic('x')+'</button></div>'+
+    '<div class="stv-b" id="stvB"><p class="st-up-msg">Loading the applicant view…</p></div></div>';
+  document.body.appendChild(d); document.addEventListener('keydown', stvEsc); syncScrollLock();
+  try{
+    const r = await sbRpc('bf_staff_status_view', { p_token:TOKEN, p_id:id });
+    const b = document.getElementById('stvB'); if (!b) return;
+    b.innerHTML = '<div class="stv-card" inert>'+statusCard(r)+'</div>';
+  }catch(x){ const b = document.getElementById('stvB'); if (b) b.innerHTML = '<p class="formerr" role="alert">'+esc(x.message || 'Could not load the applicant view.')+'</p>'; }
+}
+function stvEsc(e){ if (e.key==='Escape') closeStatusView(); }
+function closeStatusView(){ const d = document.getElementById('stvbox'); if (d) d.remove(); document.removeEventListener('keydown', stvEsc); syncScrollLock(); }
 function jobCardBtn(s){ return (isBldg(s.form) || (s.form==='subtrade' && s.linkedTo)) ? '<button class="btn" onclick="printJobCard(\''+s.id+'\')" title="Print the Post This Card job site card">'+ic('printer')+'Job site card</button>' : ''; }
 function printJobCard(id){
   let s = subById(id); if (!s) return;
@@ -6529,10 +6587,10 @@ function demoCall(fn, A){
       if (!id) return { error:'We could not find that application. Check your reference # and email, then try again.' };
       const x = S2[id].data, st = x.staff||{};
       if (!dApproved(x)) return { error:'Printing opens once the Building Department approves your application.' };
-      const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (v && (v.date || v.by)) ins[k] = { date:v.date||'', by:v.by||'', complete:!!(v.by && v.recorded) }; });
+      const ins = {}; Object.entries(st.inspections||{}).forEach(([k, v]) => { if (v && (v.date || v.by || v.recorded || v.comment)){ const c = !!(String(v.by||'').trim() && String(v.recorded||'').trim()); ins[k] = { complete:c, date:c ? (v.date||v.recorded) : (v.date||''), by:v.by||'' }; } });
       const subs = ['building','homeowner'].includes(x.form) ? Object.entries(S2).filter(([k, d]) => d.data.linkedTo===id).map(([k, d]) => ({ trade:(d.data.fields||{}).trade||'', name:(d.data.fields||{}).business||(d.data.fields||{}).subName||(d.data.fields||{}).applicant||'', permitNo:(d.data.staff||{}).permitNo||'' })) : [];
       const m = x.form==='subtrade' && x.linkedTo && S2[x.linkedTo] ? { permitNo:(S2[x.linkedTo].data.staff||{}).permitNo||'', ref:dRef(x.linkedTo) } : null;
-      return { ref:dRef(id), form:x.form, createdAt:x.createdAt||S2[id].created, fields:x.fields||{}, agreements:x.agreements||[], fees:x.fees||{}, pay:x.pay||{}, permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', co:st.co||'', inspections:ins, linkedSubs:subs, master:m, printedAt:new Date().toISOString() }; }
+      return { ref:dRef(id), form:x.form, createdAt:x.createdAt||S2[id].created, fields:x.fields||{}, agreements:x.agreements||[], fees:x.fees||{}, pay:x.pay||{}, payment:st.payment||'', permitNo:st.permitNo||'', approvedDate:st.approvedDate||'', co:st.co||'', inspections:ins, linkedSubs:subs, master:m, printedAt:new Date().toISOString() }; }
     case 'bf_info_upload': { const ref = String(A.p_ref||'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,8), em = String(A.p_email||'').trim().toLowerCase();
       let id = null;
       if (A.p_app_token){ const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits again.' }; id = Object.keys(u.apps).find(k => dRef(k)===ref && S2[k]); if (!id) return { error:'That application is not in your My permits account.' }; }
@@ -6553,6 +6611,7 @@ function demoCall(fn, A){
       if (u && u.active){ u.reset = String(Math.floor(Math.random()*1e6)).padStart(6,'0'); setTimeout(() => toast('Demo: no email is sent. The code would be '+u.reset+'.'), 300); }
       return { ok:true, msg:'If an account uses that email, we sent it a 6-digit code. It expires in 15 minutes. Check your spam folder if you do not see it.' }; }
     case 'bf_staff_app_mail_status': dNeed(T,'building'); return { ready:true, from:'noreply@jadecruz.dev', recent:[] };
+    case 'bf_staff_status_view': { dNeed(T,'building'); const d = S2[A.p_id]; if (!d) throw new Error('That application is no longer on file. Refresh and try again.'); return dStatusItem(A.p_id, d); }
     case 'bf_staff_app_accounts': { dNeed(T,'building'); return Object.values(DEMO.appUsers||{}).map(u => ({ id:'demo-app-'+u.email, email:u.email, name:u.name, active:u.active, createdAt:u.createdAt, lastLogin:u.lastLogin||null,
         resetPending:!!u.reset, resetExpires:u.reset ? new Date(Date.now()+864e5).toISOString() : null, apps:Object.keys(u.apps).filter(id => S2[id]).map(dRef) })); }
     case 'bf_staff_app_reset_code': { dNeed(T,'building'); const u = dAppById(A.p_id); const c = Array.from({length:8}, () => 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
