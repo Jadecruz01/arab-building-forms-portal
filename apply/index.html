@@ -1911,6 +1911,10 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
     if (x.docs || x.type==='doc') return null;                 // homeowners: no license / contract documents
     if (x.type==='section'){ inC = x.label==='Contractor'; return inC ? Object.assign({}, x, {label:'Contractor (earlier applications)', legacy:true}) : x; }
     if (inC) return Object.assign({}, x, {req:false, legacy:true, show:()=>false});
+    // v2.36.2 (Jade): no Residential/Commercial question; a homeowner permit is residential. Saved as buildType
+    // 'Residential' on submit; earlier homeowner applications keep whatever they had (staff still see it).
+    if (x.id === 'buildType') return Object.assign({}, x, {req:false, legacy:true, show:()=>false});
+    if (x.show){ const s0 = x.show; x = Object.assign({}, x, {show: f => s0(Object.assign({}, f, {buildType: (f && f.buildType) || 'Residential'}))}); }
     return x === OTHER_UPLOAD ? PLANS_UPLOAD : x; }).filter(Boolean); })(),
   agreements:[{id:'appAgree'},{id:'occupancy'}] });
 /* v2.34.0 (Jade): online Annexation Application, in BETA. The fillable PDF stays available in parallel.
@@ -2244,7 +2248,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.36.0';   // shown at the bottom of every page
+const APP_VERSION = '2.36.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2622,6 +2626,7 @@ async function submitForm(e){
   btn.disabled = true; err.textContent='';
   const F = FORMS[S.form], vals = {};
   valueFields(F).forEach(x => { if ((!x.show || x.show(FVALS)) && FVALS[x.id]!=null && FVALS[x.id]!=='') vals[x.id] = String(FVALS[x.id]); });
+  if (S.form === 'homeowner') vals.buildType = 'Residential';
   let opt;
   try{ btn.textContent = 'Preparing documents…'; opt = await Promise.all(FILES.map(f => OPT.get(f) || queueOptimize(f))); }
   catch(x){ err.textContent = x.message; btn.disabled=false; btn.textContent='Submit application'; return; }
