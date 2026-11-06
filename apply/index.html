@@ -2068,7 +2068,7 @@ async function sbRpc(fn, args){
 }
 let TOKEN = null; try{ TOKEN = localStorage.getItem('bdStaffToken') || sessionStorage.getItem('bdStaffToken'); }catch(e){}
 if (DEMO) TOKEN = DEMO.token;   // the real sign-in stays in storage, untouched
-// "Keep me signed in" keeps the token for 7 days (localStorage); otherwise it lives only until the browser is closed.
+// "Keep me signed in" keeps the token until Sign out or the browser's data is cleared (localStorage; v2.36.4, was 7 days); otherwise it lives only until the browser is closed.
 function saveToken(t, remember){ if (DEMO){ DEMO.token = t; demoSave(); return; } try{ localStorage.removeItem('bdStaffToken'); sessionStorage.removeItem('bdStaffToken'); (remember ? localStorage : sessionStorage).setItem('bdStaffToken', t); }catch(e){} }
 const tokenRemembered = () => { try{ return !!localStorage.getItem('bdStaffToken'); }catch(e){ return false; } };
 S.booting = !!TOKEN;   // a remembered sign-in is being checked: show "Loading", not the sign-in form
@@ -2258,7 +2258,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.36.3';   // shown at the bottom of every page
+const APP_VERSION = '2.36.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3460,7 +3460,7 @@ function viewPin(){
    '<div class="lb-wrap"><div class="lb-hero">'+logoImg('lb-logo')+'<h2><em>Applications &amp; Fees</em></h2><p>One sign-in for the Building Department and the City Clerk. You go straight to your own workspace.</p></div>'+
    '<form class="pin" id="pinf"><h1 style="font:800 22px var(--f-disp)">Staff sign in</h1>'+
    fld('lgEmail','Email','email','username')+fld('lgPass','Password','password','current-password')+
-   '<label class="opt" style="border:0;padding:0;text-align:left;background:transparent"><input type="checkbox" id="lgRem"> <span>Keep me signed in for 7 days <span style="color:var(--muted)">(only on a computer that is yours)</span></span></label>'+
+   '<label class="opt" style="border:0;padding:0;text-align:left;background:transparent"><input type="checkbox" id="lgRem"> <span>Keep me signed in until I sign out <span style="color:var(--muted)">(only on a computer that is yours)</span></span></label>'+
    (S.pinMsg?'<p class="pinmsg" role="status">'+esc(S.pinMsg)+'</p>':'')+
    '<span class="formerr" id="pinErr"></span><button class="btn primary" id="lgBtn" style="justify-content:center">Sign in</button>'+
    // v2.21.4: the reset help appears only after a sign-in attempt fails
