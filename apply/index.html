@@ -185,6 +185,16 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .done{text-align:center;padding:24px 8px}
 .done .ck{width:56px;height:56px;border-radius:50%;background:var(--okbg);color:var(--ok);display:grid;place-items:center;margin:0 auto 12px}
 .done-note{max-width:420px;margin:0 auto 22px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.dn-card{max-width:440px;margin:20px auto 18px;border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;background:var(--surface2)}
+.dn-ref{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:18px 16px 16px;background:#fef6e9;border-bottom:1px solid var(--line)}
+.dn-ref>span{font:700 11px/1.3 var(--f-body,inherit);letter-spacing:.14em;text-transform:uppercase;color:#7d6528}
+.dn-ref .dn-num{font-size:32px;font-weight:700;letter-spacing:.12em;color:#212c46;line-height:1.25}
+.dn-ref small b{color:#212c46}
+.dn-ref small{font-size:13px;line-height:1.45;color:#4b5468;max-width:340px}
+.dn-fee{display:flex;justify-content:space-between;align-items:baseline;padding:14px 18px 4px;font-size:15px}
+.dn-fee b{font-size:18px}
+.dn-small{margin:0;padding:0 18px 16px;font-size:13.5px;line-height:1.5;color:var(--ink2)}
+.dn-back{margin:16px 0 0;font-size:14px}.dn-back a{color:var(--ink2)}
 .done-acts{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
 .done-acts .btn{height:44px;padding:0 18px;justify-content:center;text-decoration:none;border-color:var(--line);color:var(--ink)}
 .done-acts .btn.primary{color:#fff;border-color:transparent}
@@ -2248,7 +2258,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.36.2';   // shown at the bottom of every page
+const APP_VERSION = '2.36.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2651,14 +2661,21 @@ async function submitForm(e){
     }
     LAST_RECEIPT = { id:subId, form:S.form, createdAt, fields:vals, fees, agreements, files };
     const done = document.getElementById('sheet');
-    done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:24px">Application submitted</h1><p class="pg-sub">The Building Department has your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'. You will be contacted at '+esc(vals.email||'the email you gave')+'.</p>'+
-      '<div class="feebox" style="max-width:420px;margin:18px auto;text-align:left"><div class="r"><span>Reference #</span><b class="num" style="font-size:18px;letter-spacing:.04em">'+refNo(subId)+'</b></div>'+(S.form==='annexation'
-        ? '<div class="r t"><span>Application fee</span><span class="num">No fee</span></div><small>The Planning Department will review your application. If the property qualifies, they will send you the official Petition for Annexation to sign in front of a notary. It then goes to the Planning Commission and the City Council. You will receive a letter when the annexation is complete.</small>'
-        : REVIEW_FORMS.includes(S.form)
-        ? '<div class="r t"><span>Estimated total</span><span class="num">'+money(fees.total)+'</span></div><small><b>Please do not pay yet.</b> This is an estimate. The Building Department will review your application and confirm the final total when it is approved, then contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy. They will also contact you if anything else is needed.</small></div>'
-        : '<div class="r t"><span>Amount due</span><span class="num">'+money(fees.total)+'</span></div><small>Download your receipt and show it (printed or on your phone) when you pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.”</small></div>')+
-      (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+'<p class="done-note">'+(vals.email ? 'We also emailed your reference # to <b>'+esc(vals.email)+'</b> (check your spam folder if you do not see it). ' : '')+'Check your permit status anytime: choose <b>Check permit status</b> on the Applications &amp; Fees page and enter reference # <b class="num">'+refNo(subId)+'</b> and '+esc(vals.email||'your email')+', or search with the property address and the owner’s name.</p>'+
-      '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a><a class="btn" '+HOME_LINK+'>Back to Applications &amp; Fees</a></div></div>';
+    // v2.36.2 (Jade): simpler confirmation. Reference # card, one short fee line, two buttons + a text link.
+    const ref = refNo(subId), em = vals.email || '';
+    const mailLine = DEMO ? 'Demo mode: no email is sent. Real applications get their reference # by email.'
+      : em ? 'We emailed it to <b>'+esc(em)+'</b>. Check your spam folder if you do not see it.' : 'Keep this number to check your status.';
+    const feeLine = S.form==='annexation'
+      ? '<div class="dn-fee"><span>Application fee</span><b>No fee</b></div><p class="dn-small">The Planning Department reviews it first. If the property qualifies, you will get the Petition for Annexation to sign.</p>'
+      : REVIEW_FORMS.includes(S.form)
+      ? '<div class="dn-fee"><span>Estimated total</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small"><b>Please do not pay yet.</b> We review your application first, confirm the total and contact you when it is time to pay.</p>'
+      : '<div class="dn-fee"><span>Amount due</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small">Pay in person at City Hall, 740 N Main St, by cash or check to “City of Arab.” Bring your receipt.</p>';
+    done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:26px">Application submitted</h1>'+
+      '<p class="pg-sub">We received your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'.</p>'+
+      '<div class="dn-card"><div class="dn-ref"><span>Your reference #</span><b class="num dn-num">'+ref+'</b><small>'+mailLine+'</small></div>'+feeLine+'</div>'+
+      (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+
+      '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a></div>'+
+      '<p class="dn-back"><a '+HOME_LINK+'>Back to Applications &amp; Fees</a></p></div>';
     FILES = []; FVALS = {};
     acAfterSubmit(subId, vals, licLinks.map(({slot, L}) => ({ slot, licenseId:L.id })));   // v2.35.0: then link saved licenses   // v2.27.0: signed in to My permits -> add it to the account
     // v2.23.1: applicant feedback survey removed (Jade's request); maybeAskFeedback is no longer called.
