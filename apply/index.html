@@ -187,6 +187,17 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .done-note{max-width:420px;margin:0 auto 22px;font-size:14px;line-height:1.55;color:var(--ink2)}
 
 /* v2.37.0 site updates */
+.upd-ed > span:last-child > .upd-who{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:2px 0 3px;font-size:inherit;color:inherit}
+.upd-role{position:relative;display:inline-flex;align-items:center;font:700 10.5px/1 var(--f-body,inherit);letter-spacing:.12em;text-transform:uppercase;color:#212c46;padding:6px 11px;border-radius:20px;
+  background:linear-gradient(110deg,#b8994f 0%,#c0a869 30%,#f6e8bb 45%,#c0a869 60%,#b8994f 100%);background-size:250% 100%;box-shadow:0 0 0 1px rgba(125,101,40,.35),0 2px 10px rgba(192,168,105,.45);animation:updShine 3.2s ease-in-out infinite}
+.upd-role .sp{position:absolute;width:10px;height:10px;pointer-events:none;background:linear-gradient(135deg,#f3dc8e,#c99a2e);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);filter:drop-shadow(0 0 2px rgba(201,154,46,.8));opacity:0;animation:updTwinkle 2.4s ease-in-out infinite}
+.upd-role .s1{top:-6px;right:-4px}
+.upd-role .s2{bottom:-5px;left:-5px;width:8px;height:8px;animation-delay:.8s}
+.upd-role .s3{top:-7px;left:38%;width:7px;height:7px;animation-delay:1.6s}
+@keyframes updShine{0%{background-position:100% 0}55%,100%{background-position:-50% 0}}
+@keyframes updTwinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:0;transform:scale(.4) rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){.upd-role,.upd-role .sp{animation:none}.upd-role .sp{opacity:.9}}
+
 .upd-art{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;height:168px;padding:16px 20px 18px;overflow:hidden;color:#fff;
   background:radial-gradient(circle at 88% 12%,rgba(192,168,105,.30),transparent 46%),linear-gradient(150deg,#2c3958,#212c46 58%,#161e31);border-bottom:3px solid var(--gold)}
 .upd-art::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:22px 22px}
@@ -2312,7 +2323,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.37.1';   // shown at the bottom of every page
+const APP_VERSION = '2.37.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2501,7 +2512,7 @@ function updBlock(b){
   return '';
 }
 function updEditor(P){
-  return '<div class="upd-ed"><span class="upd-av" aria-hidden="true">JC</span><span><small>Editor</small><b>'+esc(UPD_EDITOR)+'</b><span>Updated the site · '+esc(updDay(P.date))+'</span></span></div>';
+  return '<div class="upd-ed"><span class="upd-av" aria-hidden="true">JC</span><span><small>Editor</small><span class="upd-who"><b>'+esc(UPD_EDITOR)+'</b><span class="upd-role"><i class="sp s1" aria-hidden="true"></i><i class="sp s2" aria-hidden="true"></i><i class="sp s3" aria-hidden="true"></i>Web Admin</span></span><span>Updated the site · '+esc(updDay(P.date))+'</span></span></div>';
 }
 function viewUpdates(){
   const P = S.post ? UPDATES.find(u => u.id === S.post) : null;
