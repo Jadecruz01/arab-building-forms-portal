@@ -2323,7 +2323,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.37.2';   // shown at the bottom of every page
+const APP_VERSION = '2.37.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2584,7 +2584,7 @@ function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps" id="sheet">'+
    '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
-   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>Use the reference # on your receipt and your email.</small></span><span class="go">'+ic('right')+'</span></a>'+
+   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>No account needed. Use your reference # and email, or the property address and owner’s name.</small></span><span class="go">'+ic('right')+'</span></a>'+
    (APP_TOK ? '' : '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits</b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>')+
    (UPDATES.length ? '<a class="upd-latest" href="'+updHref(UPDATES[0].id)+'"'+(EMBED?' target="_top"':'')+'><span class="upd-new">New</span><span>'+esc(UPDATES[0].title)+'</span><span class="upd-all">Read the update '+ic('right')+'</span></a>' : '')+
    '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
@@ -4941,7 +4941,7 @@ function viewStatus(){
   const R = S.st || (S.st = { ref:'', email:'' });
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
    '<div class="sheet stat" id="sheet"><div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Check permit status</h1>'+
-     '<span class="hint" style="color:var(--muted)">Fill in <b>any two</b> of these to find your application. Your reference # is on your receipt and in the email we sent when you applied. What you enter is used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
+     '<span class="hint" style="color:var(--muted)">No account needed. Fill in <b>any two</b> of these to find your application. Your reference # is on your receipt and in the email we sent when you applied. What you enter is used only to find your application. '+PRIV_LINK('Privacy')+'</span></div>'+
    demoStatusHtml()+'<form id="stf" class="fgrid" novalidate>'+
      '<div class="fld"><label class="l" for="stRef">Reference #</label><input type="text" id="stRef" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 1B291DB2" value="'+esc(R.ref||'')+'"></div>'+
      '<div class="fld"><label class="l" for="stEmail">Email on the application</label><input type="email" id="stEmail" autocomplete="email" inputmode="email" placeholder="you@example.com" value="'+esc(R.email||'')+'"></div>'+
