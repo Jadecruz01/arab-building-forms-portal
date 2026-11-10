@@ -949,6 +949,22 @@ table.grid td.rn,table.grid th.rn{position:static}
 .nb-tx small{font-size:12px;color:var(--muted)}
 .nb-empty{display:flex;gap:8px;align-items:center;margin:0;padding:18px 14px;color:var(--muted);font-size:14px}
 .nb-empty svg{width:18px;height:18px;color:var(--ok)}
+/* v2.38.0 payment notifications (receipt button next to the bell) */
+.pb .nb-btn svg{width:21px;height:21px}
+.pb-count{background:#2f8a55}
+.pb .nb-menu{width:min(410px,calc(100vw - 24px))}
+.pb-item{align-items:flex-start}
+.pb-ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e8f5ec;color:#2f8a55;margin-top:1px}
+.pb-ic svg{width:16px;height:16px}
+.pb-item.rev .pb-ic{background:#fbeaea;color:#b23a3a}
+.pb-item.new{background:#f2faf4}
+.pb-item .nb-tx{flex:1}
+.pb-item .nb-tx span{white-space:normal;overflow:visible}
+.pb-amt{flex:none;font-weight:700;font-size:14px;color:#2f8a55;margin-left:6px;white-space:nowrap}
+.pb-item.rev .pb-amt{color:#b23a3a}
+.pb-st{font-style:normal;font-weight:700;font-size:11px;margin-left:6px;padding:1px 7px;border-radius:20px;background:#fff4e0;color:#8a5a12}
+.pb-st.ok{background:#e8f5ec;color:#2f8a55}
+
 .p-back{margin-right:6px}
 .pm-btn{display:flex;align-items:center;gap:10px;background:none;border:0;color:#e9e3d4;cursor:pointer;font:500 14px var(--f-body);padding:4px 6px;border-radius:999px}
 .pm-btn:hover,.pm-btn[aria-expanded=true]{background:rgba(255,255,255,.08)}
@@ -2139,16 +2155,16 @@ const DB = {
 async function loadSubs(){
   if (!TOKEN || !canBuilding()) return;
   S.loadingSubs = true;
-  try{ const [r] = await Promise.all([sbRpc('bf_query', {p_token:TOKEN, p_collection:'submissions', p_where_field:'app', p_where_value:APP_TAG, p_order_field:'createdAt', p_order_dir:'desc', p_limit:500}), typeof fyLoad === 'function' ? fyLoad() : null]);
+  try{ const [r] = await Promise.all([sbRpc('bf_query', {p_token:TOKEN, p_collection:'submissions', p_where_field:'app', p_where_value:APP_TAG, p_order_field:'createdAt', p_order_dir:'desc', p_limit:500}), typeof fyLoad === 'function' ? fyLoad() : null, typeof payFeedLoad === 'function' ? payFeedLoad() : null]);
     S.subs = (r||[]).map(x => Object.assign({fields:{}, staff:{}, files:[]}, x.data, {id:x.id})); S.loaded = true; S.loadErr = '';
   }catch(e){ S.loaded = true; S.loadErr = e.message; }
   S.loadingSubs = false;
   await loadStorage();
   const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest('.panel,#pf,.pin,.purge');
-  const nb = typeof notifUnread === 'function' ? notifUnread() + ':' + notifList().length : '', nbChanged = nb !== S.lastNb; S.lastNb = nb;
+  const nb = typeof notifUnread === 'function' ? notifUnread() + ':' + notifList().length + ':' + payUnread() + ':' + payList().length : '', nbChanged = nb !== S.lastNb; S.lastNb = nb;
   const inField = document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
   if (['staff','table','cict','records','ar'].includes(S.view) && !S.editing && !typing && !document.getElementById('fybox')) render();
-  else if (nbChanged && S.staff && !S.editing && !inField && !S.nmenu) render();
+  else if (nbChanged && S.staff && !S.editing && !inField && !S.nmenu && !S.paymenu) render();
 }
 async function loadStorage(){ try{ S.storage = await sbRpc('bf_storage_status', {}); }catch(e){} }
 const ATT = {};   // submissionId -> [{id,name,type,size,data(dataURL)}]
@@ -2313,7 +2329,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.37.4';   // shown at the bottom of every page
+const APP_VERSION = '2.38.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3468,7 +3484,7 @@ function visibleCols(k){
 function colSave(){ const st = S.cols; prefSet('cols.'+st.form, st.on.slice()); prefSet('pins.'+st.form, st.pin.slice()); prefSet('fyCol.'+st.form, true); prefSet('revCol.'+st.form, true); }
 function topBar(){
   return '<header class="jt-top">'+brandHtml('Arab City Staff Portal', S.view==='clerk' ? 'City Clerk' : canBuilding() || S.view!=='me' ? 'Building Department' : 'City Clerk')+((canBuilding() || canPay()) ? '<nav class="wsw" aria-label="Workspace"><button class="wsw-pub" title="Building Department Portal: the public Applications &amp; Fees page ('+FORM_ORDER.length+' forms)" aria-label="Public site" onclick="go(\'apps\')">'+ic('doc')+'<span class="wsw-l">Public site</span></button>'+(canBuilding() ? '<button class="'+(S.view!=='clerk'?'on':'')+'" onclick="go(\'staff\')">Building Dept</button>' : '')+(canPay() ? '<button class="'+(S.view==='clerk'?'on':'')+'" onclick="go(\'clerk\')">Payments</button>' : '')+'</nav>' : '')+'<span class="sp"></span>'+
-   (canBuilding() ? bellHtml() : '')+profileMenuHtml()+'</header>'+storageBanner();
+   (canBuilding() ? bellHtml()+payBellHtml() : '')+profileMenuHtml()+'</header>'+storageBanner();
 }
 
 /* ================= profile menu (upper right) + My account ================= */
@@ -3492,7 +3508,7 @@ function profileMenuHtml(){
     '</div>' : '')+'</div>';
 }
 function accessLabel(){ const a = myAccess(); return a.admin ? 'Administrator' : [a.building?'Building Department':'', a.payments?'Payments':'', canRecords()?'Records':''].filter(Boolean).join(' · ') || 'Staff'; }
-function togglePMenu(e){ if (e) e.stopPropagation(); S.nmenu = false; S.pmenu = !S.pmenu; render(); if (S.pmenu){ const f = document.querySelector('#pmMenu [role=menuitem]'); if (f) f.focus(); } }
+function togglePMenu(e){ if (e) e.stopPropagation(); S.nmenu = false; S.paymenu = false; S.pmenu = !S.pmenu; render(); if (S.pmenu){ const f = document.querySelector('#pmMenu [role=menuitem]'); if (f) f.focus(); } }
 document.addEventListener('click', e => { if (S.pmenu && !e.target.closest('.pm')){ S.pmenu = false; render(); } });
 document.addEventListener('keydown', e => { if (S.pmenu && e.key==='Escape'){ S.pmenu = false; render(); const b = document.getElementById('pmBtn'); if (b) b.focus(); } });
 /* ================= v2.21: new-application notifications (Building Department) =================
@@ -3539,7 +3555,7 @@ function bellHtml(){
     '</div>' : '')+'</div>';
 }
 function toggleBell(e){
-  if (e) e.stopPropagation(); S.pmenu = false; S.nmenu = !S.nmenu;
+  if (e) e.stopPropagation(); S.pmenu = false; S.paymenu = false; S.nmenu = !S.nmenu;
   if (S.nmenu){ const n = notifState(); S.nmenuSeen = n.seenAt; prefSet('notif', Object.assign(n, { seenAt: new Date().toISOString() })); }
   render(); if (S.nmenu){ const f = document.querySelector('#nbMenu .nb-item, #nbMenu .linkbtn'); if (f) f.focus(); }
 }
@@ -3554,6 +3570,66 @@ function openNotif(id){
 }
 document.addEventListener('click', e => { if (S.nmenu && !e.target.closest('.nb')){ S.nmenu = false; render(); } });
 document.addEventListener('keydown', e => { if (S.nmenu && e.key==='Escape'){ S.nmenu = false; render(); const b = document.getElementById('nbBtn'); if (b) b.focus(); } });
+
+/* v2.38.0 (zoning admin, via Jade): payment notifications for the Building Department.
+   A receipt button next to the bell, with a green count, lists payments the City Clerk recorded
+   (bf_staff_pay_feed, Building Department access only). Your own payments are not listed.
+   Per person, like the bell: prefs.pnotif { seenAt, clearedAt, opened[] } follows the login. */
+const PF = { items:null, busy:false };
+const PAY_IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8h6M9 12h6M9 16h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const CASH_IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5C15.7 6 14.1 5.5 12 5.5c-2.6 0-4 1.3-4 3s1.4 2.6 4 3.1 4.3 1.4 4.3 3.3-1.6 3.4-4.3 3.4c-2.2 0-3.9-.7-4.6-2.3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+function payNotifState(){
+  let n = prefGet('pnotif', null);
+  if (!n || !n.clearedAt){ const now = new Date().toISOString(); n = { seenAt: now, clearedAt: now, opened: [] }; if (S.me && TOKEN && PREF.loaded) prefSet('pnotif', n); }
+  return Object.assign({ opened: [] }, n);
+}
+async function payFeedLoad(){
+  if (!TOKEN || !canBuilding() || PF.busy) return;
+  PF.busy = true;
+  try{ const r = await sbRpc('bf_staff_pay_feed', { p_token:TOKEN, p_since: payNotifState().clearedAt }); PF.items = Array.isArray(r) ? r : []; }catch(e){}
+  PF.busy = false;
+}
+const payTime = p => { const t = Date.parse(p.recordedAt); return isNaN(t) ? 0 : t; };
+function payList(){
+  if (!canBuilding() || !PF.items) return [];
+  const n = payNotifState(), cut = Date.parse(n.clearedAt) || 0, opened = new Set((n.opened || []).map(String)), me = String((S.me && S.me.email) || '').toLowerCase();
+  return PF.items.filter(p => payTime(p) > cut && !opened.has(String(p.id)) && String(p.recordedByEmail || '').toLowerCase() !== me)
+    .sort((a, b) => payTime(b) - payTime(a)).slice(0, NOTIF_MAX);
+}
+function payUnread(){ const seen = Date.parse(payNotifState().seenAt) || 0; return payList().filter(p => payTime(p) > seen).length; }
+function payBellHtml(){
+  const list = payList(), unread = payUnread(), open = !!S.paymenu, seen = Date.parse(S.paymenuSeen || payNotifState().seenAt) || 0;
+  return '<div class="nb pb"><button type="button" class="nb-btn" id="pbBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="pbMenu" onclick="togglePayBell(event)" title="Payments recorded by the City Clerk" aria-label="Payment notifications'+(unread?', '+unread+' new':'')+'">'+
+      PAY_IC+(unread ? '<span class="nb-count pb-count" aria-hidden="true">'+(unread > 9 ? '9+' : unread)+'</span>' : '')+'</button>'+
+    (open ? '<div class="nb-menu" id="pbMenu" role="region" aria-label="Payment notifications">'+
+      '<div class="nb-h"><b>Payments received</b>'+(list.length ? '<button type="button" class="linkbtn" onclick="clearPayNotifs()">Clear all</button>' : '')+'</div>'+
+      (list.length ? '<ul class="nb-list">'+list.map(p => { const F = FORMS[p.form] || {}, rev = p.kind === 'reversal', isNew = payTime(p) > seen;
+          const who = [p.applicant || 'Applicant', p.permitNo ? 'Permit # '+p.permitNo : 'Ref '+(p.ref || '')].filter(Boolean).join(' · ');
+          const how = [p.method + (p.checkNo ? ' #'+p.checkNo : ''), p.receiptNo, p.recordedBy ? 'by '+p.recordedBy : ''].filter(Boolean).join(' · ');
+          const st = rev ? '' : p.payStatus === 'paid' ? '<em class="pb-st ok">Paid in full</em>' : p.payStatus === 'partial' ? '<em class="pb-st">Balance '+money(p.balance)+'</em>' : '';
+          return '<li><button type="button" class="nb-item pb-item'+(isNew?' new':'')+(rev?' rev':'')+'" onclick="openPayNotif('+Number(p.id)+',\''+esc(p.submissionId)+'\')">'+
+            '<span class="pb-ic" aria-hidden="true">'+(rev ? ic('undo') : CASH_IC)+'</span><span class="nb-tx"><b>'+(rev ? 'Payment reversed' : 'Payment received')+(F.short ? ' · '+esc(F.short) : '')+'</b>'+
+            '<span>'+esc(who)+'</span><span>'+esc(how)+'</span>'+
+            '<small>'+esc(agoText(p.recordedAt))+st+(isNew?'<span class="vh"> (new)</span>':'')+'</small></span><span class="pb-amt">'+(rev ? '−'+money(Math.abs(Number(p.amount))) : money(p.amount))+'</span></button></li>'; }).join('')+'</ul>'
+        : '<p class="nb-empty">'+ic('check')+'No new payments. Payments the City Clerk records will show here.</p>')+
+    '</div>' : '')+'</div>';
+}
+function togglePayBell(e){
+  if (e) e.stopPropagation(); S.pmenu = false; S.nmenu = false; S.paymenu = !S.paymenu;
+  if (S.paymenu){ const n = payNotifState(); S.paymenuSeen = n.seenAt; prefSet('pnotif', Object.assign(n, { seenAt: new Date().toISOString() })); payFeedLoad().then(() => { if (S.paymenu) render(); }); }
+  render(); if (S.paymenu){ const f = document.querySelector('#pbMenu .nb-item, #pbMenu .linkbtn'); if (f) f.focus(); }
+}
+function clearPayNotifs(){ const now = new Date().toISOString(); prefSet('pnotif', { seenAt: now, clearedAt: now, opened: [] }); S.paymenu = false; render(); toast('Payment notifications cleared.');
+  const b = document.getElementById('pbBtn'); if (b) b.focus(); }
+function openPayNotif(pid, sid){
+  const n = payNotifState(), keep = new Set((PF.items || []).map(p => String(p.id)));
+  const opened = (n.opened || []).map(String).filter(k => keep.has(k)).concat(String(pid)).slice(-200);
+  prefSet('pnotif', Object.assign(n, { opened }));
+  S.paymenu = false;
+  if (subById(sid)){ openSub(sid); S.tab = 'office'; render(); } else { render(); toast('That application is not in your list. Refresh and try again.'); }
+}
+document.addEventListener('click', e => { if (S.paymenu && !e.target.closest('.pb')){ S.paymenu = false; render(); } });
+document.addEventListener('keydown', e => { if (S.paymenu && e.key==='Escape'){ S.paymenu = false; render(); const b = document.getElementById('pbBtn'); if (b) b.focus(); } });
 
 function openAccount(sec){ S.pmenu = false; S.meSec = sec || 'profile'; if (S.view==='me') render(); else go('me');
   setTimeout(() => { const el = document.getElementById('me-'+S.meSec); if (el){ el.scrollIntoView({block:'start'}); const f = el.querySelector('input'); if (f) f.focus(); } }, 0); }
@@ -7208,6 +7284,10 @@ function demoCall(fn, A){
           const hay = (JSON.stringify(d.data.fields||{})+' '+((d.data.staff||{}).permitNo||'')+' '+dRef(id)+' '+id.replace(/-/g,'')).toLowerCase(); return w.every(x => hay.includes(x)); })
         .sort((a,b) => String(b[1].data.createdAt).localeCompare(String(a[1].data.createdAt))).slice(0, A.p_limit||50).map(([id]) => dRecordJson(id)); }
     case 'bf_clerk_get': dNeed(T,'payments'); return dClerkGet(A.p_sid);
+    case 'bf_staff_pay_feed': { dNeed(T,'building'); const since = Math.max(Date.parse(A.p_since||'')||0, Date.now()-30*864e5);
+      return DEMO.payments.filter(p => p.kind!=='legacy' && Date.parse(p.recordedAt) > since).sort((a,b) => Date.parse(b.recordedAt)-Date.parse(a.recordedAt)).slice(0,30).map(p => {
+        const d = S2[p.submissionId], f = (d && d.data.fields) || {}, pay = (d && d.data.pay) || {};
+        return Object.assign(dPayJson(p), { applicant:f.applicant||f.subName||'', address:f.address||'', form:d ? d.data.form : '', permitNo:d ? ((d.data.staff||{}).permitNo||'') : '', payStatus:pay.status||'', balance:pay.balance, ref:dRef(p.submissionId) }); }); }
     case 'bf_payment_history': dNeed(T); return DEMO.payments.filter(p => p.submissionId===A.p_sid).map(dPayJson);
     case 'bf_record_payment': {
       const a = dNeed(T,'payments'), d = S2[A.p_sid]; if (!d) throw new Error('Application not found.');
