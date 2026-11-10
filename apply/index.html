@@ -2329,7 +2329,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.38.0';   // shown at the bottom of every page
+const APP_VERSION = '2.38.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -3573,7 +3573,7 @@ document.addEventListener('keydown', e => { if (S.nmenu && e.key==='Escape'){ S.
 
 /* v2.38.0 (zoning admin, via Jade): payment notifications for the Building Department.
    A receipt button next to the bell, with a green count, lists payments the City Clerk recorded
-   (bf_staff_pay_feed, Building Department access only). Your own payments are not listed.
+   (bf_staff_pay_feed, Building Department access only). Your own payments are not listed (except in demo mode, so one person can try it).
    Per person, like the bell: prefs.pnotif { seenAt, clearedAt, opened[] } follows the login. */
 const PF = { items:null, busy:false };
 const PAY_IC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8h6M9 12h6M9 16h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
@@ -3593,7 +3593,7 @@ const payTime = p => { const t = Date.parse(p.recordedAt); return isNaN(t) ? 0 :
 function payList(){
   if (!canBuilding() || !PF.items) return [];
   const n = payNotifState(), cut = Date.parse(n.clearedAt) || 0, opened = new Set((n.opened || []).map(String)), me = String((S.me && S.me.email) || '').toLowerCase();
-  return PF.items.filter(p => payTime(p) > cut && !opened.has(String(p.id)) && String(p.recordedByEmail || '').toLowerCase() !== me)
+  return PF.items.filter(p => payTime(p) > cut && !opened.has(String(p.id)) && (DEMO || String(p.recordedByEmail || '').toLowerCase() !== me))
     .sort((a, b) => payTime(b) - payTime(a)).slice(0, NOTIF_MAX);
 }
 function payUnread(){ const seen = Date.parse(payNotifState().seenAt) || 0; return payList().filter(p => payTime(p) > seen).length; }
@@ -4456,7 +4456,8 @@ async function ckReverse(id){
   render(); window.scrollTo(0,0);
 }
 // keep the Building Department list (if loaded) in step with the server's new summary
-function syncSubPay(rec){ const s = S.subs.find(x=>x.id===rec.id); if (s){ s.pay = rec.pay; s.staff = Object.assign({}, s.staff, {payment: rec.pay.status==='paid' ? (rec.pay.lastMethod||'Paid') : '', checkNo: rec.pay.status==='paid' ? (rec.pay.lastCheckNo||'') : ''}); } delete PH[rec.id]; }
+function syncSubPay(rec){ if (typeof payFeedLoad === 'function' && canBuilding()) setTimeout(() => payFeedLoad().then(() => { if (!S.paymenu && !S.editing) render(); }), 300);   // v2.38.1: payments badge updates right away
+  const s = S.subs.find(x=>x.id===rec.id); if (s){ s.pay = rec.pay; s.staff = Object.assign({}, s.staff, {payment: rec.pay.status==='paid' ? (rec.pay.lastMethod||'Paid') : '', checkNo: rec.pay.status==='paid' ? (rec.pay.lastCheckNo||'') : ''}); } delete PH[rec.id]; }
 
 /* today's payments, for balancing the drawer */
 async function ckLoadDay(){ S.ck.dayRows = null; render();
