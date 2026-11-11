@@ -1850,7 +1850,7 @@ const cictFor = (value, commercial) => commercial ? Math.round(num(value) / 1000
 const SIGN_FEE = { 'Illuminated':75, 'Electronic Message Display (Changing Message)':75, 'Non-illuminated':50 };
 
 /* compute fees for any submission's field values; `doubled` = staff-applied penalty */
-function computeFees(form, f, doubled){
+function computeFees(form, f, doubled, letters){
   let value = 0, permit = 0, cict = 0, basis = '';
   if (isBldg(form)){
     const com = f.buildType === 'Commercial';
@@ -1866,9 +1866,13 @@ function computeFees(form, f, doubled){
   } else if (form === 'sign'){ permit = SIGN_FEE[f.signFeature] || 0; basis = f.signFeature || 'Choose sign features'; }
   else if (form === 'pool'){ permit = 50; basis = 'Flat fee'; }
   else if (form === 'demo' || form === 'moving'){ permit = 100; basis = 'Flat fee'; }
+  else if (form === 'rezoning'){ const n = Math.max(1, Math.floor(num(f && f.parcels)) || 1); permit = 500 * n; basis = '$500 per parcel × '+n; }
   if (doubled) permit *= 2;
   permit = Math.round(permit*100)/100;
-  return { value, basis, permit, cict, total: Math.round((permit + cict)*100)/100, doubled: !!doubled };
+  const lt = form === 'rezoning' ? Math.max(0, Math.round(num(letters)*100)/100) : 0;   // v2.39.0: certified letters (staff add)
+  const out = { value, basis, permit, cict, total: Math.round((permit + cict + lt)*100)/100, doubled: !!doubled };
+  if (form === 'rezoning') out.letters = lt;
+  return out;
 }
 
 /* ================= form definitions ================= */
@@ -1888,11 +1892,17 @@ const OTHER_UPLOAD = T('files','Other documents (optional)',{type:'file',req:fal
 const isUpField = x => x.type==='file' || x.type==='doc';
 /* Building Department review: these applications are reviewed and approved before payment is taken
    (enforced on the server in bf_record_payment for applications submitted from REVIEW_FROM on). */
-const REVIEW_FORMS = ['building','homeowner','subtrade','sign'];   // v2.31.9: sign permits too
+/* v2.39.0 (Zoning Administrator, via Jade): EVERY permit and fee needs Building Department approval before payment.
+   The only exception is the Annexation Application (no approval step, confirmed by the Zoning Administrator).
+   Same rule as the server (bf_review_required): held = not annexation AND (submitted on/after the form's start date
+   OR not already paid in full). So any application that still owes money, old or new, waits for approval;
+   only applications that were already paid in full before this rule keep their history as it was. */
+const REVIEW_FORMS = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning'];   // all fee forms; never 'annexation'
 const REVIEW_FROM = '2026-10-15T05:00:00Z';
-const REVIEW_FROM_FORM = { sign:'2026-10-28T17:00:00Z' };          // sign permits submitted from Oct 28, 2026 12:00 PM Central
+const REVIEW_FROM_FORM = { sign:'2026-10-28T17:00:00Z', pool:'2026-11-11T18:00:00Z', demo:'2026-11-11T18:00:00Z', moving:'2026-11-11T18:00:00Z', rezoning:'2026-11-11T18:00:00Z' };
 const reviewFrom = k => REVIEW_FROM_FORM[k] || REVIEW_FROM;
-const reviewRequired = s => !!s && REVIEW_FORMS.includes(s.form) && String(s.createdAt||'') >= reviewFrom(s.form);
+const reviewNeeded = (form, created, paidInFull) => !!form && form !== 'annexation' && (String(created||'') >= reviewFrom(form) || !paidInFull);
+const reviewRequired = s => !!s && reviewNeeded(s.form, s.createdAt, ((s.pay||{}).status) === 'paid');
 const reviewApproved = s => { const st = (s && s.staff) || {}; return !!(String(st.approvedBy||'').trim() || String(st.approvedDate||'').trim()); };
 const reviewState = s => reviewApproved(s) ? 'approved' : !reviewRequired(s) ? 'none' : String(((s.staff||{}).infoNeeded)||'').trim() ? 'info' : 'pending';
 const REVIEW_LABEL = { pending:'Under review', info:'Information needed', approved:'Approved', none:'' };
@@ -2002,9 +2012,12 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
    Locked for applicants: only signed-in Building Department staff can open the form, and the server refuses annexation
    submissions from anyone else (bf_form_locks + trigger). The process: Planning Department review -> signed, notarized
    Petition for Annexation -> Planning Commission recommendation -> City Council decision -> notification letter. */
-const BETA_FORMS = ['annexation'];
+/* v2.39.0 (Jade): the Annexation Application is open to the public (still labeled BETA), and the new Rezoning
+   Application is public in BETA. BETA is only a label now; LOCKED_FORMS (staff preview, server bf_form_locks) is empty. */
+const BETA_FORMS = ['annexation','rezoning'];
+const LOCKED_FORMS = [];
 const formBeta = k => BETA_FORMS.includes(k);
-const formLocked = k => formBeta(k) && !(typeof canBuilding === 'function' && canBuilding());
+const formLocked = k => LOCKED_FORMS.includes(k) && !(typeof canBuilding === 'function' && canBuilding());
 const isRep = f => f.applyAs === 'Legally authorized representative of the owner';
 FORMS.annexation = { key:'annexation', title:'Annexation Application', short:'Annexation Application', icon:'pin', beta:true, planning:true, group:'Planning Commission', feeLabel:'No fee', created:'Oct 30, 2026',
   agreements:[{id:'annexServices'},{id:'annexCertify'}],
@@ -2057,8 +2070,83 @@ FORMS.annexation = { key:'annexation', title:'Annexation Application', short:'An
     DOC('docAuth','Written authorization from the property owner',{show:isRep,hint:'Required when a representative applies for the owner.'}),
     T('files','Other documents (optional)',{type:'file',req:false,full:true,hint:'For example, a site plan. PDF, JPG or PNG. Up to 10 files in total, 30 MB each.'}),
     {type:'note', text:'Next steps: if the property qualifies, the Planning Department will prepare the official Petition for Annexation. Every property owner (or their legally authorized representative) signs it in front of a notary. You will receive a letter when the annexation is complete.'} ] };
+
+/* v2.39.0 (Jade, from the City's Rezoning Application PDF): online Rezoning Application, BETA, open to the public.
+   Same questions as the paper form. Fee: $500 per parcel plus the cost of certified letters (staff add the letters
+   in Office use). Like every fee form it needs Building Department approval before payment. The notarized signature
+   certificate is still signed on paper (from the Planning Department). Hearing dates/decisions are kept in staff.annex
+   (same keys as annexation) so the applicant sees them on Check permit status (server: bf_annex_status). */
+const isRezRep = f => f.applyAs === 'Representative authorized by the property owner';
+const rezNoAddr = f => !String((f && f.address) || '').trim();
+const REZ_FEE = 500;
+const rezParcels = f => Math.max(1, Math.floor(num(f && f.parcels)) || 1);
+FORMS.rezoning = { key:'rezoning', title:'Application for Property Rezoning', short:'Rezoning Application', icon:'map', beta:true, planning:true, group:'Planning Commission', feeLabel:'$500 per parcel, plus certified letters', created:'Nov 11, 2026',
+  agreements:[{id:'rezoneProc'},{id:'rezoneCertify'}],
+  fields:[
+    {type:'note', text:'A rezoning request is reviewed by the Planning Commission, which makes a recommendation, and then decided by the City Council after a public hearing. Submit this application at least 30 days before the monthly Planning Commission meeting. Questions? Call the Planning Department at 256-586-5968.'},
+    {type:'section', label:'Applicant'},
+    T('applicant','Applicant(s)',{req:true,full:true,hint:'Full name of each applicant.'}),
+    T('company','Company, if any'), T('date','Date',{type:'date',req:true}),
+    T('applicantAddress','Applicant address',{req:true,full:true,hint:'Street, city, state and ZIP'}),
+    T('phone','Phone',{type:'tel',req:true,hint:'(000) 000-0000'}), T('email','Email',{type:'email',req:true,hint:'Used with your reference # to check your application status online.'}),
+    T('applyAs','I am',{type:'radio',req:true,opts:['The property owner','Representative authorized by the property owner'],full:true}),
+    T('owner','Property owner name(s)',{req:true,full:true,hint:'If you are the owner, enter your own name. List every owner.'}),
+    {type:'section', label:'Subject property'},
+    T('address','Property address',{full:true,hint:'Leave blank only if the property has no address. Then describe its general location below.'}),
+    T('pin','PIN #',{req:true,hint:'Parcel identification number. List each PIN if more than one parcel.'}),
+    T('parcels','Number of parcels to be rezoned',{type:'number',req:true,hint:'The rezoning fee is $500 per parcel.'}),
+    T('location','General location',{type:'textarea',req:true,full:true,show:rezNoAddr,hint:'Only if you cannot provide a property address.'}),
+    T('north','North of subject',{req:true,show:rezNoAddr}), T('south','South of subject',{req:true,show:rezNoAddr}),
+    T('east','East of subject',{req:true,show:rezNoAddr}), T('west','West of subject',{req:true,show:rezNoAddr}),
+    {type:'section', label:'Rezone request'},
+    T('fromDistrict','Rezone from (current district)',{req:true,hint:'For example, R-1 or B-2'}), T('toDistrict','Rezone to (requested district)',{req:true}),
+    T('landUse','Land use (subject property)',{type:'radio',req:true,opts:['Vacant','Other'],full:true}),
+    T('landUseOther','Describe the current land use',{req:true,full:true,show:f=>f.landUse==='Other'}),
+    T('proposedUse','Proposed use of property',{type:'textarea',req:true,full:true}),
+    T('reason','Written statement: why are you requesting this rezoning?',{type:'textarea',req:true,full:true,hint:'Explain the reason for your request. This is the written statement the Planning Commission and City Council read.'}),
+    ...DOCS_HEAD,
+    DOC('docDeed','Legal description: copy of the property deed(s)'),
+    DOC('docSitePlan','Site plan showing the parcel dimensions and any structures'),
+    DOC('docPhotos','Photographs of the property'),
+    T('files','Other documents (optional)',{type:'file',req:false,full:true,hint:'For example, more photos or a typed statement. PDF, JPG or PNG. Up to 10 files in total, 30 MB each. Documents are not returned.'}),
+    {type:'note', text:'Notarized signature certificate: the property owner(s) must also sign the Notary Certificate in front of a notary. Get it from the Planning Department (256-586-5968) and return it to City Hall, 740 N Main St. If the applicant is not the owner, the owner(s) must sign it too.'} ] };
+function rezoneFeeBox(){
+  const fe = computeFees('rezoning', FVALS, false), n = rezParcels(FVALS);
+  return '<div class="r"><span>Rezoning fee <small>($500 per parcel × '+n+')</small></span><b class="num">'+money(fe.permit)+'</b></div>'+
+    '<div class="r"><span>Certified letters <small>(mailed notice to adjoining property owners)</small></span><b>Added by staff</b></div>'+
+    '<div class="r t"><span>Estimated total</span><span class="num">'+money(fe.total)+' + letters</span></div>'+
+    '<small><b>Please do not pay yet.</b> The Building Department reviews your application first, then confirms the total, including the cost of the certified letters, and contacts you to pay in person by cash or check at 740 N Main St. The fee must be paid before your application is officially filed, and it is non-refundable, even if the rezoning is not approved.</small>';
+}
+const REZ_PC = ['Recommend approval','Recommend denial','Tabled'];
+const REZ_CC = ['Approved','Denied','Tabled'];
+function rezoneStage(s){ const a = ((s.staff||{}).annex) || {}, ok = reviewApproved(s), ps = payStatus(s);
+  if (a.ccDecision==='Approved') return a.letterDate ? 'Approved · applicant notified' : 'Approved by City Council';
+  if (a.ccDecision==='Denied') return 'Denied by City Council';
+  if (a.pcRec==='Recommend approval' || a.pcRec==='Recommend denial') return a.ccDate ? 'City Council '+fmtDay(a.ccDate) : 'Waiting for City Council';
+  if (a.pcDate) return 'Planning Commission '+fmtDay(a.pcDate);
+  if (ok && ps==='paid') return 'Filed · hearing next';
+  if (ok) return 'Approved · waiting for payment';
+  return String((s.staff||{}).infoNeeded||'').trim() ? 'Information needed' : 'Under review'; }
+function rezoneOfficeHtml(s){
+  const a = (s.staff||{}).annex||{}, sel = (id, list, v) => '<select id="'+id+'"><option value="">—</option>'+list.map(o => '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+  const dt = (id, v, lab) => '<div class="fld"><label class="l" for="'+id+'">'+lab+'</label><input type="date" id="'+id+'" value="'+esc(v||'')+'"></div>';
+  return '<div class="sect">Public hearings <span class="pill beta-pill">Beta</span></div>'+
+    '<div class="fld full"><p class="hint" style="margin:0">The applicant sees these dates and decisions on Check permit status (never your comments). Adjoining property owners are notified of the Planning Commission hearing by certified letter.</p></div>'+
+    dt('a_pcDate', a.pcDate, 'Date of Planning Commission hearing')+
+    '<div class="fld"><label class="l" for="a_pcRec">Planning Commission recommendation</label>'+sel('a_pcRec', REZ_PC, a.pcRec)+'</div>'+
+    dt('a_ccDate', a.ccDate, 'Date of City Council hearing')+
+    '<div class="fld"><label class="l" for="a_ccDecision">City Council decision</label>'+sel('a_ccDecision', REZ_CC, a.ccDecision)+'</div>'+
+    '<div class="fld"><label class="l" for="a_ordinance">Ordinance #</label><input type="text" id="a_ordinance" value="'+esc(a.ordinance||'')+'"></div>'+
+    dt('a_letterDate', a.letterDate, 'Applicant notified of the decision');
+}
+function rezoneStatusSteps(r){
+  const a = r.annex || {}, d = v => v ? fmtDay(v) : '';
+  return [
+    { t:'Planning Commission hearing', d: a.pcRec ? a.pcRec+(a.pcDate ? ' · '+d(a.pcDate) : '') : a.pcDate ? 'Hearing '+d(a.pcDate)+'. Please attend.' : 'Not scheduled yet. We will tell you the date.', st: (a.pcRec==='Recommend approval'||a.pcRec==='Recommend denial') ? 'ok' : a.pcDate ? 'part' : '' },
+    { t:'City Council decision', d: a.ccDecision ? a.ccDecision+(a.ccDate ? ' · '+d(a.ccDate) : '')+(a.ordinance ? ' · Ordinance '+a.ordinance : '') : a.ccDate ? 'Hearing '+d(a.ccDate)+'. Please attend.' : 'Not scheduled yet', st: a.ccDecision==='Approved' || a.ccDecision==='Denied' ? 'ok' : a.ccDecision || a.ccDate ? 'part' : '' } ];
+}
 const isBldg = k => k==='building' || k==='homeowner';
-const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving','annexation'];
+const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning','annexation'];
 
 /* ================= terms & agreements (required on the forms that list them) ================= */
 const AGREEMENTS = {
@@ -2088,6 +2176,22 @@ const AGREEMENTS = {
     'Lastly, it is important to understand that those autonomous boards, agencies and utilities that have authority over the delivery of specific public services set their own policies, procedures, and fees. Property, regardless of its annexation date, will be required to connect to these services once they are available in their area, at the property owner’s expense.',
     '#Agreement',
     'I have read the above statement governing the delivery of city services to lands annexed into the city of Arab, and I agree to these conditions as they may pertain to any of my lands that are annexed.' ] },
+  rezoneProc: { title:'Rezoning Procedures', label:'I have read the', link:'Rezoning Procedures', text:[
+    'Once the Rezoning Application is submitted with all the necessary documents, the request is first reviewed by the Planning Commission for its recommendation, and then passed on to the City Council for the final decision.',
+    '#Application, notary certificate and documents',
+    'The property owner(s) must submit the Rezoning Application at least 30 days before the scheduled monthly Planning Commission meeting. A Notarized Signature(s) Certificate, available from the Planning Department, must also be provided.',
+    'Please provide a copy of the property deed(s) for the parcels to be rezoned, a site plan including the parcel dimensions and any structures, a written statement explaining the reason for the application, and any photographs that would help the Commission or Council in their decision. All submitted documents are the responsibility of the applicant and will not be returned.',
+    '#Fee',
+    'The rezoning fee is $500 per parcel, plus the cost of certified letters. The fee must be paid before the application can be officially filed. Fees are non-refundable, even if the proposed amendment is not enacted into law.',
+    '#Public hearings',
+    'The Planning Commission holds a public hearing, and adjoining property owners are notified of it by mail. The applicant is notified of the Planning Commission and City Council public hearings and should attend to answer any questions.',
+    '#Review standards and final decision',
+    'An application will be denied if the Planning Commission finds that the record fails to establish compliance with the standards of the Ordinance. The Planning Commission provides a recommendation to the City Council. Following a public hearing, the City Council makes the final decision to approve or disapprove the application.',
+    '#After the City Council hearing',
+    'If the City Council approves the rezoning, you will receive an email notification, and all relevant city and state representatives will be informed. If the City Council denies the request, you will not be eligible to reapply for one (1) year from the date of the decision.' ] },
+  rezoneCertify: { title:'Certification', label:'I certify the', link:'Certification', text:[
+    'By submitting this application, I hereby certify that I am either the owner(s) of the subject property, or I am a representative of the property owner authorized to submit this application on their behalf. If the APPLICANT is not the property owner, the owner of the property authorizes me to submit this application and will sign the application and the Notarized Signature(s) Certificate.',
+    'I certify that the information in this application is true and correct.' ] },
   annexCertify: { title:'Owner / Representative Certification', label:'I certify the', link:'Owner / Representative Certification', text:[
     '#Property owner',
     'I certify that I am the Property owner and I have read this application and that all information contained herein is true and correct.',
@@ -2329,7 +2433,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.38.1';   // shown at the bottom of every page
+const APP_VERSION = '2.39.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2461,6 +2565,27 @@ When you contact us, please tell us the page and what you were trying to do. You
 const UPD_BASE = (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'upd-';   // pictures are apply/upd-*.webp
 const UPD_EDITOR = 'Jade Cruz';
 const UPDATES = [
+  { id:'rezoning-annexation-online', date:'2026-11-11', tag:'New applications', title:'Rezoning and Annexation applications are now online (Beta)', art:'planning', artK:'Rezoning & Annexation',
+    sum:'You can now apply online for a property rezoning or for annexation into the City of Arab. Both applications are new and are offered in beta.',
+    body:[
+      ['p','Two Planning Commission applications can now be completed online from <b>Applications &amp; Fees</b>: the new <b>Rezoning Application</b> and the <b>Annexation Application</b>, which is now open to the public. Both are marked <b>Beta</b>.'],
+      ['img','rez-tiles.webp','Both applications are listed under Planning Commission.'],
+      ['h','What “Beta” means'],
+      ['p','These applications are new to the website. They are received and reviewed the same way as any other application, but we may still improve their wording or layout. If something does not work or looks wrong, choose <b>Report a problem with this site</b> at the bottom of any page, or call the Planning Department at 256-586-5968.'],
+      ['h','Rezoning Application'],
+      ['p','Use this application to ask the City to change the zoning district of a property. Submit it at least <b>30 days before</b> the monthly Planning Commission meeting.'],
+      ['ul',['<b>You will need:</b> the PIN #, the current and requested zoning districts, the proposed use of the property and a short written statement explaining your request.','<b>Upload:</b> a copy of the property deed(s), a site plan showing the parcel dimensions and any structures, and photographs of the property.','<b>Fee:</b> $500 per parcel, plus the cost of certified letters to adjoining property owners. <b>Please do not pay when you apply.</b> The Building Department reviews your application first, confirms the total and contacts you when it is time to pay. The fee is non-refundable.','<b>Notarized signature certificate:</b> the property owner(s) still sign this on paper in front of a notary. Get it from the Planning Department.']],
+      ['img','rez-form.webp','The online Rezoning Application.'],
+      ['p','The Planning Commission holds a public hearing and makes a recommendation, and the City Council makes the final decision after its own public hearing. You will be told the hearing dates and should attend to answer questions.'],
+      ['h','Annexation Application'],
+      ['p','Use this application to ask for your property to be brought into the Arab city limits. There is <b>no fee</b>. The Planning Department reviews it first, then the Planning Commission and City Council. If the property qualifies, you will sign the Petition for Annexation in front of a notary. The process usually takes 1 to 2 months. The fillable PDF is still available if you prefer paper.'],
+      ['h','How to apply'],
+      ['ol',['Open <b>Applications &amp; Fees</b> and find <b>Planning Commission</b>.','Choose <b>Rezoning Application</b> or <b>Annexation Application</b>.','Fill in the form, upload the documents it asks for and submit.','Keep your <b>reference #</b>. We also email it to you.']],
+      ['h','Follow your application'],
+      ['p','Check your status any time on <b>Permit Status</b> with your reference # and email. For a rezoning, it shows the review, the fee, and the Planning Commission and City Council hearing dates and decisions.'],
+      ['img','rez-status.webp','A rezoning application on Permit Status.'],
+      ['tip','You do not need an account to apply or to check your status.']
+    ] },
   { id:'saved-licenses', date:'2026-10-30', tag:'Contractors', title:'Save licenses to your profile', art:'license', artK:'Saved Licenses',
     sum:'Contractors can save their licenses to their My permits profile once. They are attached for you on every future permit you apply for with that account.',
     body:[
@@ -2499,6 +2624,7 @@ const UPDATES = [
 const updDay = d => { const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : d; };
 const updHref = id => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#updates'+(id ? '/'+id : '');
 const UPD_ART = {
+  planning:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
   account:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20.5c.9-3.9 3.9-6 7.5-6s6.6 2.1 7.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
   license:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="11" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 16.2c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M14 10h4.5M14 13.5h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
 };
@@ -2585,8 +2711,8 @@ City of Arab Building Department, 740 N Main St, Arab, AL 35016 · 256-586-5968 
 
 function uploadNote(f){ const u = f.fields.find(x => x.type==='doc') || f.fields.find(x => x.type==='file'); return !u ? 'Apply online' : u.req ? 'Apply online · upload documents' : f.key==='homeowner' ? 'Apply online · construction plans optional' : 'Apply online · documents optional'; }
 function tile(k){ const f = FORMS[k];
-  if (EMBED) return '<a class="tile" target="_top" href="https://arabcityapplications.jadecruz.dev/apply/#form-'+k+'"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.title)+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></a>';
-  return '<button class="tile" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
+  if (EMBED) return '<a class="tile'+(formBeta(k)?' beta-tile':'')+'" target="_top" href="https://arabcityapplications.jadecruz.dev/apply/#form-'+k+'"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.title)+(formBeta(k)?' <span class="pill beta-pill">Beta</span>':'')+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></a>';
+  return '<button class="tile'+(formBeta(k)?' beta-tile':'')+'" onclick="go(\'form\',\''+k+'\')"><span class="ico">'+ic(f.icon)+'</span><span><b>'+esc(f.short)+(formBeta(k)?' <span class="pill beta-pill">Beta</span>':'')+'</b><small>'+esc(uploadNote(f))+'</small><span class="fee">'+esc(f.feeLabel)+'</span></span></button>'; }
 function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps" id="sheet">'+
@@ -2598,9 +2724,9 @@ function viewApps(){
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
-     (!EMBED && !formLocked('annexation') ? '<button class="tile beta-tile" onclick="go(\'form\',\'annexation\')"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application <span class="pill beta-pill">Beta</span></b><small>Online form · staff preview only. Applicants still see the fillable PDF.</small><span class="fee">No fee</span></span></button>' : '')+
+     tile('rezoning')+tile('annexation')+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span><span class="soon">Online form coming soon</span></span></a>'+
-     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application</b><small>Apply for annexation into the City at no cost. Fill in and email the form</small><span class="fee">Fillable PDF · no fee</span><span class="soon">Online form coming soon</span></span></a>'+
+     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application (fillable PDF)</b><small>Prefer paper? Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
    '</div></section>'+
    '<section class="feesec" aria-labelledby="feeH"><h2 id="feeH">Fee schedule</h2>'+
      '<div class="feegrid">'+
@@ -2658,6 +2784,7 @@ function fieldHtml(x, f){
     (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
+  if (key === 'rezoning') return rezoneFeeBox();
   if (key === 'annexation') return '<div class="r t"><span>Application fee</span><span class="num">No fee</span></div><small>There is no fee to apply for annexation.</small>';
   const fe = computeFees(key, FVALS, false);
   const showVal = isBldg(key)||key==='subtrade';
@@ -2665,7 +2792,7 @@ function feeBoxHtml(key){
     '<div class="r"><span>Permit fee</span><b class="num">'+money(fe.permit)+'</b></div>'+
     (SHOWS_CICT(key)?'<div class="r"><span>CICT fee <small>(commercial only)</small></span><b class="num">'+money(fe.cict)+'</b></div>':'')+
     '<div class="r t"><span>'+(REVIEW_FORMS.includes(key) ? 'Estimated total' : 'Grand total')+'</span><span class="num">'+money(fe.total)+'</span></div>'+
-    (REVIEW_FORMS.includes(key) ? '<small><b>This is an estimate.</b> The final total is confirmed when the Building Department approves your application. They will contact you then to pay in person by cash or check at 740 N Main St, and the permit moves on to inspections and the Certificate of Occupancy. If work started before this permit, staff will double the permit fee.</small>'
+    (REVIEW_FORMS.includes(key) ? '<small><b>This is an estimate. Please do not pay yet.</b> The final total is confirmed when the Building Department approves your application. They will contact you then to pay in person by cash or check at 740 N Main St'+(inspForm(key) ? ', and the permit moves on to inspections and the Certificate of Occupancy' : '')+'. '+(key==='sign' ? 'If the sign went up before this permit' : 'If work started before this permit')+', staff will double the permit fee.</small>'
       : '<small>Pay in person by cash or check at 740 N Main St. If work started before this permit, staff will double the permit fee.</small>');
 }
 function viewForm(){
@@ -2687,6 +2814,9 @@ function betaLockedHtml(k){
 }
 function betaBannerHtml(k){
   if (!formBeta(k)) return '';
+  if (!LOCKED_FORMS.includes(k)) return '<div class="callout warn beta-note"><b><span class="pill beta-pill">Beta</span> New online application</b>'+
+    'This online form is new and may still be improved. If something does not work or looks wrong, use <strong>Report a problem with this site</strong> at the bottom of the page, or call the Planning Department at 256-586-5968.'+
+    (k==='annexation' ? ' Prefer paper? The <a href="#pdf-annexation">fillable PDF</a> is still available.' : '')+'</div>';
   return '<div class="callout warn beta-note"><b><span class="pill beta-pill">Beta</span> Staff preview: applicants cannot open this form yet</b>'+
     'Applicants still use the fillable PDF. Check the questions, wording and required documents against Building Department standards. '+
     (DEMO ? 'In demo mode you can submit it and follow it through Planning Department review, Planning Commission and City Council.'
@@ -2809,9 +2939,9 @@ async function submitForm(e){
     const fees = computeFees(S.form, vals, false);
     const createdAt = new Date().toISOString();
     const agreements = formAgreements(F, FVALS).map(a => ({ id:a.id, title:AGREEMENTS[a.id].title, at:createdAt }));
-    const betaTok = formBeta(S.form) ? TOKEN : null;   // v2.34.0: beta forms are submitted with the staff sign-in (server-checked)
+    const betaTok = LOCKED_FORMS.includes(S.form) ? TOKEN : null;   // v2.34.0: locked (staff preview) forms are submitted with the staff sign-in (server-checked)
     if (formLocked(S.form)) throw new Error('This form is not open to applicants yet. Please use the fillable PDF.');
-    const subId = await sbRpc('bf_add', { p_token:betaTok, p_collection:'submissions', p_data:{ hp:(document.getElementById('hpWebsite')||{}).value||'', fillMs:Date.now()-FORM_T0, app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' }, beta:formBeta(S.form) || undefined } });
+    const subId = await sbRpc('bf_add', { p_token:betaTok, p_collection:'submissions', p_data:{ hp:(document.getElementById('hpWebsite')||{}).value||'', fillMs:Date.now()-FORM_T0, app:APP_TAG, form:S.form, createdAt, read:false, starred:false, fields:vals, fees, files, agreements, staff:{ permitNo:'', payment:'' }, beta:LOCKED_FORMS.includes(S.form) || undefined } });
     for (let i=0;i<opt.length;i++){
       btn.textContent = 'Uploading document '+(i+1)+' of '+opt.length+'…';
       const data = await readDataUrl(opt[i].blob);
@@ -2825,6 +2955,8 @@ async function submitForm(e){
       : em ? 'We emailed it to <b>'+esc(em)+'</b>. Check your spam folder if you do not see it.' : 'Keep this number to check your status.';
     const feeLine = S.form==='annexation'
       ? '<div class="dn-fee"><span>Application fee</span><b>No fee</b></div><p class="dn-small">The Planning Department reviews it first. If the property qualifies, you will get the Petition for Annexation to sign.</p>'
+      : S.form==='rezoning'
+      ? '<div class="dn-fee"><span>Estimated total</span><b class="num">'+money(fees.total)+' + certified letters</b></div><p class="dn-small"><b>Please do not pay yet.</b> The Building Department reviews your application first, confirms the total (including the certified letters) and contacts you when it is time to pay. Remember the notarized signature certificate from the Planning Department.</p>'
       : REVIEW_FORMS.includes(S.form)
       ? '<div class="dn-fee"><span>Estimated total</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small"><b>Please do not pay yet.</b> We review your application first, confirm the total and contact you when it is time to pay.</p>'
       : '<div class="dn-fee"><span>Amount due</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small">Pay in person at City Hall, 740 N Main St, by cash or check to “City of Arab.” Bring your receipt.</p>';
@@ -3442,9 +3574,11 @@ const COLS = [
   {k:'fy', l:'Fiscal Year', t:'T', get:s=>fyOf(s)||0, fmt:s=>'<span class="num">'+fyName(fyOf(s))+'</span>'+(fyOv(s.id)?' <span class="pill src" title="Moved to this fiscal year by hand">moved</span>':'')},
   {k:'permitNo', l:'Permit #', t:'T', get:s=>(s.staff&&s.staff.permitNo)||'', fmt:s=>esc((s.staff&&s.staff.permitNo)||'')||'<span style="color:var(--muted)">—</span>'},
   {k:'address', l:'Address', t:'T', get:s=>s.fields.address||''},
-  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign','annexation']},
+  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign','annexation','rezoning']},
   {k:'annexStage', l:'Stage', t:'T', only:['annexation'], get:s=>annexStage(s), fmt:s=>'<span class="pill src">'+esc(annexStage(s))+'</span>'+(s.beta?' <span class="pill beta-pill">Beta test</span>':'')},
   {k:'acreage', l:'Acreage', t:'T', only:['annexation'], get:s=>s.fields.acreage||''},
+  {k:'rezStage', l:'Stage', t:'T', only:['rezoning'], get:s=>rezoneStage(s), fmt:s=>'<span class="pill src">'+esc(rezoneStage(s))+'</span>'},
+  {k:'rezRequest', l:'Rezone', t:'T', only:['rezoning'], get:s=>[s.fields.fromDistrict, s.fields.toDistrict].filter(Boolean).join(' → ')},
   {k:'files', l:'Uploads', t:'F', get:s=>(s.files||[]).length, fmt:s=>'<span class="pdfs">'+(s.files||[]).slice(0,5).map(f=>'<span class="pdfi'+(/^image/.test(f.type)?' img':'')+'">'+(/^image/.test(f.type)?'IMG':'PDF')+'</span>').join('')+((s.files||[]).length>5?'<small>+'+((s.files.length)-5)+'</small>':'')+'</span>'},
   {k:'total', l:'Grand Total Fee', t:'$', not:['annexation'], get:s=>s.fees?s.fees.total:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.total:0)+'</span>'+(s.fees&&s.fees.doubled?' <span class="pill unpaid">×2</span>':'')},
   {k:'permitFee', l:'Permit Fee', t:'$', hide:true, not:['annexation'], get:s=>s.fees?s.fees.permit:0, fmt:s=>'<span class="num">'+money(s.fees?s.fees.permit:0)+'</span>'},
@@ -3930,10 +4064,12 @@ function panelHtml(){
     const ins = st.inspections||{};
     const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
     body = '<form id="offf" class="fgrid">'+(REVIEW_FORMS.includes(s.form) ? reviewBoxHtml(s).replace('<div class="sect">', '<div class="sect" style="margin-top:0">') : '')+
-      '<div class="fld"><label class="l" for="o_permitNo">Permit #</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="e.g. 26210"></div>'+
+      '<div class="fld"><label class="l" for="o_permitNo">'+(s.form==='rezoning' ? 'App #' : 'Permit #')+'</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="'+(s.form==='rezoning' ? 'App #' : 'e.g. 26210')+'"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
-      '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> '+(s.form==='sign' ? 'Sign put up without a permit' : 'Work started without a permit')+' (double the permit fee)'+
-        (s.imported ? '' : (() => { const b = computeFees(s.form, s.fields, false).permit; return b ? '<small class="hint" style="display:block">Permit fee '+money(b)+' → '+money(b*2)+' when doubled</small>' : ''; })())+'</label></div>'+
+      (s.form==='rezoning'
+        ? '<div class="fld"><label class="l" for="o_letters">Cost of certified letters</label><input type="number" id="o_letters" min="0" step="0.01" value="'+esc(String(((s.fees||{}).letters)||''))+'" placeholder="0.00"><span class="hint">Added to the $'+(REZ_FEE*rezParcels(s.fields))+' rezoning fee ($500 per parcel × '+rezParcels(s.fields)+'). Enter it before you approve, so the applicant is told the full total.</span></div><div class="fld"></div>'+rezoneOfficeHtml(s)
+        : '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> '+(s.form==='sign' ? 'Sign put up without a permit' : 'Work started without a permit')+' (double the permit fee)'+
+        (s.imported ? '' : (() => { const b = computeFees(s.form, s.fields, false).permit; return b ? '<small class="hint" style="display:block">Permit fee '+money(b)+' → '+money(b*2)+' when doubled</small>' : ''; })())+'</label></div>')+
       (REVIEW_FORMS.includes(s.form) ? '' :
       '<div class="fld"><label class="l" for="o_approvedBy">Authorized Building Department approval</label><input type="text" id="o_approvedBy" value="'+esc(st.approvedBy||'')+'" placeholder="Initials"></div>'+
       '<div class="fld"><label class="l" for="o_approvedDate">Date initialed</label><input type="date" id="o_approvedDate" value="'+esc(st.approvedDate||'')+'"></div>')+
@@ -3985,7 +4121,7 @@ async function saveEdit(){
   const s = curSub(); if (!s||!DB) return;
   const f = Object.assign({}, s.fields);
   document.querySelectorAll('#editf [data-k]').forEach(el=>{ if (el.value==='') delete f[el.dataset.k]; else f[el.dataset.k]=el.value; });
-  const fees = s.imported ? s.fees : computeFees(s.form, f, s.fees&&s.fees.doubled);
+  const fees = s.imported ? s.fees : computeFees(s.form, f, s.fees&&s.fees.doubled, (s.fees||{}).letters);
   const body = JSON.parse(JSON.stringify(s)); delete body.id;
   Object.assign(body, { fields:f, fees, editedAt:new Date().toISOString() });
   try{ await DB.doc('submissions/'+s.id).set(body);
@@ -4008,8 +4144,17 @@ async function saveOffice(){
       if (coNeedsOverride(s)){ const init = (g('o_coOverride')||'').trim();
         if (!init){ coChange(); const el = document.getElementById('o_coOverride'); if (el) el.focus(); toast('Not paid in full. Enter your initials to override, or wait until it is paid.'); return; }
         st.coOverrideInit = init; } } }
-  const doubled = document.getElementById('o_double').checked;
-  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled) });
+  const dEl = document.getElementById('o_double'), doubled = dEl ? dEl.checked : !!(s.fees && s.fees.doubled);
+  let letters = (s.fees||{}).letters;
+  if (s.form === 'rezoning'){
+    letters = Math.round(num(g('o_letters'))*100)/100;
+    if (letters < 0 || letters > 5000){ toast('Enter the cost of the certified letters (0 to $5,000).'); return; }
+    const a = { pcDate:g('a_pcDate')||'', pcRec:g('a_pcRec')||'', ccDate:g('a_ccDate')||'', ccDecision:g('a_ccDecision')||'', ordinance:String(g('a_ordinance')||'').trim().slice(0,60), letterDate:g('a_letterDate')||'' };
+    if (a.pcRec && !a.pcDate){ toast('Enter the Planning Commission hearing date for this recommendation.'); const de = document.getElementById('a_pcDate'); if (de) de.focus(); return; }
+    if (a.ccDecision && !a.ccDate){ toast('Enter the City Council hearing date for this decision.'); const de = document.getElementById('a_ccDate'); if (de) de.focus(); return; }
+    st.annex = a;
+  }
+  try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled, letters) });
     if (st.coOverrideInit && prev.co!=='Given'){ try{ const fresh = await sbRpc('bf_get', {p_token:TOKEN, p_collection:'submissions', p_id:s.id}); if (fresh && fresh.staff){ s.staff = fresh.staff; render(); } }catch(e){} }
     toast(st.coOverrideInit && prev.co!=='Given' ? 'Saved. Certificate of Occupancy given by override ('+st.coOverrideInit+').' : 'Office use saved'); }catch(e){ toast('Could not save: '+(e.message||'try again')); }
 }
@@ -5038,7 +5183,7 @@ function statusCard(r){
      Building Department review step, so a permit # and "More information needed" no longer read out of order. */
   const permitNo = r.permitNo||'';
   const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
-    { t:'Permit # assigned', d:permitNo ? 'Permit # '+permitNo : 'Not assigned yet', st:permitNo ? 'ok' : '' }].concat(revReq ? [{ t:'Building Department review',
+    { t:(r.form==='rezoning' ? 'App # assigned' : 'Permit # assigned'), d:permitNo ? (r.form==='rezoning' ? 'App # ' : 'Permit # ')+permitNo : 'Not assigned yet', st:permitNo ? 'ok' : '' }].concat(revReq ? [{ t:'Building Department review',
     d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
     st: revOk ? 'ok' : info ? 'part' : '',
     wide: !revOk && !!info,
@@ -5051,6 +5196,7 @@ function statusCard(r){
     list: insL.length ? '<ul class="st-insp">'+insL.map(x => '<li class="'+(x.st==='complete'?'ok':'pend')+'"><span>'+esc(x.n)+'</span><span>'+
       (x.st==='complete' ? 'Complete'+(x.date ? ' · '+esc(fmtDay(x.date)) : '') : 'Pending')+'</span></li>').join('')+'</ul>' : '' });
   if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
+  if (r.form === 'rezoning') rezoneStatusSteps(r).forEach(x => steps.push(x));
   let annexClosed = false, annexed = false;
   if (r.form === 'annexation'){ const A = annexStatusSteps(r); steps.length = 0; A.steps.forEach(x => steps.push(x)); annexClosed = A.closed; annexed = A.annexed; }
   const complete = steps.every(x => x.st==='ok');
@@ -5058,7 +5204,7 @@ function statusCard(r){
     '<span class="pill '+(annexed?'paid':annexClosed?'unpaid':'partial')+'">'+(annexed?'Annexed':annexClosed?'Closed':'In progress')+'</span></div>'+
     '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
     '<p class="st-note">There is no fee for annexation. Questions? Contact the Planning Department at 256-586-5968 or kjohnson@arabcity.org.</p></section>';
-  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?' · Permit # '+esc(permitNo):'')+'</span></div>'+
+  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?(r.form==='rezoning'?' · App # ':' · Permit # ')+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     /* v2.31.2: one even row of short tiles; details (what we need + upload, inspection list) go full width below */
     '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
@@ -5066,7 +5212,7 @@ function statusCard(r){
     (holdPay && ps==='unpaid'
       ? '<div class="st-fees num"><div><span>Estimated total</span><b>'+money(total)+'</b></div></div>'
       : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
-    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay. After that, the permit moves on to inspections and the Certificate of Occupancy.</p>' : '')+
+    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay.'+(r.form==='rezoning' ? ' After that, your request is scheduled for the Planning Commission and City Council public hearings.' : hasInsp ? ' After that, the permit moves on to inspections and the Certificate of Occupancy.' : '')+'</p>' : '')+
     ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
     stPrintHtml(r)+
     '</section>';
@@ -6708,7 +6854,7 @@ function jobCardHtml(d){
 const ANNEX_REVIEW = ['Qualifies','More information needed','Does not qualify'];
 const ANNEX_PC = ['Recommend approval','Recommend denial','Tabled'];
 const ANNEX_CC = ['Approved','Denied','Tabled'];
-const annexPublic = x => { if (!x || x.form !== 'annexation') return null; const a = ((x.staff||{}).annex) || {};
+const annexPublic = x => { if (!x || (x.form !== 'annexation' && x.form !== 'rezoning')) return null; const a = ((x.staff||{}).annex) || {};
   const k = ['review','reviewDate','petitionDate','pcDate','pcRec','ccDate','ccDecision','ordinance','letterDate'], o = {}; k.forEach(n => { o[n] = String(a[n]||''); }); return o; };
 function annexStage(s){ const a = ((s.staff||{}).annex) || {};
   if (a.ccDecision==='Approved') return a.letterDate ? 'Annexed' : 'Approved by City Council';
@@ -7044,7 +7190,7 @@ function reviewBoxHtml(s){
   const msg = { pending:'Not approved yet. The applicant was told not to pay until you approve; the City Clerk cannot take payment until then.',
     info:'Waiting on the applicant for the information below. They see it on their permit status page. Payment stays on hold until you approve.',
     approved:'Approved'+(st.approvedBy?' by '+esc(st.approvedBy):'')+(st.approvedDate?' on '+esc(fmtDay(st.approvedDate)):'')+'. The City Clerk can take payment.',
-    none:'Submitted before reviews started ('+(s.form==='sign'?'Oct 28, 2026':'Oct 15, 2026')+'). Payment is not held for this application.' }[r];
+    none: s.form==='annexation' ? 'Annexation applications do not need Building Department approval.' : 'Paid in full before approval was required for this form. Nothing is on hold.' }[r];
   return '<div class="sect">Building Department review</div>'+
     '<div class="fld full"><div class="revbox rv-'+r+'">'+(reviewPill(s)||'<span class="pill src">No review hold</span>')+'<span>'+msg+'</span>'+
       (miss.length ? '<span class="revmiss">'+ic('alert')+'Missing documents: '+miss.map(x => esc(x.label)).join(', ')+'</span>' : '')+
@@ -7085,7 +7231,7 @@ function dNeed(token, what){ const a = dAcc(token); if (!a) throw new Error('Sig
   return a; }
 function dAudit(a, action, target, details){ DEMO.audit.unshift({ at:new Date().toISOString(), by:(a&&a.name)||'System', action, target:target||'', details:details||{} }); DEMO.audit = DEMO.audit.slice(0, 300); }
 function dSub(id){ const d = DEMO.docs.submissions[id]; return d || null; }
-function dReviewRequired(id, data){ const d = DEMO.docs.submissions[id]; return REVIEW_FORMS.includes(data.form) && String((d && d.created) || new Date().toISOString()) >= reviewFrom(data.form); }
+function dReviewRequired(id, data){ const d = DEMO.docs.submissions[id]; return reviewNeeded(data.form, (d && d.created) || new Date().toISOString(), ((data.pay||{}).status) === 'paid'); }
 function dApproved(data){ return !!(String(((data.staff||{}).approvedBy)||'').trim() || String(((data.staff||{}).approvedDate)||'').trim()); }
 function dPayJson(p){ const s = DEMO.scans[p.id]; return Object.assign({}, p, { scan: s ? { id:s.id, addedBy:s.addedBy, addedAt:s.addedAt, width:s.width, height:s.height } : null }); }
 function dPaySync(id){ const d = dSub(id); if (!d) return null;
