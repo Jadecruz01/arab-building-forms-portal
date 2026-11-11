@@ -298,6 +298,15 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
   .ab-acts .btn{flex:1 1 100%;justify-content:center}
 }
 html.embed .hq{margin-top:10px}
+/* v2.40.1 (Jade): signed in on a phone, the header was crowded ("Hi, Jade" + avatar + Menu). Phones show only the
+   avatar (its button still says the name to screen readers); the name moves into the Menu panel. */
+@media (max-width:560px){
+  .pbrand{min-width:0}
+  .pme{gap:0;padding:2px;margin-left:auto;border-color:transparent}
+  .pme-hi{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .pme-av{width:38px;height:38px;font-size:13px}
+  .phead{gap:10px}
+}
 .dn-card{max-width:440px;margin:20px auto 18px;border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;background:var(--surface2)}
 .dn-ref{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:18px 16px 16px;background:#fef6e9;border-bottom:1px solid var(--line)}
 .dn-ref>span{font:700 11px/1.3 var(--f-body,inherit);letter-spacing:.14em;text-transform:uppercase;color:#7d6528}
@@ -2492,7 +2501,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.0';   // shown at the bottom of every page
+const APP_VERSION = '2.40.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2514,7 +2523,7 @@ function pubMenuHtml(){
     '<a '+HOME_LINK+on('apps')+'>'+ic('doc')+'<span><b>Applications &amp; Fees</b><small>Apply for a permit online</small></span></a>'+
     '<a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>'+ic('search')+'<span><b>Permit Status</b><small>Look up an application or permit</small></span></a>'+
     '<a href="'+updHref()+'"'+on('updates')+'>'+ic('news')+'<span><b>Updates'+(fresh?' <em class="pm-new">New</em>':'')+'</b><small>What is new on this site</small></span></a>'+
-    '<a '+acctLinkAttrs()+on('account')+'>'+ic('user')+'<span><b>My permits</b><small>'+(APP_TOK ? 'Your applications, licenses and notifications' : 'Sign in or create a free account')+'</small></span></a>'+
+    '<a '+acctLinkAttrs()+on('account')+'>'+ic('user')+'<span><b>My permits</b><small>'+(APP_TOK ? (acName() ? 'Signed in as '+esc(acName()) : 'Your applications, licenses and notifications') : 'Sign in or create a free account')+'</small></span></a>'+
     '<div class="pm-contact"><a href="tel:+12565865968">'+ic('info')+'256-586-5968</a><a href="mailto:buildingdept@arabcity.org">'+ic('mail')+'Email us</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">'+ic('ext')+'arabcity.org</a></div>'+
   '</div></nav>';
 }
