@@ -300,6 +300,24 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 html.embed .hq{margin-top:10px}
 /* v2.40.1 (Jade): signed in on a phone, the header was crowded ("Hi, Jade" + avatar + Menu). Phones show only the
    avatar (its button still says the name to screen readers); the name moves into the Menu panel. */
+/* v2.40.2 (Jade): on phones and tablets the account panel opens like the Menu panel: full width under the header,
+   gold bottom edge, page not dimmed. Desktop keeps the small drop-down. */
+@media (max-width:860px){
+  .phead .pbell-w.pme-w{position:static}
+  .phead .pme-menu.pbell-menu{position:absolute;left:0;right:0;top:100%;width:auto;max-width:none;margin:0;border:0;border-radius:0;border-bottom:3px solid var(--gold);
+    box-shadow:0 14px 30px rgba(33,44,70,.18);z-index:30;animation:pmIn .18s ease-out;
+    padding:4px max(16px, calc((100% - 760px) / 2)) 10px;
+    max-height:calc(100dvh - 80px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .phead .pme-menu .pme-head{padding:12px 10px}
+  .phead .pme-menu .pme-links{border-bottom:1px solid var(--line)}
+  .phead .pme-menu .pme-links a,.pme-menu .pme-links button{justify-content:flex-start;padding:14px 10px;font:600 16px/1.2 var(--f-disp);border-radius:6px}
+  .phead .pme-menu .pme-links svg{width:20px;height:20px;color:var(--golddk)}
+  .phead .pme-menu .pme-links > * + *{border-left:0}
+  .phead .pme-menu .nb-h{padding:12px 10px 6px;border:0}
+  .phead .pme-menu .nb-list .nb-item{padding-left:10px;padding-right:10px;border-radius:6px}
+  .phead .pme-menu .pbell-tip{margin:6px 10px 4px}
+}
+@media (max-width:860px) and (prefers-reduced-motion:reduce){ .phead .pme-menu.pbell-menu{animation:none} }
 @media (max-width:560px){
   .pbrand{min-width:0}
   .pme{gap:0;padding:2px;margin-left:auto;border-color:transparent}
@@ -2501,7 +2519,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.1';   // shown at the bottom of every page
+const APP_VERSION = '2.40.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2527,7 +2545,7 @@ function pubMenuHtml(){
     '<div class="pm-contact"><a href="tel:+12565865968">'+ic('info')+'256-586-5968</a><a href="mailto:buildingdept@arabcity.org">'+ic('mail')+'Email us</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">'+ic('ext')+'arabcity.org</a></div>'+
   '</div></nav>';
 }
-function togglePubMenu(e){ if (e) e.stopPropagation(); S.pmenuOpen = !S.pmenuOpen; render(); const f = S.pmenuOpen ? document.querySelector('#pmenu a') : document.getElementById('pmenuBtn'); if (f) f.focus(); }
+function togglePubMenu(e){ if (e) e.stopPropagation(); S.pmenuOpen = !S.pmenuOpen; if (S.pmenuOpen && typeof AN !== 'undefined') AN.open = false; render(); const f = S.pmenuOpen ? document.querySelector('#pmenu a') : document.getElementById('pmenuBtn'); if (f) f.focus(); }
 function closePubMenu(focusBtn){ if (!S.pmenuOpen) return; S.pmenuOpen = false; render(); if (focusBtn){ const b = document.getElementById('pmenuBtn'); if (b) b.focus(); } }
 document.addEventListener('click', e => { if (S.pmenuOpen && !e.target.closest('.pmenu, .pmenu-btn')) closePubMenu(false); });
 document.addEventListener('keydown', e => { if (S.pmenuOpen && e.key === 'Escape') closePubMenu(true); });
@@ -3596,7 +3614,7 @@ function anBellHtml(){
   return '<div class="pbell-w pme-w"><button type="button" class="pme'+(S.view==='account'?' on':'')+'" id="anBtn" aria-haspopup="true" aria-expanded="'+open+'" aria-controls="anMenu" onclick="anToggle(event)" aria-label="My permits account'+(nm?' for '+esc(nm):'')+(n?', '+n+' new update'+(n===1?'':'s'):'')+'">'+
     '<span class="pme-hi">Hi'+(first ? ', '+esc(first) : ' there')+'</span><span class="pme-av" aria-hidden="true">'+esc(nm ? acInitials(nm) : '')+(nm ? '' : ic('user'))+
     (n ? '<span class="nb-count">'+(n > 9 ? '9+' : n)+'</span>' : '')+'</span></button>'+
-    (open && anSmall() ? '<div class="veil pme-veil" onclick="event.stopPropagation();AN.open=false;render()" aria-hidden="true"></div>' : '')+   // phones: dim + lock the page behind
+    (false && open && anSmall() ? '<div class="veil pme-veil" onclick="event.stopPropagation();AN.open=false;render()" aria-hidden="true"></div>' : '')+   // phones: dim + lock the page behind
     (open ? '<div class="nb-menu pbell-menu pme-menu" id="anMenu" role="region" aria-label="My permits account">'+
       '<div class="pme-head"><span class="pme-av lg" aria-hidden="true">'+esc(nm ? acInitials(nm) : '')+(nm ? '' : ic('user'))+'</span><span><b>'+esc(nm || 'My permits')+'</b>'+(em ? '<small>'+esc(em)+'</small>' : '')+'</span></div>'+
       '<div class="pme-links"><a href="'+ACCT_URL()+'"'+toAcct+'>'+ic('doc')+'My permits</a><button type="button" onclick="AN.open=false;acSignout().then(()=>{ if (S.view!==\'account\') render(); })">'+ic('lock')+'Sign out</button></div>'+
@@ -3619,7 +3637,7 @@ async function anLoad(force){
 const PUB_VIEWS = ['apps','form','pdf','status','privacy','accessibility','account','updates'];
 async function anToggle(e){
   if (e) e.stopPropagation();
-  AN.open = !AN.open; render();
+  AN.open = !AN.open; if (AN.open) S.pmenuOpen = false; render();   // v2.40.2: one panel at a time
   if (AN.open){ if (!AN.items || Date.now() - AN.at > 15000) await anLoad(true);
     if (AN.unread){ AN.unread = 0; render(); try{ await sbRpc('bf_app_events_read', { p_token:APP_TOK }); }catch(x){} } }
 }
