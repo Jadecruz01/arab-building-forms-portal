@@ -240,6 +240,64 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .upd-latest > span:nth-child(2){flex:1;font-weight:600}
 .upd-all{display:inline-flex;align-items:center;gap:4px;color:var(--golddk);font-weight:600;font-size:13.5px;flex:none}
 @media (max-width:720px){.upd-list{grid-template-columns:1fr}.upd-body{font-size:15.5px}.form-h .upd-meta{justify-content:flex-start}.upd-latest{flex-wrap:wrap}.upd-all{width:100%}}
+
+/* v2.40.0 home layout + phone/tablet menu (same theme) */
+.pmenu-btn{display:none;align-items:center;gap:6px;flex:none;font:500 14px/1 var(--f-disp);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 11px;cursor:pointer}
+.pmenu-btn svg{width:18px;height:18px}
+.pmenu-btn:hover,.pmenu-btn[aria-expanded="true"]{border-color:var(--gold);color:var(--golddk)}
+.pmenu{position:absolute;left:0;right:0;top:100%;background:var(--surface);border-bottom:3px solid var(--gold);box-shadow:0 14px 30px rgba(33,44,70,.18);z-index:30;animation:pmIn .18s ease-out}
+@keyframes pmIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.pmenu-in{max-width:760px;margin:0 auto;padding:8px 16px 14px;display:grid;gap:2px}
+.pmenu-in > a{display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:6px;text-decoration:none;color:var(--ink)}
+.pmenu-in > a svg{width:22px;height:22px;color:var(--golddk);flex:none}
+.pmenu-in > a span{display:grid}
+.pmenu-in > a b{font:600 16px/1.3 var(--f-disp)}
+.pmenu-in > a small{font-size:13px;color:var(--muted)}
+.pmenu-in > a:hover,.pmenu-in > a.on{background:var(--surface2)}
+.pmenu-in > a.on b{color:var(--golddk)}
+.pm-new,.qa-new{font:700 10px/1 var(--f-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#212c46;padding:3px 6px;border-radius:20px;vertical-align:middle;margin-left:4px}
+.pm-contact{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
+.pm-contact a{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:20px;padding:7px 12px}
+.pm-contact a svg{width:15px;height:15px;color:var(--golddk)}
+@media (max-width:860px){ .pmenu-btn{display:inline-flex} .phead{position:relative} .pacct{margin-left:auto} }
+@media (max-width:480px){ .pacct span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} .pacct{padding:8px 9px} .pacct svg{width:18px;height:18px} .pmenu-btn{padding:8px 10px} }
+@media (prefers-reduced-motion:reduce){ .pmenu{animation:none} }
+.hq{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 8px}
+.qa-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s,box-shadow .15s,transform .15s}
+.qa-card:hover,.qa-card:focus-visible{border-color:var(--gold);box-shadow:0 6px 18px rgba(33,44,70,.10);transform:translateY(-1px)}
+.qa-card .ico{width:42px;height:42px;border-radius:4px;background:var(--gold);color:var(--navy);display:grid;place-items:center}
+.qa-card .ico svg{width:22px;height:22px}
+.qa-tx{display:grid;gap:3px}
+.qa-tx b{font:600 16px/1.25 var(--f-disp)}
+.qa-tx small{font-size:13px;line-height:1.4;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qa-new{position:absolute;top:12px;right:12px;margin:0}
+.qa-card:first-child{background:var(--navy);border-color:var(--navy);color:#fff}
+.qa-card:first-child .qa-tx b{color:#fff}.qa-card:first-child .qa-tx small{color:rgba(255,255,255,.75)}
+@media (prefers-reduced-motion:reduce){ .qa-card{transition:none} .qa-card:hover{transform:none} }
+.acct-band{margin:30px 0 8px;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;background:var(--surface2);padding:22px 24px}
+.ab-head h2{font:700 21px/1.3 var(--f-disp);margin:0;color:var(--ink);text-transform:none;letter-spacing:0}
+.ab-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.ab-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px}
+.ab-col h3{display:flex;align-items:center;gap:8px;font:600 15.5px/1.3 var(--f-disp);margin:0 0 8px;color:var(--ink)}
+.ab-col h3 svg{width:20px;height:20px;color:var(--golddk)}
+.ab-col ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.ab-col li{position:relative;padding-left:22px;font-size:14px;line-height:1.45;color:var(--ink2)}
+.ab-col li::before{content:"";position:absolute;left:3px;top:6px;width:9px;height:5px;border-left:2px solid var(--golddk);border-bottom:2px solid var(--golddk);transform:rotate(-45deg)}
+.ab-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.ab-acts .btn{text-decoration:none}
+@media (max-width:900px){ .hq{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:640px){
+  .hq{gap:10px;margin-top:14px}
+  .qa-card{padding:13px;gap:8px}
+  .qa-card .ico{width:36px;height:36px}.qa-card .ico svg{width:19px;height:19px}
+  .qa-tx b{font-size:15px}
+  .qa-tx small{display:none}
+  .qa-new{top:10px;right:10px}
+  .ab-cols{grid-template-columns:1fr;gap:16px}
+  .acct-band{padding:18px 16px}
+  .ab-acts .btn{flex:1 1 100%;justify-content:center}
+}
+html.embed .hq{margin-top:10px}
 .dn-card{max-width:440px;margin:20px auto 18px;border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;background:var(--surface2)}
 .dn-ref{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:18px 16px 16px;background:#fef6e9;border-bottom:1px solid var(--line)}
 .dn-ref>span{font:700 11px/1.3 var(--f-body,inherit);letter-spacing:.14em;text-transform:uppercase;color:#7d6528}
@@ -1781,6 +1839,7 @@ function lookApply(L){
 const brandHtml = (sub, title) => '<a class="brandbar" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('clogo')+'<span class="bname">'+(title||'Building Department')+'<small>'+(sub||'Permits &amp; Applications')+'</small></span></a>';
 /* ================= icons ================= */
 const IC = {
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   cal:'<rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18M8 14h2M14 14h2M8 17.5h2"/>',
   db:'<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-13"/><path d="M4.5 12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8"/>',
   expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
@@ -2433,16 +2492,71 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.39.2';   // shown at the bottom of every page
+const APP_VERSION = '2.40.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
     '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a><a href="#updates"'+on('updates')+'>Updates</a></nav>'+
-    acctHeaderBtn()+'</div></header>'+
+    acctHeaderBtn()+
+    '<button type="button" class="pmenu-btn" id="pmenuBtn" aria-expanded="'+(S.pmenuOpen?'true':'false')+'" aria-controls="pmenu" onclick="togglePubMenu(event)">'+ic(S.pmenuOpen?'x':'menu')+'<span>Menu</span></button></div>'+
+    pubMenuHtml()+'</header>'+
     '<div class="pband" aria-hidden="true"><div class="pband-in"></div></div>';
 }
+
+/* v2.40.0 (Jade): phones and tablets get a Menu button with every page the desktop header has, plus contact links.
+   Same theme; the desktop header is unchanged. */
+function pubMenuHtml(){
+  if (!S.pmenuOpen) return '';
+  const v = S.view, on = k => v===k ? ' aria-current="page" class="on"' : '', u0 = UPDATES[0], fresh = u0 && (Date.now() - Date.parse(u0.date)) < 45*864e5;
+  return '<nav class="pmenu" id="pmenu" aria-label="Menu"><div class="pmenu-in">'+
+    '<a '+HOME_LINK+on('apps')+'>'+ic('doc')+'<span><b>Applications &amp; Fees</b><small>Apply for a permit online</small></span></a>'+
+    '<a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>'+ic('search')+'<span><b>Permit Status</b><small>Look up an application or permit</small></span></a>'+
+    '<a href="'+updHref()+'"'+on('updates')+'>'+ic('news')+'<span><b>Updates'+(fresh?' <em class="pm-new">New</em>':'')+'</b><small>What is new on this site</small></span></a>'+
+    '<a '+acctLinkAttrs()+on('account')+'>'+ic('user')+'<span><b>My permits</b><small>'+(APP_TOK ? 'Your applications, licenses and notifications' : 'Sign in or create a free account')+'</small></span></a>'+
+    '<div class="pm-contact"><a href="tel:+12565865968">'+ic('info')+'256-586-5968</a><a href="mailto:buildingdept@arabcity.org">'+ic('mail')+'Email us</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">'+ic('ext')+'arabcity.org</a></div>'+
+  '</div></nav>';
+}
+function togglePubMenu(e){ if (e) e.stopPropagation(); S.pmenuOpen = !S.pmenuOpen; render(); const f = S.pmenuOpen ? document.querySelector('#pmenu a') : document.getElementById('pmenuBtn'); if (f) f.focus(); }
+function closePubMenu(focusBtn){ if (!S.pmenuOpen) return; S.pmenuOpen = false; render(); if (focusBtn){ const b = document.getElementById('pmenuBtn'); if (b) b.focus(); } }
+document.addEventListener('click', e => { if (S.pmenuOpen && !e.target.closest('.pmenu, .pmenu-btn')) closePubMenu(false); });
+document.addEventListener('keydown', e => { if (S.pmenuOpen && e.key === 'Escape') closePubMenu(true); });
+document.addEventListener('click', e => { if (S.pmenuOpen && e.target.closest('.pmenu a')) S.pmenuOpen = false; }, true);
+window.addEventListener('hashchange', () => { if (S.pmenuOpen){ S.pmenuOpen = false; } });
+window.addEventListener('resize', () => { if (S.pmenuOpen && window.innerWidth > 900){ S.pmenuOpen = false; render(); } });
+
+/* v2.40.0: home page quick actions (replace the two dark bars) and the free-account section (signed out only). */
+function homeQuickHtml(){
+  const T = EMBED ? ' target="_top"' : '', base = EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '', u0 = UPDATES[0];
+  const card = (href, icon, title, sub, extra) => '<a class="qa-card" '+href+'><span class="ico">'+ic(icon)+'</span><span class="qa-tx"><b>'+title+'</b><small>'+sub+'</small></span>'+(extra||'')+'</a>';
+  return '<div class="hq" role="list">'+
+    card('href="#permits" onclick="event.preventDefault();homeScroll(\'permits\')" role="listitem"', 'doc', 'Apply for a permit', 'Pick your permit below. Your fee is figured as you type.')+
+    card('href="'+base+'#status"'+(EMBED?T+' onclick="statusHandoff()"':' onclick="event.preventDefault();go(\'status\')"')+' role="listitem"', 'search', 'Permit Status', 'No account needed. Use your reference # and email.')+
+    (APP_TOK ? card(acctLinkAttrs()+' role="listitem"', 'user', 'My permits', 'Your applications, licenses and notifications.')
+             : card(acctLinkAttrs()+' role="listitem"', 'user', 'Create a free account', 'Track every application in one place.'))+
+    card('href="'+updHref(u0 && u0.id)+'"'+T+' role="listitem"', 'news', 'Site updates', u0 ? esc(u0.title) : 'What is new on this site.', u0 ? '<em class="qa-new">New</em>' : '')+
+  '</div>';
+}
+function homeAcctHtml(){
+  if (APP_TOK) return '';
+  return '<section class="acct-band" aria-labelledby="acctH"><div class="ab-head"><h2 id="acctH">Get more with a free My permits account</h2><p>Optional. You can always apply and check your status without one.</p></div>'+
+    '<div class="ab-cols"><div class="ab-col"><h3>'+ic('home2')+'For residents and applicants</h3><ul>'+
+      '<li>Every application you send while signed in is saved to your account.</li>'+
+      '<li>See the status of each one: review, permit #, inspections.</li>'+
+      '<li>See what you owe and what you have paid.</li>'+
+      '<li>Keep your history: <b>Pending</b> and <b>Past</b> applications.</li>'+
+      '<li>Turn on notifications for approvals, payments and inspections.</li></ul></div>'+
+    '<div class="ab-col"><h3>'+ic('wrench')+'For contractors</h3><ul>'+
+      '<li>Save your business, home builder and trade licenses once.</li>'+
+      '<li>They are attached for you on every permit you apply for.</li>'+
+      '<li>Add the license # and expiration date; replace it when you renew.</li>'+
+      '<li>No more uploading the same license with each application.</li>'+
+      '<li>All of your permits and their status in one place.</li></ul></div></div>'+
+    '<div class="ab-acts"><a class="btn primary" '+acctLinkAttrs()+'>'+ic('user')+'Create a free account</a><a class="btn" '+acctLinkAttrs()+'>Sign in</a></div></section>';
+}
+function homeScroll(id){ const el = document.getElementById(id); if (!el) return; el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start' });
+  const f = el.querySelector('.tile'); if (f) setTimeout(() => f.focus({ preventScroll:true }), 400); }
 function pubFooter(){
   if (EMBED) return '<div class="verfoot">City of Arab Building Department · Website designed by Jade Cruz, Managed by The City of Arab Building Department · <button class="linkbtn" onclick="openBug()">Report a problem</button>'+PRIV_LINK('Privacy', ' · ')+A11Y_LINK('Accessibility', ' · ')+' · Version '+APP_VERSION+'</div>';
   /* v2.31.10: footer edges line up with the page card above (apps 1040px, statements 860px, other pages full width);
@@ -2717,17 +2831,16 @@ function tile(k){ const f = FORMS[k];
 function viewApps(){
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+
   '<div class="sheet apps" id="sheet">'+
-   '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Pick the permit you need. Every application can be completed online, and your fee is calculated as you fill it out.</p>'+
-   '<a class="statlink" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top"':' onclick="event.preventDefault();go(\'status\')"')+'><span class="ico">'+ic('status')+'</span><span><b>Already applied? Check your permit status</b><small>No account needed. Use your reference # and email, or the property address and owner’s name.</small></span><span class="go">'+ic('right')+'</span></a>'+
-   (APP_TOK ? '' : '<a class="statlink acct-link" '+acctLinkAttrs()+'><span class="ico">'+ic('user')+'</span><span><b>Keep track of all your permits</b><small>'+(APP_TOK ? 'Open My permits: your pending and past applications in one place.' : 'Create a free account to see your pending and past applications in one place.')+'</small></span><span class="go">'+ic('right')+'</span></a>')+
-   (UPDATES.length ? '<a class="upd-latest" href="'+updHref(UPDATES[0].id)+'"'+(EMBED?' target="_top"':'')+'><span class="upd-new">New</span><span>'+esc(UPDATES[0].title)+'</span><span class="upd-all">Read the update '+ic('right')+'</span></a>' : '')+
-   '<section class="grp"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
+   '<h1 class="pg-h">Applications &amp; Fees</h1><p class="pg-sub">Apply online, check on a permit, or keep track of everything with a free account.</p>'+
+   homeQuickHtml()+
+   '<section class="grp" id="permits"><h2>Building permits</h2><div class="tiles">'+tile('building')+tile('homeowner')+tile('subtrade')+'</div></section>'+
    '<section class="grp"><h2>Sign permit</h2><div class="tiles">'+tile('sign')+'</div></section>'+
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
      tile('rezoning')+tile('annexation')+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span><span class="soon">Online form coming soon</span></span></a>'+
    '</div></section>'+
+   homeAcctHtml()+
    '<section class="feesec" aria-labelledby="feeH"><h2 id="feeH">Fee schedule</h2>'+
      '<div class="feegrid">'+
        '<div class="feecard"><h3>Building permit fee</h3><p class="fc-sub">Based on the total construction value</p>'+
