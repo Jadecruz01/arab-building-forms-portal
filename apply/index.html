@@ -2008,7 +2008,7 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
     if (x.show){ const s0 = x.show; x = Object.assign({}, x, {show: f => s0(Object.assign({}, f, {buildType: (f && f.buildType) || 'Residential'}))}); }
     return x === OTHER_UPLOAD ? PLANS_UPLOAD : x; }).filter(Boolean); })(),
   agreements:[{id:'appAgree'},{id:'occupancy'}] });
-/* v2.34.0 (Jade): online Annexation Application, in BETA. The fillable PDF stays available in parallel.
+/* v2.34.0 (Jade): online Annexation Application, in BETA. v2.39.2: the annexation fillable PDF was removed from the site (it confused applicants).
    Locked for applicants: only signed-in Building Department staff can open the form, and the server refuses annexation
    submissions from anyone else (bf_form_locks + trigger). The process: Planning Department review -> signed, notarized
    Petition for Annexation -> Planning Commission recommendation -> City Council decision -> notification letter. */
@@ -2433,7 +2433,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.39.1';   // shown at the bottom of every page
+const APP_VERSION = '2.39.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2548,7 +2548,7 @@ const A11Y_DRAFT = `The City of Arab Building Department wants everyone to be ab
 - Pages are checked with automated accessibility tests and by hand with a keyboard before each update.
 
 ## Known limitations
-- The **Annexation** and **Subdivision** applications are fillable PDF forms. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.
+- The **Subdivision** application is a fillable PDF form. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.
 - Documents you upload are kept as you send them.
 
 ## Need help or a different format?
@@ -2569,7 +2569,7 @@ const UPDATES = [
     sum:'You can now apply online for a property rezoning or for annexation into the City of Arab. Both applications are new and are offered in beta.',
     body:[
       ['p','Two Planning Commission applications can now be completed online from <b>Applications &amp; Fees</b>: the new <b>Rezoning Application</b> and the <b>Annexation Application</b>, which is now open to the public. Both are marked <b>Beta</b>.'],
-      ['img','rez-tiles.webp','Both applications are listed under Planning Commission.'],
+      ['img','pc-tiles.webp','Both applications are on Applications & Fees, under Planning Commission.'],
       ['h','What “Beta” means'],
       ['p','These applications are new to the website. They are received and reviewed the same way as any other application, but we may still improve their wording or layout. If something does not work or looks wrong, choose <b>Report a problem with this site</b> at the bottom of any page, or call the Planning Department at 256-586-5968.'],
       ['h','Rezoning Application'],
@@ -2578,7 +2578,8 @@ const UPDATES = [
       ['img','rez-form.webp','The online Rezoning Application.'],
       ['p','The Planning Commission holds a public hearing and makes a recommendation, and the City Council makes the final decision after its own public hearing. You will be told the hearing dates and should attend to answer questions.'],
       ['h','Annexation Application'],
-      ['p','Use this application to ask for your property to be brought into the Arab city limits. There is <b>no fee</b>. The Planning Department reviews it first, then the Planning Commission and City Council. If the property qualifies, you will sign the Petition for Annexation in front of a notary. The process usually takes 1 to 2 months. The fillable PDF is still available if you prefer paper.'],
+      ['p','Use this application to ask for your property to be brought into the Arab city limits. There is <b>no fee</b>. The Planning Department reviews it first, then the Planning Commission and City Council. If the property qualifies, you will sign the Petition for Annexation in front of a notary. The process usually takes 1 to 2 months.'],
+      ['img','annex-form.webp','The online Annexation Application.'],
       ['h','How to apply'],
       ['ol',['Open <b>Applications &amp; Fees</b> and find <b>Planning Commission</b>.','Choose <b>Rezoning Application</b> or <b>Annexation Application</b>.','Fill in the form, upload the documents it asks for and submit.','Keep your <b>reference #</b>. We also email it to you.']],
       ['h','Follow your application'],
@@ -2726,7 +2727,6 @@ function viewApps(){
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
      tile('rezoning')+tile('annexation')+
      '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span><span class="soon">Online form coming soon</span></span></a>'+
-     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-annexation"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('pin')+'</span><span><b>Annexation Application (fillable PDF)</b><small>Prefer paper? Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · no fee</span></span></a>'+
    '</div></section>'+
    '<section class="feesec" aria-labelledby="feeH"><h2 id="feeH">Fee schedule</h2>'+
      '<div class="feegrid">'+
@@ -2805,7 +2805,7 @@ function viewForm(){
 }
 /* v2.34.0: beta forms. Applicants see this page instead of the form; the fillable PDF keeps working. */
 function betaLockedHtml(k){
-  const F = FORMS[k], pdf = k === 'annexation' ? '#pdf-annexation' : '#apps';
+  const F = FORMS[k], pdf = '#apps';
   return '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>'+esc(F.title)+'</h1></div>'+
     '<div class="callout pay beta-lock"><b>The online '+esc(F.short.toLowerCase())+' is not open yet</b>'+
     'The Building Department is still testing it. Please use the fillable PDF for now: fill it in on your computer, then email it to <a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a> or bring it to City Hall, 740 N Main St.'+
@@ -2816,7 +2816,7 @@ function betaBannerHtml(k){
   if (!formBeta(k)) return '';
   if (!LOCKED_FORMS.includes(k)) return '<div class="callout warn beta-note"><b><span class="pill beta-pill">Beta</span> New online application</b>'+
     'This online form is new and may still be improved. If something does not work or looks wrong, use <strong>Report a problem with this site</strong> at the bottom of the page, or call the Planning Department at 256-586-5968.'+
-    (k==='annexation' ? ' Prefer paper? The <a href="#pdf-annexation">fillable PDF</a> is still available.' : '')+'</div>';
+    '</div>';
   return '<div class="callout warn beta-note"><b><span class="pill beta-pill">Beta</span> Staff preview: applicants cannot open this form yet</b>'+
     'Applicants still use the fillable PDF. Check the questions, wording and required documents against Building Department standards. '+
     (DEMO ? 'In demo mode you can submit it and follow it through Planning Department review, Planning Commission and City Council.'
@@ -5679,7 +5679,8 @@ function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
   const pm = h.match(/^pdf-(\w+)$/);
-  if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
+  if (pm && pm[1] === 'annexation'){ S.view = 'form'; S.form = 'annexation'; startForm(); history.replaceState(null, '', '#form-annexation'); }   // v2.39.2 (Jade): annexation PDF removed; old links open the online form
+  else if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
   else if (h==='updates' || h.indexOf('updates/')===0){ S.view = 'updates'; S.post = h.slice(8) || null; }
@@ -6611,7 +6612,7 @@ const AREAS = [['clerk','Payments (City Clerk)'],['staff','Building Department w
 function staffFooter(){
   return '<footer class="sfoot"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
-const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF forms (Annexation, Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
+const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF form (Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
 const STAFF_URG = [['low','Minor'],['normal','Slows me down'],['high',"I can't do my work"]];
 const bugIsPublic = () => ['apps','form','pdf','status','account','updates'].includes(S.view);
