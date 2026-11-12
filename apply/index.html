@@ -2212,7 +2212,7 @@ FORMS.annexation = { key:'annexation', title:'Annexation Application', short:'An
     DOC('docSurvey','Survey of the properties',{show:f=>f.survey==='Yes'}),
     DOC('docAuth','Written authorization from the property owner',{show:isRep,hint:'Required when a representative applies for the owner.'}),
     T('files','Other documents (optional)',{type:'file',req:false,full:true,hint:'For example, a site plan. PDF, JPG or PNG. Up to 10 files in total, 30 MB each.'}),
-    {type:'note', text:'Next steps: if the property qualifies, the Planning Department will prepare the official Petition for Annexation. Every property owner (or their legally authorized representative) signs it in front of a notary. You will receive a letter when the annexation is complete.'} ] };
+    {type:'note', text:'Next steps: if the property qualifies, the Planning Department will prepare the official Petition for Annexation. Every property owner (or their legally authorized representative) signs it in front of a notary. Once the notarized document has been returned, you will receive a confirmation email (from buildingdept@arabcity.org) with the included public hearing date.'} ] };
 
 /* v2.39.0 (Jade, from the City's Rezoning Application PDF): online Rezoning Application, BETA, open to the public.
    Same questions as the paper form. Fee: $500 per parcel plus the cost of certified letters (staff add the letters
@@ -2576,7 +2576,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.42.2';   // shown at the bottom of every page
+const APP_VERSION = '2.42.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
