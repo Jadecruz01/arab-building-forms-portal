@@ -233,7 +233,8 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .upd-tip svg{width:18px;height:18px;flex:none;margin-top:3px}
 .upd-ed{display:flex;align-items:center;gap:12px;margin:30px 0 8px;padding-top:18px;border-top:1px solid var(--line)}
 .upd-av{width:44px;height:44px;border-radius:50%;background:#212c46;color:#fff;border:2px solid var(--gold);display:grid;place-items:center;font:700 15px var(--f-disp);flex:none}
-.upd-end{margin:18px 0 0}.upd-end .btn{text-decoration:none}
+.upd-body .upd-end{margin:44px 0 0}   /* v2.40.5: more room below the editor sign-off */
+.upd-end .btn{text-decoration:none}
 .upd-latest{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none;font-size:14.5px}
 .upd-latest:hover{border-color:var(--gold)}
 .upd-new{font:700 11px/1 var(--f-body,inherit);letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#212c46;padding:5px 8px;border-radius:20px;flex:none}
@@ -2520,7 +2521,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.4';   // shown at the bottom of every page
+const APP_VERSION = '2.40.5';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
