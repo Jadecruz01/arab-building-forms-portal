@@ -2199,7 +2199,7 @@ FORMS.annexation = { key:'annexation', title:'Annexation Application', short:'An
     T('animals','Are any animals (besides cats and dogs) kept on the property?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
     T('animalsWhat','What kind, and how many?',{req:true,full:true,show:f=>f.animals==='Yes'}),
     T('animalPens','Where are the animal enclosures, including fencing?',{type:'textarea',full:true,show:f=>f.animals==='Yes',hint:'Please also mark them on your site plan or survey.'}),
-    T('zoningWanted','Zoning classification wanted for the area',{type:'radio',req:true,opts:['Agriculture','Residential','Commercial','Industrial'],full:true}),
+    T('zoningWanted','Zoning classification desired for the property',{type:'radio',req:true,opts:['Agriculture','Residential','Commercial','Industrial'],full:true}),
     T('drainage','Are there any drainage issues that affect this property?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
     T('drainageWhat','Describe the drainage issues',{type:'textarea',req:true,full:true,show:f=>f.drainage==='Yes'}),
     T('features','Any other significant features on the property the City should know about?',{type:'textarea',full:true}),
@@ -2576,7 +2576,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.42.1';   // shown at the bottom of every page
+const APP_VERSION = '2.42.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
