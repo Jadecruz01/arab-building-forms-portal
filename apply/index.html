@@ -2576,7 +2576,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.41.1';   // shown at the bottom of every page
+const APP_VERSION = '2.41.2';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2874,7 +2874,7 @@ function viewUpdates(){
 const FORUM_CATS = [['tips','Tips & how-tos'],['building','Building permits'],['contractors','Contractors'],['planning','Planning & zoning'],['website','Using this website'],['general','General']];
 const forumCat = k => (FORUM_CATS.find(c => c[0]===k) || [k, 'General'])[1];
 const FR = { list:null, key:'', cat:'', q:'', err:'', topic:null, tId:null, tErr:'', draft:'', sending:false, sent:'', rErr:'' };
-const FA = { topics:null, pending:null, err:'', tab:'topics', edit:null, saving:false, eErr:'', topic:null, tId:null, reply:'', busy:false, msg:'' };
+const FA = { topics:null, pending:null, recent:null, err:'', tab:'topics', edit:null, saving:false, eErr:'', topic:null, tId:null, reply:'', busy:false, msg:'' };
 const forumHref = id => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#forums'+(id ? '/'+id : '');
 const forumAgo = d => { const t = Date.parse(d); if (isNaN(t)) return ''; const m = Math.round((Date.now()-t)/60000);
   return m < 1 ? 'Just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+' hr ago' : m < 10080 ? Math.round(m/1440)+' day'+(Math.round(m/1440)===1?'':'s')+' ago'
@@ -2957,11 +2957,11 @@ function forumReplyHtml(r, staff){
   return '<div class="fr-post'+(st?' fr-staff':'')+(r.isAnswer?' fr-isans':'')+(staff && r.status!=='approved' ? ' fr-'+r.status : '')+'" id="fr-r'+r.id+'">'+
     '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(acInitials(staff && !st ? (r.fullName||r.author) : r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">Building Department</span>':'')+
       (r.isAnswer?'<span class="fr-badge ans">'+ic('check')+'Answer</span>':'')+
-      (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Not approved</span>' : '')+
+      (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Hidden</span>' : '')+
       '<small>'+esc(forumAgo(r.createdAt))+(staff && r.email ? ' · '+esc(r.email) : '')+'</small></span></div>'+
     '<div class="fr-body">'+forumText(r.body)+'</div>'+
     (staff ? '<div class="fr-mod">'+
-      (r.status!=='approved' ? '<button type="button" class="btn sm primary" onclick="forumMod('+r.id+',\'approve\')">'+ic('check')+'Approve</button>' : '')+
+      (r.status!=='approved' ? '<button type="button" class="btn sm primary" onclick="forumMod('+r.id+',\'approve\')">'+ic('check')+(r.status==='rejected'?'Show again':'Approve')+'</button>' : '')+
       (r.status==='pending' ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'reject\')">Do not approve</button>' : '')+
       (r.status==='approved' && !r.isAnswer ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'answer\')">Mark as answer</button>' : '')+
       (r.isAnswer ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'unanswer\')">Remove answer mark</button>' : '')+
@@ -2971,11 +2971,11 @@ function forumReplyHtml(r, staff){
 function forumReplyBox(t){
   if (t.locked) return '<div class="fr-closed">'+ic('lock')+'This topic is closed for replies.</div>';
   if (FR.sent === t.id) return '<div class="fr-sent" role="status">'+ic('check')+'<span><b>Thanks! Your reply was sent.</b> It will appear here after the Building Department approves it.</span></div>';
-  if (!APP_TOK) return '<div class="fr-join"><b>Join the conversation</b><span>Sign in to your free My permits account to reply. Replies are reviewed by the Building Department before they appear.</span>'+
+  if (!APP_TOK) return '<div class="fr-join"><b>Join the conversation</b><span>Sign in to your free My permits account to reply.</span>'+
     '<div class="ab-acts"><a class="btn primary" '+acctLinkAttrs()+'>'+ic('user')+'Sign in to reply</a><a class="btn" '+acctLinkAttrs()+'>Create a free account</a></div></div>';
   return '<form class="fr-form" onsubmit="event.preventDefault();forumSend('+t.id+')"><label class="l" for="frr">Your reply</label>'+
     '<textarea id="frr" rows="4" maxlength="2000" oninput="FR.draft=this.value;document.getElementById(\'frc\').textContent=(2000-this.value.length)+\' characters left\'">'+esc(FR.draft)+'</textarea>'+
-    '<div class="fr-fh"><small id="frc" class="hint">'+(2000-FR.draft.length)+' characters left</small><small class="hint">Replies are reviewed before they appear. Please do not post personal information.</small></div>'+
+    '<div class="fr-fh"><small id="frc" class="hint">'+(2000-FR.draft.length)+' characters left</small><small class="hint">Be respectful and do not post personal information. The Building Department may hide replies that break these rules.</small></div>'+
     (FR.rErr ? '<p class="formerr" role="alert">'+esc(FR.rErr)+'</p>' : '')+
     '<button type="submit" class="btn primary"'+(FR.sending?' disabled':'')+'>'+(FR.sending?'Sending…':'Send reply')+'</button></form>';
 }
@@ -2983,7 +2983,8 @@ async function forumSend(id){
   const b = String(FR.draft||'').trim(); if (b.length < 2){ FR.rErr = 'Write your reply first.'; render(); return; }
   FR.sending = true; FR.rErr = ''; render();
   try{ const r = await sbRpc('bf_forum_reply', { p_app_token: APP_TOK, p_topic: Number(id), p_body: b });
-    if (r && r.error) FR.rErr = r.error; else { FR.sent = id; FR.draft = ''; } }
+    if (r && r.error) FR.rErr = r.error; else { FR.draft = ''; FR.list = null; FR.sending = false; toast('Your reply was posted.'); await forumTopicLoad(String(id));
+      const last = document.querySelector('.fr-topic .fr-post:last-of-type'); if (last) last.scrollIntoView({ block:'center' }); return; } }
   catch(x){ FR.rErr = x.message || 'Your reply could not be sent. Try again.'; }
   FR.sending = false; render();
 }
@@ -2991,7 +2992,7 @@ async function forumSend(id){
 /* ---------- staff: Workspace > Forums ---------- */
 async function forumAdminLoad(){
   FA.err = '';
-  try{ const r = await sbRpc('bf_forum_staff_list', { p_token: TOKEN }); FA.topics = r.topics || []; FA.pending = r.pending || []; }
+  try{ const r = await sbRpc('bf_forum_staff_list', { p_token: TOKEN }); FA.topics = r.topics || []; FA.pending = r.pending || []; FA.recent = r.recent || []; if (FA.tab==='pending' && !FA.pending.length) FA.tab = 'recent'; }
   catch(x){ FA.err = x.message || 'Could not load the forums.'; FA.topics = FA.topics || []; FA.pending = FA.pending || []; }
   if (S.view==='forum-admin') render();
 }
@@ -3054,8 +3055,10 @@ function viewForumAdmin(){
         '<div class="row" style="margin-top:8px"><button class="btn primary" onclick="forumStaffReply()"'+(FA.busy?' disabled':'')+'>'+(FA.busy?'Posting…':'Post reply')+'</button><span class="hint" style="margin-left:10px">Staff replies appear right away with the Building Department badge.</span></div></section>';
   } else {
     body = '<div class="fr-tabs" role="tablist"><button role="tab" class="chip'+(FA.tab==='topics'?' on':'')+'" aria-selected="'+(FA.tab==='topics')+'" onclick="FA.tab=\'topics\';render()">Topics ('+T.length+')</button>'+
-      '<button role="tab" class="chip'+(FA.tab==='pending'?' on':'')+'" aria-selected="'+(FA.tab==='pending')+'" onclick="FA.tab=\'pending\';render()">Needs approval'+(P.length?' <span class="nb-count" style="position:static;margin-left:4px">'+P.length+'</span>':' (0)')+'</button></div>'+
+      '<button role="tab" class="chip'+(FA.tab==='recent'?' on':'')+'" aria-selected="'+(FA.tab==='recent')+'" onclick="FA.tab=\'recent\';render()">Recent replies</button>'+
+      (P.length ? '<button role="tab" class="chip'+(FA.tab==='pending'?' on':'')+'" aria-selected="'+(FA.tab==='pending')+'" onclick="FA.tab=\'pending\';render()">Waiting from before <span class="nb-count" style="position:static;margin-left:4px">'+P.length+'</span></button>' : '')+'</div>'+
       (FA.err ? '<p class="formerr">'+esc(FA.err)+'</p>' : !FA.topics ? '<p class="empty">Loading…</p>' :
+       FA.tab==='recent' ? ((FA.recent||[]).length ? (FA.recent||[]).map(r => '<div class="fr-pend"><small class="hint">On <button class="linkbtn" onclick="forumAdminTopic('+r.topicId+')">'+esc(r.topicTitle)+'</button></small>'+forumReplyHtml(r, true)+'</div>').join('') : '<p class="empty">No replies from the public yet.</p>') :
        FA.tab==='pending' ? (P.length ? P.map(r => '<div class="fr-pend"><small class="hint">On <button class="linkbtn" onclick="forumAdminTopic('+r.topicId+')">'+esc(r.topicTitle)+'</button></small>'+forumReplyHtml(r, true)+'</div>').join('') : '<p class="empty">'+ic('check')+' Nothing waiting. Replies from the public show here until you approve them.</p>')
        : T.length ? '<div class="fr-list">'+T.map(t => '<button type="button" class="fr-row" onclick="forumAdminTopic('+t.id+')"><span class="fr-ic" aria-hidden="true">'+ic(t.pinned?'thumbtack':'news')+'</span>'+
            '<span class="fr-main"><span class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">Closed</span>':'')+(t.hidden?'<span class="fr-flag rej">Hidden</span>':'')+(t.pending?'<span class="fr-flag wait">'+t.pending+' to approve</span>':'')+'</span>'+
@@ -3064,7 +3067,7 @@ function viewForumAdmin(){
   }
   return topBar()+'<div class="purge fr-admin"><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span>'+
     (FA.edit ? '' : '<button class="btn sm" onclick="FA.topics=null;FA.pending=null;forumAdminLoad();render()">Refresh</button><button class="btn sm primary" onclick="forumEdit(null)">'+ic('edit')+'New topic</button>')+'</div>'+
-    '<h1>Forums</h1><p style="margin:0;color:var(--ink2);max-width:80ch">Post tips and start discussions on the public <a href="'+forumHref()+'" target="_blank" rel="noopener">Forums</a> page. People signed in to My permits can reply; their replies wait here until you approve them. Nothing is deleted: hide a topic or a reply instead.</p>'+
+    '<h1>Forums</h1><p style="margin:0;color:var(--ink2);max-width:80ch">Post tips and start discussions on the public <a href="'+forumHref()+'" target="_blank" rel="noopener">Forums</a> page. People signed in to My permits can reply, and their replies show right away. Check <b>Recent replies</b> and hide any that break the rules. Nothing is deleted: hide a topic or a reply instead.</p>'+
     (FA.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(FA.msg)+'</p>' : '')+body+'</div>';
 }
 
@@ -7682,7 +7685,7 @@ function dForum(){
     { id:2, category:'contractors', title:'Save your licenses once with a My permits account', body:'Contractors can save their City business license, State home builder license and trade license to My permits. They are attached for you on every permit you apply for while signed in.', author_name:'Kim Johnson', pinned:false, locked:false, hidden:false, created_at:new Date(now-3*day).toISOString(), updated_at:new Date(now-3*day).toISOString(), last_activity:new Date(now-1*day).toISOString(), updated_by:'Kim Johnson' } ],
     replies:[
       { id:1, topic_id:1, body:'This worked great, thank you!', kind:'public', author_name:'Dana Rivers', email:'dana@example.com', status:'approved', is_answer:false, created_at:new Date(now-2*day).toISOString() },
-      { id:2, topic_id:2, body:'Does the license expire automatically on the site?', kind:'public', author_name:'Marcus Hill', email:'marcus@example.com', status:'pending', is_answer:false, created_at:new Date(now-1*day).toISOString() },
+      { id:2, topic_id:2, body:'Does the license expire automatically on the site?', kind:'public', author_name:'Marcus Hill', email:'marcus@example.com', status:'approved', is_answer:false, created_at:new Date(now-1*day).toISOString() },
       { id:3, topic_id:1, body:'Glad it helped. Call 256-586-5968 if you cannot find your reference #.', kind:'staff', author_name:'Kim Johnson', status:'approved', is_answer:true, created_at:new Date(now-2*day+3600e3).toISOString() } ] };
   return DEMO.forum;
 }
@@ -7866,10 +7869,11 @@ function demoCall(fn, A){
       const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_topic) && !x.hidden); if (!t) return { error:'That topic was not found. It may have been removed.' };
       if (t.locked) return { error:'This topic is closed for replies.' }; const b = String(A.p_body||'').trim();
       if (b.length < 2) return { error:'Write your reply first.' }; if (b.length > 2000) return { error:'Keep your reply under 2,000 characters.' };
-      F.replies.push({ id:F.nextR++, topic_id:t.id, body:b, kind:'public', author_name:u.name, email:u.email, status:'pending', is_answer:false, created_at:new Date().toISOString() }); return { ok:true, pending:true }; }
+      F.replies.push({ id:F.nextR++, topic_id:t.id, body:b, kind:'public', author_name:u.name, email:u.email, status:'approved', is_answer:false, created_at:new Date().toISOString() }); t.last_activity = new Date().toISOString(); return { ok:true, pending:false }; }
     case 'bf_forum_staff_list': { dNeed(T,'building'); const F = dForum();
       return { topics:F.topics.slice().sort((a,b) => (a.hidden-b.hidden) || dFSort(a,b)).map(t => dFTopic(t, false, true)),
-               pending:F.replies.filter(r => r.status==='pending').map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })) }; }
+               pending:F.replies.filter(r => r.status==='pending').map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })),
+               recent:F.replies.filter(r => r.kind==='public' && r.status!=='pending').sort((a,b) => Date.parse(b.created_at)-Date.parse(a.created_at)).slice(0,50).map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })) }; }
     case 'bf_forum_staff_topic': { dNeed(T,'building'); const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id)); if (!t) throw new Error('That topic was not found.');
       return Object.assign(dFTopic(t, true, true), { items:F.replies.filter(r => r.topic_id===t.id).map(r => dFReply(r, true)) }); }
     case 'bf_forum_save_topic': { const a = dNeed(T,'building'), F = dForum(), who = a.name || a.email, ti = String(A.p_title||'').trim(), bo = String(A.p_body||'').trim();
