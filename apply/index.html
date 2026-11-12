@@ -242,6 +242,53 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .upd-all{display:inline-flex;align-items:center;gap:4px;color:var(--golddk);font-weight:600;font-size:13.5px;flex:none}
 @media (max-width:720px){.upd-list{grid-template-columns:1fr}.upd-body{font-size:15.5px}.form-h .upd-meta{justify-content:flex-start}.upd-latest{flex-wrap:wrap}.upd-all{width:100%}}
 
+
+/* v2.41.0 Forums */
+.fr-tools{display:flex;gap:10px;margin:18px 0 10px}
+.fr-q{flex:1;max-width:520px}.fr-q input{width:100%;border:0;background:transparent;padding:11px 0;font:inherit;color:var(--ink);outline:none}
+.fr-cats,.fr-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.fr-cats .chip.on,.fr-tabs .chip.on{background:var(--navy);border-color:var(--navy)}
+.fr-list{display:grid;gap:10px}
+.fr-row{display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none;cursor:pointer;font:inherit}
+.fr-row:hover,.fr-row:focus-visible{border-color:var(--gold);box-shadow:0 6px 18px rgba(33,44,70,.08)}
+.fr-ic{width:40px;height:40px;border-radius:4px;background:var(--gold);color:var(--navy);display:grid;place-items:center;flex:none}.fr-ic svg{width:20px;height:20px}
+.fr-main{flex:1;min-width:0;display:grid;gap:4px}
+.fr-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.fr-flag{display:inline-flex;align-items:center;gap:4px;font:700 11px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:20px;background:var(--navy);color:#fff}
+.fr-flag svg{width:12px;height:12px}.fr-flag.mute{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+.fr-flag.ok{background:#e4f1e8;color:#1f6b3a}.fr-flag.rej{background:#fbe5e3;color:#9b2c22}.fr-flag.wait{background:var(--gold);color:#212c46}
+.fr-t{font:600 17px/1.3 var(--f-disp);color:var(--ink)}
+.fr-ex{font-size:14px;line-height:1.45;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fr-by{font-size:12.5px;color:var(--muted)}
+.fr-n{display:grid;justify-items:center;min-width:56px;color:var(--muted)}.fr-n b{font:700 18px/1 var(--f-disp);color:var(--ink)}.fr-n small{font-size:12px;margin-top:3px}
+.fr-topic{max-width:800px}
+.fr-post{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px 18px;margin:0 0 12px}
+.fr-op{border-top:3px solid var(--gold)}
+.fr-staff{background:#fbf8f0;border-color:#e6d9b4}
+.fr-isans{border-color:#9cc9a8}
+.fr-pending{border-style:dashed;border-color:var(--gold)}.fr-rejected{opacity:.65}
+.fr-au{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.fr-au > span:last-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;line-height:1.3}
+.fr-au b{font:600 15px/1.3 var(--f-disp);color:var(--ink)}.fr-au small{flex-basis:100%;font-size:12.5px;color:var(--muted)}
+.fr-au .upd-av{width:36px;height:36px;font-size:12px}.fr-au .upd-av.pub{background:var(--surface2);color:var(--ink);border-color:var(--line)}
+.fr-badge{display:inline-flex;align-items:center;gap:3px;font:700 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:4px 7px;border-radius:20px;background:var(--navy);color:#fff}
+.fr-badge svg{width:11px;height:11px}.fr-badge.ans{background:#1f6b3a}.fr-badge.wait{background:var(--gold);color:#212c46}.fr-badge.rej{background:#9b2c22}
+.fr-body{font-size:15.5px;line-height:1.6;color:var(--ink)}.fr-body p{margin:0 0 10px}.fr-body p:last-child{margin-bottom:0}.fr-body ul{margin:0 0 10px;padding-left:22px}
+.fr-body a{color:var(--golddk);overflow-wrap:anywhere}
+.fr-answer{border:1px solid #9cc9a8;border-radius:12px;background:#f1f8f3;padding:10px 10px 0;margin:4px 0 16px}
+.fr-answer .fr-post{margin-bottom:10px}.fr-al{display:inline-flex;align-items:center;gap:5px;font:700 12px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:#1f6b3a;margin:2px 4px 10px}.fr-al svg{width:14px;height:14px}
+.fr-rh,.upd-body .fr-rh{font:700 13px var(--f-disp);letter-spacing:.12em;text-transform:uppercase;color:var(--golddk);margin:22px 0 10px}
+.fr-form{display:grid;gap:8px;margin-top:18px;border-top:1px solid var(--line);padding-top:18px}
+.fr-form textarea,.fr-admin textarea{width:100%;font:inherit;border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--surface);color:var(--ink);resize:vertical}
+.fr-form .btn{justify-self:start}
+.fr-fh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.fr-join,.fr-sent,.fr-closed{margin-top:18px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;background:var(--surface2);padding:14px 16px;display:grid;gap:4px;font-size:14.5px}
+.fr-join b{font:600 16px/1.3 var(--f-disp)}.fr-join .ab-acts{margin-top:10px}
+.fr-sent,.fr-closed{display:flex;gap:10px;align-items:flex-start}.fr-sent svg,.fr-closed svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--golddk)}
+.fr-mod{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.fr-pend{display:grid;gap:4px;margin-bottom:6px}
+.fr-admin .fe .fgrid{margin:10px 0}.fe-opts{display:flex;flex-wrap:wrap;gap:16px}
+@media (max-width:640px){ .fr-row{padding:13px;gap:10px} .fr-ic{width:34px;height:34px} .fr-t{font-size:16px} .fr-n{min-width:44px} .fr-post{padding:14px} .fr-tools{margin-top:12px} }
 /* v2.40.0 home layout + phone/tablet menu (same theme) */
 .pmenu-btn{display:none;align-items:center;gap:6px;flex:none;font:500 14px/1 var(--f-disp);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 11px;cursor:pointer}
 .pmenu-btn svg{width:18px;height:18px}
@@ -260,7 +307,8 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .pm-contact{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
 .pm-contact a{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:20px;padding:7px 12px}
 .pm-contact a svg{width:15px;height:15px;color:var(--golddk)}
-@media (max-width:860px){ .pmenu-btn{display:inline-flex} .phead{position:relative} .pacct{margin-left:auto} }
+@media (max-width:1060px){ .phead .pnav{display:none} .phead .pmenu-btn{display:inline-flex} .phead{position:relative} .phead .pacct,.phead .pme-w{margin-left:auto} }
+.pnav a{white-space:nowrap}
 @media (max-width:480px){ .pacct span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} .pacct{padding:8px 9px} .pacct svg{width:18px;height:18px} .pmenu-btn{padding:8px 10px} }
 @media (prefers-reduced-motion:reduce){ .pmenu{animation:none} }
 .hq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 8px}
@@ -2521,13 +2569,13 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.5';   // shown at the bottom of every page
+const APP_VERSION = '2.41.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
-    '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a><a href="#updates"'+on('updates')+'>Updates</a></nav>'+
+    '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a><a href="#updates"'+on('updates')+'>Updates</a><a href="#forums"'+on('forums')+'>Forums</a></nav>'+
     acctHeaderBtn()+
     '<button type="button" class="pmenu-btn" id="pmenuBtn" aria-expanded="'+(S.pmenuOpen?'true':'false')+'" aria-controls="pmenu" onclick="togglePubMenu(event)">'+ic(S.pmenuOpen?'x':'menu')+'<span>Menu</span></button></div>'+
     pubMenuHtml()+'</header>'+
@@ -2543,6 +2591,7 @@ function pubMenuHtml(){
     '<a '+HOME_LINK+on('apps')+'>'+ic('doc')+'<span><b>Applications &amp; Fees</b><small>Apply for a permit online</small></span></a>'+
     '<a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>'+ic('search')+'<span><b>Permit Status</b><small>Look up an application or permit</small></span></a>'+
     '<a href="'+updHref()+'"'+on('updates')+'>'+ic('news')+'<span><b>Updates'+(fresh?' <em class="pm-new">New</em>':'')+'</b><small>What is new on this site</small></span></a>'+
+    '<a href="'+forumHref()+'"'+on('forums')+'>'+ic('mail')+'<span><b>Forums</b><small>Tips and discussions</small></span></a>'+
     '<a '+acctLinkAttrs()+on('account')+'>'+ic('user')+'<span><b>My permits</b><small>'+(APP_TOK ? (acName() ? 'Signed in as '+esc(acName()) : 'Your applications, licenses and notifications') : 'Sign in or create a free account')+'</small></span></a>'+
     '<div class="pm-contact"><a href="tel:+12565865968">'+ic('info')+'256-586-5968</a><a href="mailto:buildingdept@arabcity.org">'+ic('mail')+'Email us</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">'+ic('ext')+'arabcity.org</a></div>'+
   '</div></nav>';
@@ -2553,7 +2602,7 @@ document.addEventListener('click', e => { if (S.pmenuOpen && !e.target.closest('
 document.addEventListener('keydown', e => { if (S.pmenuOpen && e.key === 'Escape') closePubMenu(true); });
 document.addEventListener('click', e => { if (S.pmenuOpen && e.target.closest('.pmenu a')) S.pmenuOpen = false; }, true);
 window.addEventListener('hashchange', () => { if (S.pmenuOpen){ S.pmenuOpen = false; } });
-window.addEventListener('resize', () => { if (S.pmenuOpen && window.innerWidth > 900){ S.pmenuOpen = false; render(); } });
+window.addEventListener('resize', () => { if (S.pmenuOpen && window.innerWidth > 1060){ S.pmenuOpen = false; render(); } });
 
 /* v2.40.0: home page quick actions (replace the two dark bars) and the free-account section (signed out only). */
 function homeQuickHtml(){
@@ -2594,7 +2643,7 @@ function pubFooter(){
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
     '<nav class="pf-cols" aria-label="Footer">'+
       '<div class="pf-col"><span class="pf-h">Contact</span><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="tel:+12565865968">256-586-5968</a></div>'+
-      '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a><a href="'+updHref()+'"'+(EMBED?' target="_top"':'')+'>Site updates</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
+      '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a><a href="'+updHref()+'"'+(EMBED?' target="_top"':'')+'>Site updates</a><a href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>Forums</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
     '</nav></div>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span class="pf-meta"><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span class="pf-ver">Version '+APP_VERSION+'</span></span></div></div></footer>';
 }
@@ -2611,7 +2660,7 @@ function privacyNote(){
 // ---- site notice (banner across the top of the page, or a pop-up), set by an administrator ----
 const NOTICE_LEGACY = 'Applications submitted before **October 10, 2026** are legacy applications and may not work properly with the Permit Status checker. For questions about the status of a legacy application, email buildingdept@arabcity.org, call 256-586-5968, or visit the Building Department at City Hall, 740 N Main St, Arab, AL 35016.';
 const noticeKey = n => 'bfNotice:'+[...String(n.body)].reduce((h, c) => (h*31 + c.charCodeAt(0))|0, 7)+':'+(n.updatedAt||'');
-function noticeHere(n){ return n && ['apps','form','pdf','status','privacy','accessibility','account','updates'].includes(S.view) && (n.pages==='all' || S.view==='status'); }
+function noticeHere(n){ return n && ['apps','form','pdf','status','privacy','accessibility','account','updates','forums'].includes(S.view) && (n.pages==='all' || S.view==='status'); }
 function noticeBannerHtml(n){
   return '<div class="sitenotice '+(n.tone==='warning'?'warn':'info')+'" role="region" aria-label="Notice from the Building Department">'+ic(n.tone==='warning'?'alert':'info')+'<div class="sn-body">'+mdLite(n.body)+'</div></div>';
 }
@@ -2808,6 +2857,203 @@ function viewUpdates(){
         '<span class="upd-more">Read the update '+ic('right')+'</span></span></a>').join('')+'</div>';
   }
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet stat upd" id="sheet">'+inner+'</div></main></div>';
+}
+
+/* ================= v2.41.0 (Jade): Forums =================
+   Public page (#forums, #forums/<id>): anyone can read. Building Department staff start topics; people signed in to a
+   free My permits account can reply, and their replies wait for staff approval (server: bf_forum_reply).
+   Staff manage it under Workspace > Forums (#forum-admin): new/edit topic, pin, lock, hide, reply with the
+   Building Department badge, approve or reject replies, mark the answer. Text only. Nothing is deleted. */
+const FORUM_CATS = [['tips','Tips & how-tos'],['building','Building permits'],['contractors','Contractors'],['planning','Planning & zoning'],['website','Using this website'],['general','General']];
+const forumCat = k => (FORUM_CATS.find(c => c[0]===k) || [k, 'General'])[1];
+const FR = { list:null, key:'', cat:'', q:'', err:'', topic:null, tId:null, tErr:'', draft:'', sending:false, sent:'', rErr:'' };
+const FA = { topics:null, pending:null, err:'', tab:'topics', edit:null, saving:false, eErr:'', topic:null, tId:null, reply:'', busy:false, msg:'' };
+const forumHref = id => (EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '')+'#forums'+(id ? '/'+id : '');
+const forumAgo = d => { const t = Date.parse(d); if (isNaN(t)) return ''; const m = Math.round((Date.now()-t)/60000);
+  return m < 1 ? 'Just now' : m < 60 ? m+' min ago' : m < 1440 ? Math.round(m/60)+' hr ago' : m < 10080 ? Math.round(m/1440)+' day'+(Math.round(m/1440)===1?'':'s')+' ago'
+    : new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+// Plain text -> safe HTML: paragraphs, "- " bullet lists, line breaks, and web links.
+function forumText(s){
+  const link = h => h.replace(/\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]'"]/g, u => '<a href="'+u+'" target="_blank" rel="noopener nofollow ugc">'+u+'</a>');
+  return String(s||'').replace(/\r/g,'').split(/\n{2,}/).map(block => {
+    const lines = block.split('\n').filter(l => l.trim()!=='');
+    if (!lines.length) return '';
+    if (lines.every(l => /^\s*[-•*]\s+/.test(l))) return '<ul>'+lines.map(l => '<li>'+link(esc(l.replace(/^\s*[-•*]\s+/,'')))+'</li>').join('')+'</ul>';
+    return '<p>'+lines.map(l => link(esc(l))).join('<br>')+'</p>';
+  }).join('');
+}
+async function forumLoad(force){
+  const key = FR.cat+'|'+FR.q;
+  if (!force && FR.list && FR.key===key) return;
+  FR.key = key; FR.err = '';
+  try{ const r = await sbRpc('bf_forum_list', { p_category: FR.cat || null, p_q: FR.q || null }); if (FR.key===key) FR.list = Array.isArray(r) ? r : []; }
+  catch(x){ FR.err = x.message || 'The forums could not be loaded.'; FR.list = FR.list || []; }
+  if (S.view==='forums') render();
+}
+async function forumTopicLoad(id){
+  FR.tId = id; FR.topic = null; FR.tErr = '';
+  try{ const r = await sbRpc('bf_forum_topic', { p_id: Number(id) }); if (FR.tId!==id) return; if (r && r.error) FR.tErr = r.error; else FR.topic = r; }
+  catch(x){ FR.tErr = x.message || 'That topic could not be loaded.'; }
+  if (S.view==='forums') render();
+}
+let forumQT = null;
+function forumSearch(v){ FR.q = String(v||'').slice(0,100); clearTimeout(forumQT); forumQT = setTimeout(() => { FR.list = null; forumLoad(true).then(() => { const i = document.getElementById('frq'); if (i){ i.focus(); const n = i.value.length; i.setSelectionRange(n,n); } }); }, 350); }
+function forumSetCat(c){ FR.cat = c; FR.list = null; render(); forumLoad(true); }
+function forumRow(t){
+  return '<a class="fr-row" href="'+forumHref(t.id)+'"'+(EMBED?' target="_top"':'')+'>'+
+    '<span class="fr-ic" aria-hidden="true">'+ic(t.pinned ? 'thumbtack' : t.answered ? 'check' : 'news')+'</span>'+
+    '<span class="fr-main"><span class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">'+ic('lock')+'Closed</span>':'')+(t.answered?'<span class="fr-flag ok">'+ic('check')+'Answered</span>':'')+'</span>'+
+    '<b class="fr-t">'+esc(t.title)+'</b><span class="fr-ex">'+esc(t.body)+(String(t.body||'').length>=220?'…':'')+'</span>'+
+    '<small class="fr-by">'+esc(t.author||'Building Department')+' · Building Department · '+esc(forumAgo(t.lastActivity))+'</small></span>'+
+    '<span class="fr-n"><b class="num">'+(t.replies||0)+'</b><small>'+(t.replies===1?'reply':'replies')+'</small></span></a>';
+}
+function viewForums(){
+  const id = S.post;
+  let inner;
+  if (id){
+    if (FR.tId !== id) setTimeout(() => forumTopicLoad(id), 0);
+    const t = FR.tId===id ? FR.topic : null;
+    inner = '<div class="form-h"><a class="back" href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>← All topics</a>'+
+      (t ? '<h1>'+esc(t.title)+'</h1><span class="hint upd-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">'+ic('lock')+'Closed</span>':'')+'</span>'
+         : FR.tErr ? '<h1>Topic not found</h1>' : '<h1>Loading…</h1>')+'</div>'+
+      (FR.tErr ? '<p class="formerr">'+esc(FR.tErr)+'</p>' : !t ? '<p class="empty">Loading the topic…</p>' :
+      '<article class="fr-topic upd-body">'+
+        '<div class="fr-post fr-op"><div class="fr-au"><span class="upd-av" aria-hidden="true">BD</span><span><b>'+esc(t.author||'Building Department')+'</b><span class="fr-badge">Building Department</span><small>'+esc(forumAgo(t.createdAt))+(t.updatedAt && Date.parse(t.updatedAt)-Date.parse(t.createdAt) > 120000 ? ' · edited' : '')+'</small></span></div>'+
+          '<div class="fr-body">'+forumText(t.body)+'</div></div>'+
+        (() => { const items = t.items||[], ans = items.find(r => r.isAnswer);
+          return (ans ? '<div class="fr-answer"><span class="fr-al">'+ic('check')+'Answer</span>'+forumReplyHtml(ans, false)+'</div>' : '')+
+            '<h2 class="fr-rh">'+(items.length ? items.length+' '+(items.length===1?'reply':'replies') : 'No replies yet')+'</h2>'+
+            items.map(r => forumReplyHtml(r, false)).join(''); })()+
+        forumReplyBox(t)+
+      '</article>');
+  } else {
+    if (!FR.list) setTimeout(() => forumLoad(), 0);
+    const L = FR.list;
+    inner = '<div class="form-h"><a class="back" '+HOME_LINK+'>← Applications &amp; Fees</a><h1>Forums</h1>'+
+      '<span class="hint" style="color:var(--muted)">Tips and discussions from the City of Arab Building Department. Sign in to My permits to join the conversation.</span></div>'+
+      '<div class="fr-tools"><label class="search fr-q">'+ic('search')+'<input id="frq" type="search" placeholder="Search topics and replies" value="'+esc(FR.q)+'" aria-label="Search the forums" oninput="forumSearch(this.value)"></label></div>'+
+      '<div class="fr-cats" role="group" aria-label="Categories"><button type="button" class="chip'+(FR.cat===''?' on':'')+'" aria-pressed="'+(FR.cat==='')+'" onclick="forumSetCat(\'\')">All</button>'+
+        FORUM_CATS.map(c => '<button type="button" class="chip'+(FR.cat===c[0]?' on':'')+'" aria-pressed="'+(FR.cat===c[0])+'" onclick="forumSetCat(\''+c[0]+'\')">'+esc(c[1])+'</button>').join('')+'</div>'+
+      (FR.err ? '<p class="formerr">'+esc(FR.err)+'</p>' : '')+
+      (!L ? '<p class="empty">Loading topics…</p>' : !L.length ? '<p class="empty">'+(FR.q || FR.cat ? 'No topics match. Try another word or category.' : 'No topics yet. Check back soon for tips from the Building Department.')+'</p>' :
+        '<div class="fr-list">'+L.map(forumRow).join('')+'</div>');
+  }
+  return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet fr-page" id="sheet">'+inner+'</div></main></div>';
+}
+function forumReplyHtml(r, staff){
+  const st = r.kind==='staff';
+  return '<div class="fr-post'+(st?' fr-staff':'')+(r.isAnswer?' fr-isans':'')+(staff && r.status!=='approved' ? ' fr-'+r.status : '')+'" id="fr-r'+r.id+'">'+
+    '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(st ? 'BD' : acInitials(r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">Building Department</span>':'')+
+      (r.isAnswer?'<span class="fr-badge ans">'+ic('check')+'Answer</span>':'')+
+      (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Not approved</span>' : '')+
+      '<small>'+esc(forumAgo(r.createdAt))+(staff && r.email ? ' · '+esc(r.email) : '')+'</small></span></div>'+
+    '<div class="fr-body">'+forumText(r.body)+'</div>'+
+    (staff ? '<div class="fr-mod">'+
+      (r.status!=='approved' ? '<button type="button" class="btn sm primary" onclick="forumMod('+r.id+',\'approve\')">'+ic('check')+'Approve</button>' : '')+
+      (r.status==='pending' ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'reject\')">Do not approve</button>' : '')+
+      (r.status==='approved' && !r.isAnswer ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'answer\')">Mark as answer</button>' : '')+
+      (r.isAnswer ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'unanswer\')">Remove answer mark</button>' : '')+
+      (r.status==='approved' && r.kind==='public' ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'reject\')">Hide reply</button>' : '')+'</div>' : '')+
+  '</div>';
+}
+function forumReplyBox(t){
+  if (t.locked) return '<div class="fr-closed">'+ic('lock')+'This topic is closed for replies.</div>';
+  if (FR.sent === t.id) return '<div class="fr-sent" role="status">'+ic('check')+'<span><b>Thanks! Your reply was sent.</b> It will appear here after the Building Department approves it.</span></div>';
+  if (!APP_TOK) return '<div class="fr-join"><b>Join the conversation</b><span>Sign in to your free My permits account to reply. Replies are reviewed by the Building Department before they appear.</span>'+
+    '<div class="ab-acts"><a class="btn primary" '+acctLinkAttrs()+'>'+ic('user')+'Sign in to reply</a><a class="btn" '+acctLinkAttrs()+'>Create a free account</a></div></div>';
+  return '<form class="fr-form" onsubmit="event.preventDefault();forumSend('+t.id+')"><label class="l" for="frr">Your reply</label>'+
+    '<textarea id="frr" rows="4" maxlength="2000" oninput="FR.draft=this.value;document.getElementById(\'frc\').textContent=(2000-this.value.length)+\' characters left\'">'+esc(FR.draft)+'</textarea>'+
+    '<div class="fr-fh"><small id="frc" class="hint">'+(2000-FR.draft.length)+' characters left</small><small class="hint">Replies are reviewed before they appear. Please do not post personal information.</small></div>'+
+    (FR.rErr ? '<p class="formerr" role="alert">'+esc(FR.rErr)+'</p>' : '')+
+    '<button type="submit" class="btn primary"'+(FR.sending?' disabled':'')+'>'+(FR.sending?'Sending…':'Send reply')+'</button></form>';
+}
+async function forumSend(id){
+  const b = String(FR.draft||'').trim(); if (b.length < 2){ FR.rErr = 'Write your reply first.'; render(); return; }
+  FR.sending = true; FR.rErr = ''; render();
+  try{ const r = await sbRpc('bf_forum_reply', { p_app_token: APP_TOK, p_topic: Number(id), p_body: b });
+    if (r && r.error) FR.rErr = r.error; else { FR.sent = id; FR.draft = ''; } }
+  catch(x){ FR.rErr = x.message || 'Your reply could not be sent. Try again.'; }
+  FR.sending = false; render();
+}
+
+/* ---------- staff: Workspace > Forums ---------- */
+async function forumAdminLoad(){
+  FA.err = '';
+  try{ const r = await sbRpc('bf_forum_staff_list', { p_token: TOKEN }); FA.topics = r.topics || []; FA.pending = r.pending || []; }
+  catch(x){ FA.err = x.message || 'Could not load the forums.'; FA.topics = FA.topics || []; FA.pending = FA.pending || []; }
+  if (S.view==='forum-admin') render();
+}
+async function forumAdminTopic(id){
+  FA.tId = id; FA.topic = null; FA.edit = null; FA.msg = '';
+  try{ FA.topic = await sbRpc('bf_forum_staff_topic', { p_token: TOKEN, p_id: Number(id) }); }catch(x){ FA.err = x.message; FA.tId = null; }
+  render();
+}
+function forumEdit(t){ FA.edit = t ? { id:t.id, category:t.category, title:t.title, body:t.body, pinned:!!t.pinned, locked:!!t.locked, hidden:!!t.hidden }
+                                   : { id:null, category:'tips', title:'', body:'', pinned:false, locked:false, hidden:false }; FA.eErr = ''; render();
+  setTimeout(() => { const e = document.getElementById('fe_title'); if (e) e.focus(); }, 30); }
+function forumEditSync(){ const E = FA.edit; if (!E) return; const g = id => document.getElementById(id);
+  E.category = g('fe_cat').value; E.title = g('fe_title').value; E.body = g('fe_body').value; E.pinned = g('fe_pin').checked; E.locked = g('fe_lock').checked; E.hidden = g('fe_hide').checked; }
+async function forumSave(){
+  forumEditSync(); const E = FA.edit; FA.saving = true; FA.eErr = ''; render();
+  try{ const t = await sbRpc('bf_forum_save_topic', { p_token:TOKEN, p_id:E.id, p_category:E.category, p_title:E.title, p_body:E.body, p_pinned:E.pinned, p_locked:E.locked, p_hidden:E.hidden });
+    FA.saving = false; FA.edit = null; FA.msg = E.id ? 'Topic saved.' : (E.hidden ? 'Topic saved as hidden. Turn off "Hide" to publish it.' : 'Topic published on the Forums page.');
+    const m = FA.msg; FR.list = null; FR.tId = null; await forumAdminLoad(); if (t && t.id) await forumAdminTopic(t.id); FA.msg = m; render(); }
+  catch(x){ FA.saving = false; FA.eErr = x.message || 'Could not save.'; render(); }
+}
+async function forumStaffReply(){
+  const b = String(FA.reply||'').trim(); if (b.length < 2){ toast('Write the reply first.'); return; }
+  FA.busy = true; render();
+  try{ await sbRpc('bf_forum_staff_reply', { p_token:TOKEN, p_topic:Number(FA.tId), p_body:b }); FA.reply = ''; FR.tId = null; FR.list = null; toast('Reply posted.'); await forumAdminTopic(FA.tId); forumAdminLoad(); }
+  catch(x){ toast(x.message || 'Could not post the reply.'); }
+  FA.busy = false; render();
+}
+async function forumMod(id, act){
+  try{ await sbRpc('bf_forum_moderate', { p_token:TOKEN, p_reply:Number(id), p_action:act });
+    toast({ approve:'Reply approved. It is now on the Forums page.', reject:'Reply hidden from the public.', answer:'Marked as the answer.', unanswer:'Answer mark removed.' }[act] || 'Saved.');
+    FR.tId = null; FR.list = null; await forumAdminLoad(); if (FA.tId) await forumAdminTopic(FA.tId); }
+  catch(x){ toast(x.message || 'Could not update the reply.'); }
+}
+function forumPendingPeek(){ if (FA.peeked || !canBuilding()) return; FA.peeked = true; forumAdminLoad().then(() => { if (S.view==='staff') render(); }); }
+function viewForumAdmin(){
+  if (!FA.topics && !FA.err) setTimeout(forumAdminLoad, 0);
+  const P = FA.pending || [], T = FA.topics || [];
+  let body;
+  if (FA.edit){
+    const E = FA.edit;
+    body = '<section class="card fe"><h2>'+(E.id ? 'Edit topic' : 'New topic')+'</h2>'+
+      '<div class="fgrid"><div class="fld"><label class="l" for="fe_cat">Category</label><select id="fe_cat">'+FORUM_CATS.map(c => '<option value="'+c[0]+'"'+(E.category===c[0]?' selected':'')+'>'+esc(c[1])+'</option>').join('')+'</select></div><div class="fld"></div>'+
+      '<div class="fld full"><label class="l" for="fe_title">Title</label><input id="fe_title" maxlength="140" value="'+esc(E.title)+'" placeholder="e.g. How to schedule an inspection"></div>'+
+      '<div class="fld full"><label class="l" for="fe_body">Post</label><textarea id="fe_body" rows="10" maxlength="8000">'+esc(E.body)+'</textarea>'+
+        '<span class="hint">Plain text. Leave a blank line between paragraphs. Start lines with "- " for a bulleted list. Web addresses become links.</span></div>'+
+      '<div class="fld full fe-opts"><label class="opt"><input type="checkbox" id="fe_pin"'+(E.pinned?' checked':'')+'> Pin to the top</label>'+
+        '<label class="opt"><input type="checkbox" id="fe_lock"'+(E.locked?' checked':'')+'> Close for replies</label>'+
+        '<label class="opt"><input type="checkbox" id="fe_hide"'+(E.hidden?' checked':'')+'> Hide from the public</label></div></div>'+
+      (FA.eErr ? '<p class="formerr" role="alert">'+esc(FA.eErr)+'</p>' : '')+
+      '<div class="row" style="gap:8px"><button type="button" class="btn primary" onclick="forumSave()"'+(FA.saving?' disabled':'')+'>'+(FA.saving?'Saving…':(E.id?'Save changes':'Publish topic'))+'</button><button type="button" class="btn" onclick="FA.edit=null;render()">Cancel</button></div></section>';
+  } else if (FA.tId && FA.topic){
+    const t = FA.topic;
+    body = '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="FA.tId=null;FA.topic=null;render()">'+ic('left')+'All topics</button><span style="flex:1"></span>'+
+      '<button class="btn sm" onclick="forumEdit(FA.topic)">'+ic('edit')+'Edit topic</button>'+(t.hidden?'':'<a class="btn sm" href="'+forumHref(t.id)+'" target="_blank" rel="noopener">'+ic('ext')+'View on the site</a>')+'</div>'+
+      '<section class="card fr-topic"><div class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">Closed</span>':'')+(t.hidden?'<span class="fr-flag rej">Hidden</span>':'')+'</div>'+
+        '<h2 style="margin:6px 0 4px">'+esc(t.title)+'</h2><small class="hint">'+esc(t.author)+' · '+esc(forumAgo(t.createdAt))+(t.updatedBy?' · last edited by '+esc(t.updatedBy):'')+'</small>'+
+        '<div class="fr-body">'+forumText(t.body)+'</div></section>'+
+      '<h3 class="fr-rh">Replies ('+(t.items||[]).length+')</h3>'+((t.items||[]).length ? (t.items||[]).map(r => forumReplyHtml(r, true)).join('') : '<p class="empty">No replies yet.</p>')+
+      '<section class="card"><label class="l" for="far">Reply as the Building Department</label><textarea id="far" rows="4" maxlength="4000" oninput="FA.reply=this.value">'+esc(FA.reply)+'</textarea>'+
+        '<div class="row" style="margin-top:8px"><button class="btn primary" onclick="forumStaffReply()"'+(FA.busy?' disabled':'')+'>'+(FA.busy?'Posting…':'Post reply')+'</button><span class="hint" style="margin-left:10px">Staff replies appear right away with the Building Department badge.</span></div></section>';
+  } else {
+    body = '<div class="fr-tabs" role="tablist"><button role="tab" class="chip'+(FA.tab==='topics'?' on':'')+'" aria-selected="'+(FA.tab==='topics')+'" onclick="FA.tab=\'topics\';render()">Topics ('+T.length+')</button>'+
+      '<button role="tab" class="chip'+(FA.tab==='pending'?' on':'')+'" aria-selected="'+(FA.tab==='pending')+'" onclick="FA.tab=\'pending\';render()">Needs approval'+(P.length?' <span class="nb-count" style="position:static;margin-left:4px">'+P.length+'</span>':' (0)')+'</button></div>'+
+      (FA.err ? '<p class="formerr">'+esc(FA.err)+'</p>' : !FA.topics ? '<p class="empty">Loading…</p>' :
+       FA.tab==='pending' ? (P.length ? P.map(r => '<div class="fr-pend"><small class="hint">On <button class="linkbtn" onclick="forumAdminTopic('+r.topicId+')">'+esc(r.topicTitle)+'</button></small>'+forumReplyHtml(r, true)+'</div>').join('') : '<p class="empty">'+ic('check')+' Nothing waiting. Replies from the public show here until you approve them.</p>')
+       : T.length ? '<div class="fr-list">'+T.map(t => '<button type="button" class="fr-row" onclick="forumAdminTopic('+t.id+')"><span class="fr-ic" aria-hidden="true">'+ic(t.pinned?'thumbtack':'news')+'</span>'+
+           '<span class="fr-main"><span class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">Closed</span>':'')+(t.hidden?'<span class="fr-flag rej">Hidden</span>':'')+(t.pending?'<span class="fr-flag wait">'+t.pending+' to approve</span>':'')+'</span>'+
+           '<b class="fr-t">'+esc(t.title)+'</b><small class="fr-by">'+esc(t.author)+' · '+esc(forumAgo(t.lastActivity))+'</small></span><span class="fr-n"><b class="num">'+t.replies+'</b><small>replies</small></span></button>').join('')+'</div>'
+       : '<p class="empty">No topics yet. Click <b>New topic</b> to post your first tip.</p>');
+  }
+  return topBar()+'<div class="purge fr-admin"><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span>'+
+    (FA.edit ? '' : '<button class="btn sm" onclick="FA.topics=null;FA.pending=null;forumAdminLoad();render()">Refresh</button><button class="btn sm primary" onclick="forumEdit(null)">'+ic('edit')+'New topic</button>')+'</div>'+
+    '<h1>Forums</h1><p style="margin:0;color:var(--ink2);max-width:80ch">Post tips and start discussions on the public <a href="'+forumHref()+'" target="_blank" rel="noopener">Forums</a> page. People signed in to My permits can reply; their replies wait here until you approve them. Nothing is deleted: hide a topic or a reply instead.</p>'+
+    (FA.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(FA.msg)+'</p>' : '')+body+'</div>';
 }
 
 function viewPrivacy(){
@@ -3635,7 +3881,7 @@ async function anLoad(force){
     try{ const m = await sbRpc('bf_app_me', { p_token:APP_TOK }); AC.nm = (m && m.user && m.user.name) || ''; AC.em = (m && m.user && m.user.email) || ''; try{ if (!DEMO) localStorage.setItem('bdAppName', AC.nm); }catch(e){} }catch(x){} }
   AN.busy = false; if (PUB_VIEWS.includes(S.view)) render();
 }
-const PUB_VIEWS = ['apps','form','pdf','status','privacy','accessibility','account','updates'];
+const PUB_VIEWS = ['apps','form','pdf','status','privacy','accessibility','account','updates','forums'];
 async function anToggle(e){
   if (e) e.stopPropagation();
   AN.open = !AN.open; if (AN.open) S.pmenuOpen = false; render();   // v2.40.2: one panel at a time
@@ -3972,6 +4218,7 @@ function viewWorkspace(){
    '<a class="navi" href="#cict" onclick="event.preventDefault();go(\'cict\')">'+ic('coins')+'CICT fee report</a>'+
    '<a class="navi" href="#ar" onclick="event.preventDefault();go(\'ar\')">'+ic('cal')+'AR by fiscal year</a>'+
    '<a class="navi" href="#app-accounts" onclick="event.preventDefault();go(\'app-accounts\')">'+ic('user')+'Applicant accounts</a>'+
+   '<a class="navi" href="#forum-admin" onclick="event.preventDefault();go(\'forum-admin\')">'+ic('mail')+'Forums'+(FA.pending && FA.pending.length ? '<span class="nb-count" style="position:static;margin-left:auto">'+FA.pending.length+'</span>' : '')+'</a>'+
    (canRecords()?'<a class="navi" href="#records" onclick="event.preventDefault();go(\'records\')">'+ic('db')+'Records &amp; storage</a>':'')+
    '<a class="navi" href="#privacy-statement" onclick="event.preventDefault();go(\'privacy-statement\')">'+ic('lock')+'Privacy statement</a>'+
    '<a class="navi" href="#accessibility-statement" onclick="event.preventDefault();go(\'accessibility-statement\')">'+ic('access')+'Accessibility statement</a>'+
@@ -4545,7 +4792,7 @@ function routeAllowed(v){
   if (v==='clerk') return canPay();
   if (['users','bugs','site-notice','app-look'].includes(v)) return isAdmin();
   if (v==='records') return canRecords();
-  if (v==='staff' || v==='table' || v==='cict' || v==='ar' || v==='app-accounts') return canBuilding();
+  if (v==='staff' || v==='table' || v==='cict' || v==='ar' || v==='app-accounts' || v==='forum-admin') return canBuilding();
   return false;
 }
 const ROLE_LABEL = { staff:'Building Department', clerk:'City Clerk', admin:'Administrator', citizen:'No access' };
@@ -5755,6 +6002,7 @@ function render(){
   else if (S.view==='account'){ const keep = [...root.querySelectorAll('.acct input[id]')].map(e => [e.id, e.value]); root.innerHTML = viewAccount();
     keep.forEach(([id, v]) => { const e = document.getElementById(id); if (e && !e.value) e.value = v; }); bindAccount(); }
   else if (S.view==='updates') root.innerHTML = viewUpdates();
+  else if (S.view==='forums') root.innerHTML = viewForums();
   else if (S.view==='privacy') root.innerHTML = viewPrivacy();
   else if (S.view==='accessibility') root.innerHTML = viewAccessibility();
   else if (EMBED) root.innerHTML = viewFramed();     // staff screens never load inside another site's frame
@@ -5781,6 +6029,7 @@ function render(){
   else if (S.view==='cict') root.innerHTML = viewCict();
   else if (S.view==='ar') root.innerHTML = viewAr();
   else if (S.view==='app-look' && isAdmin()){ root.innerHTML = viewLookAdmin(); }
+  else if (S.view==='forum-admin') root.innerHTML = viewForumAdmin();
   else if (S.view==='app-accounts'){ root.innerHTML = viewAppAccounts(); if (!S.appAcc.list && !S.appAcc.err) appAccLoad(); }
   else if (S.view==='table' && S.form){
     const off = document.getElementById('offf'), keep = (off && S.tab==='office') ? { sel:S.sel, v:[...off.querySelectorAll('input,select,textarea')].filter(e => e.id).map(e => [e.id, e.type==='checkbox' ? e.checked : e.value]) } : null;
@@ -5790,15 +6039,16 @@ function render(){
   if (S.sel && S.staff && S.view!=='table' && canBuilding() && !['apps','form','pdf','status','privacy','accessibility','account','updates','clerk'].includes(S.view) && root.querySelector('.jt-top')) { root.insertAdjacentHTML('beforeend', panelHtml());   // v2.29.3: record over the current page
     if (offKeep && offKeep.sel===S.sel && S.tab==='office'){ offKeep.v.forEach(([id, v]) => { const e = document.getElementById(id); if (e){ if (e.type==='checkbox') e.checked = v; else e.value = v; } }); if (typeof coChange==='function') coChange(); } }
   a11yLandmarks();
-  if (['apps','form','pdf','status','privacy','accessibility','account','updates'].includes(S.view)) paintNotice();
-  const isPub = ['apps','form','pdf','status','privacy','accessibility','account','updates'].includes(S.view);
+  if (['apps','form','pdf','status','privacy','accessibility','account','updates','forums'].includes(S.view)) paintNotice();
+  const isPub = ['apps','form','pdf','status','privacy','accessibility','account','updates','forums'].includes(S.view);
   if (S.staff && !isPub) root.insertAdjacentHTML('beforeend', staffFooter());
   else if (isPub) root.insertAdjacentHTML('beforeend', pubFooter());
   const ca = document.getElementById('ckAll'); if (ca && S.view==='table'){ const r = filteredRows(), n = r.filter(s=>S.rowSel[s.id]).length; ca.indeterminate = n>0 && n<r.length; }
+  if (S.view==='staff' && S.staff && typeof forumPendingPeek==='function') forumPendingPeek();
   const cw = document.getElementById('ckWs'); if (cw && S.view==='staff'){ const n = FORM_ORDER.filter(k=>S.wsSel&&S.wsSel[k]).length; cw.indeterminate = n>0 && n<FORM_ORDER.length; }
   const wq = document.getElementById('wsq'); if (wq) wq.oninput = () => { S.wsQ = wq.value; render(); };
   const tq = document.getElementById('tq'); if (tq) tq.oninput = () => { S.q = tq.value; render(); };
-  document.title = S.view==='updates' ? ((S.post && (UPDATES.find(u => u.id===S.post)||{}).title) || 'Site Updates')+' · City of Arab' : S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='account' ? 'My Permits · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+(/Application$/.test(FORMS[S.form].short) ? '' : ' Application')+' · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Apps & Fees · City of Arab';
+  document.title = S.view==='forums' ? ((S.post && FR.topic && String(FR.topic.id)===String(S.post) && FR.topic.title) || 'Forums')+' · City of Arab' : S.view==='updates' ? ((S.post && (UPDATES.find(u => u.id===S.post)||{}).title) || 'Site Updates')+' · City of Arab' : S.view==='status' ? 'Check Permit Status · City of Arab' : S.view==='account' ? 'My Permits · City of Arab' : S.view==='privacy' ? 'Privacy & Your Information · City of Arab' : S.view==='accessibility' ? 'Accessibility · City of Arab' : (S.view==='form' && FORMS[S.form]) ? FORMS[S.form].short+(/Application$/.test(FORMS[S.form].short) ? '' : ' Application')+' · City of Arab' : (S.view==='pdf' && typeof PDF_FORMS!=='undefined' && PDF_FORMS[S.form] && PDF_FORMS[S.form].title) ? PDF_FORMS[S.form].title+' · City of Arab' : isPub ? 'Applications & Fees · City of Arab' : 'Apps & Fees · City of Arab';
   ensureViewData();
   if (DEMO) demoPaintBar();
   if (INST.open && !['apps','status','account','privacy','accessibility','updates'].includes(S.view)) instHide(); else instMaybe();
@@ -5825,11 +6075,12 @@ function initRoute(){
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
   else if (h==='updates' || h.indexOf('updates/')===0){ S.view = 'updates'; S.post = h.slice(8) || null; }
+  else if (h==='forums' || h.indexOf('forums/')===0){ S.view = 'forums'; S.post = (h.slice(7).match(/^\d+/)||[null])[0]; }
   else if (h==='account') S.view = 'account';
   else if (h==='privacy') S.view = 'privacy';
   else if (h==='accessibility') S.view = 'accessibility';
   else if (h==='purge' || h==='import') S.view = 'records';   // old links
-  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','app-accounts','app-look'].includes(h)) S.view = h;
+  else if (['staff','records','users','me','bugs','clerk','cict','ar','privacy-statement','accessibility-statement','site-notice','app-accounts','app-look','forum-admin'].includes(h)) S.view = h;
   if (S.view==='clerk' && S.staff && canPay()) clerkLoad();
   render(); window.scrollTo(0,0); const st = document.querySelector('.stage'); if (st) st.scrollTop = 0; requestAnimationFrame(() => { window.scrollTo(0,0); if (st) st.scrollTop = 0; });
 }
@@ -6756,7 +7007,7 @@ function staffFooter(){
 const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF form (Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
 const STAFF_URG = [['low','Minor'],['normal','Slows me down'],['high',"I can't do my work"]];
-const bugIsPublic = () => ['apps','form','pdf','status','account','updates'].includes(S.view);
+const bugIsPublic = () => ['apps','form','pdf','status','account','updates','forums'].includes(S.view);
 function openBug(){
   closeBug();
   if (bugIsPublic()) return openPubBug();
@@ -7410,6 +7661,27 @@ async function demoRpc(fn, A){
   A = A || {}; await new Promise(r => setTimeout(r, 60));   // feel like a network call
   const out = demoCall(fn, A); demoSave(); return dClone(out);
 }
+
+function dForum(){
+  if (DEMO.forum) return DEMO.forum;
+  const now = Date.now(), day = 864e5;
+  DEMO.forum = { nextT:3, nextR:4, topics:[
+    { id:1, category:'tips', title:'How to check your permit status without an account', body:'You do not need an account to see where your permit is.\n\n- Open Permit Status at the top of any page.\n- Enter your reference # and the email on your application.\n- Click Check status.\n\nThe reference # is on your receipt and in the email we send when you apply.', author_name:'Kim Johnson', pinned:true, locked:false, hidden:false, created_at:new Date(now-6*day).toISOString(), updated_at:new Date(now-6*day).toISOString(), last_activity:new Date(now-2*day).toISOString(), updated_by:'Kim Johnson' },
+    { id:2, category:'contractors', title:'Save your licenses once with a My permits account', body:'Contractors can save their City business license, State home builder license and trade license to My permits. They are attached for you on every permit you apply for while signed in.', author_name:'Kim Johnson', pinned:false, locked:false, hidden:false, created_at:new Date(now-3*day).toISOString(), updated_at:new Date(now-3*day).toISOString(), last_activity:new Date(now-1*day).toISOString(), updated_by:'Kim Johnson' } ],
+    replies:[
+      { id:1, topic_id:1, body:'This worked great, thank you!', kind:'public', author_name:'Dana Rivers', email:'dana@example.com', status:'approved', is_answer:false, created_at:new Date(now-2*day).toISOString() },
+      { id:2, topic_id:2, body:'Does the license expire automatically on the site?', kind:'public', author_name:'Marcus Hill', email:'marcus@example.com', status:'pending', is_answer:false, created_at:new Date(now-1*day).toISOString() },
+      { id:3, topic_id:1, body:'Glad it helped. Call 256-586-5968 if you cannot find your reference #.', kind:'staff', author_name:'Kim Johnson', status:'approved', is_answer:true, created_at:new Date(now-2*day+3600e3).toISOString() } ] };
+  return DEMO.forum;
+}
+const dPubName = n => { const w = String(n||'').trim().split(/\s+/).filter(Boolean); return !w.length ? 'Resident' : w.length===1 ? w[0] : w[0]+' '+w[w.length-1][0].toUpperCase()+'.'; };
+function dFReply(r, staff){ const o = { id:r.id, topicId:r.topic_id, body:r.body, kind:r.kind, author:r.kind==='staff'?r.author_name:dPubName(r.author_name), createdAt:r.created_at, isAnswer:!!r.is_answer };
+  return staff ? Object.assign(o, { status:r.status, fullName:r.author_name, email:r.email||'' }) : o; }
+function dFTopic(t, full, staff){ const F = dForum(), rs = F.replies.filter(r => r.topic_id===t.id);
+  const o = { id:t.id, category:t.category, title:t.title, body: full ? t.body : t.body.replace(/\s+/g,' ').slice(0,220), author:t.author_name, pinned:t.pinned, locked:t.locked,
+    createdAt:t.created_at, updatedAt:t.updated_at, lastActivity:t.last_activity, replies:rs.filter(r => r.status==='approved').length, answered:rs.some(r => r.status==='approved' && r.is_answer) };
+  return staff ? Object.assign(o, { hidden:t.hidden, updatedBy:t.updated_by, pending:rs.filter(r => r.status==='pending').length }) : o; }
+const dFSort = (a, b) => (b.pinned - a.pinned) || (Date.parse(b.last_activity) - Date.parse(a.last_activity));
 function demoCall(fn, A){
   const T = A.p_token, S2 = DEMO.docs.submissions;
   switch (fn){
@@ -7573,6 +7845,36 @@ function demoCall(fn, A){
           const hay = (JSON.stringify(d.data.fields||{})+' '+((d.data.staff||{}).permitNo||'')+' '+dRef(id)+' '+id.replace(/-/g,'')).toLowerCase(); return w.every(x => hay.includes(x)); })
         .sort((a,b) => String(b[1].data.createdAt).localeCompare(String(a[1].data.createdAt))).slice(0, A.p_limit||50).map(([id]) => dRecordJson(id)); }
     case 'bf_clerk_get': dNeed(T,'payments'); return dClerkGet(A.p_sid);
+    case 'bf_forum_list': { const F = dForum(), q = String(A.p_q||'').toLowerCase().trim(), c = A.p_category || '';
+      return F.topics.filter(t => !t.hidden && (!c || t.category===c) && (!q || (t.title+' '+t.body).toLowerCase().includes(q) || F.replies.some(r => r.topic_id===t.id && r.status==='approved' && r.body.toLowerCase().includes(q))))
+        .sort(dFSort).map(t => dFTopic(t, false, false)); }
+    case 'bf_forum_topic': { const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id) && !x.hidden); if (!t) return { error:'That topic was not found. It may have been removed.' };
+      return Object.assign(dFTopic(t, true, false), { items:F.replies.filter(r => r.topic_id===t.id && r.status==='approved').map(r => dFReply(r, false)) }); }
+    case 'bf_forum_reply': { const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits to reply.' };
+      const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_topic) && !x.hidden); if (!t) return { error:'That topic was not found. It may have been removed.' };
+      if (t.locked) return { error:'This topic is closed for replies.' }; const b = String(A.p_body||'').trim();
+      if (b.length < 2) return { error:'Write your reply first.' }; if (b.length > 2000) return { error:'Keep your reply under 2,000 characters.' };
+      F.replies.push({ id:F.nextR++, topic_id:t.id, body:b, kind:'public', author_name:u.name, email:u.email, status:'pending', is_answer:false, created_at:new Date().toISOString() }); return { ok:true, pending:true }; }
+    case 'bf_forum_staff_list': { dNeed(T,'building'); const F = dForum();
+      return { topics:F.topics.slice().sort((a,b) => (a.hidden-b.hidden) || dFSort(a,b)).map(t => dFTopic(t, false, true)),
+               pending:F.replies.filter(r => r.status==='pending').map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })) }; }
+    case 'bf_forum_staff_topic': { dNeed(T,'building'); const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id)); if (!t) throw new Error('That topic was not found.');
+      return Object.assign(dFTopic(t, true, true), { items:F.replies.filter(r => r.topic_id===t.id).map(r => dFReply(r, true)) }); }
+    case 'bf_forum_save_topic': { const a = dNeed(T,'building'), F = dForum(), who = a.name || a.email, ti = String(A.p_title||'').trim(), bo = String(A.p_body||'').trim();
+      if (ti.length < 3 || ti.length > 140) throw new Error('Give the topic a title (3 to 140 characters).'); if (bo.length < 2) throw new Error('Write the post (up to 8,000 characters).');
+      const now = new Date().toISOString(); let t;
+      if (A.p_id == null){ t = { id:F.nextT++, category:A.p_category, title:ti, body:bo, author_name:who, pinned:!!A.p_pinned, locked:!!A.p_locked, hidden:!!A.p_hidden, created_at:now, updated_at:now, last_activity:now, updated_by:who }; F.topics.push(t); }
+      else { t = F.topics.find(x => x.id===Number(A.p_id)); if (!t) throw new Error('That topic was not found.'); Object.assign(t, { category:A.p_category, title:ti, body:bo, pinned:!!A.p_pinned, locked:!!A.p_locked, hidden:!!A.p_hidden, updated_at:now, updated_by:who }); }
+      dAudit(a, A.p_id == null ? 'forum.topic_new' : 'forum.topic_edit', String(t.id), { title:t.title }); return dFTopic(t, true, true); }
+    case 'bf_forum_staff_reply': { const a = dNeed(T,'building'), F = dForum(), t = F.topics.find(x => x.id===Number(A.p_topic)); if (!t) throw new Error('That topic was not found.');
+      const b = String(A.p_body||'').trim(); if (b.length < 2) throw new Error('Write the reply (up to 4,000 characters).');
+      const r = { id:F.nextR++, topic_id:t.id, body:b, kind:'staff', author_name:a.name || a.email, status:'approved', is_answer:false, created_at:new Date().toISOString() }; F.replies.push(r); t.last_activity = r.created_at; return dFReply(r, true); }
+    case 'bf_forum_moderate': { dNeed(T,'building'); const F = dForum(), r = F.replies.find(x => x.id===Number(A.p_reply)); if (!r) throw new Error('That reply was not found.');
+      if (A.p_action==='approve'){ r.status = 'approved'; const t = F.topics.find(x => x.id===r.topic_id); if (t) t.last_activity = new Date().toISOString(); }
+      else if (A.p_action==='reject'){ r.status = 'rejected'; r.is_answer = false; }
+      else if (A.p_action==='answer'){ if (r.status!=='approved') throw new Error('Approve the reply before marking it as the answer.'); F.replies.forEach(x => { if (x.topic_id===r.topic_id) x.is_answer = false; }); r.is_answer = true; }
+      else if (A.p_action==='unanswer') r.is_answer = false; else throw new Error('Unknown action.');
+      return dFReply(r, true); }
     case 'bf_staff_pay_feed': { dNeed(T,'building'); const since = Math.max(Date.parse(A.p_since||'')||0, Date.now()-30*864e5);
       return DEMO.payments.filter(p => p.kind!=='legacy' && Date.parse(p.recordedAt) > since).sort((a,b) => Date.parse(b.recordedAt)-Date.parse(a.recordedAt)).slice(0,30).map(p => {
         const d = S2[p.submissionId], f = (d && d.data.fields) || {}, pay = (d && d.data.pay) || {};
@@ -7703,7 +8005,7 @@ function demoExit(){ window.__demoOff = true; try{ sessionStorage.removeItem('bd
 function demoReset(){ window.__demoOff = true; const role = DEMO && DEMO.token; const D = demoSeed(); D.token = role || 'demo-admin'; try{ sessionStorage.setItem('bdDemo', JSON.stringify(D)); }catch(e){} location.reload(); }
 function demoAs(k){ if (!DEMO) return; DEMO.token = 'demo-'+k; demoSave(); window.__demoOff = true; location.hash = k==='clerk' ? '#clerk' : '#staff'; location.reload(); }
 function demoBarHtml(){
-  const k = String((DEMO&&DEMO.token)||'').replace('demo-',''), pubView = ['apps','form','pdf','status','privacy','accessibility','account','updates'].includes(S.view);
+  const k = String((DEMO&&DEMO.token)||'').replace('demo-',''), pubView = ['apps','form','pdf','status','privacy','accessibility','account','updates','forums'].includes(S.view);
   return '<div class="demobar" role="region" aria-label="Demo mode"><b>'+ic('info')+'DEMO MODE</b><span class="dm-note">Sample data only. Nothing is saved to the real system.</span>'+
     '<span class="dm-grp"><span class="dm-l">Show:</span><a href="#apps" class="'+(pubView?'on':'')+'" onclick="event.preventDefault();go(\'apps\')">Public site</a><a href="#staff" class="'+(!pubView?'on':'')+'" onclick="event.preventDefault();S.loaded=false;if(S.ck)S.ck.results=null;go(\''+(k==='clerk'?'clerk':'staff')+'\')">Staff portal</a></span>'+
     '<span class="dm-grp"><span class="dm-l">View as:</span>'+[['admin','Administrator'],['staff','Building Dept'],['clerk','City Clerk']].map(([r,l]) => '<button type="button" class="'+(k===r?'on':'')+'" onclick="demoAs(\''+r+'\')"'+(k===r?' aria-pressed="true"':'')+'>'+l+'</button>').join('')+'</span>'+
