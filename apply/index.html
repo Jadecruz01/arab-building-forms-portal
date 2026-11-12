@@ -2576,7 +2576,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.41.2';   // shown at the bottom of every page
+const APP_VERSION = '2.42.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2916,7 +2916,7 @@ function forumRow(t){
     '<span class="fr-ic" aria-hidden="true">'+ic(t.pinned ? 'thumbtack' : t.answered ? 'check' : 'news')+'</span>'+
     '<span class="fr-main"><span class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">'+ic('lock')+'Closed</span>':'')+(t.answered?'<span class="fr-flag ok">'+ic('check')+'Answered</span>':'')+'</span>'+
     '<b class="fr-t">'+esc(t.title)+'</b><span class="fr-ex">'+esc(t.body)+(String(t.body||'').length>=220?'…':'')+'</span>'+
-    '<small class="fr-by">'+esc(t.author||'Building Department')+' · Building Department · '+esc(forumAgo(t.lastActivity))+'</small></span>'+
+    '<small class="fr-by">'+esc(t.author||'Building Department')+' · '+esc(t.dept||'Building Department')+' · '+esc(forumAgo(t.lastActivity))+'</small></span>'+
     '<span class="fr-n"><b class="num">'+(t.replies||0)+'</b><small>'+(t.replies===1?'reply':'replies')+'</small></span></a>';
 }
 function viewForums(){
@@ -2930,7 +2930,7 @@ function viewForums(){
          : FR.tErr ? '<h1>Topic not found</h1>' : '<h1>Loading…</h1>')+'</div>'+
       (FR.tErr ? '<p class="formerr">'+esc(FR.tErr)+'</p>' : !t ? '<p class="empty">Loading the topic…</p>' :
       '<article class="fr-topic upd-body">'+
-        '<div class="fr-post fr-op"><div class="fr-au"><span class="upd-av" aria-hidden="true">'+esc(acInitials(t.author||'Building Department'))+'</span><span><b>'+esc(t.author||'Building Department')+'</b><span class="fr-badge">Building Department</span><small>'+esc(forumAgo(t.createdAt))+(t.updatedAt && Date.parse(t.updatedAt)-Date.parse(t.createdAt) > 120000 ? ' · edited' : '')+'</small></span></div>'+
+        '<div class="fr-post fr-op"><div class="fr-au"><span class="upd-av" aria-hidden="true">'+esc(acInitials(t.author||'Building Department'))+'</span><span><b>'+esc(t.author||'Building Department')+'</b><span class="fr-badge">'+esc(t.dept||'Building Department')+'</span><small>'+esc(forumAgo(t.createdAt))+(t.updatedAt && Date.parse(t.updatedAt)-Date.parse(t.createdAt) > 120000 ? ' · edited' : '')+'</small></span></div>'+
           '<div class="fr-body">'+forumText(t.body)+'</div></div>'+
         (() => { const items = t.items||[], ans = items.find(r => r.isAnswer);
           return (ans ? '<div class="fr-answer"><span class="fr-al">'+ic('check')+'Answer</span>'+forumReplyHtml(ans, false)+'</div>' : '')+
@@ -2955,7 +2955,7 @@ function viewForums(){
 function forumReplyHtml(r, staff){
   const st = r.kind==='staff';
   return '<div class="fr-post'+(st?' fr-staff':'')+(r.isAnswer?' fr-isans':'')+(staff && r.status!=='approved' ? ' fr-'+r.status : '')+'" id="fr-r'+r.id+'">'+
-    '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(acInitials(staff && !st ? (r.fullName||r.author) : r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">Building Department</span>':'')+
+    '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(acInitials(staff && !st ? (r.fullName||r.author) : r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">'+esc(r.dept||'Building Department')+'</span>':'')+
       (r.isAnswer?'<span class="fr-badge ans">'+ic('check')+'Answer</span>':'')+
       (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Hidden</span>' : '')+
       '<small>'+esc(forumAgo(r.createdAt))+(staff && r.email ? ' · '+esc(r.email) : '')+'</small></span></div>'+
@@ -6112,7 +6112,8 @@ function meterHtml(){
 const estBytes = s => Math.round((s.files||[]).reduce((a,f)=>a+(f.size||0),0)*1.37 + 4000);
 async function loadUsers(){
   const sec = loadSecList(true);         // loaded together, so the page draws once
-  try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'citizens', p_limit:500}); S.users = (r||[]).map(x=>x.data); }
+  try{ const r = await sbRpc('bf_query', {p_token:TOKEN, p_collection:'citizens', p_limit:500}); S.users = (r||[]).map(x=>x.data);
+    try{ const d = await sbRpc('bf_admin_departments', {p_token:TOKEN}) || {}; S.users.forEach(u => { u.department = d[u.id] || ''; }); }catch(e){} }   // v2.42.0
   catch(e){ S.users = {err:e.message}; }
   await sec;
   if (S.view==='users') render();
@@ -6148,6 +6149,7 @@ function viewUsers(){
    '</form>'+
    (!u?'<p class="empty">Loading accounts…</p>':u.err?'<p class="empty">Could not load accounts: '+esc(u.err)+'</p>':
    '<div class="row"><h2 style="font:700 16px var(--f-body);flex:1">Current logins</h2>'+(hidden?'<label class="opt" style="border:0;padding:0"><input type="checkbox" '+(showAll?'checked':'')+' onchange="S.showResidents=this.checked;render()"> Show '+hidden+' account'+(hidden===1?'':'s')+' with no access</label>':'')+'</div>'+
+   '<datalist id="deptList">'+['Building Department','Planning Department','City Clerk','Web Administration','Administration'].map(d => '<option value="'+d+'">').join('')+'</datalist>'+
    '<div class="acct-list">'+
     list.map(a=>{ const me = S.me && a.id===S.me.id, id = esc(a.id), on = a.active!==false;
       const ini = String(a.name||a.email||'?').split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
@@ -6155,6 +6157,7 @@ function viewUsers(){
         (on?'<span class="pill paid">Active</span>':'<span class="pill unpaid">Turned off</span>')+'</header>'+
       '<div class="acct-grid">'+
         '<div class="acct-f"><label class="l" for="t_'+id+'">Title</label><input class="ttl-in" id="t_'+id+'" type="text" maxlength="80" value="'+esc(a.title||'')+'" placeholder="Add a title, e.g. Building Inspector" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setTitle(\''+id+'\',this.value)"></div>'+
+        '<div class="acct-f"><label class="l" for="dp_'+id+'">Department</label><input class="ttl-in" id="dp_'+id+'" type="text" maxlength="60" list="deptList" value="'+esc(a.department||'')+'" placeholder="e.g. Building Department" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}" onchange="setDept(\''+id+'\',this.value)"><span class="hint">Shown on their forum posts. Left blank, it shows Building Department.</span></div>'+
         '<div class="acct-f"><span class="l">Workspace access</span>'+(me?'<span class="acct-v">Administrator (you cannot change your own access)</span>':'<div class="acc">'+roleSel(id, a.role, 'Access for '+esc(a.email))+addon(a)+'</div>')+'</div>'+
         '<div class="acct-f"><span class="l">Sign-in</span>'+(me?'<span class="acct-v">Active</span>':(on?'<div class="row" style="gap:8px"><span class="acct-v">Can sign in</span><button class="btn sm" onclick="setAccess(\''+id+'\',{active:false})">Turn off</button></div>':'<div class="row" style="gap:8px"><span class="acct-v">Cannot sign in</span><button class="btn sm primary" onclick="setAccess(\''+id+'\',{active:true})">Turn on</button></div>'))+'</div>'+
         secCardHtml(a, me)+'<div class="acct-f"><span class="l">Password</span>'+(me?'<button class="btn sm" onclick="openAccount(\'password\')">Change my password</button>':(S.resetFor===a.id?'<div class="row" style="gap:6px"><input id="rp_'+id+'" type="text" value="'+esc(S.resetPw||(S.resetPw=genTempPw()))+'" oninput="S.resetPw=this.value" aria-label="New password for '+esc(a.email)+'" style="width:190px"><button class="btn sm primary" onclick="resetPw(\''+id+'\')">Save</button><button class="btn sm ghost" onclick="S.resetFor=null;render()">Cancel</button></div>':'<button class="btn sm" onclick="S.resetFor=\''+id+'\';S.resetPw=genTempPw();S.removeFor=null;render()">Reset password</button>'))+'</div>'+
@@ -6214,6 +6217,11 @@ function auditHtml(){
     if (x.action==='profile.updated') return 'Updated their profile';
     return x.action; };
   return '<ul class="actlist">'+L.map(x=>'<li><span class="aw">'+fmtDT(x.at)+'<br><b>'+esc(x.by||'')+'</b></span><span>'+esc(what(x))+'</span></li>').join('')+'</ul>';
+}
+async function setDept(id, dept){   // v2.42.0 (Jade): department shown on forum posts
+  try{ const d = await sbRpc('bf_admin_set_department', {p_token:TOKEN, p_id:id, p_dept:dept}); const a = (S.users||[]).find(x=>x.id===id); if (a) a.department = d;
+    if (typeof FR !== 'undefined'){ FR.list = null; FR.tId = null; } toast(d ? 'Department saved' : 'Department cleared'); }
+  catch(e){ toast('Could not save department: '+e.message); }
 }
 async function setTitle(id, title){
   try{ const acc = await sbRpc('bf_admin_set_title', {p_token:TOKEN, p_id:id, p_title:title}); const a = S.users.find(x=>x.id===id); if (a) a.title = acc.title;
@@ -7690,10 +7698,11 @@ function dForum(){
   return DEMO.forum;
 }
 const dPubName = n => { const w = String(n||'').trim().split(/\s+/).filter(Boolean); return !w.length ? 'Resident' : w.length===1 ? w[0] : w[0]+' '+w[w.length-1][0].toUpperCase()+'.'; };
-function dFReply(r, staff){ const o = { id:r.id, topicId:r.topic_id, body:r.body, kind:r.kind, author:r.kind==='staff'?r.author_name:dPubName(r.author_name), createdAt:r.created_at, isAnswer:!!r.is_answer };
+const dDept = k => !k ? '' : (((DEMO.acc||{})[k]||{}).department != null ? DEMO.acc[k].department : (k==='admin' ? 'Web Administration' : ''));
+function dFReply(r, staff){ const o = { id:r.id, topicId:r.topic_id, body:r.body, kind:r.kind, dept: r.kind==='staff' ? (dDept(r.author_key) || 'Building Department') : '', author:r.kind==='staff'?r.author_name:dPubName(r.author_name), createdAt:r.created_at, isAnswer:!!r.is_answer };
   return staff ? Object.assign(o, { status:r.status, fullName:r.author_name, email:r.email||'' }) : o; }
 function dFTopic(t, full, staff){ const F = dForum(), rs = F.replies.filter(r => r.topic_id===t.id);
-  const o = { id:t.id, category:t.category, title:t.title, body: full ? t.body : t.body.replace(/\s+/g,' ').slice(0,220), author:t.author_name, pinned:t.pinned, locked:t.locked,
+  const o = { id:t.id, category:t.category, title:t.title, dept:dDept(t.author_key) || 'Building Department', body: full ? t.body : t.body.replace(/\s+/g,' ').slice(0,220), author:t.author_name, pinned:t.pinned, locked:t.locked,
     createdAt:t.created_at, updatedAt:t.updated_at, lastActivity:t.last_activity, replies:rs.filter(r => r.status==='approved').length, answered:rs.some(r => r.status==='approved' && r.is_answer) };
   return staff ? Object.assign(o, { hidden:t.hidden, updatedBy:t.updated_by, pending:rs.filter(r => r.status==='pending').length }) : o; }
 const dFSort = (a, b) => (b.pinned - a.pinned) || (Date.parse(b.last_activity) - Date.parse(a.last_activity));
@@ -7879,12 +7888,12 @@ function demoCall(fn, A){
     case 'bf_forum_save_topic': { const a = dNeed(T,'building'), F = dForum(), who = a.name || a.email, ti = String(A.p_title||'').trim(), bo = String(A.p_body||'').trim();
       if (ti.length < 3 || ti.length > 140) throw new Error('Give the topic a title (3 to 140 characters).'); if (bo.length < 2) throw new Error('Write the post (up to 8,000 characters).');
       const now = new Date().toISOString(); let t;
-      if (A.p_id == null){ t = { id:F.nextT++, category:A.p_category, title:ti, body:bo, author_name:who, pinned:!!A.p_pinned, locked:!!A.p_locked, hidden:!!A.p_hidden, created_at:now, updated_at:now, last_activity:now, updated_by:who }; F.topics.push(t); }
+      if (A.p_id == null){ t = { id:F.nextT++, category:A.p_category, title:ti, body:bo, author_name:who, author_key:a.key, pinned:!!A.p_pinned, locked:!!A.p_locked, hidden:!!A.p_hidden, created_at:now, updated_at:now, last_activity:now, updated_by:who }; F.topics.push(t); }
       else { t = F.topics.find(x => x.id===Number(A.p_id)); if (!t) throw new Error('That topic was not found.'); Object.assign(t, { category:A.p_category, title:ti, body:bo, pinned:!!A.p_pinned, locked:!!A.p_locked, hidden:!!A.p_hidden, updated_at:now, updated_by:who }); }
       dAudit(a, A.p_id == null ? 'forum.topic_new' : 'forum.topic_edit', String(t.id), { title:t.title }); return dFTopic(t, true, true); }
     case 'bf_forum_staff_reply': { const a = dNeed(T,'building'), F = dForum(), t = F.topics.find(x => x.id===Number(A.p_topic)); if (!t) throw new Error('That topic was not found.');
       const b = String(A.p_body||'').trim(); if (b.length < 2) throw new Error('Write the reply (up to 4,000 characters).');
-      const r = { id:F.nextR++, topic_id:t.id, body:b, kind:'staff', author_name:a.name || a.email, status:'approved', is_answer:false, created_at:new Date().toISOString() }; F.replies.push(r); t.last_activity = r.created_at; return dFReply(r, true); }
+      const r = { id:F.nextR++, topic_id:t.id, body:b, kind:'staff', author_name:a.name || a.email, author_key:a.key, status:'approved', is_answer:false, created_at:new Date().toISOString() }; F.replies.push(r); t.last_activity = r.created_at; return dFReply(r, true); }
     case 'bf_forum_moderate': { dNeed(T,'building'); const F = dForum(), r = F.replies.find(x => x.id===Number(A.p_reply)); if (!r) throw new Error('That reply was not found.');
       if (A.p_action==='approve'){ r.status = 'approved'; const t = F.topics.find(x => x.id===r.topic_id); if (t) t.last_activity = new Date().toISOString(); }
       else if (A.p_action==='reject'){ r.status = 'rejected'; r.is_answer = false; }
@@ -7925,6 +7934,8 @@ function demoCall(fn, A){
     case 'bf_add_check_scan': { const a = dNeed(T,'payments'); const s = { id:Date.now(), mime:A.p_mime, data:A.p_data, width:A.p_width, height:A.p_height, addedBy:a.name, addedAt:new Date().toISOString() }; DEMO.scans[A.p_payment_id] = s; return { scan:{ id:s.id, addedBy:s.addedBy, addedAt:s.addedAt, width:s.width, height:s.height } }; }
     case 'bf_admin_audit': dNeed(T,'admin'); return DEMO.audit.slice(0, A.p_limit||200);
     case 'bf_update_my_profile': { const a = dNeed(T); DEMO.acc[a.key] = { name:String(A.p_name||'').trim()||a.name, title:String(A.p_title||'').trim() }; const r = dAccJson(a.key); return r; }
+    case 'bf_admin_departments': { dNeed(T,'admin'); const o = {}; Object.keys(DEMO_ROLES).forEach(k => { o['demo-'+k] = dDept(k); }); return o; }
+    case 'bf_admin_set_department': { dNeed(T,'admin'); const k = String(A.p_id).replace(/^demo-/,''); if (!DEMO_ROLES[k]) throw new Error('Account not found.'); const d = String(A.p_dept||'').trim().replace(/\s+/g,' ').slice(0,60); DEMO.acc[k] = Object.assign({}, DEMO.acc[k], { department:d }); return d; }
     case 'bf_admin_set_title': { dNeed(T,'admin'); const k = String(A.p_id).replace(/^demo-/,''); if (!DEMO_ROLES[k]) throw new Error('Account not found.'); DEMO.acc[k] = Object.assign({}, DEMO.acc[k], { title:String(A.p_title||'').trim() }); return dAccJson(k); }
     case 'bf_notice_get': dNeed(T,'admin'); return DEMO.notice || null;
   }
