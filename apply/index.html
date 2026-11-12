@@ -262,7 +262,7 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 @media (max-width:860px){ .pmenu-btn{display:inline-flex} .phead{position:relative} .pacct{margin-left:auto} }
 @media (max-width:480px){ .pacct span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} .pacct{padding:8px 9px} .pacct svg{width:18px;height:18px} .pmenu-btn{padding:8px 10px} }
 @media (prefers-reduced-motion:reduce){ .pmenu{animation:none} }
-.hq{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 8px}
+.hq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 8px}
 .qa-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s,box-shadow .15s,transform .15s}
 .qa-card:hover,.qa-card:focus-visible{border-color:var(--gold);box-shadow:0 6px 18px rgba(33,44,70,.10);transform:translateY(-1px)}
 .qa-card .ico{width:42px;height:42px;border-radius:4px;background:var(--gold);color:var(--navy);display:grid;place-items:center}
@@ -271,8 +271,6 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .qa-tx b{font:600 16px/1.25 var(--f-disp)}
 .qa-tx small{font-size:13px;line-height:1.4;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .qa-new{position:absolute;top:12px;right:12px;margin:0}
-.qa-card:first-child{background:var(--navy);border-color:var(--navy);color:#fff}
-.qa-card:first-child .qa-tx b{color:#fff}.qa-card:first-child .qa-tx small{color:rgba(255,255,255,.75)}
 @media (prefers-reduced-motion:reduce){ .qa-card{transition:none} .qa-card:hover{transform:none} }
 .acct-band{margin:30px 0 8px;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;background:var(--surface2);padding:22px 24px}
 .ab-head h2{font:700 21px/1.3 var(--f-disp);margin:0;color:var(--ink);text-transform:none;letter-spacing:0}
@@ -285,12 +283,14 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .ab-col li::before{content:"";position:absolute;left:3px;top:6px;width:9px;height:5px;border-left:2px solid var(--golddk);border-bottom:2px solid var(--golddk);transform:rotate(-45deg)}
 .ab-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .ab-acts .btn{text-decoration:none}
-@media (max-width:900px){ .hq{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
 @media (max-width:640px){
   .hq{gap:10px;margin-top:14px}
   .qa-card{padding:13px;gap:8px}
   .qa-card .ico{width:36px;height:36px}.qa-card .ico svg{width:19px;height:19px}
-  .qa-tx b{font-size:15px}
+  .qa-tx b{font-size:14px}
+  .hq{gap:8px}
+  .qa-card{padding:12px 10px}
   .qa-tx small{display:none}
   .qa-new{top:10px;right:10px}
   .ab-cols{grid-template-columns:1fr;gap:16px}
@@ -2519,7 +2519,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.2';   // shown at the bottom of every page
+const APP_VERSION = '2.40.3';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2558,7 +2558,6 @@ function homeQuickHtml(){
   const T = EMBED ? ' target="_top"' : '', base = EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '', u0 = UPDATES[0];
   const card = (href, icon, title, sub, extra) => '<a class="qa-card" '+href+'><span class="ico">'+ic(icon)+'</span><span class="qa-tx"><b>'+title+'</b><small>'+sub+'</small></span>'+(extra||'')+'</a>';
   return '<div class="hq" role="list">'+
-    card('href="#permits" onclick="event.preventDefault();homeScroll(\'permits\')" role="listitem"', 'doc', 'Apply for a permit', 'Pick your permit below. Your fee is figured as you type.')+
     card('href="'+base+'#status"'+(EMBED?T+' onclick="statusHandoff()"':' onclick="event.preventDefault();go(\'status\')"')+' role="listitem"', 'search', 'Permit Status', 'No account needed. Use your reference # and email.')+
     (APP_TOK ? card(acctLinkAttrs()+' role="listitem"', 'user', 'My permits', 'Your applications, licenses and notifications.')
              : card(acctLinkAttrs()+' role="listitem"', 'user', 'Create a free account', 'Track every application in one place.'))+
