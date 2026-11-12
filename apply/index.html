@@ -298,6 +298,7 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
   .ab-acts .btn{flex:1 1 100%;justify-content:center}
 }
 html.embed .hq{margin-top:10px}
+.hq-grp .hq{margin-top:0}
 /* v2.40.1 (Jade): signed in on a phone, the header was crowded ("Hi, Jade" + avatar + Menu). Phones show only the
    avatar (its button still says the name to screen readers); the name moves into the Menu panel. */
 /* v2.40.2 (Jade): on phones and tablets the account panel opens like the Menu panel: full width under the header,
@@ -2519,7 +2520,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.40.3';   // shown at the bottom of every page
+const APP_VERSION = '2.40.4';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2557,12 +2558,12 @@ window.addEventListener('resize', () => { if (S.pmenuOpen && window.innerWidth >
 function homeQuickHtml(){
   const T = EMBED ? ' target="_top"' : '', base = EMBED ? 'https://arabcityapplications.jadecruz.dev/apply/' : '', u0 = UPDATES[0];
   const card = (href, icon, title, sub, extra) => '<a class="qa-card" '+href+'><span class="ico">'+ic(icon)+'</span><span class="qa-tx"><b>'+title+'</b><small>'+sub+'</small></span>'+(extra||'')+'</a>';
-  return '<div class="hq" role="list">'+
+  return '<section class="grp hq-grp" aria-labelledby="qlH"><h2 id="qlH">Quick links</h2><div class="hq" role="list">'+
     card('href="'+base+'#status"'+(EMBED?T+' onclick="statusHandoff()"':' onclick="event.preventDefault();go(\'status\')"')+' role="listitem"', 'search', 'Permit Status', 'No account needed. Use your reference # and email.')+
     (APP_TOK ? card(acctLinkAttrs()+' role="listitem"', 'user', 'My permits', 'Your applications, licenses and notifications.')
              : card(acctLinkAttrs()+' role="listitem"', 'user', 'Create a free account', 'Track every application in one place.'))+
     card('href="'+updHref(u0 && u0.id)+'"'+T+' role="listitem"', 'news', 'Site updates', u0 ? esc(u0.title) : 'What is new on this site.', u0 ? '<em class="qa-new">New</em>' : '')+
-  '</div>';
+  '</div></section>';
 }
 function homeAcctHtml(){
   if (APP_TOK) return '';
