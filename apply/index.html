@@ -289,6 +289,13 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .fr-pend{display:grid;gap:4px;margin-bottom:6px}
 .fr-admin .fe .fgrid{margin:10px 0}.fe-opts{display:flex;flex-wrap:wrap;gap:16px}
 @media (max-width:640px){ .fr-row{padding:13px;gap:10px} .fr-ic{width:34px;height:34px} .fr-t{font-size:16px} .fr-n{min-width:44px} .fr-post{padding:14px} .fr-tools{margin-top:12px} }
+/* v2.41.1: topic page in one centered column, header left-aligned with the post */
+.fr-wrap{max-width:820px;margin:0 auto}
+.fr-wrap .fr-head{text-align:left;align-items:flex-start}
+.fr-wrap .fr-head h1{text-align:left;margin-top:10px}
+.fr-wrap .fr-head .upd-meta{justify-content:flex-start;margin-top:8px}
+.fr-wrap .fr-topic{max-width:none;margin:0}
+.fr-wrap .fr-topic .fr-post{margin-left:0;margin-right:0}
 /* v2.40.0 home layout + phone/tablet menu (same theme) */
 .pmenu-btn{display:none;align-items:center;gap:6px;flex:none;font:500 14px/1 var(--f-disp);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:8px 11px;cursor:pointer}
 .pmenu-btn svg{width:18px;height:18px}
@@ -2569,7 +2576,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.41.0';   // shown at the bottom of every page
+const APP_VERSION = '2.41.1';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2878,8 +2885,13 @@ function forumText(s){
   return String(s||'').replace(/\r/g,'').split(/\n{2,}/).map(block => {
     const lines = block.split('\n').filter(l => l.trim()!=='');
     if (!lines.length) return '';
-    if (lines.every(l => /^\s*[-•*]\s+/.test(l))) return '<ul>'+lines.map(l => '<li>'+link(esc(l.replace(/^\s*[-•*]\s+/,'')))+'</li>').join('')+'</ul>';
-    return '<p>'+lines.map(l => link(esc(l))).join('<br>')+'</p>';
+    // v2.41.1: group runs of "- " lines into a list and the other lines into paragraphs, even without a blank line between them
+    const out = []; let txt = [], li = [];
+    const flushT = () => { if (txt.length) out.push('<p>'+txt.map(l => link(esc(l))).join('<br>')+'</p>'); txt = []; };
+    const flushL = () => { if (li.length) out.push('<ul>'+li.map(l => '<li>'+link(esc(l.replace(/^\s*[-•*]\s+/,'')))+'</li>').join('')+'</ul>'); li = []; };
+    lines.forEach(l => { if (/^\s*[-•*]\s+/.test(l)){ flushT(); li.push(l); } else { flushL(); txt.push(l); } });
+    flushT(); flushL();
+    return out.join('');
   }).join('');
 }
 async function forumLoad(force){
@@ -2913,19 +2925,19 @@ function viewForums(){
   if (id){
     if (FR.tId !== id) setTimeout(() => forumTopicLoad(id), 0);
     const t = FR.tId===id ? FR.topic : null;
-    inner = '<div class="form-h"><a class="back" href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>← All topics</a>'+
+    inner = '<div class="fr-wrap"><div class="form-h fr-head"><a class="back" href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>← All topics</a>'+
       (t ? '<h1>'+esc(t.title)+'</h1><span class="hint upd-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">'+ic('lock')+'Closed</span>':'')+'</span>'
          : FR.tErr ? '<h1>Topic not found</h1>' : '<h1>Loading…</h1>')+'</div>'+
       (FR.tErr ? '<p class="formerr">'+esc(FR.tErr)+'</p>' : !t ? '<p class="empty">Loading the topic…</p>' :
       '<article class="fr-topic upd-body">'+
-        '<div class="fr-post fr-op"><div class="fr-au"><span class="upd-av" aria-hidden="true">BD</span><span><b>'+esc(t.author||'Building Department')+'</b><span class="fr-badge">Building Department</span><small>'+esc(forumAgo(t.createdAt))+(t.updatedAt && Date.parse(t.updatedAt)-Date.parse(t.createdAt) > 120000 ? ' · edited' : '')+'</small></span></div>'+
+        '<div class="fr-post fr-op"><div class="fr-au"><span class="upd-av" aria-hidden="true">'+esc(acInitials(t.author||'Building Department'))+'</span><span><b>'+esc(t.author||'Building Department')+'</b><span class="fr-badge">Building Department</span><small>'+esc(forumAgo(t.createdAt))+(t.updatedAt && Date.parse(t.updatedAt)-Date.parse(t.createdAt) > 120000 ? ' · edited' : '')+'</small></span></div>'+
           '<div class="fr-body">'+forumText(t.body)+'</div></div>'+
         (() => { const items = t.items||[], ans = items.find(r => r.isAnswer);
           return (ans ? '<div class="fr-answer"><span class="fr-al">'+ic('check')+'Answer</span>'+forumReplyHtml(ans, false)+'</div>' : '')+
             '<h2 class="fr-rh">'+(items.length ? items.length+' '+(items.length===1?'reply':'replies') : 'No replies yet')+'</h2>'+
             items.map(r => forumReplyHtml(r, false)).join(''); })()+
         forumReplyBox(t)+
-      '</article>');
+      '</article>')+'</div>';
   } else {
     if (!FR.list) setTimeout(() => forumLoad(), 0);
     const L = FR.list;
@@ -2943,7 +2955,7 @@ function viewForums(){
 function forumReplyHtml(r, staff){
   const st = r.kind==='staff';
   return '<div class="fr-post'+(st?' fr-staff':'')+(r.isAnswer?' fr-isans':'')+(staff && r.status!=='approved' ? ' fr-'+r.status : '')+'" id="fr-r'+r.id+'">'+
-    '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(st ? 'BD' : acInitials(r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">Building Department</span>':'')+
+    '<div class="fr-au"><span class="upd-av'+(st?'':' pub')+'" aria-hidden="true">'+esc(acInitials(staff && !st ? (r.fullName||r.author) : r.author))+'</span><span><b>'+esc(staff && !st ? (r.fullName||r.author) : r.author)+'</b>'+(st?'<span class="fr-badge">Building Department</span>':'')+
       (r.isAnswer?'<span class="fr-badge ans">'+ic('check')+'Answer</span>':'')+
       (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Not approved</span>' : '')+
       '<small>'+esc(forumAgo(r.createdAt))+(staff && r.email ? ' · '+esc(r.email) : '')+'</small></span></div>'+
