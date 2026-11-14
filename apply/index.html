@@ -289,6 +289,10 @@ table.fees th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color
 .fr-pend{display:grid;gap:4px;margin-bottom:6px}
 .fr-admin .fe .fgrid{margin:10px 0}.fe-opts{display:flex;flex-wrap:wrap;gap:16px}
 @media (max-width:640px){ .fr-row{padding:13px;gap:10px} .fr-ic{width:34px;height:34px} .fr-t{font-size:16px} .fr-n{min-width:44px} .fr-post{padding:14px} .fr-tools{margin-top:12px} }
+.fr-del{color:#9b2c22}
+.fr-ask{font-size:13.5px;font-weight:600;color:#9b2c22;align-self:center}
+.fr-own{border-top:0;padding-top:0;margin-top:8px;align-items:center}
+.fr-own span{font-size:13.5px;color:#9b2c22;font-weight:600}
 /* v2.41.1: topic page in one centered column, header left-aligned with the post */
 .fr-wrap{max-width:820px;margin:0 auto}
 .fr-wrap .fr-head{text-align:left;align-items:flex-start}
@@ -2576,7 +2580,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.42.3';   // shown at the bottom of every page
+const APP_VERSION = '2.43.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2906,6 +2910,8 @@ async function forumTopicLoad(id){
   FR.tId = id; FR.topic = null; FR.tErr = '';
   try{ const r = await sbRpc('bf_forum_topic', { p_id: Number(id) }); if (FR.tId!==id) return; if (r && r.error) FR.tErr = r.error; else FR.topic = r; }
   catch(x){ FR.tErr = x.message || 'That topic could not be loaded.'; }
+  FR.mine = [];   // v2.43.0: replies this My permits account wrote (they can delete them)
+  if (APP_TOK && FR.topic){ try{ const m = await sbRpc('bf_forum_my_replies', { p_app_token: APP_TOK, p_topic: Number(id) }); FR.mine = Array.isArray(m) ? m.map(Number) : []; }catch(x){} }
   if (S.view==='forums') render();
 }
 let forumQT = null;
@@ -2952,6 +2958,23 @@ function viewForums(){
   }
   return '<div class="app pub">'+sideNav()+'<main class="stage">'+pubHeader()+'<div class="sheet fr-page" id="sheet">'+inner+'</div></main></div>';
 }
+
+/* v2.43.0 (Jade): Delete. The post leaves the site and the staff lists for good; the database keeps it marked deleted. */
+async function forumDelMine(id){
+  try{ const r = await sbRpc('bf_forum_delete_my_reply', { p_app_token: APP_TOK, p_reply: Number(id) });
+    if (r && r.error){ toast(r.error); return; } FR.delAsk = null; FR.list = null; toast('Your reply was deleted.'); await forumTopicLoad(FR.tId); }
+  catch(x){ toast(x.message || 'Could not delete the reply.'); }
+}
+async function forumDelReply(id){
+  try{ await sbRpc('bf_forum_delete_reply', { p_token: TOKEN, p_reply: Number(id) }); FA.delAsk = null; FR.tId = null; FR.list = null; toast('Reply deleted.');
+    await forumAdminLoad(); if (FA.tId) await forumAdminTopic(FA.tId); }
+  catch(x){ toast(x.message || 'Could not delete the reply.'); }
+}
+async function forumDelTopic(id){
+  try{ await sbRpc('bf_forum_delete_topic', { p_token: TOKEN, p_id: Number(id) }); FA.delTopic = false; FA.tId = null; FA.topic = null; FR.tId = null; FR.list = null;
+    toast('Topic deleted.'); await forumAdminLoad(); render(); }
+  catch(x){ toast(x.message || 'Could not delete the topic.'); }
+}
 function forumReplyHtml(r, staff){
   const st = r.kind==='staff';
   return '<div class="fr-post'+(st?' fr-staff':'')+(r.isAnswer?' fr-isans':'')+(staff && r.status!=='approved' ? ' fr-'+r.status : '')+'" id="fr-r'+r.id+'">'+
@@ -2960,12 +2983,17 @@ function forumReplyHtml(r, staff){
       (staff && r.status==='pending' ? '<span class="fr-badge wait">Needs approval</span>' : staff && r.status==='rejected' ? '<span class="fr-badge rej">Hidden</span>' : '')+
       '<small>'+esc(forumAgo(r.createdAt))+(staff && r.email ? ' · '+esc(r.email) : '')+'</small></span></div>'+
     '<div class="fr-body">'+forumText(r.body)+'</div>'+
+    (!staff && (FR.mine||[]).includes(Number(r.id)) ? '<div class="fr-mod fr-own">'+(FR.delAsk===r.id
+        ? '<span>Delete your reply? This cannot be undone.</span><button type="button" class="btn sm danger" onclick="forumDelMine('+r.id+')">Delete</button><button type="button" class="btn sm ghost" onclick="FR.delAsk=null;render()">Keep</button>'
+        : '<button type="button" class="btn sm ghost" onclick="FR.delAsk='+r.id+';render()">'+ic('trash')+'Delete my reply</button>')+'</div>' : '')+
     (staff ? '<div class="fr-mod">'+
       (r.status!=='approved' ? '<button type="button" class="btn sm primary" onclick="forumMod('+r.id+',\'approve\')">'+ic('check')+(r.status==='rejected'?'Show again':'Approve')+'</button>' : '')+
       (r.status==='pending' ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'reject\')">Do not approve</button>' : '')+
       (r.status==='approved' && !r.isAnswer ? '<button type="button" class="btn sm" onclick="forumMod('+r.id+',\'answer\')">Mark as answer</button>' : '')+
       (r.isAnswer ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'unanswer\')">Remove answer mark</button>' : '')+
-      (r.status==='approved' && r.kind==='public' ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'reject\')">Hide reply</button>' : '')+'</div>' : '')+
+      (r.status==='approved' && r.kind==='public' ? '<button type="button" class="btn sm ghost" onclick="forumMod('+r.id+',\'reject\')">Hide reply</button>' : '')+
+      (FA.delAsk===r.id ? '<span class="fr-ask">Delete this reply for good?</span><button type="button" class="btn sm danger" onclick="forumDelReply('+r.id+')">Delete</button><button type="button" class="btn sm ghost" onclick="FA.delAsk=null;render()">Keep</button>'
+                        : '<button type="button" class="btn sm ghost fr-del" onclick="FA.delAsk='+r.id+';render()">'+ic('trash')+'Delete</button>')+'</div>' : '')+
   '</div>';
 }
 function forumReplyBox(t){
@@ -2997,7 +3025,7 @@ async function forumAdminLoad(){
   if (S.view==='forum-admin') render();
 }
 async function forumAdminTopic(id){
-  FA.tId = id; FA.topic = null; FA.edit = null; FA.msg = '';
+  FA.tId = id; FA.topic = null; FA.edit = null; FA.msg = ''; FA.delTopic = false; FA.delAsk = null;
   try{ FA.topic = await sbRpc('bf_forum_staff_topic', { p_token: TOKEN, p_id: Number(id) }); }catch(x){ FA.err = x.message; FA.tId = null; }
   render();
 }
@@ -3046,7 +3074,9 @@ function viewForumAdmin(){
   } else if (FA.tId && FA.topic){
     const t = FA.topic;
     body = '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="FA.tId=null;FA.topic=null;render()">'+ic('left')+'All topics</button><span style="flex:1"></span>'+
-      '<button class="btn sm" onclick="forumEdit(FA.topic)">'+ic('edit')+'Edit topic</button>'+(t.hidden?'':'<a class="btn sm" href="'+forumHref(t.id)+'" target="_blank" rel="noopener">'+ic('ext')+'View on the site</a>')+'</div>'+
+      '<button class="btn sm" onclick="forumEdit(FA.topic)">'+ic('edit')+'Edit topic</button>'+
+      (FA.delTopic ? '<span class="fr-ask">Delete this topic and all of its replies for good?</span><button class="btn sm danger" onclick="forumDelTopic(FA.tId)">Delete topic</button><button class="btn sm ghost" onclick="FA.delTopic=false;render()">Keep</button>'
+                   : '<button class="btn sm ghost fr-del" onclick="FA.delTopic=true;render()">'+ic('trash')+'Delete topic</button>')+(t.hidden?'':'<a class="btn sm" href="'+forumHref(t.id)+'" target="_blank" rel="noopener">'+ic('ext')+'View on the site</a>')+'</div>'+
       '<section class="card fr-topic"><div class="fr-meta"><span class="upd-tag">'+esc(forumCat(t.category))+'</span>'+(t.pinned?'<span class="fr-flag">Pinned</span>':'')+(t.locked?'<span class="fr-flag mute">Closed</span>':'')+(t.hidden?'<span class="fr-flag rej">Hidden</span>':'')+'</div>'+
         '<h2 style="margin:6px 0 4px">'+esc(t.title)+'</h2><small class="hint">'+esc(t.author)+' · '+esc(forumAgo(t.createdAt))+(t.updatedBy?' · last edited by '+esc(t.updatedBy):'')+'</small>'+
         '<div class="fr-body">'+forumText(t.body)+'</div></section>'+
@@ -3067,7 +3097,7 @@ function viewForumAdmin(){
   }
   return topBar()+'<div class="purge fr-admin"><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm" onclick="go(\'staff\')">'+ic('left')+'Workspace</button><span style="flex:1"></span>'+
     (FA.edit ? '' : '<button class="btn sm" onclick="FA.topics=null;FA.pending=null;forumAdminLoad();render()">Refresh</button><button class="btn sm primary" onclick="forumEdit(null)">'+ic('edit')+'New topic</button>')+'</div>'+
-    '<h1>Forums</h1><p style="margin:0;color:var(--ink2);max-width:80ch">Post tips and start discussions on the public <a href="'+forumHref()+'" target="_blank" rel="noopener">Forums</a> page. People signed in to My permits can reply, and their replies show right away. Check <b>Recent replies</b> and hide any that break the rules. Nothing is deleted: hide a topic or a reply instead.</p>'+
+    '<h1>Forums</h1><p style="margin:0;color:var(--ink2);max-width:80ch">Post tips and start discussions on the public <a href="'+forumHref()+'" target="_blank" rel="noopener">Forums</a> page. People signed in to My permits can reply, and their replies show right away. Check <b>Recent replies</b> and hide any that break the rules. <b>Hide</b> takes a post down for now; <b>Delete</b> removes it from the site for good (the database keeps a record).</p>'+
     (FA.msg ? '<p class="hint" role="status" style="margin:0;color:var(--ok);font-weight:600">'+esc(FA.msg)+'</p>' : '')+body+'</div>';
 }
 
@@ -7712,6 +7742,7 @@ function dFTopic(t, full, staff){ const F = dForum(), rs = F.replies.filter(r =>
   const o = { id:t.id, category:t.category, title:t.title, dept:dDept(t.author_key) || 'Building Department', body: full ? t.body : t.body.replace(/\s+/g,' ').slice(0,220), author:t.author_name, pinned:t.pinned, locked:t.locked,
     createdAt:t.created_at, updatedAt:t.updated_at, lastActivity:t.last_activity, replies:rs.filter(r => r.status==='approved').length, answered:rs.some(r => r.status==='approved' && r.is_answer) };
   return staff ? Object.assign(o, { hidden:t.hidden, updatedBy:t.updated_by, pending:rs.filter(r => r.status==='pending').length }) : o; }
+const dLive = x => !x.deleted;
 const dFSort = (a, b) => (b.pinned - a.pinned) || (Date.parse(b.last_activity) - Date.parse(a.last_activity));
 function demoCall(fn, A){
   const T = A.p_token, S2 = DEMO.docs.submissions;
@@ -7877,21 +7908,30 @@ function demoCall(fn, A){
         .sort((a,b) => String(b[1].data.createdAt).localeCompare(String(a[1].data.createdAt))).slice(0, A.p_limit||50).map(([id]) => dRecordJson(id)); }
     case 'bf_clerk_get': dNeed(T,'payments'); return dClerkGet(A.p_sid);
     case 'bf_forum_list': { const F = dForum(), q = String(A.p_q||'').toLowerCase().trim(), c = A.p_category || '';
-      return F.topics.filter(t => !t.hidden && (!c || t.category===c) && (!q || (t.title+' '+t.body).toLowerCase().includes(q) || F.replies.some(r => r.topic_id===t.id && r.status==='approved' && r.body.toLowerCase().includes(q))))
+      return F.topics.filter(t => dLive(t) && !t.hidden && (!c || t.category===c) && (!q || (t.title+' '+t.body).toLowerCase().includes(q) || F.replies.some(r => r.topic_id===t.id && r.status==='approved' && r.body.toLowerCase().includes(q))))
         .sort(dFSort).map(t => dFTopic(t, false, false)); }
-    case 'bf_forum_topic': { const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id) && !x.hidden); if (!t) return { error:'That topic was not found. It may have been removed.' };
-      return Object.assign(dFTopic(t, true, false), { items:F.replies.filter(r => r.topic_id===t.id && r.status==='approved').map(r => dFReply(r, false)) }); }
+    case 'bf_forum_topic': { const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id) && !x.hidden && dLive(x)); if (!t) return { error:'That topic was not found. It may have been removed.' };
+      return Object.assign(dFTopic(t, true, false), { items:F.replies.filter(r => r.topic_id===t.id && r.status==='approved' && dLive(r)).map(r => dFReply(r, false)) }); }
     case 'bf_forum_reply': { const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits to reply.' };
       const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_topic) && !x.hidden); if (!t) return { error:'That topic was not found. It may have been removed.' };
       if (t.locked) return { error:'This topic is closed for replies.' }; const b = String(A.p_body||'').trim();
       if (b.length < 2) return { error:'Write your reply first.' }; if (b.length > 2000) return { error:'Keep your reply under 2,000 characters.' };
       F.replies.push({ id:F.nextR++, topic_id:t.id, body:b, kind:'public', author_name:u.name, email:u.email, status:'approved', is_answer:false, created_at:new Date().toISOString() }); t.last_activity = new Date().toISOString(); return { ok:true, pending:false }; }
     case 'bf_forum_staff_list': { dNeed(T,'building'); const F = dForum();
-      return { topics:F.topics.slice().sort((a,b) => (a.hidden-b.hidden) || dFSort(a,b)).map(t => dFTopic(t, false, true)),
-               pending:F.replies.filter(r => r.status==='pending').map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })),
-               recent:F.replies.filter(r => r.kind==='public' && r.status!=='pending').sort((a,b) => Date.parse(b.created_at)-Date.parse(a.created_at)).slice(0,50).map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })) }; }
-    case 'bf_forum_staff_topic': { dNeed(T,'building'); const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id)); if (!t) throw new Error('That topic was not found.');
-      return Object.assign(dFTopic(t, true, true), { items:F.replies.filter(r => r.topic_id===t.id).map(r => dFReply(r, true)) }); }
+      return { topics:F.topics.filter(dLive).sort((a,b) => (a.hidden-b.hidden) || dFSort(a,b)).map(t => dFTopic(t, false, true)),
+               pending:F.replies.filter(r => r.status==='pending' && dLive(r)).map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })),
+               recent:F.replies.filter(r => r.kind==='public' && r.status!=='pending' && dLive(r)).sort((a,b) => Date.parse(b.created_at)-Date.parse(a.created_at)).slice(0,50).map(r => Object.assign(dFReply(r, true), { topicTitle:(F.topics.find(t => t.id===r.topic_id)||{}).title||'' })) }; }
+    case 'bf_forum_staff_topic': { dNeed(T,'building'); const F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id) && dLive(x)); if (!t) throw new Error('That topic was not found.');
+      return Object.assign(dFTopic(t, true, true), { items:F.replies.filter(r => r.topic_id===t.id && dLive(r)).map(r => dFReply(r, true)) }); }
+    case 'bf_forum_delete_topic': { const a = dNeed(T,'building'), F = dForum(), t = F.topics.find(x => x.id===Number(A.p_id) && dLive(x)); if (!t) throw new Error('That topic was not found. It may already be deleted.');
+      t.deleted = true; t.hidden = true; F.replies.forEach(r => { if (r.topic_id===t.id) r.deleted = true; }); dAudit(a, 'forum.topic_delete', String(t.id), { title:t.title }); return { ok:true }; }
+    case 'bf_forum_delete_reply': { dNeed(T,'building'); const r = dForum().replies.find(x => x.id===Number(A.p_reply) && dLive(x)); if (!r) throw new Error('That reply was not found. It may already be deleted.');
+      r.deleted = true; r.status = 'rejected'; r.is_answer = false; return { ok:true }; }
+    case 'bf_forum_delete_my_reply': { const u = dAppUser(A.p_app_token); if (!u) return { error:'Please sign in to My permits again.' };
+      const r = dForum().replies.find(x => x.id===Number(A.p_reply) && dLive(x) && x.email===u.email && x.kind==='public'); if (!r) return { error:'That reply was not found, or it is not yours.' };
+      r.deleted = true; r.status = 'rejected'; r.is_answer = false; return { ok:true }; }
+    case 'bf_forum_my_replies': { const u = dAppUser(A.p_app_token); if (!u) return [];
+      return dForum().replies.filter(x => x.topic_id===Number(A.p_topic) && dLive(x) && x.kind==='public' && x.email===u.email).map(x => x.id); }
     case 'bf_forum_save_topic': { const a = dNeed(T,'building'), F = dForum(), who = a.name || a.email, ti = String(A.p_title||'').trim(), bo = String(A.p_body||'').trim();
       if (ti.length < 3 || ti.length > 140) throw new Error('Give the topic a title (3 to 140 characters).'); if (bo.length < 2) throw new Error('Write the post (up to 8,000 characters).');
       const now = new Date().toISOString(); let t;
