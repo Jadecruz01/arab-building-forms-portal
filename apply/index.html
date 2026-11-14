@@ -2580,13 +2580,13 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.43.0';   // shown at the bottom of every page
+const APP_VERSION = '2.44.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
   const v = S.view, on = (k) => v===k ? ' class="on" aria-current="page"' : '';
   return '<header class="phead-wrap"><div class="phead"><a class="pbrand" href="https://www.arabcity.org/" target="_blank" rel="noopener" aria-label="City of Arab, Alabama (opens arabcity.org)">'+logoImg('plogo')+'<span><small>City of Arab, Alabama</small><b>Building Department</b></span></a>'+
-    '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a><a href="#updates"'+on('updates')+'>Updates</a><a href="#forums"'+on('forums')+'>Forums</a></nav>'+
+    '<nav class="pnav" aria-label="Building Department"><a '+HOME_LINK+on('apps')+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>Permit Status</a><a href="#forums"'+on('forums')+'>Forums</a></nav>'+
     acctHeaderBtn()+
     '<button type="button" class="pmenu-btn" id="pmenuBtn" aria-expanded="'+(S.pmenuOpen?'true':'false')+'" aria-controls="pmenu" onclick="togglePubMenu(event)">'+ic(S.pmenuOpen?'x':'menu')+'<span>Menu</span></button></div>'+
     pubMenuHtml()+'</header>'+
@@ -2601,7 +2601,6 @@ function pubMenuHtml(){
   return '<nav class="pmenu" id="pmenu" aria-label="Menu"><div class="pmenu-in">'+
     '<a '+HOME_LINK+on('apps')+'>'+ic('doc')+'<span><b>Applications &amp; Fees</b><small>Apply for a permit online</small></span></a>'+
     '<a href="#status" onclick="event.preventDefault();go(\'status\')"'+on('status')+'>'+ic('search')+'<span><b>Permit Status</b><small>Look up an application or permit</small></span></a>'+
-    '<a href="'+updHref()+'"'+on('updates')+'>'+ic('news')+'<span><b>Updates'+(fresh?' <em class="pm-new">New</em>':'')+'</b><small>What is new on this site</small></span></a>'+
     '<a href="'+forumHref()+'"'+on('forums')+'>'+ic('mail')+'<span><b>Forums</b><small>Tips and discussions</small></span></a>'+
     '<a '+acctLinkAttrs()+on('account')+'>'+ic('user')+'<span><b>My permits</b><small>'+(APP_TOK ? (acName() ? 'Signed in as '+esc(acName()) : 'Your applications, licenses and notifications') : 'Sign in or create a free account')+'</small></span></a>'+
     '<div class="pm-contact"><a href="tel:+12565865968">'+ic('info')+'256-586-5968</a><a href="mailto:buildingdept@arabcity.org">'+ic('mail')+'Email us</a><a href="https://www.arabcity.org/" target="_blank" rel="noopener">'+ic('ext')+'arabcity.org</a></div>'+
@@ -2623,7 +2622,7 @@ function homeQuickHtml(){
     card('href="'+base+'#status"'+(EMBED?T+' onclick="statusHandoff()"':' onclick="event.preventDefault();go(\'status\')"')+' role="listitem"', 'search', 'Permit Status', 'No account needed. Use your reference # and email.')+
     (APP_TOK ? card(acctLinkAttrs()+' role="listitem"', 'user', 'My permits', 'Your applications, licenses and notifications.')
              : card(acctLinkAttrs()+' role="listitem"', 'user', 'Create a free account', 'Track every application in one place.'))+
-    card('href="'+updHref(u0 && u0.id)+'"'+T+' role="listitem"', 'news', 'Site updates', u0 ? esc(u0.title) : 'What is new on this site.', u0 ? '<em class="qa-new">New</em>' : '')+
+    card('href="'+forumHref()+'"'+T+' role="listitem"', 'mail', 'Forums', 'Tips and discussions from the Building Department.')+   // v2.44.0 (Jade): was Site updates
   '</div></section>';
 }
 function homeAcctHtml(){
@@ -2654,7 +2653,7 @@ function pubFooter(){
     '<div class="pf-brand">'+logoImg('flogo')+'<div><b>City of Arab Building Department</b><span>740 N Main St, Arab, AL 35016</span></div></div>'+
     '<nav class="pf-cols" aria-label="Footer">'+
       '<div class="pf-col"><span class="pf-h">Contact</span><a href="mailto:buildingdept@arabcity.org">buildingdept@arabcity.org</a><a href="tel:+12565865968">256-586-5968</a></div>'+
-      '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a><a href="'+updHref()+'"'+(EMBED?' target="_top"':'')+'>Site updates</a><a href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>Forums</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
+      '<div class="pf-col"><span class="pf-h">Links</span><a '+HOME_LINK+'>Applications &amp; Fees</a><a href="#status" onclick="event.preventDefault();go(\'status\')">Permit Status</a><a href="'+forumHref()+'"'+(EMBED?' target="_top"':'')+'>Forums</a>'+PRIV_LINK('Privacy &amp; your information')+A11Y_LINK('Accessibility')+'<a href="https://www.arabcity.org/" target="_blank" rel="noopener">arabcity.org<span class="vh"> (opens in a new tab)</span></a><a class="pf-staff" href="#staff">'+ic('lock')+'Staff sign in</a></div>'+
     '</nav></div>'+
     '<div class="pf-credit"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span class="pf-meta"><button class="linkbtn" onclick="openBug()">Report a problem with this site</button><span class="pf-ver">Version '+APP_VERSION+'</span></span></div></div></footer>';
 }
@@ -6120,7 +6119,7 @@ function initRoute(){
   else if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
-  else if (h==='updates' || h.indexOf('updates/')===0){ S.view = 'updates'; S.post = h.slice(8) || null; }
+  else if (h==='updates' || h.indexOf('updates/')===0){ S.view = 'forums'; S.post = null; history.replaceState(null, '', '#forums'); }   // v2.44.0 (Jade): Updates page removed; old links open the Forums
   else if (h==='forums' || h.indexOf('forums/')===0){ S.view = 'forums'; S.post = (h.slice(7).match(/^\d+/)||[null])[0]; }
   else if (h==='account') S.view = 'account';
   else if (h==='privacy') S.view = 'privacy';
