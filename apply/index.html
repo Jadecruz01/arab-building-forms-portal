@@ -2014,6 +2014,7 @@ function computeFees(form, f, doubled, letters){
   else if (form === 'pool'){ permit = 50; basis = 'Flat fee'; }
   else if (form === 'demo' || form === 'moving'){ permit = 100; basis = 'Flat fee'; }
   else if (form === 'rezoning'){ const n = Math.max(1, Math.floor(num(f && f.parcels)) || 1); permit = 500 * n; basis = '$500 per parcel × '+n; }
+  else if (form === 'subdivision'){ const s = subFeeFor(f); permit = s.fee; basis = s.basis; }   // v2.45.0: Resolution 2024-25R review fee
   if (doubled) permit *= 2;
   permit = Math.round(permit*100)/100;
   const lt = form === 'rezoning' ? Math.max(0, Math.round(num(letters)*100)/100) : 0;   // v2.39.0: certified letters (staff add)
@@ -2044,9 +2045,9 @@ const isUpField = x => x.type==='file' || x.type==='doc';
    Same rule as the server (bf_review_required): held = not annexation AND (submitted on/after the form's start date
    OR not already paid in full). So any application that still owes money, old or new, waits for approval;
    only applications that were already paid in full before this rule keep their history as it was. */
-const REVIEW_FORMS = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning'];   // all fee forms; never 'annexation'
+const REVIEW_FORMS = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning','subdivision'];   // all fee forms; never 'annexation'
 const REVIEW_FROM = '2026-10-15T05:00:00Z';
-const REVIEW_FROM_FORM = { sign:'2026-10-28T17:00:00Z', pool:'2026-11-11T18:00:00Z', demo:'2026-11-11T18:00:00Z', moving:'2026-11-11T18:00:00Z', rezoning:'2026-11-11T18:00:00Z' };
+const REVIEW_FROM_FORM = { sign:'2026-10-28T17:00:00Z', pool:'2026-11-11T18:00:00Z', demo:'2026-11-11T18:00:00Z', moving:'2026-11-11T18:00:00Z', rezoning:'2026-11-11T18:00:00Z', subdivision:'2026-11-19T06:00:00Z' };
 const reviewFrom = k => REVIEW_FROM_FORM[k] || REVIEW_FROM;
 const reviewNeeded = (form, created, paidInFull) => !!form && form !== 'annexation' && (String(created||'') >= reviewFrom(form) || !paidInFull);
 const reviewRequired = s => !!s && reviewNeeded(s.form, s.createdAt, ((s.pay||{}).status) === 'paid');
@@ -2161,7 +2162,7 @@ FORMS.homeowner = Object.assign({}, FORMS.building, { key:'homeowner', title:'Ho
    Petition for Annexation -> Planning Commission recommendation -> City Council decision -> notification letter. */
 /* v2.39.0 (Jade): the Annexation Application is open to the public (still labeled BETA), and the new Rezoning
    Application is public in BETA. BETA is only a label now; LOCKED_FORMS (staff preview, server bf_form_locks) is empty. */
-const BETA_FORMS = ['annexation','rezoning'];
+const BETA_FORMS = ['annexation','rezoning','subdivision'];
 const LOCKED_FORMS = [];
 const formBeta = k => BETA_FORMS.includes(k);
 const formLocked = k => LOCKED_FORMS.includes(k) && !(typeof canBuilding === 'function' && canBuilding());
@@ -2293,7 +2294,8 @@ function rezoneStatusSteps(r){
     { t:'City Council decision', d: a.ccDecision ? a.ccDecision+(a.ccDate ? ' · '+d(a.ccDate) : '')+(a.ordinance ? ' · Ordinance '+a.ordinance : '') : a.ccDate ? 'Hearing '+d(a.ccDate)+'. Please attend.' : 'Not scheduled yet', st: a.ccDecision==='Approved' || a.ccDecision==='Denied' ? 'ok' : a.ccDecision || a.ccDate ? 'part' : '' } ];
 }
 const isBldg = k => k==='building' || k==='homeowner';
-const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning','annexation'];
+const FORM_ORDER = ['building','homeowner','subtrade','sign','pool','demo','moving','rezoning','subdivision','annexation'];
+const isAppNoForm = k => k==='rezoning' || k==='subdivision';   // v2.45.0: Planning Commission applications get an App #, not a permit #
 
 /* ================= terms & agreements (required on the forms that list them) ================= */
 const AGREEMENTS = {
@@ -2580,7 +2582,7 @@ function go(view, form){ if (typeof NAV !== 'undefined') NAV.length = 0; S.nmenu
   render(); window.scrollTo(0,0); }
 
 /* ================= PUBLIC: Applications & Fees ================= */
-const APP_VERSION = '2.44.0';   // shown at the bottom of every page
+const APP_VERSION = '2.45.0';   // shown at the bottom of every page
 // "Applications & Fees" links open this site's own Applications page.
 const HOME_LINK = 'href="#apps" onclick="event.preventDefault();go(\'apps\')"';
 function pubHeader(){
@@ -2749,7 +2751,7 @@ const A11Y_DRAFT = `The City of Arab Building Department wants everyone to be ab
 - Pages are checked with automated accessibility tests and by hand with a keyboard before each update.
 
 ## Known limitations
-- The **Subdivision** application is a fillable PDF form. The fields are named for screen readers, but the PDFs themselves are not fully tagged. If they are hard to use with your assistive technology, contact us and we will help you complete the application another way.
+- Some **documents you upload or download** (for example plat drawings, deeds or the Subdivision Regulations) are PDFs that may not be fully tagged. If one is hard to use with your assistive technology, contact us and we will help another way.
 - Documents you upload are kept as you send them.
 
 ## Need help or a different format?
@@ -3156,7 +3158,7 @@ function viewApps(){
    '<section class="grp"><h2>Pools, demolition &amp; moving</h2><div class="tiles">'+tile('pool')+tile('demo')+tile('moving')+'</div></section>'+
    '<section class="grp"><h2>Planning Commission</h2><div class="tiles">'+
      tile('rezoning')+tile('annexation')+
-     '<a class="tile paper" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#pdf-subdivision"'+(EMBED?' target="_top"':'')+' style="text-decoration:none"><span class="ico">'+ic('map')+'</span><span><b>Application for Subdivision Consideration</b><small>Fill in the form on your computer, then email it to the Building Department</small><span class="fee">Fillable PDF · review fee from $100</span><span class="soon">Online form coming soon</span></span></a>'+
+     tile('subdivision')+   // v2.45.0: online (was the fillable PDF)
    '</div></section>'+
    homeAcctHtml()+
    '<section class="feesec" aria-labelledby="feeH"><h2 id="feeH">Fee schedule</h2>'+
@@ -3192,6 +3194,7 @@ let LAST_RECEIPT = null;   // shown on the confirmation page        // live fiel
 const AUTOCOMP = { applicant:'name', email:'email', phone:'tel' };
 function fieldHtml(x, f){
   if (x.legacy) return '';
+  if ((x.type==='section' || x.type==='note') && x.show && !x.show(f)) return '';   // v2.45.0: sections and notes can be conditional too
   if (x.type==='section') return '<div class="sect">'+esc(x.label)+'</div>';
   if (x.type==='note') return '<div class="fld full hint" style="color:var(--ink2);font-size:14px">'+esc(x.text)+'</div>';
   if (x.show && !x.show(f)) return '';
@@ -3201,6 +3204,8 @@ function fieldHtml(x, f){
   const ac = AUTOCOMP[x.id] ? ' autocomplete="'+AUTOCOMP[x.id]+'"' : '';
   let inner='';
   if (x.type==='radio') inner = '<div class="opts'+(x.stack?' stack':'')+'" role="radiogroup" aria-labelledby="l_'+id+'"'+(x.req?' aria-required="true"':'')+dby+'>'+x.opts.map((o,i)=>'<label class="opt"><input type="radio" name="'+id+'" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(v===o?' checked':'')+req+' data-k="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>';
+  else if (x.type==='checks'){ const on = String(v).split('; ').filter(Boolean);   // v2.45.0: check all that apply, saved as "A; B"
+    inner = '<div class="opts stack" role="group" aria-labelledby="l_'+id+'"'+dby+'>'+x.opts.map((o,i)=>'<label class="opt"><input type="checkbox" id="'+id+'_'+i+'" value="'+esc(o)+'"'+(on.includes(o)?' checked':'')+' data-ck="'+x.id+'"> <span>'+esc(o)+'</span></label>').join('')+'</div>'; }
   else if (x.type==='select') inner = '<select id="'+id+'" data-k="'+x.id+'"'+req+dby+'><option value="">Please select</option>'+x.opts.map(o=>'<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
   else if (x.type==='textarea') inner = '<textarea id="'+id+'" data-k="'+x.id+'"'+req+dby+'>'+esc(v)+'</textarea>';
   else if (x.type==='doc' && licUse(x.id)) inner = licSlotHtml(x, licUse(x.id));
@@ -3210,12 +3215,13 @@ function fieldHtml(x, f){
   else if (x.type==='file') inner = '<div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="l_'+id+' dropTxt" aria-describedby="upHint">'+ic('upload')+'<div id="dropTxt"><b style="color:var(--blue)">Browse files</b> or drag and drop here</div><input type="file" id="fileIn" multiple accept="application/pdf,image/*,.heic,.heif" hidden></div><div class="filelist" id="flist"></div>';
   else { const t = x.type==='money'||x.type==='number' ? 'text" inputmode="decimal' : x.type;
     inner = '<input type="'+t+'" id="'+id+'" data-k="'+x.id+'" value="'+esc(v)+'"'+req+ac+dby+(x.type==='money'?' placeholder="$0.00"':'')+'>'; }
-  const lab = (x.type==='radio'||isUpField(x)) ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
+  const lab = (x.type==='radio'||x.type==='checks'||isUpField(x)) ? '<span class="l" id="l_'+id+'">'+esc(x.label)+star+'</span>' : '<label class="l" id="l_'+id+'" for="'+id+'">'+esc(x.label)+star+'</label>';
   return '<div class="fld'+(x.full?' full':'')+'"'+(x.type==='radio'?' data-group="'+id+'"':'')+'>'+lab+inner+(x.hint?'<span class="hint" id="'+hid+'">'+esc(x.hint)+'</span>':'')+(x.type==='doc' ? licSlotNote(x) : '')+
     (x.type==='file'?'<span class="hint upwarn" id="upHint">'+ic('lock')+'Please do not upload driver’s licenses, Social Security numbers, or bank or card information. They are not needed for a permit.</span>':'')+'</div>';
 }
 function feeBoxHtml(key){
   if (key === 'rezoning') return rezoneFeeBox();
+  if (key === 'subdivision') return subdivFeeBox();
   if (key === 'annexation') return '<div class="r t"><span>Application fee</span><span class="num">No fee</span></div><small>There is no fee to apply for annexation.</small>';
   const fe = computeFees(key, FVALS, false);
   const showVal = isBldg(key)||key==='subtrade';
@@ -3265,6 +3271,8 @@ function bindForm(){
   const form = document.getElementById('pf'); if (!form) return;
   if (APP_TOK && LIC.items == null && !LIC.loading && FORMS[S.form] && FORMS[S.form].fields.some(x => x.type==='doc' && LIC_KINDS[x.id])) licLoad();
   form.oninput = form.onchange = e => {
+    const ck = e.target.dataset && e.target.dataset.ck;
+    if (ck && e.type==='change'){ FVALS[ck] = [...form.querySelectorAll('input[data-ck="'+ck+'"]')].filter(c => c.checked).map(c => c.value).join('; '); return; }
     const k = e.target.dataset && e.target.dataset.k; if (!k) return;
     FVALS[k] = e.target.value; clearFieldError(e.target);
     const F = FORMS[S.form];
@@ -3392,7 +3400,7 @@ async function submitForm(e){
       ? '<div class="dn-fee"><span>Estimated total</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small"><b>Please do not pay yet.</b> We review your application first, confirm the total and contact you when it is time to pay.</p>'
       : '<div class="dn-fee"><span>Amount due</span><b class="num">'+money(fees.total)+'</b></div><p class="dn-small">Pay in person at City Hall, 740 N Main St, by cash or check to “City of Arab.” Bring your receipt.</p>';
     done.innerHTML = '<div class="done"><div class="ck">'+ic('check')+'</div><h1 class="pg-h" style="font-size:26px">Application submitted</h1>'+
-      '<p class="pg-sub">We received your '+esc(F.short)+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'.</p>'+
+      '<p class="pg-sub">We received your '+esc(F.short.replace(/ Application$/, ''))+' application'+(files.length?' and '+files.length+' document'+(files.length>1?'s':''):'')+'.</p>'+
       '<div class="dn-card"><div class="dn-ref"><span>Your reference #</span><b class="num dn-num">'+ref+'</b><small>'+mailLine+'</small></div>'+feeLine+'</div>'+
       (APP_TOK ? '<p class="ac-saved" id="acSaved" role="status"><span>Saving to My permits…</span></p>' : '')+
       '<div class="done-acts"><button class="btn primary" onclick="downloadReceipt()">'+ic('down')+'Download receipt (PDF)</button><a class="btn" href="'+(EMBED?'https://arabcityapplications.jadecruz.dev/apply/':'')+'#status"'+(EMBED?' target="_top" onclick="statusHandoff()"':' onclick="event.preventDefault();openMyStatus()"')+'>'+ic('status')+'Check permit status</a></div>'+
@@ -4005,7 +4013,9 @@ const COLS = [
   {k:'fy', l:'Fiscal Year', t:'T', get:s=>fyOf(s)||0, fmt:s=>'<span class="num">'+fyName(fyOf(s))+'</span>'+(fyOv(s.id)?' <span class="pill src" title="Moved to this fiscal year by hand">moved</span>':'')},
   {k:'permitNo', l:'Permit #', t:'T', get:s=>(s.staff&&s.staff.permitNo)||'', fmt:s=>esc((s.staff&&s.staff.permitNo)||'')||'<span style="color:var(--muted)">—</span>'},
   {k:'address', l:'Address', t:'T', get:s=>s.fields.address||''},
-  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign','annexation','rezoning']},
+  {k:'lot', l:'Lot #', t:'T', get:s=>s.fields.lot||'', not:['sign','annexation','rezoning','subdivision']},
+  {k:'subStage', l:'Stage', t:'T', only:['subdivision'], get:s=>subdivStage(s), fmt:s=>'<span class="pill src">'+esc(subdivStage(s))+'</span>'},
+  {k:'subApproval', l:'Approval', t:'T', only:['subdivision'], get:s=>[s.fields.approvalType, s.fields.devName].filter(Boolean).join(' · ')},
   {k:'annexStage', l:'Stage', t:'T', only:['annexation'], get:s=>annexStage(s), fmt:s=>'<span class="pill src">'+esc(annexStage(s))+'</span>'+(s.beta?' <span class="pill beta-pill">Beta test</span>':'')},
   {k:'acreage', l:'Acreage', t:'T', only:['annexation'], get:s=>s.fields.acreage||''},
   {k:'rezStage', l:'Stage', t:'T', only:['rezoning'], get:s=>rezoneStage(s), fmt:s=>'<span class="pill src">'+esc(rezoneStage(s))+'</span>'},
@@ -4496,10 +4506,11 @@ function panelHtml(){
     const ins = st.inspections||{};
     const hasInsp = inspForm(s.form) || inspHasData(st.inspections);
     body = '<form id="offf" class="fgrid">'+(REVIEW_FORMS.includes(s.form) ? reviewBoxHtml(s).replace('<div class="sect">', '<div class="sect" style="margin-top:0">') : '')+
-      '<div class="fld"><label class="l" for="o_permitNo">'+(s.form==='rezoning' ? 'App #' : 'Permit #')+'</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="'+(s.form==='rezoning' ? 'App #' : 'e.g. 26210')+'"></div>'+
+      '<div class="fld"><label class="l" for="o_permitNo">'+(isAppNoForm(s.form) ? 'App #' : 'Permit #')+'</label><input type="text" id="o_permitNo" value="'+esc(st.permitNo||'')+'" placeholder="'+(isAppNoForm(s.form) ? 'App #' : 'e.g. 26210')+'"></div>'+
       '<div class="fld full"><span class="l">Payment</span>'+payBoxHtml(s)+'</div>'+
       (s.form==='rezoning'
         ? '<div class="fld"><label class="l" for="o_letters">Cost of certified letters</label><input type="number" id="o_letters" min="0" step="0.01" value="'+esc(String(((s.fees||{}).letters)||''))+'" placeholder="0.00"><span class="hint">Added to the $'+(REZ_FEE*rezParcels(s.fields))+' rezoning fee ($500 per parcel × '+rezParcels(s.fields)+'). Enter it before you approve, so the applicant is told the full total.</span></div><div class="fld"></div>'+rezoneOfficeHtml(s)
+        : s.form==='subdivision' ? subdivOfficeHtml(s)
         : '<div class="fld"><label class="l" for="o_double">Penalty</label><label class="opt"><input type="checkbox" id="o_double"'+(s.fees&&s.fees.doubled?' checked':'')+'> '+(s.form==='sign' ? 'Sign put up without a permit' : 'Work started without a permit')+' (double the permit fee)'+
         (s.imported ? '' : (() => { const b = computeFees(s.form, s.fields, false).permit; return b ? '<small class="hint" style="display:block">Permit fee '+money(b)+' → '+money(b*2)+' when doubled</small>' : ''; })())+'</label></div>')+
       (REVIEW_FORMS.includes(s.form) ? '' :
@@ -4585,6 +4596,11 @@ async function saveOffice(){
     if (a.pcRec && !a.pcDate){ toast('Enter the Planning Commission hearing date for this recommendation.'); const de = document.getElementById('a_pcDate'); if (de) de.focus(); return; }
     if (a.ccDecision && !a.ccDate){ toast('Enter the City Council hearing date for this decision.'); const de = document.getElementById('a_ccDate'); if (de) de.focus(); return; }
     st.annex = a;
+  }
+  if (s.form === 'subdivision'){   // v2.45.0
+    const a = { pcDate:g('a_pcDate')||'', pcRec:g('a_pcRec')||'' };
+    if (a.pcRec && !a.pcDate){ toast('Enter the Planning Commission meeting date for this decision.'); const de = document.getElementById('a_pcDate'); if (de) de.focus(); return; }
+    st.annex = a; st.platType = g('o_platType')||''; st.pcNotes = String(g('o_pcNotes')||'').trim().slice(0, 4000);
   }
   try{ await DB.doc('submissions/'+s.id).update({ staff:st, fees:(s.imported && !!doubled===!!(s.fees&&s.fees.doubled)) ? s.fees : computeFees(s.form, s.fields, doubled, letters) });
     if (st.coOverrideInit && prev.co!=='Given'){ try{ const fresh = await sbRpc('bf_get', {p_token:TOKEN, p_collection:'submissions', p_id:s.id}); if (fresh && fresh.staff){ s.staff = fresh.staff; render(); } }catch(e){} }
@@ -4781,6 +4797,129 @@ const SUB_FEES = [
 ];
 const LOT_TIERS = ['2–10 lots','11–25 lots','25–40 lots','40 or more lots'];
 const lotTier = n => n <= 10 ? 0 : n <= 25 ? 1 : n <= 40 ? 2 : 3;
+
+/* ================= v2.45.0 (Jade): online Application for Subdivision Consideration (BETA, public) =================
+   Same questions as the City's paper application (letter, application page, certifications, Appendix III plat
+   checklist). Review fee from Resolution 2024-25R (SUB_FEES above), estimated from the fee type and number of lots;
+   like every fee form it is approved by the Building Department before payment. The property owner certifies
+   online; the surveyor and engineer certifications are shown for information (their seals go on the drawings).
+   Planning Commission meeting date and decision are kept in staff.annex (pcDate, pcRec) so the applicant sees them
+   on Check permit status (server: bf_annex_status). The fillable Subdivision PDF is no longer offered. */
+const SUB_APPROVAL = ['Sketch','Preliminary','Final'];
+const SUB_PC = ['Approved','Approved with modifications','Disapproved','Tabled'];
+const notOwner = f => !!f.applyAs && f.applyAs !== 'Property owner';
+const subPlat = f => f.approvalType === 'Preliminary' || f.approvalType === 'Final';
+function subFeeFor(f){
+  const s = SUB_FEES.find(x => x[1] === (f && f.feeType)); if (!s) return { fee:0, basis:'Choose the review fee that applies' };
+  if (!Array.isArray(s[2])) return { fee:s[2], basis:s[1] };
+  const n = Math.max(2, Math.floor(num(f.lots)) || 2), k = lotTier(n);
+  return { fee:s[2][k], basis:s[1]+' · '+LOT_TIERS[k] };
+}
+const PLAT_CHECK = ['Deed book and page of record of the legal owner','Date, north point, scale',
+  'Caption: location by quarter section, township, range, city, county, state','Acreage subdivided/combined','Vicinity map',
+  'Exact length and bearing of the exterior boundaries of the tract','Location of existing physical features on the property and adjoining properties',
+  'Names of adjacent subdivisions/developments','Names and addresses of record owners of adjoining land','Proposed minimum building setback lines',
+  'Names, locations, width, dimensions of existing and proposed streets, alleys, easements, parks, rights-of-way and other open spaces, reservations, lot lines and building lines',
+  'Dimensions and area in acres of all proposed lots and bearings of respective sides','Lot and block numbers; smallest lot size, total number of lots',
+  'Dimensions to the nearest 1/100 of a foot and angles within plus or minus 5 seconds','Profiles of streets where required; linear feet in streets',
+  'ADEM permit applied for if greater than one acre','Contours where required','Zoning classifications',
+  'Construction plans of proposed utility layouts, sewer, water, electricity, street plans, and storm drainage',
+  'Sponsor transmits construction plans to Water, Electric, Sanitary and Health Departments for review and approval',
+  'Conforms to general requirements and minimum standards of design'];
+FORMS.subdivision = { key:'subdivision', title:'Application for Subdivision Consideration', short:'Subdivision Application', icon:'map', beta:true, planning:true, group:'Planning Commission', feeLabel:'Review fee by plat type and number of lots', created:'Nov 19, 2026',
+  agreements:[{id:'subdivOwner'},{id:'subdivPros'}],
+  fields:[
+    {type:'note', text:'Subdivision and development plats are approved by the Arab Planning Commission, which meets on the 3rd Tuesday of every month. There are no special meetings. A complete application and drawings must be received at least 25 days before the meeting, or 30 calendar days before it if construction plans are submitted with the preliminary plat for review at the same time. Partial drawings are not accepted. This application does not take the place of the City of Arab Subdivision Regulations (on arabcity.org under the Building tab). Questions? Call 256-586-5968.'},
+    {type:'section', label:'Type of approval'},
+    T('approvalType','Type of approval',{type:'radio',req:true,opts:SUB_APPROVAL,full:true,hint:'In most cases, the sketch plat is approved before a preliminary plat is submitted.'}),
+    T('devType','Type of development',{type:'radio',req:true,opts:['Residential','Commercial'],full:true,hint:'Residential: 3 sets of drawings. Commercial: 5 sets of drawings.'}),
+    {type:'section', label:'Submitted by'},
+    T('applicant','Your name',{req:true}), T('email','Email',{type:'email',req:true,hint:'Used with your reference # to check your application status online.'}),
+    T('phone','Phone',{type:'tel',req:true,hint:'(000) 000-0000'}), T('date','Date',{type:'date',req:true}),
+    T('applyAs','I am the',{type:'radio',req:true,opts:['Property owner','Agent for the property owner','Surveyor or engineer for the property owner'],full:true}),
+    T('agentFirm','Company or firm',{show:notOwner}), T('agentAddress','Your mailing address',{req:true,full:true,show:notOwner,hint:'Street, city, state and ZIP'}),
+    {type:'section', label:'Subdivision or development'},
+    T('devName','Subdivision/Development name',{req:true,full:true}),
+    T('address','Location',{req:true,full:true,hint:'Street address, or the road and nearest cross street.'}),
+    {type:'section', label:'Property owner'},
+    T('owner','Property owner(s)',{req:true,full:true,hint:'List every owner.'}),
+    T('ownerAddress','Mailing address',{req:true,full:true,hint:'Street, city, state and ZIP'}),
+    T('ownerPhone','Phone',{type:'tel',req:true}), T('ownerCell','Cell',{type:'tel'}), T('ownerEmail','Email',{type:'email',full:true}),
+    {type:'section', label:'Registered surveyor'},
+    T('surveyor','Registered surveyor',{req:true}), T('surveyFirm','Firm',{req:true}), T('surveyLic','Lic. #',{req:true,hint:'State registration number'}),
+    T('surveyPhone','Phone',{type:'tel'}), T('surveyAddress','Mailing address',{full:true}), T('surveyEmail','Email',{type:'email',full:true}),
+    {type:'section', label:'Civil engineer'},
+    T('engineer','Civil engineer',{hint:'Leave blank if no civil engineer is involved yet.'}), T('engFirm','Firm'), T('engReg','State registration #'),
+    T('engPhone','Phone',{type:'tel'}), T('engAddress','Mailing address',{full:true}), T('engEmail','Email',{type:'email',full:true}),
+    {type:'section', label:'Property'},
+    T('phase','Phase (if any)'), T('sketchDate','Date of sketch plat approval, if any',{type:'date',show:subPlat}),
+    T('acreage','Gross acreage of property to be subdivided or combined (acres)',{type:'number',req:true,full:true}),
+    T('lots','If subdivided: total number of lots',{type:'number',req:true,hint:'Enter the total number of lots shown on the plat.'}),
+    T('zoning','Zoning',{req:true,hint:'For example, R-1 or B-2'}),
+    T('lotW','Average lot size: width (ft.)',{type:'number'}), T('lotD','Average lot size: depth (ft.)',{type:'number'}),
+    T('lotSqft','Average lot size (sq. ft.)',{type:'number',full:true}),
+    T('utilities','Available',{type:'checks',opts:['City Sewer','City Water Lines','Electric Power Lines'],full:true,hint:'Check each one available to the property.'}),
+    T('ownAdjoin','Do you own land adjoining the parcel(s) being reviewed?',{type:'radio',req:true,opts:['Yes','No'],full:true}),
+    T('adjoinLater','If so, will adjoining lands be subdivided later?',{type:'radio',req:true,opts:['Yes','No','Not sure yet'],full:true,show:f=>f.ownAdjoin==='Yes'}),
+    {type:'section', label:'Review fee'},
+    T('feeType','Which review fee applies?',{type:'select',req:true,opts:SUB_FEES.map(x => x[1]),full:true,hint:'From the City fee schedule (Resolution 2024-25R). Fees are charged per review period. The Building Department confirms the fee when it reviews your application.'}),
+    {type:'section', label:'Plat checklist', show:subPlat},
+    {type:'note', show:subPlat, text:'For a preliminary or final plat, check each item that is shown on your plat or provided. The Planning Commission uses this checklist (Appendix III of the Subdivision Regulations) to review your plat.'},
+    T('platCheck','Plat checklist',{type:'checks',opts:PLAT_CHECK,full:true,show:subPlat}),
+    T('finalCheck','Final plat',{type:'checks',opts:['All utilities that will serve the subdivision have signed the plat (required BEFORE the Planning Commission meeting for final approval)'],full:true,show:f=>f.approvalType==='Final'}),
+    {type:'note', text:'The preliminary plat, construction plans and final plat are reviewed at the appropriate stages by the City’s consulting civil engineering firm before approval, to make sure the Subdivision Regulations are followed. The engineer sends any corrections and recommendations to the Planning Commission and the developer on record. All construction must be inspected by the City’s consulting civil engineer before it is covered by additional construction.'},
+    ...DOCS_HEAD,
+    DOC('docPlat','Plat drawing',{hint:'The sketch, preliminary or final plat as a PDF.'}),
+    T('files','Construction plans and other documents (optional)',{type:'file',req:false,full:true,hint:'For example, construction plans, a vicinity map or the deed. PDF, JPG or PNG. Up to 10 files in total, 30 MB each.'}),
+    {type:'note', text:'Paper drawings: also bring 3 sets of drawings (residential) or 5 sets (commercial) to City Hall, 740 N Main St, at least 25 days before the Planning Commission meeting. Your application is not complete until the drawings are received.'} ] };
+Object.assign(AGREEMENTS, {
+  subdivOwner: { title:'Property Owner Certification', label:'I certify the', link:'Property Owner Certification', text:[
+    'As owner(s) of the above property, I submit this application for subdivision/development approval and hereby certify that I am ultimately responsible for the information provided in this application.',
+    'I also agree not to hold the Arab Planning Commission, the City of Arab, Alabama, or its City Council liable for any information or construction inspections provided by City employees or inspectors, or by surveyor, engineers, contractors or sub-contractors employed by myself, during the design or construction of the subject subdivision.',
+    'I further certify that a qualified, licensed contractor or a registered civil engineer in my employ, will oversee the various elements of the subdivision construction, said contractor or engineer to be identified in writing prior to final approval of the PRELIMINARY PLAT.',
+    'I further certify that I am aware of the current City of Arab Subdivision Regulations, have read said regulations and will abide by them during the subdivision of the subject property.',
+    '#Submitting for the owner',
+    'If I am submitting this application as the agent, surveyor or engineer for the property owner, I certify that the property owner(s) have read and agree to this certification and have authorized me to submit this application on their behalf.' ] },
+  subdivPros: { title:'Surveyor and Engineer Certifications', label:'I have read the', link:'Surveyor and Engineer Certifications', text:[
+    'The registered land surveyor and civil engineer named in this application make the following certifications. Their signatures, dates and State registration numbers appear with their seals on the plat drawings and construction plans.',
+    '#Surveyor certification',
+    'As registered land surveyor identified herein, I do hereby certify that I have been employed by the above property owner(s) to survey, draw and certify the subdivision plat attached in accordance with all State and local laws and regulations. I hereby certify that I am aware of the current City of Arab Subdivision Regulations, have read said regulations and will abide by them during the subdivision of the subject property.',
+    '#Engineer certification',
+    'As registered Civil Engineer identified herein, I do hereby certify that I have been employed by the above property owner(s) to complete engineering requirements for the specified subdivision plat attached in accordance with all State and local laws and regulations. I hereby certify that I am aware of the current City of Arab Subdivision Regulations, have read said regulations and will abide by them during the subdivision of the subject property.' ] }
+});
+function subdivFeeBox(){
+  const s = subFeeFor(FVALS), row = (l, v) => '<tr><td>'+l+'</td><td class="num" style="text-align:right">'+v+'</td></tr>';
+  return '<div class="r"><span>Review fee <small>('+esc(s.basis)+')</small></span><b class="num">'+money(s.fee)+'</b></div>'+
+    '<div class="r t"><span>Estimated total</span><span class="num">'+money(s.fee)+'</span></div>'+
+    '<small><b>This is an estimate. Please do not pay yet.</b> Fees are charged per review period: one complete plan review cycle, including preliminary reviews, technical review and Planning Commission action. The Building Department confirms the fee when it reviews your application, then contacts you to pay in person by cash or check at 740 N Main St.</small>'+
+    '<details class="feesched"><summary>Full fee schedule</summary><table class="fs">'+
+      row('Minor subdivision (no more than 3 lots with no road construction)', '$100.00')+
+      ['prelim','eng','final'].map(k => { const f = SUB_FEES.find(x => x[0]===k); return '<tr><th colspan="2">'+f[1]+'</th></tr>'+f[2].map((v,i) => row('&nbsp;&nbsp;'+LOT_TIERS[i], money(v))).join(''); }).join('')+
+      row('Re-subdivision', '$100.00')+row('Certificate to subdivide and/or consolidate', '$100.00')+row('Site plan', '$200.00')+
+    '</table><p class="hint" style="margin:8px 0 0">Source: City of Arab Resolution 2024-25R, Attachment B (June 17, 2024).</p></details>';
+}
+function subdivStage(s){ const a = ((s.staff||{}).annex) || {}, ok = reviewApproved(s), ps = payStatus(s);
+  if (a.pcRec==='Approved' || a.pcRec==='Approved with modifications') return 'Approved by Planning Commission';
+  if (a.pcRec==='Disapproved') return 'Disapproved';
+  if (a.pcRec==='Tabled') return 'Tabled';
+  if (a.pcDate) return 'Planning Commission '+fmtDay(a.pcDate);
+  if (ok && ps==='paid') return 'Paid · on agenda next';
+  if (ok) return 'Approved · waiting for payment';
+  return String((s.staff||{}).infoNeeded||'').trim() ? 'Information needed' : 'Under review'; }
+function subdivOfficeHtml(s){
+  const st = s.staff||{}, a = st.annex||{}, sel = (id, list, v) => '<select id="'+id+'"><option value="">—</option>'+list.map(o => '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select>';
+  return '<div class="sect">Planning Commission <span class="pill beta-pill">Beta</span></div>'+
+    '<div class="fld full"><p class="hint" style="margin:0">The applicant sees the meeting date and decision on Check permit status (never your notes).</p></div>'+
+    '<div class="fld"><label class="l" for="o_platType">Plat type</label>'+sel('o_platType', ['Minor Plat','Major Plat'], st.platType)+'</div>'+
+    '<div class="fld"><label class="l" for="a_pcDate">Date of meeting</label><input type="date" id="a_pcDate" value="'+esc(a.pcDate||'')+'"></div>'+
+    '<div class="fld"><label class="l" for="a_pcRec">Planning Commission decision</label>'+sel('a_pcRec', SUB_PC, a.pcRec)+'</div><div class="fld"></div>'+
+    '<div class="fld full"><label class="l" for="o_pcNotes">Modifications, variances granted, or reasons for disapproval</label><textarea id="o_pcNotes">'+esc(st.pcNotes||'')+'</textarea><span class="hint">Staff only. Email the applicant the decision letter as usual.</span></div>';
+}
+function subdivStatusSteps(r){
+  const a = r.annex || {}, d = v => v ? fmtDay(v) : '';
+  return [{ t:'Planning Commission', d: a.pcRec ? a.pcRec+(a.pcDate ? ' · '+d(a.pcDate) : '') : a.pcDate ? 'Meeting '+d(a.pcDate)+'. Please attend.' : 'Not scheduled yet. The Planning Commission meets the 3rd Tuesday of each month.',
+    st: (a.pcRec==='Approved' || a.pcRec==='Approved with modifications' || a.pcRec==='Disapproved') ? 'ok' : a.pcRec || a.pcDate ? 'part' : '' }];
+}
 function subFee(){
   const t = (document.getElementById('sfType')||{}).value || 'minor', f = SUB_FEES.find(x=>x[0]===t), lotsEl = document.getElementById('sfLots');
   const lots = Math.max(0, parseInt((lotsEl||{}).value, 10) || 0), tiered = Array.isArray(f[2]);
@@ -5615,7 +5754,7 @@ function statusCard(r){
      Building Department review step, so a permit # and "More information needed" no longer read out of order. */
   const permitNo = r.permitNo||'';
   const steps = [{ t:'Application received', d:fmtDay(r.createdAt), st:'ok' },
-    { t:(r.form==='rezoning' ? 'App # assigned' : 'Permit # assigned'), d:permitNo ? (r.form==='rezoning' ? 'App # ' : 'Permit # ')+permitNo : 'Not assigned yet', st:permitNo ? 'ok' : '' }].concat(revReq ? [{ t:'Building Department review',
+    { t:(isAppNoForm(r.form) ? 'App # assigned' : 'Permit # assigned'), d:permitNo ? (isAppNoForm(r.form) ? 'App # ' : 'Permit # ')+permitNo : 'Not assigned yet', st:permitNo ? 'ok' : '' }].concat(revReq ? [{ t:'Building Department review',
     d: revOk ? (r.approvedDate ? 'Approved '+fmtDay(r.approvedDate) : 'Approved') : info ? 'More information needed' : 'Under review. We will contact you when it is approved.',
     st: revOk ? 'ok' : info ? 'part' : '',
     wide: !revOk && !!info,
@@ -5629,6 +5768,7 @@ function statusCard(r){
       (x.st==='complete' ? 'Complete'+(x.date ? ' · '+esc(fmtDay(x.date)) : '') : 'Pending')+'</span></li>').join('')+'</ul>' : '' });
   if (hasCo) steps.push({ t:'Certificate of Occupancy', d:r.co==='Given' ? 'Given' : 'Not yet', st:r.co==='Given' ? 'ok' : '' });
   if (r.form === 'rezoning') rezoneStatusSteps(r).forEach(x => steps.push(x));
+  if (r.form === 'subdivision') subdivStatusSteps(r).forEach(x => steps.push(x));
   let annexClosed = false, annexed = false;
   if (r.form === 'annexation'){ const A = annexStatusSteps(r); steps.length = 0; A.steps.forEach(x => steps.push(x)); annexClosed = A.closed; annexed = A.annexed; }
   const complete = steps.every(x => x.st==='ok');
@@ -5636,7 +5776,7 @@ function statusCard(r){
     '<span class="pill '+(annexed?'paid':annexClosed?'unpaid':'partial')+'">'+(annexed?'Annexed':annexClosed?'Closed':'In progress')+'</span></div>'+
     '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
     '<p class="st-note">There is no fee for annexation. Questions? Contact the Planning Department at 256-586-5968 or kjohnson@arabcity.org.</p></section>';
-  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?(r.form==='rezoning'?' · App # ':' · Permit # ')+esc(permitNo):'')+'</span></div>'+
+  return '<section class="st-card"><div class="st-top"><div><small>'+esc(F.short)+'</small><b>'+esc(r.address||'Property address not given')+'</b><span>'+esc(r.applicant||'')+' · Ref '+esc(r.ref)+(permitNo?(isAppNoForm(r.form)?' · App # ':' · Permit # ')+esc(permitNo):'')+'</span></div>'+
     '<span class="pill '+(complete?'paid':'partial')+'">'+(complete?'Complete':'In progress')+'</span></div>'+
     /* v2.31.2: one even row of short tiles; details (what we need + upload, inspection list) go full width below */
     '<ol class="steps tiles n'+steps.length+'">'+steps.map(x => '<li class="'+x.st+'"><span class="dot">'+(x.st==='ok'?ic('check'):'')+'</span><div><b>'+x.t+'</b><span>'+esc(x.d)+'</span></div></li>').join('')+'</ol>'+
@@ -5644,7 +5784,7 @@ function statusCard(r){
     (holdPay && ps==='unpaid'
       ? '<div class="st-fees num"><div><span>Estimated total</span><b>'+money(total)+'</b></div></div>'
       : '<div class="st-fees num"><div><span>'+(revReq && revOk ? 'Confirmed total' : 'Amount due')+'</span><b>'+money(total)+'</b></div><div><span>Paid</span><b>'+money(ps==='paid' ? total : (p.paid||0))+'</b></div><div><span>Balance</span><b>'+money(ps==='none' ? 0 : bal)+'</b></div></div>')+
-    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay.'+(r.form==='rezoning' ? ' After that, your request is scheduled for the Planning Commission and City Council public hearings.' : hasInsp ? ' After that, the permit moves on to inspections and the Certificate of Occupancy.' : '')+'</p>' : '')+
+    ((ps==='unpaid'||ps==='partial') && holdPay ? '<p class="st-note"><b>Please do not pay yet.</b> This is an estimate. The final total will be shown here once the Building Department approves your application, and they will contact you to pay.'+(r.form==='rezoning' ? ' After that, your request is scheduled for the Planning Commission and City Council public hearings.' : r.form==='subdivision' ? ' After that, your plat is placed on the Planning Commission agenda.' : hasInsp ? ' After that, the permit moves on to inspections and the Certificate of Occupancy.' : '')+'</p>' : '')+
     ((ps==='unpaid'||ps==='partial') && !holdPay ? '<p class="st-note">Pay in person at 740 N Main St, Arab, by cash or check made payable to “City of Arab.” Bring reference # '+esc(r.ref)+'.</p>' : '')+
     stPrintHtml(r)+
     '</section>';
@@ -6115,7 +6255,7 @@ function initRoute(){
   S.sel = null; S.editing = false; S.view = 'apps'; S.form = null;
   const h = (location.hash||'').slice(1); const m = h.match(/^(form|table)-(\w+)$/);
   const pm = h.match(/^pdf-(\w+)$/);
-  if (pm && pm[1] === 'annexation'){ S.view = 'form'; S.form = 'annexation'; startForm(); history.replaceState(null, '', '#form-annexation'); }   // v2.39.2 (Jade): annexation PDF removed; old links open the online form
+  if (pm && (pm[1] === 'annexation' || pm[1] === 'subdivision')){ S.view = 'form'; S.form = pm[1]; startForm(); history.replaceState(null, '', '#form-'+pm[1]); }   // v2.39.2 / v2.45.0: fillable PDFs removed; old links open the online form   // v2.39.2 (Jade): annexation PDF removed; old links open the online form
   else if (pm && PDF_FORMS[pm[1]]){ S.view = 'pdf'; S.form = pm[1]; }
   else if (m && FORMS[m[2]]){ S.view = m[1]; S.form = m[2]; if (m[1]==='form') startForm(); }
   else if (h==='status') S.view = 'status';
@@ -7057,7 +7197,7 @@ const AREAS = [['clerk','Payments (City Clerk)'],['staff','Building Department w
 function staffFooter(){
   return '<footer class="sfoot"><span>Website designed by Jade Cruz, Managed by The City of Arab Building Department</span><span aria-hidden="true">·</span><button class="linkbtn" onclick="openBug()">Report bugs</button>'+(isAdmin()?'<span aria-hidden="true">·</span><button class="linkbtn" onclick="go(\'bugs\')">View reports</button>':'')+'<span aria-hidden="true">·</span><span class="ver">Version '+APP_VERSION+'</span></footer>';
 }
-const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF form (Subdivision)'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
+const PUB_AREAS = [['apps','Applications & Fees page'],['form','Filling out an application'],['upload','Uploading documents'],['pdf','Fillable PDF form'],['status','Checking permit status'],['receipt','Receipt download'],['phone','Using the site on a phone or tablet'],['other','Something else']];
 const PUB_URG = [['low','Minor'],['normal','Hard to use'],['high',"I can't finish what I came to do"]];
 const STAFF_URG = [['low','Minor'],['normal','Slows me down'],['high',"I can't do my work"]];
 const bugIsPublic = () => ['apps','form','pdf','status','account','updates','forums'].includes(S.view);
@@ -7300,7 +7440,7 @@ function jobCardHtml(d){
 const ANNEX_REVIEW = ['Qualifies','More information needed','Does not qualify'];
 const ANNEX_PC = ['Recommend approval','Recommend denial','Tabled'];
 const ANNEX_CC = ['Approved','Denied','Tabled'];
-const annexPublic = x => { if (!x || (x.form !== 'annexation' && x.form !== 'rezoning')) return null; const a = ((x.staff||{}).annex) || {};
+const annexPublic = x => { if (!x || !['annexation','rezoning','subdivision'].includes(x.form)) return null; const a = ((x.staff||{}).annex) || {};
   const k = ['review','reviewDate','petitionDate','pcDate','pcRec','ccDate','ccDecision','ordinance','letterDate'], o = {}; k.forEach(n => { o[n] = String(a[n]||''); }); return o; };
 function annexStage(s){ const a = ((s.staff||{}).annex) || {};
   if (a.ccDecision==='Approved') return a.letterDate ? 'Annexed' : 'Approved by City Council';
